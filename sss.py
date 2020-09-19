@@ -24,87 +24,87 @@ print(symbols)
 # Temporary for test:
 # symbols = ['EBAY', 'FB', 'AL', 'INTC', 'AES']
 
-with open('sss.csv', 'w', newline='') as file:
-    writer = csv.writer(file)
-    writer.writerow(["Ticker", "Name", "sss_value1", "sss_value2", "EV/R", "profit_margin", "forward_eps", "trailing_eps", "price_to_book", "shares_outstanding", "net_income_to_common_shareholders", "nitcsh_div_shares_outstanding", "employees", "nitcsh_div_num_employees", "earnings_quarterly_growth", "price_to_earnings_to_growth_ratio", "last_dividend_0", "last_dividend_1", "last_dividend_2", "last_dividend_3" ])
-    iteration = 0
-    for symb in symbols:
-        iteration += 1
-        print('Checking {} ({}/{})'.format(symb,iteration,len(symbols)))
-        symbol = yf.Ticker(symb)
-        #     calendar = symbol.get_calendar(as_dict=True)
-        #     earnings = symbol.get_earnings(as_dict=True)
-        try:
-            info = symbol.get_info()
-            num_employees                     = info['fullTimeEmployees']
+rows = []
+rows.append(["Ticker", "Name", "sss_value", "ssse_value", "EV/R", "profit_margin", "forward_eps", "trailing_eps", "price_to_book", "shares_outstanding", "net_income_to_common_shareholders", "nitcsh_div_shares_outstanding", "employees", "nitcsh_div_num_employees", "earnings_quarterly_growth", "price_to_earnings_to_growth_ratio", "last_dividend_0", "last_dividend_1", "last_dividend_2", "last_dividend_3" ])
+iteration = 0
+for symb in symbols:
+    iteration += 1
+    print('Checking {} ({}/{})'.format(symb,iteration,len(symbols)))
+    symbol = yf.Ticker(symb)
+    #     calendar = symbol.get_calendar(as_dict=True)
+    #     earnings = symbol.get_earnings(as_dict=True)
+    try:
+        info = symbol.get_info()
+        num_employees                     = info['fullTimeEmployees']
 
-            # Special exception for Intel (INTC):
-            if symb is 'INTC' and num_employees < 1000: num_employees *= 1000
+        # Special exception for Intel (INTC):
+        if symb is 'INTC' and num_employees < 1000: num_employees *= 1000
 
-            short_name                        = info['shortName']
-            website                           = info['website']
-            evr                               = info['enterpriseToRevenue']
-            profit_margin                     = info['profitMargins']
-            forward_eps                       = info['forwardEps']
-            trailing_eps                      = info['trailingEps']
-            price_to_book                     = info['priceToBook']
-            earnings_quarterly_growth         = info['earningsQuarterlyGrowth']
-            price_to_earnings_to_growth_ratio = info['pegRatio']
-            shares_outstanding                = info['sharesOutstanding']
-            net_income_to_common_shareholders = info['netIncomeToCommon']
+        short_name                        = info['shortName']
+        website                           = info['website']
+        evr                               = info['enterpriseToRevenue']
+        profit_margin                     = info['profitMargins']
+        forward_eps                       = info['forwardEps']
+        trailing_eps                      = info['trailingEps']
+        price_to_book                     = info['priceToBook']
+        earnings_quarterly_growth         = info['earningsQuarterlyGrowth']
+        price_to_earnings_to_growth_ratio = info['pegRatio']
+        shares_outstanding                = info['sharesOutstanding']
+        net_income_to_common_shareholders = info['netIncomeToCommon']
 
-            if evr                               is None and CONTINUE_UPON_NONE_FIELD or evr                               >   15: continue
-            if profit_margin                     is None and CONTINUE_UPON_NONE_FIELD or profit_margin                     < 0.15: continue
-            if forward_eps                       is None and CONTINUE_UPON_NONE_FIELD                                            : continue
-            if trailing_eps                      is None and CONTINUE_UPON_NONE_FIELD or trailing_eps                      <    0: continue
-            if price_to_book                     is None and CONTINUE_UPON_NONE_FIELD                                            : continue
-            if earnings_quarterly_growth         is None and CONTINUE_UPON_NONE_FIELD or earnings_quarterly_growth         <    0: continue
-            if price_to_earnings_to_growth_ratio is None and CONTINUE_UPON_NONE_FIELD or price_to_earnings_to_growth_ratio <    0: continue
-            if shares_outstanding                is None and CONTINUE_UPON_NONE_FIELD                                            : continue
-            if net_income_to_common_shareholders is None and CONTINUE_UPON_NONE_FIELD or net_income_to_common_shareholders <    0: continue
+        if evr                               is None and CONTINUE_UPON_NONE_FIELD or evr                               >   15: continue
+        if profit_margin                     is None and CONTINUE_UPON_NONE_FIELD or profit_margin                     < 0.15: continue
+        if forward_eps                       is None and CONTINUE_UPON_NONE_FIELD                                            : continue
+        if trailing_eps                      is None and CONTINUE_UPON_NONE_FIELD or trailing_eps                      <    0: continue
+        if price_to_book                     is None and CONTINUE_UPON_NONE_FIELD                                            : continue
+        if earnings_quarterly_growth         is None and CONTINUE_UPON_NONE_FIELD or earnings_quarterly_growth         <    0: continue
+        if price_to_earnings_to_growth_ratio is None and CONTINUE_UPON_NONE_FIELD or price_to_earnings_to_growth_ratio <    0: continue
+        if shares_outstanding                is None and CONTINUE_UPON_NONE_FIELD                                            : continue
+        if net_income_to_common_shareholders is None and CONTINUE_UPON_NONE_FIELD or net_income_to_common_shareholders <    0: continue
 
-            nitcsh_div_shares_outstanding     = round(float(net_income_to_common_shareholders)/float(shares_outstanding),2)
-            nitcsh_div_num_employees          = round(float(net_income_to_common_shareholders)/float(num_employees),     2)
+        nitcsh_div_shares_outstanding     = round(float(net_income_to_common_shareholders)/float(shares_outstanding),2)
+        nitcsh_div_num_employees          = round(float(net_income_to_common_shareholders)/float(num_employees),     2)
 
-            sss_value1 = evr
-            sss_value2 = profit_margin
+        sss_value  = evr
+        ssse_value = profit_margin
 
-            print('Name: {}, sss_value1: {}, sss_value2: {}, EV/R: {}, profit_margin: {}, forward_eps: {}, trailing_eps: {}, price_to_book: {}, shares_outstanding: {}, net_income_to_common_shareholders: {}, nitcsh_div_shares_outstanding: {}, # employees: {}, nitcsh_div_num_employees: {}, earnings_quarterly_growth: {}, price_to_earnings_to_growth_ratio: {}'.format(short_name, sss_value1, sss_value2, evr, profit_margin, forward_eps, trailing_eps, price_to_book, shares_outstanding, net_income_to_common_shareholders, nitcsh_div_shares_outstanding, num_employees, nitcsh_div_num_employees, earnings_quarterly_growth, price_to_earnings_to_growth_ratio))
+        print('Name: {}, sss_value: {}, ssse_value: {}, EV/R: {}, profit_margin: {}, forward_eps: {}, trailing_eps: {}, price_to_book: {}, shares_outstanding: {}, net_income_to_common_shareholders: {}, nitcsh_div_shares_outstanding: {}, # employees: {}, nitcsh_div_num_employees: {}, earnings_quarterly_growth: {}, price_to_earnings_to_growth_ratio: {}'.format(short_name, sss_value, ssse_value, evr, profit_margin, forward_eps, trailing_eps, price_to_book, shares_outstanding, net_income_to_common_shareholders, nitcsh_div_shares_outstanding, num_employees, nitcsh_div_num_employees, earnings_quarterly_growth, price_to_earnings_to_growth_ratio))
 
-        except:
-            print("Exception in info")
-            if CONTINUE_UPON_INFO_EXCEPTION:
-                continue
-            num_employees                          = 0
-            short_name                             = 0
-            website                                = 0
-            evr                                    = 0
-            profit_margin                          = 0
-            forward_eps                            = 0
-            trailing_eps                           = 0
-            price_to_book                          = 0
-            earnings_quarterly_growth              = 0
-            price_to_earnings_to_growth_ratio      = 0
-            shares_outstanding                     = 0
-            net_income_to_common_shareholders      = 0
-            nitcsh_div_shares_outstanding          = 0
-            nitcsh_div_num_employees               = 0
-            sss_value1                             = 0
-            sss_value2                             = 0
-        try:
-            last_4_dividends = symbol.dividends[-4:]
-            print('last_4_dividends list: {}, {}, {}, {}'.format(last_4_dividends[0],last_4_dividends[1],last_4_dividends[2],last_4_dividends[3]))
-        except:
-            last_4_dividends = [0,0,0,0]
-            print("Exception in dividends")
-        writer.writerow([symb, short_name, sss_value1, sss_value2, evr, profit_margin, forward_eps, trailing_eps, price_to_book, shares_outstanding, net_income_to_common_shareholders, nitcsh_div_shares_outstanding, num_employees, nitcsh_div_num_employees, earnings_quarterly_growth, price_to_earnings_to_growth_ratio, last_4_dividends[0], last_4_dividends[1], last_4_dividends[2], last_4_dividends[3]])
-        print('\n')
+    except:
+        print("Exception in info")
+        if CONTINUE_UPON_INFO_EXCEPTION:
+            continue
+        num_employees                          = 0
+        short_name                             = 0
+        website                                = 0
+        evr                                    = 0
+        profit_margin                          = 0
+        forward_eps                            = 0
+        trailing_eps                           = 0
+        price_to_book                          = 0
+        earnings_quarterly_growth              = 0
+        price_to_earnings_to_growth_ratio      = 0
+        shares_outstanding                     = 0
+        net_income_to_common_shareholders      = 0
+        nitcsh_div_shares_outstanding          = 0
+        nitcsh_div_num_employees               = 0
+        sss_value                              = 0
+        ssse_value                             = 0
+    try:
+        last_4_dividends = symbol.dividends[-4:]
+        print('last_4_dividends list: {}, {}, {}, {}'.format(last_4_dividends[0],last_4_dividends[1],last_4_dividends[2],last_4_dividends[3]))
+    except:
+        last_4_dividends = [0,0,0,0]
+        print("Exception in dividends")
+    rows.append([symb, short_name, sss_value, ssse_value, evr, profit_margin, forward_eps, trailing_eps, price_to_book, shares_outstanding, net_income_to_common_shareholders, nitcsh_div_shares_outstanding, num_employees, nitcsh_div_num_employees, earnings_quarterly_growth, price_to_earnings_to_growth_ratio, last_4_dividends[0], last_4_dividends[1], last_4_dividends[2], last_4_dividends[3]])
+    print('\n')
 
-# Now, Sort the CSV using the sss_value formula:
-reader_sss       = csv.reader(open("sss.csv"))
-reader_ssse      = csv.reader(open("sss.csv"))
-sorted_list_sss  = sorted(reader_sss,  key=lambda row: float(row[2]), reverse=True )  # Sort by sss_value1
-sorted_list_ssse = sorted(reader_ssse, key=lambda row: float(row[3]), reverse=False)  # Sort by sss_value2
+# Now, Sort the rows using the sss_value and ssse_value formulas: [1:] skips the 1st title row
+sorted_list_sss  = sorted(rows[1:], key=lambda row: row[2], reverse=False)  # Sort by sss_value  -> The lower  - the more attractive
+sorted_list_ssse = sorted(rows[1:], key=lambda row: row[3], reverse=True )  # Sort by ssse_value -> The higher - the more attractive
+
+sorted_list_sss.insert( 0, rows[0])
+sorted_list_ssse.insert(0, rows[0])
 
 with open('sss_engine.csv', mode='w', newline='') as sss_engine:
     writer = csv.writer(sss_engine)
