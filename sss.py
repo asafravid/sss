@@ -1,3 +1,4 @@
+import time
 
 CONTINUE_UPON_INFO_EXCEPTION = 1 # Instead of filling with zeros, continue
 CONTINUE_UPON_NONE_FIELD     = 1 # Ignore stocks with None fields which are important for scanning
@@ -38,7 +39,8 @@ for symb in symbols:
         num_employees                     = info['fullTimeEmployees']
 
         # Special exception for Intel (INTC):
-        if symb is 'INTC' and num_employees < 1000: num_employees *= 1000
+        if symb == 'INTC' and num_employees < 1000:
+            num_employees *= 1000
 
         short_name                        = info['shortName']
         website                           = info['website']
@@ -106,10 +108,12 @@ sorted_list_ssse = sorted(rows[1:], key=lambda row: row[3], reverse=True )  # So
 sorted_list_sss.insert( 0, rows[0])
 sorted_list_ssse.insert(0, rows[0])
 
-with open('sss_engine.csv', mode='w', newline='') as sss_engine:
+date_and_time = time.strftime("%Y%m%d-%H%M%S")
+
+with open('sss_engine_{}.csv'.format(date_and_time), mode='w', newline='') as sss_engine:
     writer = csv.writer(sss_engine)
     writer.writerows(sorted_list_sss)
 
-with open('ssse_engine.csv', mode='w', newline='') as ssse_engine:
+with open('ssse_engine_{}.csv'.format(date_and_time), mode='w', newline='') as ssse_engine:
     writer = csv.writer(ssse_engine)
     writer.writerows(sorted_list_ssse)
