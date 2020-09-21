@@ -1,7 +1,9 @@
 import time
 
-CONTINUE_UPON_INFO_EXCEPTION = 1 # Instead of filling with zeros, continue
-CONTINUE_UPON_NONE_FIELD     = 1 # Ignore stocks with None fields which are important for scanning
+CONTINUE_UPON_INFO_EXCEPTION = 1            # Instead of filling with zeros, continue
+CONTINUE_UPON_NONE_FIELD     = 1            # Ignore stocks with None fields which are important for scanning
+NUM_EMPLOYEES_UNKNOWN        = 10000000     # This will make the company very inefficient in terms of number of employees
+MUTUALFUND                   = 'MUTUALFUND' # Definition of a mutual fund 'quoteType' field in base.py, those are not interesting
 
 import pandas   as pd
 import yfinance as yf
@@ -20,10 +22,10 @@ symbols_russel1000 = ['TWOU', 'MMM', 'ABT', 'ABBV', 'ABMD', 'ACHC', 'ACN', 'ATVI
 
 symbols = symbols_snp500 + symbols_nasdaq100 + symbols_russel1000
 symbols = list(set(symbols))
-print(symbols)
+print('SSS Symbols to Scan: {}'.format(symbols))
 
 # Temporary for test:
-# symbols = ['EBAY', 'FB', 'AL', 'INTC', 'AES']
+# symbols = ['WRK', 'EBAY', 'RSPP', 'FB', 'AL', 'INTC', 'AES', 'MMM', 'ADBE', 'MS']
 
 rows = []
 rows.append(["Ticker", "Name", "sss_value", "ssse_value", "EV/R", "profit_margin", "forward_eps", "trailing_eps", "price_to_book", "shares_outstanding", "net_income_to_common_shareholders", "nitcsh_div_shares_outstanding", "employees", "nitcsh_div_num_employees", "earnings_quarterly_growth", "price_to_earnings_to_growth_ratio", "last_dividend_0", "last_dividend_1", "last_dividend_2", "last_dividend_3" ])
@@ -36,14 +38,23 @@ for symb in symbols:
     #     earnings = symbol.get_earnings(as_dict=True)
     try:
         info = symbol.get_info()
-        num_employees                     = info['fullTimeEmployees']
 
-        # Special exception for Intel (INTC):
+        if info['quoteType'] == MUTUALFUND:
+            print('Mutual Fund: Skip')
+            continue # Not interested in those and they lack all the below info[] properties so nothing to do with them anyways
+
+        if 'fullTimeEmployees' in info:
+            num_employees                 = info['fullTimeEmployees']
+        else:
+            num_employees                 = NUM_EMPLOYEES_UNKNOWN
+
+        # Special exception for Intel (INTC) - Bug in Yahoo Finance:
         if symb == 'INTC' and num_employees < 1000:
             num_employees *= 1000
 
         short_name                        = info['shortName']
-        website                           = info['website']
+
+        # if 'fullTimeEmployees' in info:
         evr                               = info['enterpriseToRevenue']
         profit_margin                     = info['profitMargins']
         forward_eps                       = info['forwardEps']
@@ -54,7 +65,7 @@ for symb in symbols:
         shares_outstanding                = info['sharesOutstanding']
         net_income_to_common_shareholders = info['netIncomeToCommon']
 
-        if evr                               is None and CONTINUE_UPON_NONE_FIELD or evr                               >   15: continue
+        if evr                               is None and CONTINUE_UPON_NONE_FIELD or evr < 0 or evr                    >   15: continue
         if profit_margin                     is None and CONTINUE_UPON_NONE_FIELD or profit_margin                     < 0.15: continue
         if forward_eps                       is None and CONTINUE_UPON_NONE_FIELD                                            : continue
         if trailing_eps                      is None and CONTINUE_UPON_NONE_FIELD or trailing_eps                      <    0: continue
@@ -72,8 +83,8 @@ for symb in symbols:
 
         print('Name: {}, sss_value: {}, ssse_value: {}, EV/R: {}, profit_margin: {}, forward_eps: {}, trailing_eps: {}, price_to_book: {}, shares_outstanding: {}, net_income_to_common_shareholders: {}, nitcsh_div_shares_outstanding: {}, # employees: {}, nitcsh_div_num_employees: {}, earnings_quarterly_growth: {}, price_to_earnings_to_growth_ratio: {}'.format(short_name, sss_value, ssse_value, evr, profit_margin, forward_eps, trailing_eps, price_to_book, shares_outstanding, net_income_to_common_shareholders, nitcsh_div_shares_outstanding, num_employees, nitcsh_div_num_employees, earnings_quarterly_growth, price_to_earnings_to_growth_ratio))
 
-    except:
-        print("Exception in info")
+    except Exception as e: # More information is output when exception is used instead of Exception
+        print("Exception in info: {}".format(e))
         if CONTINUE_UPON_INFO_EXCEPTION:
             continue
         num_employees                          = 0
@@ -111,9 +122,9 @@ sorted_list_ssse.insert(0, rows[0])
 date_and_time = time.strftime("%Y%m%d-%H%M%S")
 
 with open('sss_engine_{}.csv'.format(date_and_time), mode='w', newline='') as sss_engine:
-    writer = csv.writer(sss_engine)
-    writer.writerows(sorted_list_sss)
+    writer_sss = csv.writer(sss_engine)
+    writer_sss.writerows(sorted_list_sss)
 
 with open('ssse_engine_{}.csv'.format(date_and_time), mode='w', newline='') as ssse_engine:
-    writer = csv.writer(ssse_engine)
-    writer.writerows(sorted_list_ssse)
+    writer_ssse = csv.writer(ssse_engine)
+    writer_ssse.writerows(sorted_list_ssse)
