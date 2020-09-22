@@ -1,13 +1,16 @@
 import time
+import pandas   as pd
+import yfinance as yf
+import csv
+import os
+import errno
 
 CONTINUE_UPON_INFO_EXCEPTION = 1            # Instead of filling with zeros, continue
 CONTINUE_UPON_NONE_FIELD     = 1            # Ignore stocks with None fields which are important for scanning
 NUM_EMPLOYEES_UNKNOWN        = 10000000     # This will make the company very inefficient in terms of number of employees
+EVR_UNKNOWN                  = 10000000     # This will make the company very expensive in terms of number of EVR
 MUTUALFUND                   = 'MUTUALFUND' # Definition of a mutual fund 'quoteType' field in base.py, those are not interesting
-
-import pandas   as pd
-import yfinance as yf
-import csv
+PROFIT_MARGIN_UNKNOWN        = 0            # This will make the company not profitable terms of profit margins
 
 # There are 2 tables on the Wikipedia page
 # we want the first table
@@ -25,17 +28,20 @@ symbols = list(set(symbols))
 print('SSS Symbols to Scan: {}'.format(symbols))
 
 # Temporary for test:
-# symbols = ['WRK', 'EBAY', 'RSPP', 'FB', 'AL', 'INTC', 'AES', 'MMM', 'ADBE', 'MS']
+# symbols = ['CHKP', 'BR', 'GDI', 'LOGM', 'WRK', 'EBAY', 'RSPP', 'FB', 'AL', 'INTC', 'AES', 'MMM', 'ADBE', 'MS']
 
-rows = []
-rows.append(["Ticker", "Name", "sss_value", "ssse_value", "EV/R", "profit_margin", "forward_eps", "trailing_eps", "price_to_book", "shares_outstanding", "net_income_to_common_shareholders", "nitcsh_div_shares_outstanding", "employees", "nitcsh_div_num_employees", "earnings_quarterly_growth", "price_to_earnings_to_growth_ratio", "last_dividend_0", "last_dividend_1", "last_dividend_2", "last_dividend_3" ])
+rows          = []
+rows_no_div   = []
+rows_only_div = []
+
+rows.append(         ["Ticker", "Name", "sss_value", "ssse_value", "EV/R", "profit_margin", "forward_eps", "trailing_eps", "price_to_book", "shares_outstanding", "net_income_to_common_shareholders", "nitcsh_div_shares_outstanding", "employees", "nitcsh_div_num_employees", "earnings_quarterly_growth", "price_to_earnings_to_growth_ratio", "last_dividend_0", "last_dividend_1", "last_dividend_2", "last_dividend_3" ])
+rows_no_div.append(  ["Ticker", "Name", "sss_value", "ssse_value", "EV/R", "profit_margin", "forward_eps", "trailing_eps", "price_to_book", "shares_outstanding", "net_income_to_common_shareholders", "nitcsh_div_shares_outstanding", "employees", "nitcsh_div_num_employees", "earnings_quarterly_growth", "price_to_earnings_to_growth_ratio", "last_dividend_0", "last_dividend_1", "last_dividend_2", "last_dividend_3" ])
+rows_only_div.append(["Ticker", "Name", "sss_value", "ssse_value", "EV/R", "profit_margin", "forward_eps", "trailing_eps", "price_to_book", "shares_outstanding", "net_income_to_common_shareholders", "nitcsh_div_shares_outstanding", "employees", "nitcsh_div_num_employees", "earnings_quarterly_growth", "price_to_earnings_to_growth_ratio", "last_dividend_0", "last_dividend_1", "last_dividend_2", "last_dividend_3" ])
 iteration = 0
 for symb in symbols:
     iteration += 1
     print('Checking {} ({}/{})'.format(symb,iteration,len(symbols)))
     symbol = yf.Ticker(symb)
-    #     calendar = symbol.get_calendar(as_dict=True)
-    #     earnings = symbol.get_earnings(as_dict=True)
     try:
         info = symbol.get_info()
 
@@ -43,10 +49,8 @@ for symb in symbols:
             print('Mutual Fund: Skip')
             continue # Not interested in those and they lack all the below info[] properties so nothing to do with them anyways
 
-        if 'fullTimeEmployees' in info:
-            num_employees                 = info['fullTimeEmployees']
-        else:
-            num_employees                 = NUM_EMPLOYEES_UNKNOWN
+        if 'fullTimeEmployees' in info: num_employees = info['fullTimeEmployees']
+        else                          : num_employees = NUM_EMPLOYEES_UNKNOWN
 
         # Special exception for Intel (INTC) - Bug in Yahoo Finance:
         if symb == 'INTC' and num_employees < 1000:
@@ -54,9 +58,12 @@ for symb in symbols:
 
         short_name                        = info['shortName']
 
-        # if 'fullTimeEmployees' in info:
-        evr                               = info['enterpriseToRevenue']
-        profit_margin                     = info['profitMargins']
+        if 'enterpriseToRevenue' in info: evr           = info['enterpriseToRevenue']
+        else                            : evr           = EVR_UNKNOWN
+
+        if 'profitMargins'       in info: profit_margin = info['profitMargins']
+        else                            : profit_margin = PROFIT_MARGIN_UNKNOWN
+
         forward_eps                       = info['forwardEps']
         trailing_eps                      = info['trailingEps']
         price_to_book                     = info['priceToBook']
@@ -89,7 +96,6 @@ for symb in symbols:
             continue
         num_employees                          = 0
         short_name                             = 0
-        website                                = 0
         evr                                    = 0
         profit_margin                          = 0
         forward_eps                            = 0
@@ -106,25 +112,70 @@ for symb in symbols:
     try:
         last_4_dividends = symbol.dividends[-4:]
         print('last_4_dividends list: {}, {}, {}, {}'.format(last_4_dividends[0],last_4_dividends[1],last_4_dividends[2],last_4_dividends[3]))
+        dividends_exist = True
     except:
         last_4_dividends = [0,0,0,0]
-        print("Exception in dividends")
+        print("Added to No Dividends Lists")
+        dividends_exist = False
     rows.append([symb, short_name, sss_value, ssse_value, evr, profit_margin, forward_eps, trailing_eps, price_to_book, shares_outstanding, net_income_to_common_shareholders, nitcsh_div_shares_outstanding, num_employees, nitcsh_div_num_employees, earnings_quarterly_growth, price_to_earnings_to_growth_ratio, last_4_dividends[0], last_4_dividends[1], last_4_dividends[2], last_4_dividends[3]])
+
+    if dividends_exist:
+        rows_only_div.append([symb, short_name, sss_value, ssse_value, evr, profit_margin, forward_eps, trailing_eps, price_to_book, shares_outstanding, net_income_to_common_shareholders, nitcsh_div_shares_outstanding, num_employees, nitcsh_div_num_employees, earnings_quarterly_growth, price_to_earnings_to_growth_ratio, last_4_dividends[0], last_4_dividends[1], last_4_dividends[2], last_4_dividends[3]])
+    else:
+        rows_no_div.append(  [symb, short_name, sss_value, ssse_value, evr, profit_margin, forward_eps, trailing_eps, price_to_book, shares_outstanding, net_income_to_common_shareholders, nitcsh_div_shares_outstanding, num_employees, nitcsh_div_num_employees, earnings_quarterly_growth, price_to_earnings_to_growth_ratio, last_4_dividends[0], last_4_dividends[1], last_4_dividends[2], last_4_dividends[3]])
+
     print('\n')
 
 # Now, Sort the rows using the sss_value and ssse_value formulas: [1:] skips the 1st title row
-sorted_list_sss  = sorted(rows[1:], key=lambda row: row[2], reverse=False)  # Sort by sss_value  -> The lower  - the more attractive
-sorted_list_ssse = sorted(rows[1:], key=lambda row: row[3], reverse=True )  # Sort by ssse_value -> The higher - the more attractive
+sorted_list_sss           = sorted(rows[1:],          key=lambda row:          row[2],          reverse=False)  # Sort by sss_value  -> The lower  - the more attractive
+sorted_list_ssse          = sorted(rows[1:],          key=lambda row:          row[3],          reverse=True )  # Sort by ssse_value -> The higher - the more attractive
+sorted_list_sss_no_div    = sorted(rows_no_div[1:],   key=lambda row_no_div:   row_no_div[2],   reverse=False)  # Sort by sss_value  -> The lower  - the more attractive
+sorted_list_ssse_no_div   = sorted(rows_no_div[1:],   key=lambda row_no_div:   row_no_div[3],   reverse=True )  # Sort by ssse_value -> The higher - the more attractive
+sorted_list_sss_only_div  = sorted(rows_only_div[1:], key=lambda row_only_div: row_only_div[2], reverse=False)  # Sort by sss_value  -> The lower  - the more attractive
+sorted_list_ssse_only_div = sorted(rows_only_div[1:], key=lambda row_only_div: row_only_div[3], reverse=True )  # Sort by ssse_value -> The higher - the more attractive
 
-sorted_list_sss.insert( 0, rows[0])
-sorted_list_ssse.insert(0, rows[0])
+sorted_list_sss.insert(          0, rows[0])
+sorted_list_ssse.insert(         0, rows[0])
+sorted_list_sss_no_div.insert(   0, rows_no_div[0])
+sorted_list_ssse_no_div.insert(  0, rows_no_div[0])
+sorted_list_sss_only_div.insert( 0, rows_only_div[0])
+sorted_list_ssse_only_div.insert(0, rows_only_div[0])
 
 date_and_time = time.strftime("%Y%m%d-%H%M%S")
 
-with open('sss_engine_{}.csv'.format(date_and_time), mode='w', newline='') as sss_engine:
+filename_sss_engine           = "{}/sss_engine.csv".format(date_and_time)
+filename_ssse_engine          = "{}/ssse_engine.csv".format(date_and_time)
+filename_sss_engine_no_div    = "{}/sss_engine_no_div.csv".format(date_and_time)
+filename_ssse_engine_no_div   = "{}/ssse_engine_no_div.csv".format(date_and_time)
+filename_sss_engine_only_div  = "{}/sss_engine_only_div.csv".format(date_and_time)
+filename_ssse_engine_only_div = "{}/ssse_engine_only_div.csv".format(date_and_time)
+
+os.makedirs(os.path.dirname(filename_sss_engine),           exist_ok=True)
+with open(filename_sss_engine,           mode='w', newline='') as sss_engine:
     writer_sss = csv.writer(sss_engine)
     writer_sss.writerows(sorted_list_sss)
 
-with open('ssse_engine_{}.csv'.format(date_and_time), mode='w', newline='') as ssse_engine:
+os.makedirs(os.path.dirname(filename_ssse_engine),          exist_ok=True)
+with open(filename_ssse_engine,          mode='w', newline='') as ssse_engine:
     writer_ssse = csv.writer(ssse_engine)
     writer_ssse.writerows(sorted_list_ssse)
+
+os.makedirs(os.path.dirname(filename_sss_engine_no_div),    exist_ok=True)
+with open(filename_sss_engine_no_div,    mode='w', newline='') as sss_engine:
+    writer_sss = csv.writer(sss_engine)
+    writer_sss.writerows(sorted_list_sss_no_div)
+
+os.makedirs(os.path.dirname(filename_ssse_engine_no_div),   exist_ok=True)
+with open(filename_ssse_engine_no_div,   mode='w', newline='') as ssse_engine:
+    writer_ssse = csv.writer(ssse_engine)
+    writer_ssse.writerows(sorted_list_ssse_no_div)
+
+os.makedirs(os.path.dirname(filename_sss_engine_only_div),  exist_ok=True)
+with open(filename_sss_engine_only_div,  mode='w', newline='') as sss_engine:
+    writer_sss = csv.writer(sss_engine)
+    writer_sss.writerows(sorted_list_sss_only_div)
+
+os.makedirs(os.path.dirname(filename_ssse_engine_only_div), exist_ok=True)
+with open(filename_ssse_engine_only_div, mode='w', newline='') as ssse_engine:
+    writer_ssse = csv.writer(ssse_engine)
+    writer_ssse.writerows(sorted_list_ssse_only_div)
