@@ -4,22 +4,16 @@ import yfinance as yf
 import csv
 import os
 
-TASE_MODE                         = 0            # Work on the Israeli Market only
-CONTINUE_UPON_INFO_EXCEPTION      = 1            # Instead of filling with zeros, continue
+TASE_MODE                         = 1            # Work on the Israeli Market only
 NUM_EMPLOYEES_UNKNOWN             = 10000000     # This will make the company very inefficient in terms of number of employees
-EVR_UNKNOWN                       = 10000000     # This will make the company very expensive in terms of number of EVR
 MUTUALFUND                        = 'MUTUALFUND' # Definition of a mutual fund 'quoteType' field in base.py, those are not interesting
-PROFIT_MARGIN_UNKNOWN             = 0.01         # This will make the company not profitable terms of profit margins
-SHARES_OUTSTANDING_UNKNOWN        = 1000000      # one million shares, jsut a number
-UNKNOWN_PEG2R                     = 10000000     # unknown so high will yield uninteresting company
+PROFIT_MARGIN_UNKNOWN             = 0.025        # This will make the company not profitable terms of profit margins, thus less attractive
 TASE_PROFIT_MARGIN                = 0.13
 PROFIT_MARGIN_LIMIT               = 0.15
 PERCENT_HELD_INSTITUTIONS_UNKNOWN = 0.05         # low, to make less relevant
+PEG_UNKNOWN                       = 10           # use a rather high value, such that those companies with PEG - will be more attractive since the information exists for them
 
-# There are 2 tables on the Wikipedia page
-# we want the first table
-
-payload            = pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies')
+payload            = pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies') # There are 2 tables on the Wikipedia page, get the first table
 first_table        = payload[0]
 second_table       = payload[1]
 df                 = first_table
@@ -35,15 +29,15 @@ if TASE_MODE: symbols = symbols_tase
 print('SSS Symbols to Scan: {}'.format(symbols))
 
 # Temporary for test:
-# symbols = ['HOLX', 'SKLN.TA', 'ALMA.TA', 'SHOM.TA', 'BR', 'GDI', 'LOGM', 'WRK', 'EBAY', 'RSPP', 'FB', 'AL', 'INTC', 'AES', 'MMM', 'ADBE', 'MS']
+# symbols = ['ISTA.TA', 'ALD.TA', 'ADGR.TA', 'HOLX', 'SKLN.TA', 'ALMA.TA', 'SHOM.TA', 'BR', 'GDI', 'LOGM', 'WRK', 'EBAY', 'RSPP', 'FB', 'AL', 'INTC', 'AES', 'MMM', 'ADBE', 'MS']
 
 rows          = []
 rows_no_div   = []
 rows_only_div = []
 
-rows.append(         ["Ticker", "Name", "sss_value", "ssss_value", "ssse_value", "sssi_value", "ssssi_value", "sssei_value", "EV/R", "profit_margin", "held_percent_institutions", "forward_eps", "trailing_eps", "price_to_book", "shares_outstanding", "net_income_to_common_shareholders", "nitcsh_div_shares_outstanding", "employees", "nitcsh_div_num_employees", "earnings_quarterly_growth", "price_to_earnings_to_growth_ratio", "last_dividend_0", "last_dividend_1", "last_dividend_2", "last_dividend_3" ])
-rows_no_div.append(  ["Ticker", "Name", "sss_value", "ssss_value", "ssse_value", "sssi_value", "ssssi_value", "sssei_value", "EV/R", "profit_margin", "held_percent_institutions", "forward_eps", "trailing_eps", "price_to_book", "shares_outstanding", "net_income_to_common_shareholders", "nitcsh_div_shares_outstanding", "employees", "nitcsh_div_num_employees", "earnings_quarterly_growth", "price_to_earnings_to_growth_ratio", "last_dividend_0", "last_dividend_1", "last_dividend_2", "last_dividend_3" ])
-rows_only_div.append(["Ticker", "Name", "sss_value", "ssss_value", "ssse_value", "sssi_value", "ssssi_value", "sssei_value", "EV/R", "profit_margin", "held_percent_institutions", "forward_eps", "trailing_eps", "price_to_book", "shares_outstanding", "net_income_to_common_shareholders", "nitcsh_div_shares_outstanding", "employees", "nitcsh_div_num_employees", "earnings_quarterly_growth", "price_to_earnings_to_growth_ratio", "last_dividend_0", "last_dividend_1", "last_dividend_2", "last_dividend_3" ])
+rows.append(         ["Ticker", "Name", "sss_value", "ssss_value", "sssss_value", "ssse_value", "sssse_value", "ssssse_value", "sssi_value", "ssssi_value", "sssssi_value", "sssei_value", "ssssei_value", "sssssei_value", "evr", "trailing_pe", "ev_to_ebitda", "profit_margin", "held_percent_institutions", "forward_eps", "trailing_eps", "price_to_book", "shares_outstanding", "net_income_to_common_shareholders", "nitcsh_div_shares_outstanding", "employees", "nitcsh_div_num_employees", "earnings_quarterly_growth", "price_to_earnings_to_growth_ratio", "last_dividend_0", "last_dividend_1", "last_dividend_2", "last_dividend_3" ])
+rows_no_div.append(  ["Ticker", "Name", "sss_value", "ssss_value", "sssss_value", "ssse_value", "sssse_value", "ssssse_value", "sssi_value", "ssssi_value", "sssssi_value", "sssei_value", "ssssei_value", "sssssei_value", "evr", "trailing_pe", "ev_to_ebitda", "profit_margin", "held_percent_institutions", "forward_eps", "trailing_eps", "price_to_book", "shares_outstanding", "net_income_to_common_shareholders", "nitcsh_div_shares_outstanding", "employees", "nitcsh_div_num_employees", "earnings_quarterly_growth", "price_to_earnings_to_growth_ratio", "last_dividend_0", "last_dividend_1", "last_dividend_2", "last_dividend_3" ])
+rows_only_div.append(["Ticker", "Name", "sss_value", "ssss_value", "sssss_value", "ssse_value", "sssse_value", "ssssse_value", "sssi_value", "ssssi_value", "sssssi_value", "sssei_value", "ssssei_value", "sssssei_value", "evr", "trailing_pe", "ev_to_ebitda", "profit_margin", "held_percent_institutions", "forward_eps", "trailing_eps", "price_to_book", "shares_outstanding", "net_income_to_common_shareholders", "nitcsh_div_shares_outstanding", "employees", "nitcsh_div_num_employees", "earnings_quarterly_growth", "price_to_earnings_to_growth_ratio", "last_dividend_0", "last_dividend_1", "last_dividend_2", "last_dividend_3" ])
 iteration = 0
 for symb in symbols:
     iteration += 1
@@ -58,6 +52,7 @@ for symb in symbols:
 
         if 'fullTimeEmployees' in info: num_employees = info['fullTimeEmployees']
         else                          : num_employees = NUM_EMPLOYEES_UNKNOWN
+        if num_employees is None      : num_employees = NUM_EMPLOYEES_UNKNOWN
 
         # Special exception for Intel (INTC) - Bug in Yahoo Finance:
         if symb == 'INTC' and num_employees < 1000:
@@ -66,77 +61,91 @@ for symb in symbols:
         if 'shortName' in info: short_name = info['shortName']
         else:                   short_name = 'None'
 
-        # https://www.investopedia.com/terms/e/ev-revenue-multiple.asp
-        if 'enterpriseToRevenue' in info:
-            evr = info['enterpriseToRevenue']
-        else:
-            evr = EVR_UNKNOWN
-
         if 'profitMargins'       in info: profit_margin = info['profitMargins']
         else                            : profit_margin = PROFIT_MARGIN_UNKNOWN
+        if profit_margin is None        : profit_margin = NUM_EMPLOYEES_UNKNOWN
 
         if 'heldPercentInstitutions' in info: held_percent_institutions = info['heldPercentInstitutions']
+        else                                : held_percent_institutions = None
         if held_percent_institutions is None: held_percent_institutions = PERCENT_HELD_INSTITUTIONS_UNKNOWN
 
-        if 'forwardEps' in info:
-            forward_eps = info['forwardEps']
-        else:
-            forward_eps = 0
 
-        if 'trailingEps' in info:
-            trailing_eps = info['trailingEps']
-        else:
-            trailing_eps = 0
+        # https://www.investopedia.com/terms/e/ev-revenue-multiple.asp
+        if 'enterpriseToRevenue' in info: evr          = info['enterpriseToRevenue']
+        else                            : evr          = None
 
-        if 'trailingPE' in info: trailing_pe = info['trailingPE'] # https://www.investopedia.com/terms/t/trailingpe.asp
-        else:
-            if evr == EVR_UNKNOWN:
-                print('skipping since trailing_peand evr are unknown')
-                continue
+        if 'enterpriseToEbitda'  in info: ev_to_ebitda = info['enterpriseToEbitda'] # The lower the better
+        else                            : ev_to_ebitda = None
 
-        if evr == EVR_UNKNOWN:
-            evr = trailing_pe
+        if 'trailingPE'          in info: trailing_pe  = info['trailingPE'] # https://www.investopedia.com/terms/t/trailingpe.asp
+        else                            : trailing_pe  = None
 
-        price_to_book                     = info['priceToBook']
-        earnings_quarterly_growth         = info['earningsQuarterlyGrowth']
-        price_to_earnings_to_growth_ratio = info['pegRatio']
-        shares_outstanding                = info['sharesOutstanding']
+        if evr is None and ev_to_ebitda is None and trailing_pe is None:
+            print('skipping since trailing_pe, ev_to_ebitda and evr are unknown')
+            continue
 
-        if shares_outstanding is None: shares_outstanding = SHARES_OUTSTANDING_UNKNOWN
+        if   evr          is None and ev_to_ebitda is not None: evr          = ev_to_ebitda
+        elif evr          is None and trailing_pe  is not None: evr          = trailing_pe
 
-        net_income_to_common_shareholders = info['netIncomeToCommon']
+        if   ev_to_ebitda is None and evr          is not None: ev_to_ebitda = evr
+        elif ev_to_ebitda is None and trailing_pe  is not None: ev_to_ebitda = trailing_pe
 
-        if evr is None: evr = EVR_UNKNOWN
-        if evr != EVR_UNKNOWN and (evr < 0 or evr > 15 + 25*TASE_MODE):
+        if   trailing_pe  is None and evr          is not None: trailing_pe  = evr
+        elif trailing_pe  is None and ev_to_ebitda is not None: trailing_pe  = ev_to_ebitda
+
+
+        if 'forwardEps'              in info: forward_eps                       = info['forwardEps']
+        else                                : forward_eps                       = None
+
+        if 'trailingEps'             in info: trailing_eps                      = info['trailingEps']
+        else                                : trailing_eps                      = None
+
+        if 'sharesOutstanding'       in info: price_to_book                     = info['priceToBook']
+        else                                : price_to_book                     = None
+
+        if 'earningsQuarterlyGrowth' in info: earnings_quarterly_growth         = info['earningsQuarterlyGrowth']
+        else                                : earnings_quarterly_growth         = None
+
+        if 'pegRatio'                in info        : price_to_earnings_to_growth_ratio = info['pegRatio']
+        else                                        : price_to_earnings_to_growth_ratio = PEG_UNKNOWN
+        if price_to_earnings_to_growth_ratio is None: price_to_earnings_to_growth_ratio = PEG_UNKNOWN
+
+        if 'sharesOutstanding'       in info: shares_outstanding                = info['sharesOutstanding']
+        else                                : shares_outstanding                = None
+
+        if 'netIncomeToCommon'       in info: net_income_to_common_shareholders = info['netIncomeToCommon']
+        else                                : net_income_to_common_shareholders = None
+
+        if evr < 0 or evr > 20 + 20*TASE_MODE:
             print('skipping evr: {}'.format(evr))
             continue
 
-        if profit_margin is None: profit_margin = PROFIT_MARGIN_UNKNOWN
-        if profit_margin < PROFIT_MARGIN_LIMIT-TASE_PROFIT_MARGIN*TASE_MODE or profit_margin <= 0:
-            if not TASE_MODE or profit_margin <= 0:
+        if ev_to_ebitda < 0:
+            print('skipping ev_to_ebitda: {}'.format(ev_to_ebitda))
+            continue
+
+        if trailing_pe < 0:
+            print('skipping trailing_pe: {}'.format(trailing_pe))
+            continue
+
+        if profit_margin is None or profit_margin < PROFIT_MARGIN_LIMIT-TASE_PROFIT_MARGIN*TASE_MODE or profit_margin <= 0:
+            if profit_margin is not None and (not TASE_MODE or profit_margin <= 0):
                 print('skipping profit_margin: {}'.format(profit_margin))
                 continue
 
-        if trailing_eps is None: trailing_eps = 0
-
-        if trailing_eps                      <    0               :
+        if trailing_eps is not None and trailing_eps < 0:
             print('skipping trailing_eps: {}'.format(trailing_eps))
             continue
 
-        if price_to_book is None: price_to_book = 0
-
-        if earnings_quarterly_growth is None: earnings_quarterly_growth = 0
-        if earnings_quarterly_growth         <    0               :
+        if earnings_quarterly_growth is not None and earnings_quarterly_growth < 0:
             print('skipping earnings_quarterly_growth: {}'.format(earnings_quarterly_growth))
             continue
 
-        if price_to_earnings_to_growth_ratio is None: price_to_earnings_to_growth_ratio = UNKNOWN_PEG2R
-        if price_to_earnings_to_growth_ratio <    0               :
+        if price_to_earnings_to_growth_ratio is not None and price_to_earnings_to_growth_ratio < 0:
             print('skipping price_to_earnings_to_growth_ratio: {}'.format(price_to_earnings_to_growth_ratio))
             continue
 
-        if net_income_to_common_shareholders is None: net_income_to_common_shareholders = 0
-        if net_income_to_common_shareholders <    0               :
+        if net_income_to_common_shareholders is not None and net_income_to_common_shareholders < 0:
             print('skipping net_income_to_common_shareholders: {}'.format(net_income_to_common_shareholders))
             continue
 
@@ -145,36 +154,24 @@ for symb in symbols:
 
         sss_value  = evr
         ssss_value = price_to_earnings_to_growth_ratio
+        sssss_value   = trailing_pe
         ssse_value = profit_margin
+        sssse_value   = nitcsh_div_num_employees
+        ssssse_value  = nitcsh_div_num_employees
 
-        sssi_value  = sss_value
-        ssssi_value = ssss_value
-        sssei_value = ssse_value
+        sssi_value    = evr
+        ssssi_value   = price_to_earnings_to_growth_ratio
+        sssssi_value  = trailing_pe
+        sssei_value   = profit_margin
+        ssssei_value  = nitcsh_div_num_employees
+        sssssei_value = nitcsh_div_num_employees
 
-        print('Name: {}, sss_value: {}, ssss_value: {}, ssse_value: {}, sssi_value: {}, ssssi_value: {}, sssei_value: {}, EV/R: {}, profit_margin: {}, held_percent_institutions: {}, forward_eps: {}, trailing_eps: {}, price_to_book: {}, shares_outstanding: {}, net_income_to_common_shareholders: {}, nitcsh_div_shares_outstanding: {}, # employees: {}, nitcsh_div_num_employees: {}, earnings_quarterly_growth: {}, price_to_earnings_to_growth_ratio: {}'.format(short_name, sss_value, ssss_value, ssse_value, sssi_value, ssssi_value, sssei_value, evr, profit_margin, held_percent_institutions, forward_eps, trailing_eps, price_to_book, shares_outstanding, net_income_to_common_shareholders, nitcsh_div_shares_outstanding, num_employees, nitcsh_div_num_employees, earnings_quarterly_growth, price_to_earnings_to_growth_ratio))
+        print('Name: {}, sss_value: {}, ssss_value: {}, sssss_value: {}, ssse_value: {}, sssse_value: {}, ssssse_value: {}, sssi_value: {}, ssssi_value: {}, sssssi_value: {}, sssei_value: {}, ssssei_value: {}, sssssei_value: {}, evr: {}, trailing_pe: {}, ev_to_ebitda: {}, profit_margin: {}, held_percent_institutions: {}, forward_eps: {}, trailing_eps: {}, price_to_book: {}, shares_outstanding: {}, net_income_to_common_shareholders: {}, nitcsh_div_shares_outstanding: {}, # employees: {}, nitcsh_div_num_employees: {}, earnings_quarterly_growth: {}, price_to_earnings_to_growth_ratio: {}'.format(short_name, sss_value, ssss_value, sssss_value, ssse_value, sssse_value, ssssse_value, sssi_value, ssssi_value, sssssi_value, sssei_value, ssssei_value, sssssei_value, evr, trailing_pe, ev_to_ebitda, profit_margin, held_percent_institutions, forward_eps, trailing_eps, price_to_book, shares_outstanding, net_income_to_common_shareholders, nitcsh_div_shares_outstanding, num_employees, nitcsh_div_num_employees, earnings_quarterly_growth, price_to_earnings_to_growth_ratio))
 
     except Exception as e: # More information is output when exception is used instead of Exception
         print("Exception in info: {}".format(e))
-        if CONTINUE_UPON_INFO_EXCEPTION:
-            continue
-        num_employees                          = 0
-        short_name                             = 0
-        evr                                    = 0
-        profit_margin                          = 0
-        forward_eps                            = 0
-        trailing_eps                           = 0
-        price_to_book                          = 0
-        earnings_quarterly_growth              = 0
-        price_to_earnings_to_growth_ratio      = 0
-        shares_outstanding                     = 0
-        net_income_to_common_shareholders      = 0
-        nitcsh_div_shares_outstanding          = 0
-        nitcsh_div_num_employees               = 0
-        sss_value                              = 0
-        ssss_value                             = 0
-        ssse_value                             = 0
-        trailing_pe                            = 0
-        held_percent_institutions              = 0
+        continue
+
     try:
         last_4_dividends = symbol.dividends[-4:]
         print('last_4_dividends list: {}, {}, {}, {}'.format(last_4_dividends[0],last_4_dividends[1],last_4_dividends[2],last_4_dividends[3]))
@@ -183,78 +180,132 @@ for symb in symbols:
         last_4_dividends = [0,0,0,0]
         print("Added to No Dividends Lists")
         dividends_exist = False
-    if TASE_MODE:
-        symb = 'TLV:' + symb.replace('.TA','')
-    rows.append([             symb, short_name, sss_value, ssss_value, ssse_value, sssi_value, ssssi_value, sssei_value, evr, profit_margin, held_percent_institutions, forward_eps, trailing_eps, price_to_book, shares_outstanding, net_income_to_common_shareholders, nitcsh_div_shares_outstanding, num_employees, nitcsh_div_num_employees, earnings_quarterly_growth, price_to_earnings_to_growth_ratio, last_4_dividends[0], last_4_dividends[1], last_4_dividends[2], last_4_dividends[3]])
 
+    if TASE_MODE: symb = 'TLV:' + symb.replace('.TA','')
+
+    rows.append([             symb, short_name, sss_value, ssss_value, sssss_value, ssse_value, sssse_value, ssssse_value, sssi_value, ssssi_value, sssssi_value, sssei_value, ssssei_value, ssssei_value, evr, trailing_pe, ev_to_ebitda, profit_margin, held_percent_institutions, forward_eps, trailing_eps, price_to_book, shares_outstanding, net_income_to_common_shareholders, nitcsh_div_shares_outstanding, num_employees, nitcsh_div_num_employees, earnings_quarterly_growth, price_to_earnings_to_growth_ratio, last_4_dividends[0], last_4_dividends[1], last_4_dividends[2], last_4_dividends[3]])
     if dividends_exist:
-        rows_only_div.append([symb, short_name, sss_value, ssss_value, ssse_value, sssi_value, ssssi_value, sssei_value, evr, profit_margin, held_percent_institutions, forward_eps, trailing_eps, price_to_book, shares_outstanding, net_income_to_common_shareholders, nitcsh_div_shares_outstanding, num_employees, nitcsh_div_num_employees, earnings_quarterly_growth, price_to_earnings_to_growth_ratio, last_4_dividends[0], last_4_dividends[1], last_4_dividends[2], last_4_dividends[3]])
+        rows_only_div.append([symb, short_name, sss_value, ssss_value, sssss_value, ssse_value, sssse_value, ssssse_value, sssi_value, ssssi_value, sssssi_value, sssei_value, ssssei_value, ssssei_value, evr, trailing_pe, ev_to_ebitda, profit_margin, held_percent_institutions, forward_eps, trailing_eps, price_to_book, shares_outstanding, net_income_to_common_shareholders, nitcsh_div_shares_outstanding, num_employees, nitcsh_div_num_employees, earnings_quarterly_growth, price_to_earnings_to_growth_ratio, last_4_dividends[0], last_4_dividends[1], last_4_dividends[2], last_4_dividends[3]])
     else:
-        rows_no_div.append(  [symb, short_name, sss_value, ssss_value, ssse_value, sssi_value, ssssi_value, sssei_value, evr, profit_margin, held_percent_institutions, forward_eps, trailing_eps, price_to_book, shares_outstanding, net_income_to_common_shareholders, nitcsh_div_shares_outstanding, num_employees, nitcsh_div_num_employees, earnings_quarterly_growth, price_to_earnings_to_growth_ratio, last_4_dividends[0], last_4_dividends[1], last_4_dividends[2], last_4_dividends[3]])
+        rows_no_div.append(  [symb, short_name, sss_value, ssss_value, sssss_value, ssse_value, sssse_value, ssssse_value, sssi_value, ssssi_value, sssssi_value, sssei_value, ssssei_value, ssssei_value, evr, trailing_pe, ev_to_ebitda, profit_margin, held_percent_institutions, forward_eps, trailing_eps, price_to_book, shares_outstanding, net_income_to_common_shareholders, nitcsh_div_shares_outstanding, num_employees, nitcsh_div_num_employees, earnings_quarterly_growth, price_to_earnings_to_growth_ratio, last_4_dividends[0], last_4_dividends[1], last_4_dividends[2], last_4_dividends[3]])
 
     print('\n')
 
 # Now, Sort the rows using the sss_value and ssse_value formulas: [1:] skips the 1st title row
-sorted_list_sss            = sorted(rows[1:],          key=lambda row:          row[2],          reverse=False)  # Sort by sss_value   -> The lower  - the more attractive
-sorted_list_ssss           = sorted(rows[1:],          key=lambda row:          row[3],          reverse=False)  # Sort by ssss_value  -> The lower  - the more attractive
-sorted_list_ssse           = sorted(rows[1:],          key=lambda row:          row[4],          reverse=True )  # Sort by ssse_value  -> The higher - the more attractive
-sorted_list_sss_no_div     = sorted(rows_no_div[1:],   key=lambda row_no_div:   row_no_div[2],   reverse=False)  # Sort by sss_value   -> The lower  - the more attractive
-sorted_list_ssss_no_div    = sorted(rows_no_div[1:],   key=lambda row_no_div:   row_no_div[3],   reverse=False)  # Sort by ssss_value  -> The lower  - the more attractive
-sorted_list_ssse_no_div    = sorted(rows_no_div[1:],   key=lambda row_no_div:   row_no_div[4],   reverse=True )  # Sort by ssse_value  -> The higher - the more attractive
-sorted_list_sss_only_div   = sorted(rows_only_div[1:], key=lambda row_only_div: row_only_div[2], reverse=False)  # Sort by sss_value   -> The lower  - the more attractive
-sorted_list_ssss_only_div  = sorted(rows_only_div[1:], key=lambda row_only_div: row_only_div[3], reverse=False)  # Sort by ssss_value  -> The lower  - the more attractive
-sorted_list_ssse_only_div  = sorted(rows_only_div[1:], key=lambda row_only_div: row_only_div[4], reverse=True )  # Sort by ssse_value  -> The higher - the more attractive
-sorted_list_sssi           = sorted(rows[1:],          key=lambda row:          row[5],          reverse=False)  # Sort by sssi_value  -> The lower  - the more attractive
-sorted_list_ssssi          = sorted(rows[1:],          key=lambda row:          row[6],          reverse=False)  # Sort by ssssi_value -> The lower  - the more attractive
-sorted_list_sssei          = sorted(rows[1:],          key=lambda row:          row[7],          reverse=True )  # Sort by sssei_value -> The higher - the more attractive
-sorted_list_sssi_no_div    = sorted(rows_no_div[1:],   key=lambda row_no_div:   row_no_div[5],   reverse=False)  # Sort by sssi_value  -> The lower  - the more attractive
-sorted_list_ssssi_no_div   = sorted(rows_no_div[1:],   key=lambda row_no_div:   row_no_div[6],   reverse=False)  # Sort by ssssi_value -> The lower  - the more attractive
-sorted_list_sssei_no_div   = sorted(rows_no_div[1:],   key=lambda row_no_div:   row_no_div[7],   reverse=True )  # Sort by sssei_value -> The higher - the more attractive
-sorted_list_sssi_only_div  = sorted(rows_only_div[1:], key=lambda row_only_div: row_only_div[5], reverse=False)  # Sort by sssi_value  -> The lower  - the more attractive
-sorted_list_ssssi_only_div = sorted(rows_only_div[1:], key=lambda row_only_div: row_only_div[6], reverse=False)  # Sort by ssssi_value -> The lower  - the more attractive
-sorted_list_sssei_only_div = sorted(rows_only_div[1:], key=lambda row_only_div: row_only_div[7], reverse=True )  # Sort by sssei_value -> The higher - the more attractive
+sorted_list_sss              = sorted(rows[1:],          key=lambda row:          row[2],           reverse=False)  # Sort by sss_value     -> The lower  - the more attractive
+sorted_list_ssss             = sorted(rows[1:],          key=lambda row:          row[3],           reverse=False)  # Sort by ssss_value    -> The lower  - the more attractive
+sorted_list_sssss            = sorted(rows[1:],          key=lambda row:          row[4],           reverse=False)  # Sort by sssss_value   -> The lower  - the more attractive
+sorted_list_ssse             = sorted(rows[1:],          key=lambda row:          row[5],           reverse=True )  # Sort by ssse_value    -> The higher - the more attractive
+sorted_list_sssse            = sorted(rows[1:],          key=lambda row:          row[6],           reverse=True )  # Sort by sssse_value   -> The higher - the more attractive
+sorted_list_ssssse           = sorted(rows[1:],          key=lambda row:          row[7],           reverse=True )  # Sort by ssssse_value  -> The higher - the more attractive
+sorted_list_sss_no_div       = sorted(rows_no_div[1:],   key=lambda row_no_div:   row_no_div[2],    reverse=False)  # Sort by sss_value     -> The lower  - the more attractive
+sorted_list_ssss_no_div      = sorted(rows_no_div[1:],   key=lambda row_no_div:   row_no_div[3],    reverse=False)  # Sort by ssss_value    -> The lower  - the more attractive
+sorted_list_sssss_no_div     = sorted(rows_no_div[1:],   key=lambda row_no_div:   row_no_div[4],    reverse=False)  # Sort by sssss_value   -> The lower  - the more attractive
+sorted_list_ssse_no_div      = sorted(rows_no_div[1:],   key=lambda row_no_div:   row_no_div[5],    reverse=True )  # Sort by ssse_value    -> The higher - the more attractive
+sorted_list_sssse_no_div     = sorted(rows_no_div[1:],   key=lambda row_no_div:   row_no_div[6],    reverse=True )  # Sort by sssse_value   -> The higher - the more attractive
+sorted_list_ssssse_no_div    = sorted(rows_no_div[1:],   key=lambda row_no_div:   row_no_div[7],    reverse=True )  # Sort by ssssse_value  -> The higher - the more attractive
+sorted_list_sss_only_div     = sorted(rows_only_div[1:], key=lambda row_only_div: row_only_div[2],  reverse=False)  # Sort by sss_value     -> The lower  - the more attractive
+sorted_list_ssss_only_div    = sorted(rows_only_div[1:], key=lambda row_only_div: row_only_div[3],  reverse=False)  # Sort by ssss_value    -> The lower  - the more attractive
+sorted_list_sssss_only_div   = sorted(rows_only_div[1:], key=lambda row_only_div: row_only_div[4],  reverse=False)  # Sort by sssss_value   -> The lower  - the more attractive
+sorted_list_ssse_only_div    = sorted(rows_only_div[1:], key=lambda row_only_div: row_only_div[5],  reverse=True )  # Sort by ssse_value    -> The higher - the more attractive
+sorted_list_sssse_only_div   = sorted(rows_only_div[1:], key=lambda row_only_div: row_only_div[6],  reverse=True )  # Sort by sssse_value   -> The higher - the more attractive
+sorted_list_ssssse_only_div  = sorted(rows_only_div[1:], key=lambda row_only_div: row_only_div[7],  reverse=True )  # Sort by ssssse_value  -> The higher - the more attractive
+sorted_list_sssi             = sorted(rows[1:],          key=lambda row:          row[8],           reverse=False)  # Sort by sssi_value    -> The lower  - the more attractive
+sorted_list_ssssi            = sorted(rows[1:],          key=lambda row:          row[9],           reverse=False)  # Sort by ssssi_value   -> The lower  - the more attractive
+sorted_list_sssssi           = sorted(rows[1:],          key=lambda row:          row[10],          reverse=False)  # Sort by sssssi_value  -> The lower  - the more attractive
+sorted_list_sssei            = sorted(rows[1:],          key=lambda row:          row[11],          reverse=True )  # Sort by sssei_value   -> The higher - the more attractive
+sorted_list_ssssei           = sorted(rows[1:],          key=lambda row:          row[12],          reverse=True )  # Sort by ssssei_value  -> The higher - the more attractive
+sorted_list_sssssei          = sorted(rows[1:],          key=lambda row:          row[13],          reverse=True )  # Sort by sssssei_value -> The higher - the more attractive
+sorted_list_sssi_no_div      = sorted(rows_no_div[1:],   key=lambda row_no_div:   row_no_div[8],    reverse=False)  # Sort by sssi_value    -> The lower  - the more attractive
+sorted_list_ssssi_no_div     = sorted(rows_no_div[1:],   key=lambda row_no_div:   row_no_div[9],    reverse=False)  # Sort by ssssi_value   -> The lower  - the more attractive
+sorted_list_sssssi_no_div    = sorted(rows_no_div[1:],   key=lambda row_no_div:   row_no_div[10],   reverse=False)  # Sort by sssssi_value  -> The lower  - the more attractive
+sorted_list_sssei_no_div     = sorted(rows_no_div[1:],   key=lambda row_no_div:   row_no_div[11],   reverse=True )  # Sort by sssei_value   -> The higher - the more attractive
+sorted_list_ssssei_no_div    = sorted(rows_no_div[1:],   key=lambda row_no_div:   row_no_div[12],   reverse=True )  # Sort by ssssei_value  -> The higher - the more attractive
+sorted_list_sssssei_no_div   = sorted(rows_no_div[1:],   key=lambda row_no_div:   row_no_div[13],   reverse=True )  # Sort by sssssei_value -> The higher - the more attractive
+sorted_list_sssi_only_div    = sorted(rows_only_div[1:], key=lambda row_only_div: row_only_div[8],  reverse=False)  # Sort by sssi_value    -> The lower  - the more attractive
+sorted_list_ssssi_only_div   = sorted(rows_only_div[1:], key=lambda row_only_div: row_only_div[9],  reverse=False)  # Sort by ssssi_value   -> The lower  - the more attractive
+sorted_list_sssssi_only_div  = sorted(rows_only_div[1:], key=lambda row_only_div: row_only_div[10], reverse=False)  # Sort by sssssi_value  -> The lower  - the more attractive
+sorted_list_sssei_only_div   = sorted(rows_only_div[1:], key=lambda row_only_div: row_only_div[11], reverse=True )  # Sort by sssei_value   -> The higher - the more attractive
+sorted_list_ssssei_only_div  = sorted(rows_only_div[1:], key=lambda row_only_div: row_only_div[12], reverse=True )  # Sort by ssssei_value  -> The higher - the more attractive
+sorted_list_sssssei_only_div = sorted(rows_only_div[1:], key=lambda row_only_div: row_only_div[13], reverse=True )  # Sort by sssssei_value -> The higher - the more attractive
 
-sorted_list_sss.insert(          0, rows[0])
-sorted_list_ssss.insert(         0, rows[0])
-sorted_list_ssse.insert(         0, rows[0])
-sorted_list_sss_no_div.insert(   0, rows_no_div[0])
-sorted_list_ssss_no_div.insert(  0, rows_no_div[0])
-sorted_list_ssse_no_div.insert(  0, rows_no_div[0])
-sorted_list_sss_only_div.insert( 0, rows_only_div[0])
-sorted_list_ssss_only_div.insert(0, rows_only_div[0])
-sorted_list_ssse_only_div.insert(0, rows_only_div[0])
-sorted_list_sssi.insert(          0, rows[0])
-sorted_list_ssssi.insert(         0, rows[0])
-sorted_list_sssei.insert(         0, rows[0])
-sorted_list_sssi_no_div.insert(   0, rows_no_div[0])
-sorted_list_ssssi_no_div.insert(  0, rows_no_div[0])
-sorted_list_sssei_no_div.insert(  0, rows_no_div[0])
-sorted_list_sssi_only_div.insert( 0, rows_only_div[0])
-sorted_list_ssssi_only_div.insert(0, rows_only_div[0])
-sorted_list_sssei_only_div.insert(0, rows_only_div[0])
+sorted_list_sss.insert(             0, rows[0])
+sorted_list_ssss.insert(            0, rows[0])
+sorted_list_sssss.insert(           0, rows[0])
+sorted_list_ssse.insert(            0, rows[0])
+sorted_list_sssse.insert(           0, rows[0])
+sorted_list_ssssse.insert(          0, rows[0])
+sorted_list_sss_no_div.insert(      0, rows_no_div[0])
+sorted_list_ssss_no_div.insert(     0, rows_no_div[0])
+sorted_list_sssss_no_div.insert(    0, rows_no_div[0])
+sorted_list_ssse_no_div.insert(     0, rows_no_div[0])
+sorted_list_sssse_no_div.insert(    0, rows_no_div[0])
+sorted_list_ssssse_no_div.insert(   0, rows_no_div[0])
+sorted_list_sss_only_div.insert(    0, rows_only_div[0])
+sorted_list_ssss_only_div.insert(   0, rows_only_div[0])
+sorted_list_sssss_only_div.insert(  0, rows_only_div[0])
+sorted_list_ssse_only_div.insert(   0, rows_only_div[0])
+sorted_list_sssse_only_div.insert(  0, rows_only_div[0])
+sorted_list_ssssse_only_div.insert( 0, rows_only_div[0])
+sorted_list_sssi.insert(            0, rows[0])
+sorted_list_ssssi.insert(           0, rows[0])
+sorted_list_sssssi.insert(          0, rows[0])
+sorted_list_sssei.insert(           0, rows[0])
+sorted_list_ssssei.insert(          0, rows[0])
+sorted_list_sssssei.insert(         0, rows[0])
+sorted_list_sssi_no_div.insert(     0, rows_no_div[0])
+sorted_list_ssssi_no_div.insert(    0, rows_no_div[0])
+sorted_list_sssssi_no_div.insert(   0, rows_no_div[0])
+sorted_list_sssei_no_div.insert(    0, rows_no_div[0])
+sorted_list_ssssei_no_div.insert(   0, rows_no_div[0])
+sorted_list_sssssei_no_div.insert(  0, rows_no_div[0])
+sorted_list_sssi_only_div.insert(   0, rows_only_div[0])
+sorted_list_ssssi_only_div.insert(  0, rows_only_div[0])
+sorted_list_sssssi_only_div.insert( 0, rows_only_div[0])
+sorted_list_sssei_only_div.insert(  0, rows_only_div[0])
+sorted_list_ssssei_only_div.insert( 0, rows_only_div[0])
+sorted_list_sssssei_only_div.insert(0, rows_only_div[0])
 
 tase_str = ""
 if TASE_MODE: tase_str = "_TASE"
 date_and_time = time.strftime("%Y%m%d-%H%M%S{}".format(tase_str))
 
-filename_sss_engine            = "{}/sss_engine.csv".format(date_and_time)
-filename_ssss_engine           = "{}/ssss_engine.csv".format(date_and_time)
-filename_ssse_engine           = "{}/ssse_engine.csv".format(date_and_time)
-filename_sss_engine_no_div     = "{}/sss_engine_no_div.csv".format(date_and_time)
-filename_ssss_engine_no_div    = "{}/ssss_engine_no_div.csv".format(date_and_time)
-filename_ssse_engine_no_div    = "{}/ssse_engine_no_div.csv".format(date_and_time)
-filename_sss_engine_only_div   = "{}/sss_engine_only_div.csv".format(date_and_time)
-filename_ssss_engine_only_div  = "{}/ssss_engine_only_div.csv".format(date_and_time)
-filename_ssse_engine_only_div  = "{}/ssse_engine_only_div.csv".format(date_and_time)
-filename_sssi_engine           = "{}/sssi_engine.csv".format(date_and_time)
-filename_ssssi_engine          = "{}/ssssi_engine.csv".format(date_and_time)
-filename_sssei_engine          = "{}/sssei_engine.csv".format(date_and_time)
-filename_sssi_engine_no_div    = "{}/sssi_engine_no_div.csv".format(date_and_time)
-filename_ssssi_engine_no_div   = "{}/ssssi_engine_no_div.csv".format(date_and_time)
-filename_sssei_engine_no_div   = "{}/sssei_engine_no_div.csv".format(date_and_time)
-filename_sssi_engine_only_div  = "{}/sssi_engine_only_div.csv".format(date_and_time)
-filename_ssssi_engine_only_div = "{}/ssssi_engine_only_div.csv".format(date_and_time)
-filename_sssei_engine_only_div = "{}/sssei_engine_only_div.csv".format(date_and_time)
+filename_sss_engine              = "{}/sss_engine.csv".format(date_and_time)
+filename_ssss_engine             = "{}/ssss_engine.csv".format(date_and_time)
+filename_sssss_engine            = "{}/sssss_engine.csv".format(date_and_time)
+filename_ssse_engine             = "{}/ssse_engine.csv".format(date_and_time)
+filename_sssse_engine            = "{}/sssse_engine.csv".format(date_and_time)
+filename_ssssse_engine           = "{}/ssssse_engine.csv".format(date_and_time)
+filename_sss_engine_no_div       = "{}/sss_engine_no_div.csv".format(date_and_time)
+filename_ssss_engine_no_div      = "{}/ssss_engine_no_div.csv".format(date_and_time)
+filename_sssss_engine_no_div     = "{}/sssss_engine_no_div.csv".format(date_and_time)
+filename_ssse_engine_no_div      = "{}/ssse_engine_no_div.csv".format(date_and_time)
+filename_sssse_engine_no_div     = "{}/sssse_engine_no_div.csv".format(date_and_time)
+filename_ssssse_engine_no_div    = "{}/ssssse_engine_no_div.csv".format(date_and_time)
+filename_sss_engine_only_div     = "{}/sss_engine_only_div.csv".format(date_and_time)
+filename_ssss_engine_only_div    = "{}/ssss_engine_only_div.csv".format(date_and_time)
+filename_sssss_engine_only_div   = "{}/sssss_engine_only_div.csv".format(date_and_time)
+filename_ssse_engine_only_div    = "{}/ssse_engine_only_div.csv".format(date_and_time)
+filename_sssse_engine_only_div   = "{}/sssse_engine_only_div.csv".format(date_and_time)
+filename_ssssse_engine_only_div  = "{}/ssssse_engine_only_div.csv".format(date_and_time)
+filename_sssi_engine             = "{}/sssi_engine.csv".format(date_and_time)
+filename_ssssi_engine            = "{}/ssssi_engine.csv".format(date_and_time)
+filename_sssssi_engine           = "{}/sssssi_engine.csv".format(date_and_time)
+filename_sssei_engine            = "{}/sssei_engine.csv".format(date_and_time)
+filename_ssssei_engine           = "{}/ssssei_engine.csv".format(date_and_time)
+filename_sssssei_engine          = "{}/sssssei_engine.csv".format(date_and_time)
+filename_sssi_engine_no_div      = "{}/sssi_engine_no_div.csv".format(date_and_time)
+filename_ssssi_engine_no_div     = "{}/ssssi_engine_no_div.csv".format(date_and_time)
+filename_sssssi_engine_no_div    = "{}/sssssi_engine_no_div.csv".format(date_and_time)
+filename_sssei_engine_no_div     = "{}/sssei_engine_no_div.csv".format(date_and_time)
+filename_ssssei_engine_no_div    = "{}/ssssei_engine_no_div.csv".format(date_and_time)
+filename_sssssei_engine_no_div   = "{}/sssssei_engine_no_div.csv".format(date_and_time)
+filename_sssi_engine_only_div    = "{}/sssi_engine_only_div.csv".format(date_and_time)
+filename_ssssi_engine_only_div   = "{}/ssssi_engine_only_div.csv".format(date_and_time)
+filename_sssssi_engine_only_div  = "{}/sssssi_engine_only_div.csv".format(date_and_time)
+filename_sssei_engine_only_div   = "{}/sssei_engine_only_div.csv".format(date_and_time)
+filename_ssssei_engine_only_div  = "{}/ssssei_engine_only_div.csv".format(date_and_time)
+filename_sssssei_engine_only_div = "{}/sssssei_engine_only_div.csv".format(date_and_time)
 
 os.makedirs(os.path.dirname(filename_sss_engine),           exist_ok=True)
 with open(filename_sss_engine,           mode='w', newline='') as sss_engine:
@@ -266,10 +317,25 @@ with open(filename_ssss_engine,          mode='w', newline='') as ssss_engine:
     writer_ssss = csv.writer(ssss_engine)
     writer_ssss.writerows(sorted_list_ssss)
 
+os.makedirs(os.path.dirname(filename_sssss_engine),           exist_ok=True)
+with open(filename_sssss_engine,          mode='w', newline='') as sssss_engine:
+    writer_sssss = csv.writer(sssss_engine)
+    writer_sssss.writerows(sorted_list_sssss)
+
 os.makedirs(os.path.dirname(filename_ssse_engine),          exist_ok=True)
 with open(filename_ssse_engine,          mode='w', newline='') as ssse_engine:
     writer_ssse = csv.writer(ssse_engine)
     writer_ssse.writerows(sorted_list_ssse)
+
+os.makedirs(os.path.dirname(filename_sssse_engine),          exist_ok=True)
+with open(filename_sssse_engine,          mode='w', newline='') as sssse_engine:
+    writer_sssse = csv.writer(sssse_engine)
+    writer_sssse.writerows(sorted_list_sssse)
+
+os.makedirs(os.path.dirname(filename_ssssse_engine),          exist_ok=True)
+with open(filename_ssssse_engine,          mode='w', newline='') as ssssse_engine:
+    writer_ssssse = csv.writer(ssssse_engine)
+    writer_ssssse.writerows(sorted_list_ssssse)
 
 os.makedirs(os.path.dirname(filename_sss_engine_no_div),    exist_ok=True)
 with open(filename_sss_engine_no_div,    mode='w', newline='') as sss_engine:
@@ -281,10 +347,25 @@ with open(filename_ssss_engine_no_div,   mode='w', newline='') as ssss_engine:
     writer_ssss = csv.writer(ssss_engine)
     writer_ssss.writerows(sorted_list_ssss_no_div)
 
+os.makedirs(os.path.dirname(filename_sssss_engine_no_div),    exist_ok=True)
+with open(filename_sssss_engine_no_div,   mode='w', newline='') as sssss_engine:
+    writer_sssss = csv.writer(sssss_engine)
+    writer_sssss.writerows(sorted_list_sssss_no_div)
+
 os.makedirs(os.path.dirname(filename_ssse_engine_no_div),   exist_ok=True)
 with open(filename_ssse_engine_no_div,   mode='w', newline='') as ssse_engine:
     writer_ssse = csv.writer(ssse_engine)
     writer_ssse.writerows(sorted_list_ssse_no_div)
+
+os.makedirs(os.path.dirname(filename_sssse_engine_no_div),   exist_ok=True)
+with open(filename_sssse_engine_no_div,   mode='w', newline='') as sssse_engine:
+    writer_sssse = csv.writer(sssse_engine)
+    writer_sssse.writerows(sorted_list_sssse_no_div)
+
+os.makedirs(os.path.dirname(filename_ssssse_engine_no_div),   exist_ok=True)
+with open(filename_ssssse_engine_no_div,   mode='w', newline='') as ssssse_engine:
+    writer_ssssse = csv.writer(ssssse_engine)
+    writer_ssssse.writerows(sorted_list_ssssse_no_div)
 
 os.makedirs(os.path.dirname(filename_sss_engine_only_div),  exist_ok=True)
 with open(filename_sss_engine_only_div,  mode='w', newline='') as sss_engine:
@@ -296,10 +377,25 @@ with open(filename_ssss_engine_only_div, mode='w', newline='') as ssss_engine:
     writer_ssss = csv.writer(ssss_engine)
     writer_ssss.writerows(sorted_list_ssss_only_div)
 
+os.makedirs(os.path.dirname(filename_sssss_engine_only_div),  exist_ok=True)
+with open(filename_sssss_engine_only_div, mode='w', newline='') as sssss_engine:
+    writer_sssss = csv.writer(sssss_engine)
+    writer_sssss.writerows(sorted_list_sssss_only_div)
+
 os.makedirs(os.path.dirname(filename_ssse_engine_only_div), exist_ok=True)
 with open(filename_ssse_engine_only_div, mode='w', newline='') as ssse_engine:
     writer_ssse = csv.writer(ssse_engine)
     writer_ssse.writerows(sorted_list_ssse_only_div)
+
+os.makedirs(os.path.dirname(filename_sssse_engine_only_div), exist_ok=True)
+with open(filename_sssse_engine_only_div, mode='w', newline='') as sssse_engine:
+    writer_sssse = csv.writer(sssse_engine)
+    writer_sssse.writerows(sorted_list_sssse_only_div)
+
+os.makedirs(os.path.dirname(filename_ssssse_engine_only_div), exist_ok=True)
+with open(filename_ssssse_engine_only_div, mode='w', newline='') as ssssse_engine:
+    writer_ssssse = csv.writer(ssssse_engine)
+    writer_ssssse.writerows(sorted_list_ssssse_only_div)
 
 # i
 # ------
@@ -314,10 +410,25 @@ with open(filename_ssssi_engine,          mode='w', newline='') as ssssi_engine:
     writer_ssssi = csv.writer(ssssi_engine)
     writer_ssssi.writerows(sorted_list_ssssi)
 
+os.makedirs(os.path.dirname(filename_sssssi_engine),           exist_ok=True)
+with open(filename_sssssi_engine,          mode='w', newline='') as sssssi_engine:
+    writer_sssssi = csv.writer(sssssi_engine)
+    writer_sssssi.writerows(sorted_list_sssssi)
+
 os.makedirs(os.path.dirname(filename_sssei_engine),          exist_ok=True)
 with open(filename_sssei_engine,          mode='w', newline='') as sssei_engine:
     writer_sssei = csv.writer(sssei_engine)
     writer_sssei.writerows(sorted_list_sssei)
+
+os.makedirs(os.path.dirname(filename_ssssei_engine),          exist_ok=True)
+with open(filename_ssssei_engine,          mode='w', newline='') as ssssei_engine:
+    writer_ssssei = csv.writer(ssssei_engine)
+    writer_ssssei.writerows(sorted_list_ssssei)
+
+os.makedirs(os.path.dirname(filename_sssssei_engine),          exist_ok=True)
+with open(filename_sssssei_engine,          mode='w', newline='') as sssssei_engine:
+    writer_sssssei = csv.writer(sssssei_engine)
+    writer_sssssei.writerows(sorted_list_sssssei)
 
 os.makedirs(os.path.dirname(filename_sssi_engine_no_div),    exist_ok=True)
 with open(filename_sssi_engine_no_div,    mode='w', newline='') as sssi_engine:
@@ -329,10 +440,25 @@ with open(filename_ssssi_engine_no_div,   mode='w', newline='') as ssssi_engine:
     writer_ssssi = csv.writer(ssssi_engine)
     writer_ssssi.writerows(sorted_list_ssssi_no_div)
 
+os.makedirs(os.path.dirname(filename_sssssi_engine_no_div),    exist_ok=True)
+with open(filename_sssssi_engine_no_div,   mode='w', newline='') as sssssi_engine:
+    writer_sssssi = csv.writer(sssssi_engine)
+    writer_sssssi.writerows(sorted_list_sssssi_no_div)
+
 os.makedirs(os.path.dirname(filename_sssei_engine_no_div),   exist_ok=True)
 with open(filename_sssei_engine_no_div,   mode='w', newline='') as sssei_engine:
     writer_sssei = csv.writer(sssei_engine)
     writer_sssei.writerows(sorted_list_sssei_no_div)
+
+os.makedirs(os.path.dirname(filename_ssssei_engine_no_div),   exist_ok=True)
+with open(filename_ssssei_engine_no_div,   mode='w', newline='') as ssssei_engine:
+    writer_ssssei = csv.writer(ssssei_engine)
+    writer_ssssei.writerows(sorted_list_ssssei_no_div)
+
+os.makedirs(os.path.dirname(filename_sssssei_engine_no_div),   exist_ok=True)
+with open(filename_sssssei_engine_no_div,   mode='w', newline='') as sssssei_engine:
+    writer_sssssei = csv.writer(sssssei_engine)
+    writer_sssssei.writerows(sorted_list_sssssei_no_div)
 
 os.makedirs(os.path.dirname(filename_sssi_engine_only_div),  exist_ok=True)
 with open(filename_sssi_engine_only_div,  mode='w', newline='') as sssi_engine:
@@ -344,7 +470,22 @@ with open(filename_ssssi_engine_only_div, mode='w', newline='') as ssssi_engine:
     writer_ssssi = csv.writer(ssssi_engine)
     writer_ssssi.writerows(sorted_list_ssssi_only_div)
 
+os.makedirs(os.path.dirname(filename_sssssi_engine_only_div),  exist_ok=True)
+with open(filename_sssssi_engine_only_div, mode='w', newline='') as sssssi_engine:
+    writer_sssssi = csv.writer(sssssi_engine)
+    writer_sssssi.writerows(sorted_list_sssssi_only_div)
+
 os.makedirs(os.path.dirname(filename_sssei_engine_only_div), exist_ok=True)
 with open(filename_sssei_engine_only_div, mode='w', newline='') as sssei_engine:
     writer_sssei = csv.writer(sssei_engine)
     writer_sssei.writerows(sorted_list_sssei_only_div)
+
+os.makedirs(os.path.dirname(filename_ssssei_engine_only_div), exist_ok=True)
+with open(filename_ssssei_engine_only_div, mode='w', newline='') as ssssei_engine:
+    writer_ssssei = csv.writer(ssssei_engine)
+    writer_ssssei.writerows(sorted_list_ssssei_only_div)
+
+os.makedirs(os.path.dirname(filename_sssssei_engine_only_div), exist_ok=True)
+with open(filename_sssssei_engine_only_div, mode='w', newline='') as sssssei_engine:
+    writer_sssssei = csv.writer(sssssei_engine)
+    writer_sssssei.writerows(sorted_list_sssssei_only_div)
