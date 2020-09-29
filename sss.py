@@ -5,11 +5,9 @@ import csv
 import os
 import itertools
 
+from threading import Thread
 from dataclasses import dataclass
 
-
-# TODO: ASAFR:
-# 1. Threading
 
 @dataclass
 class StockData:
@@ -279,65 +277,99 @@ def process_info(symbol, stock_data):
         print("Exception in info: {}".format(e))
         return False
 
-rows          = []
-rows_no_div   = []
-rows_only_div = []
-rows.append(         ["Ticker", "Name", "sss_value", "ssss_value", "sssss_value", "ssse_value", "sssse_value", "ssssse_value", "sssi_value", "ssssi_value", "sssssi_value", "sssei_value", "ssssei_value", "sssssei_value", "enterprise_value_to_revenue", "trailing_price_to_earnings", "enterprise_value_to_ebitda", "profit_margin", "held_percent_institutions", "forward_eps", "trailing_eps", "price_to_book", "shares_outstanding", "net_income_to_common_shareholders", "nitcsh_to_shares_outstanding", "employees", "nitcsh_to_num_employees", "earnings_quarterly_growth", "price_to_earnings_to_growth_ratio", "last_dividend_0", "last_dividend_1", "last_dividend_2", "last_dividend_3" ])
-rows_no_div.append(  ["Ticker", "Name", "sss_value", "ssss_value", "sssss_value", "ssse_value", "sssse_value", "ssssse_value", "sssi_value", "ssssi_value", "sssssi_value", "sssei_value", "ssssei_value", "sssssei_value", "enterprise_value_to_revenue", "trailing_price_to_earnings", "enterprise_value_to_ebitda", "profit_margin", "held_percent_institutions", "forward_eps", "trailing_eps", "price_to_book", "shares_outstanding", "net_income_to_common_shareholders", "nitcsh_to_shares_outstanding", "employees", "nitcsh_to_num_employees", "earnings_quarterly_growth", "price_to_earnings_to_growth_ratio", "last_dividend_0", "last_dividend_1", "last_dividend_2", "last_dividend_3" ])
-rows_only_div.append(["Ticker", "Name", "sss_value", "ssss_value", "sssss_value", "ssse_value", "sssse_value", "ssssse_value", "sssi_value", "ssssi_value", "sssssi_value", "sssei_value", "ssssei_value", "sssssei_value", "enterprise_value_to_revenue", "trailing_price_to_earnings", "enterprise_value_to_ebitda", "profit_margin", "held_percent_institutions", "forward_eps", "trailing_eps", "price_to_book", "shares_outstanding", "net_income_to_common_shareholders", "nitcsh_to_shares_outstanding", "employees", "nitcsh_to_num_employees", "earnings_quarterly_growth", "price_to_earnings_to_growth_ratio", "last_dividend_0", "last_dividend_1", "last_dividend_2", "last_dividend_3" ])
+def process_symbols(symbols, rows, rows_no_div, rows_only_div):
+    iteration = 0
+    for symb in symbols:
+        iteration += 1
+        print('Checking {:9} ({:4}/{:4}/{:4}): '.format(symb, len(rows), iteration, len(symbols)), end='')
+        symbol = yf.Ticker(symb)
+        stock_data = StockData(ticker=symb)
+        if not process_info(symbol=symbol, stock_data=stock_data):
+            continue
 
-iteration  = 0
-for symb in symbols:
-    iteration += 1
-    print('Checking {:9} ({:4}/{:4}/{:4}): '.format(symb, len(rows)-1, iteration, len(symbols)), end='')
-    symbol     = yf.Ticker(symb)
-    stock_data = StockData(ticker=symb)
-    if not process_info(symbol=symbol, stock_data=stock_data):
-        continue
+        if TASE_MODE: stock_data.ticker = 'TLV:' + stock_data.ticker.replace('.TA', '')
 
-    if TASE_MODE: stock_data.ticker = 'TLV:' + stock_data.ticker.replace('.TA','')
+        rows.append(                                   [stock_data.ticker, stock_data.short_name, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.ssssei_value, stock_data.enterprise_value_to_revenue, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.last_4_dividends_0, stock_data.last_4_dividends_1, stock_data.last_4_dividends_2, stock_data.last_4_dividends_3])
+        if len(symbol.dividends): rows_only_div.append([stock_data.ticker, stock_data.short_name, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.ssssei_value, stock_data.enterprise_value_to_revenue, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.last_4_dividends_0, stock_data.last_4_dividends_1, stock_data.last_4_dividends_2, stock_data.last_4_dividends_3])
+        else:                     rows_no_div.append(  [stock_data.ticker, stock_data.short_name, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.ssssei_value, stock_data.enterprise_value_to_revenue, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.last_4_dividends_0, stock_data.last_4_dividends_1, stock_data.last_4_dividends_2, stock_data.last_4_dividends_3])
 
-    rows.append(                                   [stock_data.ticker, stock_data.short_name, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.ssssei_value, stock_data.enterprise_value_to_revenue, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.last_4_dividends_0, stock_data.last_4_dividends_1, stock_data.last_4_dividends_2, stock_data.last_4_dividends_3])
-    if len(symbol.dividends): rows_only_div.append([stock_data.ticker, stock_data.short_name, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.ssssei_value, stock_data.enterprise_value_to_revenue, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.last_4_dividends_0, stock_data.last_4_dividends_1, stock_data.last_4_dividends_2, stock_data.last_4_dividends_3])
-    else                    : rows_no_div.append(  [stock_data.ticker, stock_data.short_name, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.ssssei_value, stock_data.enterprise_value_to_revenue, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.last_4_dividends_0, stock_data.last_4_dividends_1, stock_data.last_4_dividends_2, stock_data.last_4_dividends_3])
+rows           = []
+rows_no_div    = []
+rows_only_div  = []
+rows0          = []
+rows0_no_div   = []
+rows0_only_div = []
+rows1          = []
+rows1_no_div   = []
+rows1_only_div = []
+rows2          = []
+rows2_no_div   = []
+rows2_only_div = []
+rows3          = []
+rows3_no_div   = []
+rows3_only_div = []
+
+symbols0 = symbols[0:][::4] # 0, 4,  8, ...
+symbols1 = symbols[1:][::4] # 1, 5,  9, ...
+symbols2 = symbols[2:][::4] # 2, 6, 10, ...
+symbols3 = symbols[3:][::4] # 3, 7, 11, ...
+
+thread0 = Thread(target=process_symbols, args=(symbols0, rows0, rows0_no_div, rows0_only_div)) # process_symbols(symbols=symbols0, rows=rows0, rows_no_div=rows0_no_div, rows_only_div=rows0_only_div)
+thread1 = Thread(target=process_symbols, args=(symbols1, rows1, rows1_no_div, rows1_only_div)) # process_symbols(symbols=symbols1, rows=rows1, rows_no_div=rows1_no_div, rows_only_div=rows1_only_div)
+thread2 = Thread(target=process_symbols, args=(symbols2, rows2, rows2_no_div, rows2_only_div))
+thread3 = Thread(target=process_symbols, args=(symbols3, rows3, rows3_no_div, rows3_only_div))
+
+thread0.start()
+thread1.start()
+thread2.start()
+thread3.start()
+
+thread0.join()
+thread1.join()
+thread2.join()
+thread3.join()
+
+rows.extend(         rows0          + rows1          + rows2          + rows3         )
+rows_no_div.extend(  rows0_no_div   + rows1_no_div   + rows2_no_div   + rows3_no_div  )
+rows_only_div.extend(rows0_only_div + rows1_only_div + rows2_only_div + rows3_only_div)
 
 # Now, Sort the rows using the sss_value and ssse_value formulas: [1:] skips the 1st title row
-sorted_list_sss              = sorted(rows[1:],          key=lambda row:          row[2],           reverse=False)  # Sort by sss_value     -> The lower  - the more attractive
-sorted_list_ssss             = sorted(rows[1:],          key=lambda row:          row[3],           reverse=False)  # Sort by ssss_value    -> The lower  - the more attractive
-sorted_list_sssss            = sorted(rows[1:],          key=lambda row:          row[4],           reverse=False)  # Sort by sssss_value   -> The lower  - the more attractive
-sorted_list_ssse             = sorted(rows[1:],          key=lambda row:          row[5],           reverse=True )  # Sort by ssse_value    -> The higher - the more attractive
-sorted_list_sssse            = sorted(rows[1:],          key=lambda row:          row[6],           reverse=True )  # Sort by sssse_value   -> The higher - the more attractive
-sorted_list_ssssse           = sorted(rows[1:],          key=lambda row:          row[7],           reverse=True )  # Sort by ssssse_value  -> The higher - the more attractive
-sorted_list_sss_no_div       = sorted(rows_no_div[1:],   key=lambda row_no_div:   row_no_div[2],    reverse=False)  # Sort by sss_value     -> The lower  - the more attractive
-sorted_list_ssss_no_div      = sorted(rows_no_div[1:],   key=lambda row_no_div:   row_no_div[3],    reverse=False)  # Sort by ssss_value    -> The lower  - the more attractive
-sorted_list_sssss_no_div     = sorted(rows_no_div[1:],   key=lambda row_no_div:   row_no_div[4],    reverse=False)  # Sort by sssss_value   -> The lower  - the more attractive
-sorted_list_ssse_no_div      = sorted(rows_no_div[1:],   key=lambda row_no_div:   row_no_div[5],    reverse=True )  # Sort by ssse_value    -> The higher - the more attractive
-sorted_list_sssse_no_div     = sorted(rows_no_div[1:],   key=lambda row_no_div:   row_no_div[6],    reverse=True )  # Sort by sssse_value   -> The higher - the more attractive
-sorted_list_ssssse_no_div    = sorted(rows_no_div[1:],   key=lambda row_no_div:   row_no_div[7],    reverse=True )  # Sort by ssssse_value  -> The higher - the more attractive
-sorted_list_sss_only_div     = sorted(rows_only_div[1:], key=lambda row_only_div: row_only_div[2],  reverse=False)  # Sort by sss_value     -> The lower  - the more attractive
-sorted_list_ssss_only_div    = sorted(rows_only_div[1:], key=lambda row_only_div: row_only_div[3],  reverse=False)  # Sort by ssss_value    -> The lower  - the more attractive
-sorted_list_sssss_only_div   = sorted(rows_only_div[1:], key=lambda row_only_div: row_only_div[4],  reverse=False)  # Sort by sssss_value   -> The lower  - the more attractive
-sorted_list_ssse_only_div    = sorted(rows_only_div[1:], key=lambda row_only_div: row_only_div[5],  reverse=True )  # Sort by ssse_value    -> The higher - the more attractive
-sorted_list_sssse_only_div   = sorted(rows_only_div[1:], key=lambda row_only_div: row_only_div[6],  reverse=True )  # Sort by sssse_value   -> The higher - the more attractive
-sorted_list_ssssse_only_div  = sorted(rows_only_div[1:], key=lambda row_only_div: row_only_div[7],  reverse=True )  # Sort by ssssse_value  -> The higher - the more attractive
-sorted_list_sssi             = sorted(rows[1:],          key=lambda row:          row[8],           reverse=False)  # Sort by sssi_value    -> The lower  - the more attractive
-sorted_list_ssssi            = sorted(rows[1:],          key=lambda row:          row[9],           reverse=False)  # Sort by ssssi_value   -> The lower  - the more attractive
-sorted_list_sssssi           = sorted(rows[1:],          key=lambda row:          row[10],          reverse=False)  # Sort by sssssi_value  -> The lower  - the more attractive
-sorted_list_sssei            = sorted(rows[1:],          key=lambda row:          row[11],          reverse=True )  # Sort by sssei_value   -> The higher - the more attractive
-sorted_list_ssssei           = sorted(rows[1:],          key=lambda row:          row[12],          reverse=True )  # Sort by ssssei_value  -> The higher - the more attractive
-sorted_list_sssssei          = sorted(rows[1:],          key=lambda row:          row[13],          reverse=True )  # Sort by sssssei_value -> The higher - the more attractive
-sorted_list_sssi_no_div      = sorted(rows_no_div[1:],   key=lambda row_no_div:   row_no_div[8],    reverse=False)  # Sort by sssi_value    -> The lower  - the more attractive
-sorted_list_ssssi_no_div     = sorted(rows_no_div[1:],   key=lambda row_no_div:   row_no_div[9],    reverse=False)  # Sort by ssssi_value   -> The lower  - the more attractive
-sorted_list_sssssi_no_div    = sorted(rows_no_div[1:],   key=lambda row_no_div:   row_no_div[10],   reverse=False)  # Sort by sssssi_value  -> The lower  - the more attractive
-sorted_list_sssei_no_div     = sorted(rows_no_div[1:],   key=lambda row_no_div:   row_no_div[11],   reverse=True )  # Sort by sssei_value   -> The higher - the more attractive
-sorted_list_ssssei_no_div    = sorted(rows_no_div[1:],   key=lambda row_no_div:   row_no_div[12],   reverse=True )  # Sort by ssssei_value  -> The higher - the more attractive
-sorted_list_sssssei_no_div   = sorted(rows_no_div[1:],   key=lambda row_no_div:   row_no_div[13],   reverse=True )  # Sort by sssssei_value -> The higher - the more attractive
-sorted_list_sssi_only_div    = sorted(rows_only_div[1:], key=lambda row_only_div: row_only_div[8],  reverse=False)  # Sort by sssi_value    -> The lower  - the more attractive
-sorted_list_ssssi_only_div   = sorted(rows_only_div[1:], key=lambda row_only_div: row_only_div[9],  reverse=False)  # Sort by ssssi_value   -> The lower  - the more attractive
-sorted_list_sssssi_only_div  = sorted(rows_only_div[1:], key=lambda row_only_div: row_only_div[10], reverse=False)  # Sort by sssssi_value  -> The lower  - the more attractive
-sorted_list_sssei_only_div   = sorted(rows_only_div[1:], key=lambda row_only_div: row_only_div[11], reverse=True )  # Sort by sssei_value   -> The higher - the more attractive
-sorted_list_ssssei_only_div  = sorted(rows_only_div[1:], key=lambda row_only_div: row_only_div[12], reverse=True )  # Sort by ssssei_value  -> The higher - the more attractive
-sorted_list_sssssei_only_div = sorted(rows_only_div[1:], key=lambda row_only_div: row_only_div[13], reverse=True )  # Sort by sssssei_value -> The higher - the more attractive
+sorted_list_sss              = sorted(rows,          key=lambda row:          row[2],           reverse=False)  # Sort by sss_value     -> The lower  - the more attractive
+sorted_list_ssss             = sorted(rows,          key=lambda row:          row[3],           reverse=False)  # Sort by ssss_value    -> The lower  - the more attractive
+sorted_list_sssss            = sorted(rows,          key=lambda row:          row[4],           reverse=False)  # Sort by sssss_value   -> The lower  - the more attractive
+sorted_list_ssse             = sorted(rows,          key=lambda row:          row[5],           reverse=True )  # Sort by ssse_value    -> The higher - the more attractive
+sorted_list_sssse            = sorted(rows,          key=lambda row:          row[6],           reverse=True )  # Sort by sssse_value   -> The higher - the more attractive
+sorted_list_ssssse           = sorted(rows,          key=lambda row:          row[7],           reverse=True )  # Sort by ssssse_value  -> The higher - the more attractive
+sorted_list_sss_no_div       = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[2],    reverse=False)  # Sort by sss_value     -> The lower  - the more attractive
+sorted_list_ssss_no_div      = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[3],    reverse=False)  # Sort by ssss_value    -> The lower  - the more attractive
+sorted_list_sssss_no_div     = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[4],    reverse=False)  # Sort by sssss_value   -> The lower  - the more attractive
+sorted_list_ssse_no_div      = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[5],    reverse=True )  # Sort by ssse_value    -> The higher - the more attractive
+sorted_list_sssse_no_div     = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[6],    reverse=True )  # Sort by sssse_value   -> The higher - the more attractive
+sorted_list_ssssse_no_div    = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[7],    reverse=True )  # Sort by ssssse_value  -> The higher - the more attractive
+sorted_list_sss_only_div     = sorted(rows_only_div, key=lambda row_only_div: row_only_div[2],  reverse=False)  # Sort by sss_value     -> The lower  - the more attractive
+sorted_list_ssss_only_div    = sorted(rows_only_div, key=lambda row_only_div: row_only_div[3],  reverse=False)  # Sort by ssss_value    -> The lower  - the more attractive
+sorted_list_sssss_only_div   = sorted(rows_only_div, key=lambda row_only_div: row_only_div[4],  reverse=False)  # Sort by sssss_value   -> The lower  - the more attractive
+sorted_list_ssse_only_div    = sorted(rows_only_div, key=lambda row_only_div: row_only_div[5],  reverse=True )  # Sort by ssse_value    -> The higher - the more attractive
+sorted_list_sssse_only_div   = sorted(rows_only_div, key=lambda row_only_div: row_only_div[6],  reverse=True )  # Sort by sssse_value   -> The higher - the more attractive
+sorted_list_ssssse_only_div  = sorted(rows_only_div, key=lambda row_only_div: row_only_div[7],  reverse=True )  # Sort by ssssse_value  -> The higher - the more attractive
+sorted_list_sssi             = sorted(rows,          key=lambda row:          row[8],           reverse=False)  # Sort by sssi_value    -> The lower  - the more attractive
+sorted_list_ssssi            = sorted(rows,          key=lambda row:          row[9],           reverse=False)  # Sort by ssssi_value   -> The lower  - the more attractive
+sorted_list_sssssi           = sorted(rows,          key=lambda row:          row[10],          reverse=False)  # Sort by sssssi_value  -> The lower  - the more attractive
+sorted_list_sssei            = sorted(rows,          key=lambda row:          row[11],          reverse=True )  # Sort by sssei_value   -> The higher - the more attractive
+sorted_list_ssssei           = sorted(rows,          key=lambda row:          row[12],          reverse=True )  # Sort by ssssei_value  -> The higher - the more attractive
+sorted_list_sssssei          = sorted(rows,          key=lambda row:          row[13],          reverse=True )  # Sort by sssssei_value -> The higher - the more attractive
+sorted_list_sssi_no_div      = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[8],    reverse=False)  # Sort by sssi_value    -> The lower  - the more attractive
+sorted_list_ssssi_no_div     = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[9],    reverse=False)  # Sort by ssssi_value   -> The lower  - the more attractive
+sorted_list_sssssi_no_div    = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[10],   reverse=False)  # Sort by sssssi_value  -> The lower  - the more attractive
+sorted_list_sssei_no_div     = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[11],   reverse=True )  # Sort by sssei_value   -> The higher - the more attractive
+sorted_list_ssssei_no_div    = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[12],   reverse=True )  # Sort by ssssei_value  -> The higher - the more attractive
+sorted_list_sssssei_no_div   = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[13],   reverse=True )  # Sort by sssssei_value -> The higher - the more attractive
+sorted_list_sssi_only_div    = sorted(rows_only_div, key=lambda row_only_div: row_only_div[8],  reverse=False)  # Sort by sssi_value    -> The lower  - the more attractive
+sorted_list_ssssi_only_div   = sorted(rows_only_div, key=lambda row_only_div: row_only_div[9],  reverse=False)  # Sort by ssssi_value   -> The lower  - the more attractive
+sorted_list_sssssi_only_div  = sorted(rows_only_div, key=lambda row_only_div: row_only_div[10], reverse=False)  # Sort by sssssi_value  -> The lower  - the more attractive
+sorted_list_sssei_only_div   = sorted(rows_only_div, key=lambda row_only_div: row_only_div[11], reverse=True )  # Sort by sssei_value   -> The higher - the more attractive
+sorted_list_ssssei_only_div  = sorted(rows_only_div, key=lambda row_only_div: row_only_div[12], reverse=True )  # Sort by ssssei_value  -> The higher - the more attractive
+sorted_list_sssssei_only_div = sorted(rows_only_div, key=lambda row_only_div: row_only_div[13], reverse=True )  # Sort by sssssei_value -> The higher - the more attractive
 
 list_sss_best = []
 list_sss_best.extend(sorted_list_sss             [:BEST_N_SELECT])
@@ -387,46 +419,48 @@ list_sss_best_only_div.extend(sorted_list_sssssei_only_div[:BEST_N_SELECT])
 sorted_list_sssss_best_only_div_with_duplicates = sorted(list_sss_best_only_div, key=lambda row: row[4], reverse=False)  # Sort by sssss_value   -> The lower  - the more attractive
 sorted_list_sssss_best_only_div = list(k for k, _ in itertools.groupby(sorted_list_sssss_best_only_div_with_duplicates))
 
-sorted_list_sss.insert(             0, rows[0])
-sorted_list_ssss.insert(            0, rows[0])
-sorted_list_sssss.insert(           0, rows[0])
-sorted_list_ssse.insert(            0, rows[0])
-sorted_list_sssse.insert(           0, rows[0])
-sorted_list_ssssse.insert(          0, rows[0])
-sorted_list_sss_no_div.insert(      0, rows_no_div[0])
-sorted_list_ssss_no_div.insert(     0, rows_no_div[0])
-sorted_list_sssss_no_div.insert(    0, rows_no_div[0])
-sorted_list_ssse_no_div.insert(     0, rows_no_div[0])
-sorted_list_sssse_no_div.insert(    0, rows_no_div[0])
-sorted_list_ssssse_no_div.insert(   0, rows_no_div[0])
-sorted_list_sss_only_div.insert(    0, rows_only_div[0])
-sorted_list_ssss_only_div.insert(   0, rows_only_div[0])
-sorted_list_sssss_only_div.insert(  0, rows_only_div[0])
-sorted_list_ssse_only_div.insert(   0, rows_only_div[0])
-sorted_list_sssse_only_div.insert(  0, rows_only_div[0])
-sorted_list_ssssse_only_div.insert( 0, rows_only_div[0])
-sorted_list_sssi.insert(            0, rows[0])
-sorted_list_ssssi.insert(           0, rows[0])
-sorted_list_sssssi.insert(          0, rows[0])
-sorted_list_sssei.insert(           0, rows[0])
-sorted_list_ssssei.insert(          0, rows[0])
-sorted_list_sssssei.insert(         0, rows[0])
-sorted_list_sssi_no_div.insert(     0, rows_no_div[0])
-sorted_list_ssssi_no_div.insert(    0, rows_no_div[0])
-sorted_list_sssssi_no_div.insert(   0, rows_no_div[0])
-sorted_list_sssei_no_div.insert(    0, rows_no_div[0])
-sorted_list_ssssei_no_div.insert(   0, rows_no_div[0])
-sorted_list_sssssei_no_div.insert(  0, rows_no_div[0])
-sorted_list_sssi_only_div.insert(   0, rows_only_div[0])
-sorted_list_ssssi_only_div.insert(  0, rows_only_div[0])
-sorted_list_sssssi_only_div.insert( 0, rows_only_div[0])
-sorted_list_sssei_only_div.insert(  0, rows_only_div[0])
-sorted_list_ssssei_only_div.insert( 0, rows_only_div[0])
-sorted_list_sssssei_only_div.insert(0, rows_only_div[0])
+header_row = ["Ticker", "Name", "sss_value", "ssss_value", "sssss_value", "ssse_value", "sssse_value", "ssssse_value", "sssi_value", "ssssi_value", "sssssi_value", "sssei_value", "ssssei_value", "sssssei_value", "enterprise_value_to_revenue", "trailing_price_to_earnings", "enterprise_value_to_ebitda", "profit_margin", "held_percent_institutions", "forward_eps", "trailing_eps", "price_to_book", "shares_outstanding", "net_income_to_common_shareholders", "nitcsh_to_shares_outstanding", "employees", "nitcsh_to_num_employees", "earnings_quarterly_growth", "price_to_earnings_to_growth_ratio", "last_dividend_0", "last_dividend_1", "last_dividend_2", "last_dividend_3" ]
 
-sorted_list_sssss_best.insert(               0, rows[0])
-sorted_list_sssss_best_no_div.insert(        0, rows[0])
-sorted_list_sssss_best_only_div.insert(      0, rows[0])
+sorted_list_sss.insert(             0, header_row)
+sorted_list_ssss.insert(            0, header_row)
+sorted_list_sssss.insert(           0, header_row)
+sorted_list_ssse.insert(            0, header_row)
+sorted_list_sssse.insert(           0, header_row)
+sorted_list_ssssse.insert(          0, header_row)
+sorted_list_sss_no_div.insert(      0, header_row)
+sorted_list_ssss_no_div.insert(     0, header_row)
+sorted_list_sssss_no_div.insert(    0, header_row)
+sorted_list_ssse_no_div.insert(     0, header_row)
+sorted_list_sssse_no_div.insert(    0, header_row)
+sorted_list_ssssse_no_div.insert(   0, header_row)
+sorted_list_sss_only_div.insert(    0, header_row)
+sorted_list_ssss_only_div.insert(   0, header_row)
+sorted_list_sssss_only_div.insert(  0, header_row)
+sorted_list_ssse_only_div.insert(   0, header_row)
+sorted_list_sssse_only_div.insert(  0, header_row)
+sorted_list_ssssse_only_div.insert( 0, header_row)
+sorted_list_sssi.insert(            0, header_row)
+sorted_list_ssssi.insert(           0, header_row)
+sorted_list_sssssi.insert(          0, header_row)
+sorted_list_sssei.insert(           0, header_row)
+sorted_list_ssssei.insert(          0, header_row)
+sorted_list_sssssei.insert(         0, header_row)
+sorted_list_sssi_no_div.insert(     0, header_row)
+sorted_list_ssssi_no_div.insert(    0, header_row)
+sorted_list_sssssi_no_div.insert(   0, header_row)
+sorted_list_sssei_no_div.insert(    0, header_row)
+sorted_list_ssssei_no_div.insert(   0, header_row)
+sorted_list_sssssei_no_div.insert(  0, header_row)
+sorted_list_sssi_only_div.insert(   0, header_row)
+sorted_list_ssssi_only_div.insert(  0, header_row)
+sorted_list_sssssi_only_div.insert( 0, header_row)
+sorted_list_sssei_only_div.insert(  0, header_row)
+sorted_list_ssssei_only_div.insert( 0, header_row)
+sorted_list_sssssei_only_div.insert(0, header_row)
+
+sorted_list_sssss_best.insert(               0, header_row)
+sorted_list_sssss_best_no_div.insert(        0, header_row)
+sorted_list_sssss_best_only_div.insert(      0, header_row)
 
 tase_str = ""
 if TASE_MODE: tase_str = "_TASE"
