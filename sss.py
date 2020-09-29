@@ -46,7 +46,7 @@ class StockData:
     last_4_dividends_2:                float = 0.0
     last_4_dividends_3:                float = 0.0
 
-
+NUM_THREADS                   = 1            # 1..4 Threads are supported
 TASE_MODE                     = 1            # Work on the Israeli Market only
 NUM_EMPLOYEES_UNKNOWN         = 10000000     # This will make the company very inefficient in terms of number of employees
 MUTUALFUND                    = 'MUTUALFUND' # Definition of a mutual fund 'quoteType' field in base.py, those are not interesting
@@ -76,7 +76,7 @@ if TASE_MODE: symbols = symbols_tase
 print('\nSSS Symbols to Scan: {}\n'.format(symbols))
 
 # Temporary for test:
-# symbols = ['MVNE.TA', 'IGLD-M.TA', 'ALMA.TA', 'EMDV.TA', 'ISTA.TA', 'ALD.TA', 'ADGR.TA', 'HOLX', 'SKLN.TA', 'ALMA.TA', 'SHOM.TA', 'BR', 'GDI', 'LOGM', 'WRK', 'EBAY', 'RSPP', 'FB', 'AL', 'INTC', 'AES', 'MMM', 'ADBE', 'MS']
+# symbols = ['MSBI.TA', 'RANI.TA', 'SHOM.TA', 'IMCO.TA', 'AFID.TA', 'ASPF.TA', 'GLRS.TA', 'HAML.TA', 'MVNE.TA', 'IGLD-M.TA', 'ALMA.TA', 'EMDV.TA', 'ISTA.TA', 'ALD.TA', 'ADGR.TA', 'HOLX', 'SKLN.TA', 'ALMA.TA', 'BR', 'GDI', 'LOGM', 'WRK', 'EBAY', 'RSPP', 'FB', 'AL', 'INTC', 'AES', 'MMM', 'ADBE', 'MS']
 
 def process_info(symbol, stock_data):
     try:
@@ -107,14 +107,17 @@ def process_info(symbol, stock_data):
         else:                                                                                         stock_data.held_percent_institutions = PERCENT_HELD_INSTITUTIONS_LOW
         if stock_data.held_percent_institutions is None or stock_data.held_percent_institutions == 0: stock_data.held_percent_institutions = PERCENT_HELD_INSTITUTIONS_LOW
 
-        if 'enterpriseToRevenue' in info: stock_data.enterprise_value_to_revenue = info['enterpriseToRevenue']  # https://www.investopedia.com/terms/e/ev-revenue-multiple.asp
-        else:                             stock_data.enterprise_value_to_revenue = None
+        if 'enterpriseToRevenue' in info:                          stock_data.enterprise_value_to_revenue = info['enterpriseToRevenue']  # https://www.investopedia.com/terms/e/ev-revenue-multiple.asp
+        else:                                                      stock_data.enterprise_value_to_revenue = None
+        if isinstance(stock_data.enterprise_value_to_revenue,str): stock_data.enterprise_value_to_revenue = None
 
-        if 'enterpriseToEbitda' in info:  stock_data.enterprise_value_to_ebitda  = info['enterpriseToEbitda']  # The lower the better: https://www.investopedia.com/ask/answers/072715/what-considered-healthy-evebitda.asp
-        else:                             stock_data.enterprise_value_to_ebitda  = None
+        if 'enterpriseToEbitda' in info:                           stock_data.enterprise_value_to_ebitda  = info['enterpriseToEbitda']  # The lower the better: https://www.investopedia.com/ask/answers/072715/what-considered-healthy-evebitda.asp
+        else:                                                      stock_data.enterprise_value_to_ebitda  = None
+        if isinstance(stock_data.enterprise_value_to_ebitda,str):  stock_data.enterprise_value_to_ebitda  = None
 
-        if 'trailingPE' in info:          stock_data.trailing_price_to_earnings  = info['trailingPE']  # https://www.investopedia.com/terms/t/trailingpe.asp
-        else:                             stock_data.trailing_price_to_earnings  = None
+        if 'trailingPE' in info:                                   stock_data.trailing_price_to_earnings  = info['trailingPE']  # https://www.investopedia.com/terms/t/trailingpe.asp
+        else:                                                      stock_data.trailing_price_to_earnings  = None
+        if isinstance(stock_data.trailing_price_to_earnings,str):  stock_data.trailing_price_to_earnings  = None
 
         if stock_data.enterprise_value_to_revenue is None and stock_data.enterprise_value_to_ebitda is None and stock_data.trailing_price_to_earnings is None:
             print('skipping since trailing_price_to_earnings, enterprise_value_to_ebitda and enterprise_value_to_revenue are unknown')
@@ -131,12 +134,15 @@ def process_info(symbol, stock_data):
 
         if 'forwardEps'                                 in info: stock_data.forward_eps                       = info['forwardEps']
         else:                                                    stock_data.forward_eps                       = None
+        if isinstance(stock_data.forward_eps,str):               stock_data.forward_eps                       = None
 
         if 'trailingEps'                                in info: stock_data.trailing_eps                      = info['trailingEps']
         else:                                                    stock_data.trailing_eps                      = None
+        if isinstance(stock_data.trailing_eps,str):              stock_data.trailing_eps                      = None
 
         if 'priceToBook'                                in info: stock_data.price_to_book                     = info['priceToBook']
         else:                                                    stock_data.price_to_book                     = None
+        if isinstance(stock_data.price_to_book,str):             stock_data.price_to_book                     = None
 
         if 'earningsQuarterlyGrowth'                    in info: stock_data.earnings_quarterly_growth         = info['earningsQuarterlyGrowth']
         else:                                                    stock_data.earnings_quarterly_growth         = None
@@ -265,10 +271,14 @@ def process_info(symbol, stock_data):
         stock_data.last_4_dividends_2 = 0
         stock_data.last_4_dividends_3 = 0
 
-        if len(symbol.dividends) > 0: stock_data.last_4_dividends_0 = symbol.dividends[0]
-        if len(symbol.dividends) > 1: stock_data.last_4_dividends_1 = symbol.dividends[1]
-        if len(symbol.dividends) > 2: stock_data.last_4_dividends_2 = symbol.dividends[2]
-        if len(symbol.dividends) > 3: stock_data.last_4_dividends_3 = symbol.dividends[3]
+        try:
+            if len(symbol.dividends) > 0: stock_data.last_4_dividends_0 = symbol.dividends[0]
+            if len(symbol.dividends) > 1: stock_data.last_4_dividends_1 = symbol.dividends[1]
+            if len(symbol.dividends) > 2: stock_data.last_4_dividends_2 = symbol.dividends[2]
+            if len(symbol.dividends) > 3: stock_data.last_4_dividends_3 = symbol.dividends[3]
+        except Exception as e:
+            print("Exception in symbol.dividends: {}".format(e))
+            pass
 
         print('sss_value: {:15}, ssss_value: {:15}, sssss_value: {:15}, ssse_value: {:15}, sssse_value: {:15}, ssssse_value: {:15}, sssi_value: {:15}, ssssi_value: {:15}, sssssi_value: {:15}, sssei_value: {:15}, ssssei_value: {:15}, sssssei_value: {:15}, enterprise_value_to_revenue: {:15}, trailing_price_to_earnings: {:15}, enterprise_value_to_ebitda: {:15}, profit_margin: {:15}, held_percent_institutions: {:15}, forward_eps: {:15}, trailing_eps: {:15}, price_to_book: {:15}, shares_outstanding: {:15}, net_income_to_common_shareholders: {:15}, nitcsh_to_shares_outstanding: {:15}, num_employees: {:15}, nitcsh_to_num_employees: {:15}, earnings_quarterly_growth: {:15}, price_to_earnings_to_growth_ratio: {:15}'.format(stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.sssssei_value, stock_data.enterprise_value_to_revenue, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio))
         return True
@@ -289,9 +299,10 @@ def process_symbols(symbols, rows, rows_no_div, rows_only_div):
 
         if TASE_MODE: stock_data.ticker = 'TLV:' + stock_data.ticker.replace('.TA', '')
 
-        rows.append(                                   [stock_data.ticker, stock_data.short_name, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.ssssei_value, stock_data.enterprise_value_to_revenue, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.last_4_dividends_0, stock_data.last_4_dividends_1, stock_data.last_4_dividends_2, stock_data.last_4_dividends_3])
-        if len(symbol.dividends): rows_only_div.append([stock_data.ticker, stock_data.short_name, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.ssssei_value, stock_data.enterprise_value_to_revenue, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.last_4_dividends_0, stock_data.last_4_dividends_1, stock_data.last_4_dividends_2, stock_data.last_4_dividends_3])
-        else:                     rows_no_div.append(  [stock_data.ticker, stock_data.short_name, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.ssssei_value, stock_data.enterprise_value_to_revenue, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.last_4_dividends_0, stock_data.last_4_dividends_1, stock_data.last_4_dividends_2, stock_data.last_4_dividends_3])
+        dividends_sum = stock_data.last_4_dividends_0+stock_data.last_4_dividends_1+stock_data.last_4_dividends_2+stock_data.last_4_dividends_3
+        rows.append(                           [stock_data.ticker, stock_data.short_name, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.ssssei_value, stock_data.enterprise_value_to_revenue, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.last_4_dividends_0, stock_data.last_4_dividends_1, stock_data.last_4_dividends_2, stock_data.last_4_dividends_3])
+        if dividends_sum: rows_only_div.append([stock_data.ticker, stock_data.short_name, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.ssssei_value, stock_data.enterprise_value_to_revenue, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.last_4_dividends_0, stock_data.last_4_dividends_1, stock_data.last_4_dividends_2, stock_data.last_4_dividends_3])
+        else:             rows_no_div.append(  [stock_data.ticker, stock_data.short_name, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.ssssei_value, stock_data.enterprise_value_to_revenue, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.last_4_dividends_0, stock_data.last_4_dividends_1, stock_data.last_4_dividends_2, stock_data.last_4_dividends_3])
 
 rows           = []
 rows_no_div    = []
@@ -309,25 +320,25 @@ rows3          = []
 rows3_no_div   = []
 rows3_only_div = []
 
-symbols0 = symbols[0:][::4] # 0, 4,  8, ...
-symbols1 = symbols[1:][::4] # 1, 5,  9, ...
-symbols2 = symbols[2:][::4] # 2, 6, 10, ...
-symbols3 = symbols[3:][::4] # 3, 7, 11, ...
+if NUM_THREADS >= 1: symbols0 = symbols[0:][::NUM_THREADS] # 0,   NUM_THREADS,   2*NUM_THREADS, ...
+if NUM_THREADS >= 2: symbols1 = symbols[1:][::NUM_THREADS] # 1, 1+NUM_THREADS, 2+2*NUM_THREADS, ...
+if NUM_THREADS >= 3: symbols2 = symbols[2:][::NUM_THREADS] # 2, 2+NUM_THREADS, 3+2*NUM_THREADS, ...
+if NUM_THREADS >= 4: symbols3 = symbols[3:][::NUM_THREADS] # 3, 3+NUM_THREADS, 4+2*NUM_THREADS, ...
 
-thread0 = Thread(target=process_symbols, args=(symbols0, rows0, rows0_no_div, rows0_only_div)) # process_symbols(symbols=symbols0, rows=rows0, rows_no_div=rows0_no_div, rows_only_div=rows0_only_div)
-thread1 = Thread(target=process_symbols, args=(symbols1, rows1, rows1_no_div, rows1_only_div)) # process_symbols(symbols=symbols1, rows=rows1, rows_no_div=rows1_no_div, rows_only_div=rows1_only_div)
-thread2 = Thread(target=process_symbols, args=(symbols2, rows2, rows2_no_div, rows2_only_div))
-thread3 = Thread(target=process_symbols, args=(symbols3, rows3, rows3_no_div, rows3_only_div))
+if NUM_THREADS >= 1: thread0 = Thread(target=process_symbols, args=(symbols0, rows0, rows0_no_div, rows0_only_div)) # process_symbols(symbols=symbols0, rows=rows0, rows_no_div=rows0_no_div, rows_only_div=rows0_only_div)
+if NUM_THREADS >= 2: thread1 = Thread(target=process_symbols, args=(symbols1, rows1, rows1_no_div, rows1_only_div)) # process_symbols(symbols=symbols1, rows=rows1, rows_no_div=rows1_no_div, rows_only_div=rows1_only_div)
+if NUM_THREADS >= 3: thread2 = Thread(target=process_symbols, args=(symbols2, rows2, rows2_no_div, rows2_only_div))
+if NUM_THREADS >= 4: thread3 = Thread(target=process_symbols, args=(symbols3, rows3, rows3_no_div, rows3_only_div))
 
-thread0.start()
-thread1.start()
-thread2.start()
-thread3.start()
+if NUM_THREADS >= 1: thread0.start()
+if NUM_THREADS >= 2: thread1.start()
+if NUM_THREADS >= 3: thread2.start()
+if NUM_THREADS >= 4: thread3.start()
 
-thread0.join()
-thread1.join()
-thread2.join()
-thread3.join()
+if NUM_THREADS >= 1: thread0.join()
+if NUM_THREADS >= 2: thread1.join()
+if NUM_THREADS >= 3: thread2.join()
+if NUM_THREADS >= 4: thread3.join()
 
 rows.extend(         rows0          + rows1          + rows2          + rows3         )
 rows_no_div.extend(  rows0_no_div   + rows1_no_div   + rows2_no_div   + rows3_no_div  )
