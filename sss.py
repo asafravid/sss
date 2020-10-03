@@ -46,8 +46,8 @@ class StockData:
     last_4_dividends_2:                float = 0.0
     last_4_dividends_3:                float = 0.0
 
-NUM_THREADS                   = 1            # 1..4 Threads are supported
-TASE_MODE                     = 1            # Work on the Israeli Market only
+NUM_THREADS                   = 4            # 1..4 Threads are supported
+TASE_MODE                     = 0            # Work on the Israeli Market only
 NUM_EMPLOYEES_UNKNOWN         = 10000000     # This will make the company very inefficient in terms of number of employees
 MUTUALFUND                    = 'MUTUALFUND' # Definition of a mutual fund 'quoteType' field in base.py, those are not interesting
 PROFIT_MARGIN_UNKNOWN         = 0.025        # This will make the company not profitable terms of profit margins, thus less attractive
@@ -76,7 +76,7 @@ if TASE_MODE: symbols = symbols_tase
 print('\nSSS Symbols to Scan: {}\n'.format(symbols))
 
 # Temporary for test:
-# symbols = ['MSBI.TA', 'RANI.TA', 'SHOM.TA', 'IMCO.TA', 'AFID.TA', 'ASPF.TA', 'GLRS.TA', 'HAML.TA', 'MVNE.TA', 'IGLD-M.TA', 'ALMA.TA', 'EMDV.TA', 'ISTA.TA', 'ALD.TA', 'ADGR.TA', 'HOLX', 'SKLN.TA', 'ALMA.TA', 'BR', 'GDI', 'LOGM', 'WRK', 'EBAY', 'RSPP', 'FB', 'AL', 'INTC', 'AES', 'MMM', 'ADBE', 'MS']
+# symbols = ['ACM', 'MSBI.TA', 'RANI.TA', 'SHOM.TA', 'IMCO.TA', 'AFID.TA', 'ASPF.TA', 'GLRS.TA', 'HAML.TA', 'MVNE.TA', 'IGLD-M.TA', 'ALMA.TA', 'EMDV.TA', 'ISTA.TA', 'ALD.TA', 'ADGR.TA', 'HOLX', 'SKLN.TA', 'ALMA.TA', 'BR', 'GDI', 'LOGM', 'WRK', 'EBAY', 'RSPP', 'FB', 'AL', 'INTC', 'AES', 'MMM', 'ADBE', 'MS']
 
 def process_info(symbol, stock_data):
     try:
@@ -475,7 +475,7 @@ sorted_list_sssss_best_only_div.insert(      0, header_row)
 
 tase_str = ""
 if TASE_MODE: tase_str = "_TASE"
-date_and_time = time.strftime("%Y%m%d-%H%M%S{}".format(tase_str))
+date_and_time = time.strftime("Results/%Y%m%d-%H%M%S{}".format(tase_str))
 
 filename_sss_engine              = "{}/sss_engine.csv".format(date_and_time)
 filename_ssss_engine             = "{}/ssss_engine.csv".format(date_and_time)
