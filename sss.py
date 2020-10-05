@@ -4,6 +4,7 @@ import yfinance as yf
 import csv
 import os
 import itertools
+import sss_filenames
 
 from threading import Thread
 from dataclasses import dataclass
@@ -432,290 +433,33 @@ sorted_list_sssss_best_only_div = list(k for k, _ in itertools.groupby(sorted_li
 
 header_row = ["Ticker", "Name", "sss_value", "ssss_value", "sssss_value", "ssse_value", "sssse_value", "ssssse_value", "sssi_value", "ssssi_value", "sssssi_value", "sssei_value", "ssssei_value", "sssssei_value", "enterprise_value_to_revenue", "trailing_price_to_earnings", "enterprise_value_to_ebitda", "profit_margin", "held_percent_institutions", "forward_eps", "trailing_eps", "price_to_book", "shares_outstanding", "net_income_to_common_shareholders", "nitcsh_to_shares_outstanding", "employees", "nitcsh_to_num_employees", "earnings_quarterly_growth", "price_to_earnings_to_growth_ratio", "last_dividend_0", "last_dividend_1", "last_dividend_2", "last_dividend_3" ]
 
-sorted_list_sss.insert(             0, header_row)
-sorted_list_ssss.insert(            0, header_row)
-sorted_list_sssss.insert(           0, header_row)
-sorted_list_ssse.insert(            0, header_row)
-sorted_list_sssse.insert(           0, header_row)
-sorted_list_ssssse.insert(          0, header_row)
-sorted_list_sss_no_div.insert(      0, header_row)
-sorted_list_ssss_no_div.insert(     0, header_row)
-sorted_list_sssss_no_div.insert(    0, header_row)
-sorted_list_ssse_no_div.insert(     0, header_row)
-sorted_list_sssse_no_div.insert(    0, header_row)
-sorted_list_ssssse_no_div.insert(   0, header_row)
-sorted_list_sss_only_div.insert(    0, header_row)
-sorted_list_ssss_only_div.insert(   0, header_row)
-sorted_list_sssss_only_div.insert(  0, header_row)
-sorted_list_ssse_only_div.insert(   0, header_row)
-sorted_list_sssse_only_div.insert(  0, header_row)
-sorted_list_ssssse_only_div.insert( 0, header_row)
-sorted_list_sssi.insert(            0, header_row)
-sorted_list_ssssi.insert(           0, header_row)
-sorted_list_sssssi.insert(          0, header_row)
-sorted_list_sssei.insert(           0, header_row)
-sorted_list_ssssei.insert(          0, header_row)
-sorted_list_sssssei.insert(         0, header_row)
-sorted_list_sssi_no_div.insert(     0, header_row)
-sorted_list_ssssi_no_div.insert(    0, header_row)
-sorted_list_sssssi_no_div.insert(   0, header_row)
-sorted_list_sssei_no_div.insert(    0, header_row)
-sorted_list_ssssei_no_div.insert(   0, header_row)
-sorted_list_sssssei_no_div.insert(  0, header_row)
-sorted_list_sssi_only_div.insert(   0, header_row)
-sorted_list_ssssi_only_div.insert(  0, header_row)
-sorted_list_sssssi_only_div.insert( 0, header_row)
-sorted_list_sssei_only_div.insert(  0, header_row)
-sorted_list_ssssei_only_div.insert( 0, header_row)
-sorted_list_sssssei_only_div.insert(0, header_row)
+sorted_lists_list = [
+    sorted_list_sss,                        sorted_list_ssss,                       sorted_list_sssss,                      sorted_list_ssse,
+    sorted_list_sssse,                      sorted_list_ssssse,                     sorted_list_sss_no_div,                 sorted_list_ssss_no_div,
+    sorted_list_sssss_no_div,               sorted_list_ssse_no_div,                sorted_list_sssse_no_div,               sorted_list_ssssse_no_div,
+    sorted_list_sss_only_div,               sorted_list_ssss_only_div,              sorted_list_sssss_only_div,             sorted_list_ssse_only_div,
+    sorted_list_sssse_only_div,             sorted_list_ssssse_only_div,            sorted_list_sssi,                       sorted_list_ssssi,
+    sorted_list_sssssi,                     sorted_list_sssei,                      sorted_list_ssssei,                     sorted_list_sssssei,
+    sorted_list_sssi_no_div,                sorted_list_ssssi_no_div,               sorted_list_sssssi_no_div,              sorted_list_sssei_no_div,
+    sorted_list_ssssei_no_div,              sorted_list_sssssei_no_div,             sorted_list_sssi_only_div,              sorted_list_ssssi_only_div,
+    sorted_list_sssssi_only_div,            sorted_list_sssei_only_div,             sorted_list_ssssei_only_div,            sorted_list_sssssei_only_div,
+    sorted_list_sssss_best,                 sorted_list_sssss_best_no_div,          sorted_list_sssss_best_only_div
+]
 
-sorted_list_sssss_best.insert(               0, header_row)
-sorted_list_sssss_best_no_div.insert(        0, header_row)
-sorted_list_sssss_best_only_div.insert(      0, header_row)
+for sorted_list in sorted_lists_list:
+    sorted_list.insert(0, header_row)
 
 tase_str = ""
 if TASE_MODE: tase_str = "_TASE"
 date_and_time = time.strftime("Results/%Y%m%d-%H%M%S{}".format(tase_str))
+# ]
 
-filename_sss_engine              = "{}/sss_engine.csv".format(date_and_time)
-filename_ssss_engine             = "{}/ssss_engine.csv".format(date_and_time)
-filename_sssss_engine            = "{}/sssss_engine.csv".format(date_and_time)
-filename_ssse_engine             = "{}/ssse_engine.csv".format(date_and_time)
-filename_sssse_engine            = "{}/sssse_engine.csv".format(date_and_time)
-filename_ssssse_engine           = "{}/ssssse_engine.csv".format(date_and_time)
-filename_sss_engine_no_div       = "{}/sss_engine_no_div.csv".format(date_and_time)
-filename_ssss_engine_no_div      = "{}/ssss_engine_no_div.csv".format(date_and_time)
-filename_sssss_engine_no_div     = "{}/sssss_engine_no_div.csv".format(date_and_time)
-filename_ssse_engine_no_div      = "{}/ssse_engine_no_div.csv".format(date_and_time)
-filename_sssse_engine_no_div     = "{}/sssse_engine_no_div.csv".format(date_and_time)
-filename_ssssse_engine_no_div    = "{}/ssssse_engine_no_div.csv".format(date_and_time)
-filename_sss_engine_only_div     = "{}/sss_engine_only_div.csv".format(date_and_time)
-filename_ssss_engine_only_div    = "{}/ssss_engine_only_div.csv".format(date_and_time)
-filename_sssss_engine_only_div   = "{}/sssss_engine_only_div.csv".format(date_and_time)
-filename_ssse_engine_only_div    = "{}/ssse_engine_only_div.csv".format(date_and_time)
-filename_sssse_engine_only_div   = "{}/sssse_engine_only_div.csv".format(date_and_time)
-filename_ssssse_engine_only_div  = "{}/ssssse_engine_only_div.csv".format(date_and_time)
-filename_sssi_engine             = "{}/sssi_engine.csv".format(date_and_time)
-filename_ssssi_engine            = "{}/ssssi_engine.csv".format(date_and_time)
-filename_sssssi_engine           = "{}/sssssi_engine.csv".format(date_and_time)
-filename_sssei_engine            = "{}/sssei_engine.csv".format(date_and_time)
-filename_ssssei_engine           = "{}/ssssei_engine.csv".format(date_and_time)
-filename_sssssei_engine          = "{}/sssssei_engine.csv".format(date_and_time)
-filename_sssi_engine_no_div      = "{}/sssi_engine_no_div.csv".format(date_and_time)
-filename_ssssi_engine_no_div     = "{}/ssssi_engine_no_div.csv".format(date_and_time)
-filename_sssssi_engine_no_div    = "{}/sssssi_engine_no_div.csv".format(date_and_time)
-filename_sssei_engine_no_div     = "{}/sssei_engine_no_div.csv".format(date_and_time)
-filename_ssssei_engine_no_div    = "{}/ssssei_engine_no_div.csv".format(date_and_time)
-filename_sssssei_engine_no_div   = "{}/sssssei_engine_no_div.csv".format(date_and_time)
-filename_sssi_engine_only_div    = "{}/sssi_engine_only_div.csv".format(date_and_time)
-filename_ssssi_engine_only_div   = "{}/ssssi_engine_only_div.csv".format(date_and_time)
-filename_sssssi_engine_only_div  = "{}/sssssi_engine_only_div.csv".format(date_and_time)
-filename_sssei_engine_only_div   = "{}/sssei_engine_only_div.csv".format(date_and_time)
-filename_ssssei_engine_only_div  = "{}/ssssei_engine_only_div.csv".format(date_and_time)
-filename_sssssei_engine_only_div = "{}/sssssei_engine_only_div.csv".format(date_and_time)
+filenames_list = sss_filenames.create_filenames_list(date_and_time)
 
-filename_sssss_best_engine          = "{}/sssss_best_engine.csv".format(date_and_time)
-filename_sssss_best_no_div_engine   = "{}/sssss_best_no_div_engine.csv".format(date_and_time)
-filename_sssss_best_only_div_engine = "{}/sssss_best_only_div_engine.csv".format(date_and_time)
+for index in range(len(filenames_list)):
+    os.makedirs(os.path.dirname(filenames_list[index]), exist_ok=True)
+    with open(filenames_list[index], mode='w', newline='') as engine:
+        writer = csv.writer(engine)
+        writer.writerows(sorted_lists_list[index])
 
 
-os.makedirs(os.path.dirname(filename_sss_engine),           exist_ok=True)
-with open(filename_sss_engine,           mode='w', newline='') as sss_engine:
-    writer_sss = csv.writer(sss_engine)
-    writer_sss.writerows(sorted_list_sss)
-
-os.makedirs(os.path.dirname(filename_ssss_engine),           exist_ok=True)
-with open(filename_ssss_engine,          mode='w', newline='') as ssss_engine:
-    writer_ssss = csv.writer(ssss_engine)
-    writer_ssss.writerows(sorted_list_ssss)
-
-os.makedirs(os.path.dirname(filename_sssss_engine),           exist_ok=True)
-with open(filename_sssss_engine,          mode='w', newline='') as sssss_engine:
-    writer_sssss = csv.writer(sssss_engine)
-    writer_sssss.writerows(sorted_list_sssss)
-
-os.makedirs(os.path.dirname(filename_ssse_engine),          exist_ok=True)
-with open(filename_ssse_engine,          mode='w', newline='') as ssse_engine:
-    writer_ssse = csv.writer(ssse_engine)
-    writer_ssse.writerows(sorted_list_ssse)
-
-os.makedirs(os.path.dirname(filename_sssse_engine),          exist_ok=True)
-with open(filename_sssse_engine,          mode='w', newline='') as sssse_engine:
-    writer_sssse = csv.writer(sssse_engine)
-    writer_sssse.writerows(sorted_list_sssse)
-
-os.makedirs(os.path.dirname(filename_ssssse_engine),          exist_ok=True)
-with open(filename_ssssse_engine,          mode='w', newline='') as ssssse_engine:
-    writer_ssssse = csv.writer(ssssse_engine)
-    writer_ssssse.writerows(sorted_list_ssssse)
-
-os.makedirs(os.path.dirname(filename_sss_engine_no_div),    exist_ok=True)
-with open(filename_sss_engine_no_div,    mode='w', newline='') as sss_engine:
-    writer_sss = csv.writer(sss_engine)
-    writer_sss.writerows(sorted_list_sss_no_div)
-
-os.makedirs(os.path.dirname(filename_ssss_engine_no_div),    exist_ok=True)
-with open(filename_ssss_engine_no_div,   mode='w', newline='') as ssss_engine:
-    writer_ssss = csv.writer(ssss_engine)
-    writer_ssss.writerows(sorted_list_ssss_no_div)
-
-os.makedirs(os.path.dirname(filename_sssss_engine_no_div),    exist_ok=True)
-with open(filename_sssss_engine_no_div,   mode='w', newline='') as sssss_engine:
-    writer_sssss = csv.writer(sssss_engine)
-    writer_sssss.writerows(sorted_list_sssss_no_div)
-
-os.makedirs(os.path.dirname(filename_ssse_engine_no_div),   exist_ok=True)
-with open(filename_ssse_engine_no_div,   mode='w', newline='') as ssse_engine:
-    writer_ssse = csv.writer(ssse_engine)
-    writer_ssse.writerows(sorted_list_ssse_no_div)
-
-os.makedirs(os.path.dirname(filename_sssse_engine_no_div),   exist_ok=True)
-with open(filename_sssse_engine_no_div,   mode='w', newline='') as sssse_engine:
-    writer_sssse = csv.writer(sssse_engine)
-    writer_sssse.writerows(sorted_list_sssse_no_div)
-
-os.makedirs(os.path.dirname(filename_ssssse_engine_no_div),   exist_ok=True)
-with open(filename_ssssse_engine_no_div,   mode='w', newline='') as ssssse_engine:
-    writer_ssssse = csv.writer(ssssse_engine)
-    writer_ssssse.writerows(sorted_list_ssssse_no_div)
-
-os.makedirs(os.path.dirname(filename_sss_engine_only_div),  exist_ok=True)
-with open(filename_sss_engine_only_div,  mode='w', newline='') as sss_engine:
-    writer_sss = csv.writer(sss_engine)
-    writer_sss.writerows(sorted_list_sss_only_div)
-
-os.makedirs(os.path.dirname(filename_ssss_engine_only_div),  exist_ok=True)
-with open(filename_ssss_engine_only_div, mode='w', newline='') as ssss_engine:
-    writer_ssss = csv.writer(ssss_engine)
-    writer_ssss.writerows(sorted_list_ssss_only_div)
-
-os.makedirs(os.path.dirname(filename_sssss_engine_only_div),  exist_ok=True)
-with open(filename_sssss_engine_only_div, mode='w', newline='') as sssss_engine:
-    writer_sssss = csv.writer(sssss_engine)
-    writer_sssss.writerows(sorted_list_sssss_only_div)
-
-os.makedirs(os.path.dirname(filename_ssse_engine_only_div), exist_ok=True)
-with open(filename_ssse_engine_only_div, mode='w', newline='') as ssse_engine:
-    writer_ssse = csv.writer(ssse_engine)
-    writer_ssse.writerows(sorted_list_ssse_only_div)
-
-os.makedirs(os.path.dirname(filename_sssse_engine_only_div), exist_ok=True)
-with open(filename_sssse_engine_only_div, mode='w', newline='') as sssse_engine:
-    writer_sssse = csv.writer(sssse_engine)
-    writer_sssse.writerows(sorted_list_sssse_only_div)
-
-os.makedirs(os.path.dirname(filename_ssssse_engine_only_div), exist_ok=True)
-with open(filename_ssssse_engine_only_div, mode='w', newline='') as ssssse_engine:
-    writer_ssssse = csv.writer(ssssse_engine)
-    writer_ssssse.writerows(sorted_list_ssssse_only_div)
-
-# i
-# ------
-
-os.makedirs(os.path.dirname(filename_sssi_engine),           exist_ok=True)
-with open(filename_sssi_engine,           mode='w', newline='') as sssi_engine:
-    writer_sssi = csv.writer(sssi_engine)
-    writer_sssi.writerows(sorted_list_sssi)
-
-os.makedirs(os.path.dirname(filename_ssssi_engine),           exist_ok=True)
-with open(filename_ssssi_engine,          mode='w', newline='') as ssssi_engine:
-    writer_ssssi = csv.writer(ssssi_engine)
-    writer_ssssi.writerows(sorted_list_ssssi)
-
-os.makedirs(os.path.dirname(filename_sssssi_engine),           exist_ok=True)
-with open(filename_sssssi_engine,          mode='w', newline='') as sssssi_engine:
-    writer_sssssi = csv.writer(sssssi_engine)
-    writer_sssssi.writerows(sorted_list_sssssi)
-
-os.makedirs(os.path.dirname(filename_sssei_engine),          exist_ok=True)
-with open(filename_sssei_engine,          mode='w', newline='') as sssei_engine:
-    writer_sssei = csv.writer(sssei_engine)
-    writer_sssei.writerows(sorted_list_sssei)
-
-os.makedirs(os.path.dirname(filename_ssssei_engine),          exist_ok=True)
-with open(filename_ssssei_engine,          mode='w', newline='') as ssssei_engine:
-    writer_ssssei = csv.writer(ssssei_engine)
-    writer_ssssei.writerows(sorted_list_ssssei)
-
-os.makedirs(os.path.dirname(filename_sssssei_engine),          exist_ok=True)
-with open(filename_sssssei_engine,          mode='w', newline='') as sssssei_engine:
-    writer_sssssei = csv.writer(sssssei_engine)
-    writer_sssssei.writerows(sorted_list_sssssei)
-
-os.makedirs(os.path.dirname(filename_sssi_engine_no_div),    exist_ok=True)
-with open(filename_sssi_engine_no_div,    mode='w', newline='') as sssi_engine:
-    writer_sssi = csv.writer(sssi_engine)
-    writer_sssi.writerows(sorted_list_sssi_no_div)
-
-os.makedirs(os.path.dirname(filename_ssssi_engine_no_div),    exist_ok=True)
-with open(filename_ssssi_engine_no_div,   mode='w', newline='') as ssssi_engine:
-    writer_ssssi = csv.writer(ssssi_engine)
-    writer_ssssi.writerows(sorted_list_ssssi_no_div)
-
-os.makedirs(os.path.dirname(filename_sssssi_engine_no_div),    exist_ok=True)
-with open(filename_sssssi_engine_no_div,   mode='w', newline='') as sssssi_engine:
-    writer_sssssi = csv.writer(sssssi_engine)
-    writer_sssssi.writerows(sorted_list_sssssi_no_div)
-
-os.makedirs(os.path.dirname(filename_sssei_engine_no_div),   exist_ok=True)
-with open(filename_sssei_engine_no_div,   mode='w', newline='') as sssei_engine:
-    writer_sssei = csv.writer(sssei_engine)
-    writer_sssei.writerows(sorted_list_sssei_no_div)
-
-os.makedirs(os.path.dirname(filename_ssssei_engine_no_div),   exist_ok=True)
-with open(filename_ssssei_engine_no_div,   mode='w', newline='') as ssssei_engine:
-    writer_ssssei = csv.writer(ssssei_engine)
-    writer_ssssei.writerows(sorted_list_ssssei_no_div)
-
-os.makedirs(os.path.dirname(filename_sssssei_engine_no_div),   exist_ok=True)
-with open(filename_sssssei_engine_no_div,   mode='w', newline='') as sssssei_engine:
-    writer_sssssei = csv.writer(sssssei_engine)
-    writer_sssssei.writerows(sorted_list_sssssei_no_div)
-
-os.makedirs(os.path.dirname(filename_sssi_engine_only_div),  exist_ok=True)
-with open(filename_sssi_engine_only_div,  mode='w', newline='') as sssi_engine:
-    writer_sssi = csv.writer(sssi_engine)
-    writer_sssi.writerows(sorted_list_sssi_only_div)
-
-os.makedirs(os.path.dirname(filename_ssssi_engine_only_div),  exist_ok=True)
-with open(filename_ssssi_engine_only_div, mode='w', newline='') as ssssi_engine:
-    writer_ssssi = csv.writer(ssssi_engine)
-    writer_ssssi.writerows(sorted_list_ssssi_only_div)
-
-os.makedirs(os.path.dirname(filename_sssssi_engine_only_div),  exist_ok=True)
-with open(filename_sssssi_engine_only_div, mode='w', newline='') as sssssi_engine:
-    writer_sssssi = csv.writer(sssssi_engine)
-    writer_sssssi.writerows(sorted_list_sssssi_only_div)
-
-os.makedirs(os.path.dirname(filename_sssei_engine_only_div), exist_ok=True)
-with open(filename_sssei_engine_only_div, mode='w', newline='') as sssei_engine:
-    writer_sssei = csv.writer(sssei_engine)
-    writer_sssei.writerows(sorted_list_sssei_only_div)
-
-os.makedirs(os.path.dirname(filename_ssssei_engine_only_div), exist_ok=True)
-with open(filename_ssssei_engine_only_div, mode='w', newline='') as ssssei_engine:
-    writer_ssssei = csv.writer(ssssei_engine)
-    writer_ssssei.writerows(sorted_list_ssssei_only_div)
-
-os.makedirs(os.path.dirname(filename_sssssei_engine_only_div), exist_ok=True)
-with open(filename_sssssei_engine_only_div, mode='w', newline='') as sssssei_engine:
-    writer_sssssei = csv.writer(sssssei_engine)
-    writer_sssssei.writerows(sorted_list_sssssei_only_div)
-
-# Best
-# ----
-
-os.makedirs(os.path.dirname(filename_sssss_best_engine), exist_ok=True)
-with open(filename_sssss_best_engine, mode='w', newline='') as sssss_best_engine:
-    writer_sssss_best = csv.writer(sssss_best_engine)
-    writer_sssss_best.writerows(sorted_list_sssss_best)
-
-os.makedirs(os.path.dirname(filename_sssss_best_no_div_engine), exist_ok=True)
-with open(filename_sssss_best_no_div_engine, mode='w', newline='') as sssss_best_no_div_engine:
-    writer_sssss_best_no_div = csv.writer(sssss_best_no_div_engine)
-    writer_sssss_best_no_div.writerows(sorted_list_sssss_best_no_div)
-
-os.makedirs(os.path.dirname(filename_sssss_best_only_div_engine), exist_ok=True)
-with open(filename_sssss_best_only_div_engine, mode='w', newline='') as sssss_best_only_div_engine:
-    writer_sssss_best_only_div = csv.writer(sssss_best_only_div_engine)
-    writer_sssss_best_only_div.writerows(sorted_list_sssss_best_only_div)
