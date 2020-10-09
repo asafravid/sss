@@ -1,10 +1,10 @@
 import sss_filenames
 import csv
 
-NEWER_DATE_AND_TIME = "Results/20201005-232308"
-OLDER_DATE_AND_TIME = "Results/20200929-152305"
+NEWER_DATE_AND_TIME = "Results/20201009-212821"
+OLDER_DATE_AND_TIME = "Results/20201009-023906"
 TICKER_INDEX        = 0
-MOVEMENT_THRESHOLD  = 2 # Alert only for tickers which have moved more than a certain amount of positions
+MOVEMENT_THRESHOLD  = 3 # Alert only for tickers which have moved more than a certain amount of positions
 
 older_filenames_list = sss_filenames.create_filenames_list(OLDER_DATE_AND_TIME)
 newer_filenames_list = sss_filenames.create_filenames_list(NEWER_DATE_AND_TIME)
@@ -53,7 +53,7 @@ for index in range(len(newer_filenames_list)):
                 row_index_in_older_file = get_row_index(ticker, older_rows)
                 if row_index_in_older_file >= 0:
                     if abs(row_index_in_older_file - (row_index-1)) > MOVEMENT_THRESHOLD:
-                        print("ticker {:10}: {:2} positions change from older file".format(ticker, row_index_in_older_file-(row_index-1)))
+                        print("ticker {:10}: {:2} positions change from {:3} to {:3}".format(ticker, row_index_in_older_file-(row_index-1), row_index_in_older_file, (row_index-1)))
                 else:
                     print("ticker {:10}: appears at position {:2} (new)".format(ticker, row_index-1))
                 row_index += 1
