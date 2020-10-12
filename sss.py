@@ -62,7 +62,7 @@ EARNINGS_QUARTERLY_GROWTH_MIN     = -0.125*TASE_MODE       # The earnings can de
 NUM_ROUND_DECIMALS                = 4
 BEST_N_SELECT                     = 50                     # Select best N from each of the resulting sorted tables
 ENTERPRISE_VALUE_TO_REVENUE_LIMIT = 20                     # Higher than that is too expensive
-SECTORS_LIST                      = [] # ['Consumer Cyclical', 'Consumer Defensive', 'Industrials']  # Allows filtering by sector(s)
+SECTORS_LIST                      = [] # ['Consumer Cyclical', 'Consumer Defensive', 'Industrials', 'Consumer Goods']  # Allows filtering by sector(s)
 
 payload            = pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies') # There are 2 tables on the Wikipedia page, get the first table
 first_table        = payload[0]
@@ -97,12 +97,11 @@ def process_info(symbol, stock_data):
                 print('Mutual Fund: Skip')
                 return False  # Not interested in those and they lack all the below info[] properties so nothing to do with them anyways
 
-        if len(SECTORS_LIST) and 'sector' in info:
-            if info['sector'] not in SECTORS_LIST:
-                print('Skipping Sector {}'.format(info['sector']))
+        if 'sector' in info:
+            stock_data.sector = info['sector']
+            if len(SECTORS_LIST) and stock_data.sector not in SECTORS_LIST:
+                print('Skipping Sector {}'.format(stock_data.sector))
                 return False
-            else:
-                stock_data.sector = info['sector']
 
         if 'fullTimeEmployees' in info:      stock_data.num_employees = info['fullTimeEmployees']
         else:                                stock_data.num_employees = NUM_EMPLOYEES_UNKNOWN
@@ -464,7 +463,7 @@ for sorted_list in sorted_lists_list:
 
 tase_str    = ""
 sectors_str = ""
-if TASE_MODE:          tase_str    = "_TASE"
+if TASE_MODE:         tase_str    = "_TASE"
 if len(SECTORS_LIST):  sectors_str = '_'+'_'.join(SECTORS_LIST)
 date_and_time = time.strftime("Results/%Y%m%d-%H%M%S{}{}".format(tase_str, sectors_str))
 
