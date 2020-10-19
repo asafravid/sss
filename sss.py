@@ -48,7 +48,7 @@ class StockData:
     last_4_dividends_2:                float = 0.0
     last_4_dividends_3:                float = 0.0
 
-NUM_THREADS                       = 4            # 1..4 Threads are supported
+NUM_THREADS                       = 5            # 1..5 Threads are supported
 TASE_MODE                         = 0            # Work on the Israeli Market only
 NUM_EMPLOYEES_UNKNOWN             = 10000000     # This will make the company very inefficient in terms of number of employees
 MUTUALFUND                        = 'MUTUALFUND' # Definition of a mutual fund 'quoteType' field in base.py, those are not interesting
@@ -300,11 +300,11 @@ def process_info(symbol, stock_data):
         return False
 
 
-def process_symbols(symbols, rows, rows_no_div, rows_only_div):
+def process_symbols(symbols, rows, rows_no_div, rows_only_div, thread_id):
     iteration = 0
     for symb in symbols:
         iteration += 1
-        print('Checking {:9} ({:4}/{:4}/{:4}): '.format(symb, len(rows), iteration, len(symbols)), end='')
+        print('[thread_id {}] Checking {:9} ({:4}/{:4}/{:4}): '.format(thread_id, symb, len(rows), iteration, len(symbols)), end='')
         symbol = yf.Ticker(symb)
         stock_data = StockData(ticker=symb)
         if not process_info(symbol=symbol, stock_data=stock_data):
@@ -332,30 +332,37 @@ rows2_only_div = []
 rows3          = []
 rows3_no_div   = []
 rows3_only_div = []
+rows4          = []
+rows4_no_div   = []
+rows4_only_div = []
 
-if NUM_THREADS >= 1: symbols0 = symbols[0:][::NUM_THREADS] # 0,   NUM_THREADS,   2*NUM_THREADS, ...
-if NUM_THREADS >= 2: symbols1 = symbols[1:][::NUM_THREADS] # 1, 1+NUM_THREADS, 2+2*NUM_THREADS, ...
-if NUM_THREADS >= 3: symbols2 = symbols[2:][::NUM_THREADS] # 2, 2+NUM_THREADS, 3+2*NUM_THREADS, ...
-if NUM_THREADS >= 4: symbols3 = symbols[3:][::NUM_THREADS] # 3, 3+NUM_THREADS, 4+2*NUM_THREADS, ...
+if NUM_THREADS >= 1: symbols0 = symbols[0:][::NUM_THREADS] # 0,   NUM_THREADS,   2*NUM_THREADS,   3*NUM_THREADS, ...
+if NUM_THREADS >= 2: symbols1 = symbols[1:][::NUM_THREADS] # 1, 1+NUM_THREADS, 2+2*NUM_THREADS, 2+3*NUM_THREADS, ...
+if NUM_THREADS >= 3: symbols2 = symbols[2:][::NUM_THREADS] # 2, 2+NUM_THREADS, 3+2*NUM_THREADS, 3+3*NUM_THREADS, ...
+if NUM_THREADS >= 4: symbols3 = symbols[3:][::NUM_THREADS] # 3, 3+NUM_THREADS, 4+2*NUM_THREADS, 4+3*NUM_THREADS, ...
+if NUM_THREADS >= 5: symbols4 = symbols[4:][::NUM_THREADS] # 4, 4+NUM_THREADS, 5+2*NUM_THREADS, 5+3*NUM_THREADS, ...
 
-if NUM_THREADS >= 1: thread0 = Thread(target=process_symbols, args=(symbols0, rows0, rows0_no_div, rows0_only_div)) # process_symbols(symbols=symbols0, rows=rows0, rows_no_div=rows0_no_div, rows_only_div=rows0_only_div)
-if NUM_THREADS >= 2: thread1 = Thread(target=process_symbols, args=(symbols1, rows1, rows1_no_div, rows1_only_div)) # process_symbols(symbols=symbols1, rows=rows1, rows_no_div=rows1_no_div, rows_only_div=rows1_only_div)
-if NUM_THREADS >= 3: thread2 = Thread(target=process_symbols, args=(symbols2, rows2, rows2_no_div, rows2_only_div))
-if NUM_THREADS >= 4: thread3 = Thread(target=process_symbols, args=(symbols3, rows3, rows3_no_div, rows3_only_div))
+if NUM_THREADS >= 1: thread0 = Thread(target=process_symbols, args=(symbols0, rows0, rows0_no_div, rows0_only_div, 0)) # process_symbols(symbols=symbols0, rows=rows0, rows_no_div=rows0_no_div, rows_only_div=rows0_only_div)
+if NUM_THREADS >= 2: thread1 = Thread(target=process_symbols, args=(symbols1, rows1, rows1_no_div, rows1_only_div, 1)) # process_symbols(symbols=symbols1, rows=rows1, rows_no_div=rows1_no_div, rows_only_div=rows1_only_div)
+if NUM_THREADS >= 3: thread2 = Thread(target=process_symbols, args=(symbols2, rows2, rows2_no_div, rows2_only_div, 2))
+if NUM_THREADS >= 4: thread3 = Thread(target=process_symbols, args=(symbols3, rows3, rows3_no_div, rows3_only_div, 3))
+if NUM_THREADS >= 5: thread4 = Thread(target=process_symbols, args=(symbols4, rows4, rows4_no_div, rows4_only_div, 4))
 
 if NUM_THREADS >= 1: thread0.start()
 if NUM_THREADS >= 2: thread1.start()
 if NUM_THREADS >= 3: thread2.start()
 if NUM_THREADS >= 4: thread3.start()
+if NUM_THREADS >= 5: thread4.start()
 
 if NUM_THREADS >= 1: thread0.join()
 if NUM_THREADS >= 2: thread1.join()
 if NUM_THREADS >= 3: thread2.join()
 if NUM_THREADS >= 4: thread3.join()
+if NUM_THREADS >= 5: thread4.join()
 
-rows.extend(         rows0          + rows1          + rows2          + rows3         )
-rows_no_div.extend(  rows0_no_div   + rows1_no_div   + rows2_no_div   + rows3_no_div  )
-rows_only_div.extend(rows0_only_div + rows1_only_div + rows2_only_div + rows3_only_div)
+rows.extend(         rows0          + rows1          + rows2          + rows3          + rows4         )
+rows_no_div.extend(  rows0_no_div   + rows1_no_div   + rows2_no_div   + rows3_no_div   + rows4_no_div  )
+rows_only_div.extend(rows0_only_div + rows1_only_div + rows2_only_div + rows3_only_div + rows4_only_div)
 
 # Now, Sort the rows using the sss_value and ssse_value formulas: [1:] skips the 1st title row
 sorted_list_sss              = sorted(rows,          key=lambda row:          row[3],           reverse=False)  # Sort by sss_value     -> The lower  - the more attractive
