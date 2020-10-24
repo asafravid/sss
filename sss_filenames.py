@@ -1,5 +1,6 @@
 
 def create_filenames_list(date_and_time):
+    filename_csv_db                     = "{}/db.csv".format(date_and_time)
     filename_sss_engine                 = "{}/sss_engine.csv".format(date_and_time)
     filename_ssss_engine                = "{}/ssss_engine.csv".format(date_and_time)
     filename_sssss_engine               = "{}/sssss_engine.csv".format(date_and_time)
@@ -42,6 +43,7 @@ def create_filenames_list(date_and_time):
     filename_sssss_best_only_div_engine = "{}/sssss_best_only_div_engine.csv".format(date_and_time)
 
     filenames_list = [
+        filename_csv_db,
         filename_sss_engine                ,    filename_ssss_engine               ,    filename_sssss_engine              ,    filename_ssse_engine               ,
         filename_sssse_engine              ,    filename_ssssse_engine             ,    filename_sss_engine_no_div         ,    filename_ssss_engine_no_div        ,
         filename_sssss_engine_no_div       ,    filename_ssse_engine_no_div        ,    filename_sssse_engine_no_div       ,    filename_ssssse_engine_no_div      ,
