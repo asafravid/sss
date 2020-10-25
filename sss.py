@@ -51,7 +51,7 @@ class StockData:
 
 # Working Mode:
 BUILD_CSV_DB                      = 1
-CSV_DB_PATH                       = 'Results/20201024-064219_Technology_OTHERS'
+CSV_DB_PATH                       = 'Results/20201025-020312_Technology'
 READ_NASDAQ_INPUT_SYMBOLS         = 0            # when set, covers 7,000 stocks
 TASE_MODE                         = 0            # Work on the Israeli Market only
 NUM_THREADS                       = 4            # 1..5 Threads are supported
@@ -69,7 +69,7 @@ EARNINGS_QUARTERLY_GROWTH_MIN     = -0.125*TASE_MODE       # The earnings can de
 NUM_ROUND_DECIMALS                = 4
 BEST_N_SELECT                     = 50                     # Select best N from each of the resulting sorted tables
 ENTERPRISE_VALUE_TO_REVENUE_LIMIT = 17.5 - 2.5*READ_NASDAQ_INPUT_SYMBOLS  - 2.5*TASE_MODE                    # Higher than that is too expensive
-SECTORS_LIST                      = ['Technology'] # ['Consumer Cyclical', 'Consumer Defensive', 'Industrials', 'Consumer Goods']  # Allows filtering by sector(s)
+SECTORS_LIST                      = [] # ['Technology', 'Consumer Cyclical', 'Consumer Defensive', 'Industrials', 'Consumer Goods']  # Allows filtering by sector(s)
 
 if len(SECTORS_LIST):
     ENTERPRISE_VALUE_TO_REVENUE_LIMIT *= 5
@@ -126,98 +126,112 @@ symbols = list(set(symbols))
 if TASE_MODE: symbols = symbols_tase
 
 # Temporary for test:
-# symbols = ['QRVO', 'IGLD-M.TA', 'ALMA.TA', 'EMDV.TA', 'ISTA.TA', 'ALD.TA', 'ADGR.TA', 'HOLX', 'SKLN.TA', 'ALMA.TA', 'BR', 'GDI', 'LOGM', 'WRK', 'EBAY', 'RSPP', 'FB', 'AL', 'INTC', 'AES', 'MMM', 'ADBE', 'MS']
+# symbols = ['HYI', 'IGLD-M.TA', 'ALMA.TA', 'EMDV.TA', 'ISTA.TA', 'ALD.TA', 'ADGR.TA', 'HOLX', 'SKLN.TA', 'ALMA.TA', 'BR', 'GDI', 'LOGM', 'WRK', 'EBAY', 'RSPP', 'FB', 'AL', 'INTC', 'AES', 'MMM', 'ADBE', 'MS']
 
 print('\nSSS Symbols to Scan: {}\n'.format(symbols))
+
+
+def check_quote_type(stock_data):
+    if stock_data.quote_type == MUTUALFUND:
+        print('Mutual Fund: Skip')
+        return False  # Not interested in those and they lack all the below info[] properties so nothing to do with them anyways
+    return True
+
+
+def check_sector(stock_data):
+    if len(SECTORS_LIST) and stock_data.sector not in SECTORS_LIST:
+        print('              Skipping Sector {}'.format(stock_data.sector))
+        return False
+    return True
 
 
 def process_info(symbol, stock_data):
     try:
         return_value = True
-        info = symbol.get_info()
-        if 'shortName' in info: stock_data.short_name = info['shortName']
-        else:                   stock_data.short_name = 'None'
+        info = {}
+        if BUILD_CSV_DB: info = symbol.get_info()
+
+        if BUILD_CSV_DB:
+            if 'shortName' in info: stock_data.short_name = info['shortName']
+            else:                   stock_data.short_name = 'None'
         print('{:35} - '.format(stock_data.short_name), end='')
 
-        if 'quoteType' in info:
-            stock_data.quote_type = info['quoteType']
-            if stock_data.quote_type == MUTUALFUND:
-                print('Mutual Fund: Skip')
-                return_value = False  # Not interested in those and they lack all the below info[] properties so nothing to do with them anyways
+        if BUILD_CSV_DB and 'quoteType' in info: stock_data.quote_type = info['quoteType']
+        if not check_quote_type(stock_data):     return_value = False
 
-        if 'sector' in info:
-            stock_data.sector = info['sector']
-            if len(SECTORS_LIST) and stock_data.sector not in SECTORS_LIST:
-                print('              Skipping Sector {}'.format(stock_data.sector))
-                return_value = False
+        if BUILD_CSV_DB and 'sector' in info:    stock_data.sector = info['sector']
+        if not check_sector(stock_data):         return_value = False
 
-        if 'fullTimeEmployees' in info:      stock_data.num_employees = info['fullTimeEmployees']
-        else:                                stock_data.num_employees = NUM_EMPLOYEES_UNKNOWN
-        if stock_data.num_employees is None: stock_data.num_employees = NUM_EMPLOYEES_UNKNOWN
+        if BUILD_CSV_DB:
+            if 'fullTimeEmployees' in info:      stock_data.num_employees = info['fullTimeEmployees']
+            else:                                stock_data.num_employees = NUM_EMPLOYEES_UNKNOWN
+            if stock_data.num_employees is None: stock_data.num_employees = NUM_EMPLOYEES_UNKNOWN
 
-        # Special exception for Intel (INTC) - Bug in Yahoo Finance:
-        if stock_data.ticker == 'INTC' and stock_data.num_employees < 1000:
-            stock_data.num_employees *= 1000
+            # Special exception for Intel (INTC) - Bug in Yahoo Finance:
+            if stock_data.ticker == 'INTC' and stock_data.num_employees < 1000:
+                stock_data.num_employees *= 1000
 
-        if 'profitMargins' in info:          stock_data.profit_margin = info['profitMargins']
-        else:                                stock_data.profit_margin = PROFIT_MARGIN_UNKNOWN
-        if stock_data.profit_margin is None: stock_data.profit_margin = PROFIT_MARGIN_UNKNOWN
+        if BUILD_CSV_DB:
+            if 'profitMargins' in info:          stock_data.profit_margin = info['profitMargins']
+            else:                                stock_data.profit_margin = PROFIT_MARGIN_UNKNOWN
+            if stock_data.profit_margin is None: stock_data.profit_margin = PROFIT_MARGIN_UNKNOWN
 
-        if 'heldPercentInstitutions' in info:                                                         stock_data.held_percent_institutions = info['heldPercentInstitutions']
-        else:                                                                                         stock_data.held_percent_institutions = PERCENT_HELD_INSTITUTIONS_LOW
-        if stock_data.held_percent_institutions is None or stock_data.held_percent_institutions == 0: stock_data.held_percent_institutions = PERCENT_HELD_INSTITUTIONS_LOW
+            if 'heldPercentInstitutions' in info:                                                         stock_data.held_percent_institutions = info['heldPercentInstitutions']
+            else:                                                                                         stock_data.held_percent_institutions = PERCENT_HELD_INSTITUTIONS_LOW
+            if stock_data.held_percent_institutions is None or stock_data.held_percent_institutions == 0: stock_data.held_percent_institutions = PERCENT_HELD_INSTITUTIONS_LOW
 
-        if 'enterpriseToRevenue' in info:                          stock_data.enterprise_value_to_revenue = info['enterpriseToRevenue']  # https://www.investopedia.com/terms/e/ev-revenue-multiple.asp
-        else:                                                      stock_data.enterprise_value_to_revenue = None
-        if isinstance(stock_data.enterprise_value_to_revenue,str): stock_data.enterprise_value_to_revenue = None
+            if 'enterpriseToRevenue' in info:                          stock_data.enterprise_value_to_revenue = info['enterpriseToRevenue']  # https://www.investopedia.com/terms/e/ev-revenue-multiple.asp
+            else:                                                      stock_data.enterprise_value_to_revenue = None
+            if isinstance(stock_data.enterprise_value_to_revenue,str): stock_data.enterprise_value_to_revenue = None
 
-        if 'enterpriseToEbitda' in info:                           stock_data.enterprise_value_to_ebitda  = info['enterpriseToEbitda']  # The lower the better: https://www.investopedia.com/ask/answers/072715/what-considered-healthy-evebitda.asp
-        else:                                                      stock_data.enterprise_value_to_ebitda  = None
-        if isinstance(stock_data.enterprise_value_to_ebitda,str):  stock_data.enterprise_value_to_ebitda  = None
+            if 'enterpriseToEbitda' in info:                           stock_data.enterprise_value_to_ebitda  = info['enterpriseToEbitda']  # The lower the better: https://www.investopedia.com/ask/answers/072715/what-considered-healthy-evebitda.asp
+            else:                                                      stock_data.enterprise_value_to_ebitda  = None
+            if isinstance(stock_data.enterprise_value_to_ebitda,str):  stock_data.enterprise_value_to_ebitda  = None
 
-        if 'trailingPE' in info:                                   stock_data.trailing_price_to_earnings  = info['trailingPE']  # https://www.investopedia.com/terms/t/trailingpe.asp
-        else:                                                      stock_data.trailing_price_to_earnings  = None
-        if isinstance(stock_data.trailing_price_to_earnings,str):  stock_data.trailing_price_to_earnings  = None
+            if 'trailingPE' in info:                                   stock_data.trailing_price_to_earnings  = info['trailingPE']  # https://www.investopedia.com/terms/t/trailingpe.asp
+            else:                                                      stock_data.trailing_price_to_earnings  = None
+            if isinstance(stock_data.trailing_price_to_earnings,str):  stock_data.trailing_price_to_earnings  = None
 
         if stock_data.enterprise_value_to_revenue is None and stock_data.enterprise_value_to_ebitda is None and stock_data.trailing_price_to_earnings is None:
             print('              Skipping since trailing_price_to_earnings, enterprise_value_to_ebitda and enterprise_value_to_revenue are unknown')
             return_value = False
 
-        if   stock_data.enterprise_value_to_revenue is None and stock_data.enterprise_value_to_ebitda  is not None: stock_data.enterprise_value_to_revenue = stock_data.enterprise_value_to_ebitda
-        elif stock_data.enterprise_value_to_revenue is None and stock_data.trailing_price_to_earnings  is not None: stock_data.enterprise_value_to_revenue = stock_data.trailing_price_to_earnings
+        if BUILD_CSV_DB:
+            if   stock_data.enterprise_value_to_revenue is None and stock_data.enterprise_value_to_ebitda  is not None: stock_data.enterprise_value_to_revenue = stock_data.enterprise_value_to_ebitda
+            elif stock_data.enterprise_value_to_revenue is None and stock_data.trailing_price_to_earnings  is not None: stock_data.enterprise_value_to_revenue = stock_data.trailing_price_to_earnings
 
-        if   stock_data.enterprise_value_to_ebitda  is None and stock_data.enterprise_value_to_revenue is not None: stock_data.enterprise_value_to_ebitda  = stock_data.enterprise_value_to_revenue
-        elif stock_data.enterprise_value_to_ebitda  is None and stock_data.trailing_price_to_earnings  is not None: stock_data.enterprise_value_to_ebitda  = stock_data.trailing_price_to_earnings
+            if   stock_data.enterprise_value_to_ebitda  is None and stock_data.enterprise_value_to_revenue is not None: stock_data.enterprise_value_to_ebitda  = stock_data.enterprise_value_to_revenue
+            elif stock_data.enterprise_value_to_ebitda  is None and stock_data.trailing_price_to_earnings  is not None: stock_data.enterprise_value_to_ebitda  = stock_data.trailing_price_to_earnings
 
-        if   stock_data.trailing_price_to_earnings  is None and stock_data.enterprise_value_to_revenue is not None: stock_data.trailing_price_to_earnings  = stock_data.enterprise_value_to_revenue
-        elif stock_data.trailing_price_to_earnings  is None and stock_data.enterprise_value_to_ebitda  is not None: stock_data.trailing_price_to_earnings  = stock_data.enterprise_value_to_ebitda
+            if   stock_data.trailing_price_to_earnings  is None and stock_data.enterprise_value_to_revenue is not None: stock_data.trailing_price_to_earnings  = stock_data.enterprise_value_to_revenue
+            elif stock_data.trailing_price_to_earnings  is None and stock_data.enterprise_value_to_ebitda  is not None: stock_data.trailing_price_to_earnings  = stock_data.enterprise_value_to_ebitda
 
-        if 'forwardEps'                                 in info: stock_data.forward_eps                       = info['forwardEps']
-        else:                                                    stock_data.forward_eps                       = None
-        if isinstance(stock_data.forward_eps,str):               stock_data.forward_eps                       = None
+            if 'forwardEps'                                 in info: stock_data.forward_eps                       = info['forwardEps']
+            else:                                                    stock_data.forward_eps                       = None
+            if isinstance(stock_data.forward_eps,str):               stock_data.forward_eps                       = None
 
-        if 'trailingEps'                                in info: stock_data.trailing_eps                      = info['trailingEps']
-        else:                                                    stock_data.trailing_eps                      = None
-        if isinstance(stock_data.trailing_eps,str):              stock_data.trailing_eps                      = None
+            if 'trailingEps'                                in info: stock_data.trailing_eps                      = info['trailingEps']
+            else:                                                    stock_data.trailing_eps                      = None
+            if isinstance(stock_data.trailing_eps,str):              stock_data.trailing_eps                      = None
 
-        if 'priceToBook'                                in info: stock_data.price_to_book                     = info['priceToBook']
-        else:                                                    stock_data.price_to_book                     = None
-        if isinstance(stock_data.price_to_book,str):             stock_data.price_to_book                     = None
+            if 'priceToBook'                                in info: stock_data.price_to_book                     = info['priceToBook']
+            else:                                                    stock_data.price_to_book                     = None
+            if isinstance(stock_data.price_to_book,str):             stock_data.price_to_book                     = None
 
-        if 'earningsQuarterlyGrowth'                    in info: stock_data.earnings_quarterly_growth         = info['earningsQuarterlyGrowth']
-        else:                                                    stock_data.earnings_quarterly_growth         = None
-        if stock_data.earnings_quarterly_growth         is None: stock_data.earnings_quarterly_growth         = EARNINGS_QUARTERLY_GROWTH_MIN
+            if 'earningsQuarterlyGrowth'                    in info: stock_data.earnings_quarterly_growth         = info['earningsQuarterlyGrowth']
+            else:                                                    stock_data.earnings_quarterly_growth         = None
+            if stock_data.earnings_quarterly_growth         is None: stock_data.earnings_quarterly_growth         = EARNINGS_QUARTERLY_GROWTH_MIN
 
-        if 'pegRatio'                                   in info: stock_data.price_to_earnings_to_growth_ratio = info['pegRatio']
-        else:                                                    stock_data.price_to_earnings_to_growth_ratio = PEG_UNKNOWN
-        if stock_data.price_to_earnings_to_growth_ratio is None: stock_data.price_to_earnings_to_growth_ratio = PEG_UNKNOWN
+            if 'pegRatio'                                   in info: stock_data.price_to_earnings_to_growth_ratio = info['pegRatio']
+            else:                                                    stock_data.price_to_earnings_to_growth_ratio = PEG_UNKNOWN
+            if stock_data.price_to_earnings_to_growth_ratio is None: stock_data.price_to_earnings_to_growth_ratio = PEG_UNKNOWN
 
-        if 'sharesOutstanding'                          in info: stock_data.shares_outstanding                = info['sharesOutstanding']
-        else:                                                    stock_data.shares_outstanding                = SHARES_OUTSTANDING_UNKNOWN
-        if stock_data.shares_outstanding is None or stock_data.shares_outstanding == 0: stock_data.shares_outstanding = SHARES_OUTSTANDING_UNKNOWN
+            if 'sharesOutstanding'                          in info: stock_data.shares_outstanding                = info['sharesOutstanding']
+            else:                                                    stock_data.shares_outstanding                = SHARES_OUTSTANDING_UNKNOWN
+            if stock_data.shares_outstanding is None or stock_data.shares_outstanding == 0: stock_data.shares_outstanding = SHARES_OUTSTANDING_UNKNOWN
 
-        if 'netIncomeToCommon' in info: stock_data.net_income_to_common_shareholders = info['netIncomeToCommon']
-        else:                           stock_data.net_income_to_common_shareholders = None
+            if 'netIncomeToCommon' in info: stock_data.net_income_to_common_shareholders = info['netIncomeToCommon']
+            else:                           stock_data.net_income_to_common_shareholders = None
 
         if stock_data.enterprise_value_to_revenue < 0 or stock_data.enterprise_value_to_revenue > ENTERPRISE_VALUE_TO_REVENUE_LIMIT + ENTERPRISE_VALUE_TO_REVENUE_LIMIT*TASE_MODE:
             print('              Skipping enterprise_value_to_revenue: {}'.format(stock_data.enterprise_value_to_revenue))
@@ -252,7 +266,7 @@ def process_info(symbol, stock_data):
             print('              Skipping net_income_to_common_shareholders: {}'.format(stock_data.net_income_to_common_shareholders))
             return_value = False
 
-        if 'enterpriseValue' in info: stock_data.enterprise_value = info['enterpriseValue']
+        if BUILD_CSV_DB and 'enterpriseValue' in info: stock_data.enterprise_value = info['enterpriseValue']
         if stock_data.enterprise_value < MIN_ENTERPRISE_VALUE:
             print('              Skipping enterprise_value: {}'.format(stock_data.enterprise_value))
             return_value = False
@@ -303,47 +317,48 @@ def process_info(symbol, stock_data):
         if stock_data.earnings_quarterly_growth         is not None: stock_data.earnings_quarterly_growth         = round(stock_data.earnings_quarterly_growth,         NUM_ROUND_DECIMALS)
         if stock_data.price_to_earnings_to_growth_ratio is not None: stock_data.price_to_earnings_to_growth_ratio = round(stock_data.price_to_earnings_to_growth_ratio, NUM_ROUND_DECIMALS)
 
-        if stock_data.sss_value                         is     None: stock_data.sss_value                         = 0
-        if stock_data.ssss_value                        is     None: stock_data.ssss_value                        = 0
-        if stock_data.sssss_value                       is     None: stock_data.sssss_value                       = 0
-        if stock_data.ssse_value                        is     None: stock_data.ssse_value                        = 0
-        if stock_data.sssse_value                       is     None: stock_data.sssse_value                       = 0
-        if stock_data.ssssse_value                      is     None: stock_data.ssssse_value                      = 0
-        if stock_data.sssi_value                        is     None: stock_data.sssi_value                        = 0
-        if stock_data.ssssi_value                       is     None: stock_data.ssssi_value                       = 0
-        if stock_data.sssssi_value                      is     None: stock_data.sssssi_value                      = 0
-        if stock_data.sssei_value                       is     None: stock_data.sssei_value                       = 0
-        if stock_data.ssssei_value                      is     None: stock_data.ssssei_value                      = 0
-        if stock_data.sssssei_value                     is     None: stock_data.sssssei_value                     = 0
-        if stock_data.enterprise_value_to_revenue       is     None: stock_data.enterprise_value_to_revenue       = 0
-        if stock_data.trailing_price_to_earnings        is     None: stock_data.trailing_price_to_earnings        = 0
-        if stock_data.enterprise_value_to_ebitda        is     None: stock_data.enterprise_value_to_ebitda        = 0
-        if stock_data.profit_margin                     is     None: stock_data.profit_margin                     = 0
-        if stock_data.held_percent_institutions         is     None: stock_data.held_percent_institutions         = 0
-        if stock_data.forward_eps                       is     None: stock_data.forward_eps                       = 0
-        if stock_data.trailing_eps                      is     None: stock_data.trailing_eps                      = 0
-        if stock_data.price_to_book                     is     None: stock_data.price_to_book                     = 0
-        if stock_data.shares_outstanding                is     None: stock_data.shares_outstanding                = 0
-        if stock_data.net_income_to_common_shareholders is     None: stock_data.net_income_to_common_shareholders = 0
-        if stock_data.nitcsh_to_shares_outstanding      is     None: stock_data.nitcsh_to_shares_outstanding      = 0
-        if stock_data.num_employees                     is     None: stock_data.num_employees                     = 0
-        if stock_data.nitcsh_to_num_employees           is     None: stock_data.nitcsh_to_num_employees           = 0
-        if stock_data.earnings_quarterly_growth         is     None: stock_data.earnings_quarterly_growth         = 0
-        if stock_data.price_to_earnings_to_growth_ratio is     None: stock_data.price_to_earnings_to_growth_ratio = 0
+        if BUILD_CSV_DB:
+            if stock_data.sss_value                         is     None: stock_data.sss_value                         = 0
+            if stock_data.ssss_value                        is     None: stock_data.ssss_value                        = 0
+            if stock_data.sssss_value                       is     None: stock_data.sssss_value                       = 0
+            if stock_data.ssse_value                        is     None: stock_data.ssse_value                        = 0
+            if stock_data.sssse_value                       is     None: stock_data.sssse_value                       = 0
+            if stock_data.ssssse_value                      is     None: stock_data.ssssse_value                      = 0
+            if stock_data.sssi_value                        is     None: stock_data.sssi_value                        = 0
+            if stock_data.ssssi_value                       is     None: stock_data.ssssi_value                       = 0
+            if stock_data.sssssi_value                      is     None: stock_data.sssssi_value                      = 0
+            if stock_data.sssei_value                       is     None: stock_data.sssei_value                       = 0
+            if stock_data.ssssei_value                      is     None: stock_data.ssssei_value                      = 0
+            if stock_data.sssssei_value                     is     None: stock_data.sssssei_value                     = 0
+            if stock_data.enterprise_value_to_revenue       is     None: stock_data.enterprise_value_to_revenue       = 0
+            if stock_data.trailing_price_to_earnings        is     None: stock_data.trailing_price_to_earnings        = 0
+            if stock_data.enterprise_value_to_ebitda        is     None: stock_data.enterprise_value_to_ebitda        = 0
+            if stock_data.profit_margin                     is     None: stock_data.profit_margin                     = 0
+            if stock_data.held_percent_institutions         is     None: stock_data.held_percent_institutions         = 0
+            if stock_data.forward_eps                       is     None: stock_data.forward_eps                       = 0
+            if stock_data.trailing_eps                      is     None: stock_data.trailing_eps                      = 0
+            if stock_data.price_to_book                     is     None: stock_data.price_to_book                     = 0
+            if stock_data.shares_outstanding                is     None: stock_data.shares_outstanding                = 0
+            if stock_data.net_income_to_common_shareholders is     None: stock_data.net_income_to_common_shareholders = 0
+            if stock_data.nitcsh_to_shares_outstanding      is     None: stock_data.nitcsh_to_shares_outstanding      = 0
+            if stock_data.num_employees                     is     None: stock_data.num_employees                     = 0
+            if stock_data.nitcsh_to_num_employees           is     None: stock_data.nitcsh_to_num_employees           = 0
+            if stock_data.earnings_quarterly_growth         is     None: stock_data.earnings_quarterly_growth         = 0
+            if stock_data.price_to_earnings_to_growth_ratio is     None: stock_data.price_to_earnings_to_growth_ratio = 0
 
-        stock_data.last_4_dividends_0 = 0
-        stock_data.last_4_dividends_1 = 0
-        stock_data.last_4_dividends_2 = 0
-        stock_data.last_4_dividends_3 = 0
+            stock_data.last_4_dividends_0 = 0
+            stock_data.last_4_dividends_1 = 0
+            stock_data.last_4_dividends_2 = 0
+            stock_data.last_4_dividends_3 = 0
 
-        try:
-            if len(symbol.dividends) > 0: stock_data.last_4_dividends_0 = symbol.dividends[0]
-            if len(symbol.dividends) > 1: stock_data.last_4_dividends_1 = symbol.dividends[1]
-            if len(symbol.dividends) > 2: stock_data.last_4_dividends_2 = symbol.dividends[2]
-            if len(symbol.dividends) > 3: stock_data.last_4_dividends_3 = symbol.dividends[3]
-        except Exception as e:
-            print("Exception in symbol.dividends: {}".format(e))
-            pass
+            try:
+                if len(symbol.dividends) > 0: stock_data.last_4_dividends_0 = symbol.dividends[0]
+                if len(symbol.dividends) > 1: stock_data.last_4_dividends_1 = symbol.dividends[1]
+                if len(symbol.dividends) > 2: stock_data.last_4_dividends_2 = symbol.dividends[2]
+                if len(symbol.dividends) > 3: stock_data.last_4_dividends_3 = symbol.dividends[3]
+            except Exception as e:
+                print("Exception in symbol.dividends: {}".format(e))
+                pass
 
         print('sector: {:15}, sss_value: {:15}, ssss_value: {:15}, sssss_value: {:15}, ssse_value: {:15}, sssse_value: {:15}, ssssse_value: {:15}, sssi_value: {:15}, ssssi_value: {:15}, sssssi_value: {:15}, sssei_value: {:15}, ssssei_value: {:15}, sssssei_value: {:15}, enterprise_value_to_revenue: {:15}, trailing_price_to_earnings: {:15}, enterprise_value_to_ebitda: {:15}, profit_margin: {:15}, held_percent_institutions: {:15}, forward_eps: {:15}, trailing_eps: {:15}, price_to_book: {:15}, shares_outstanding: {:15}, net_income_to_common_shareholders: {:15}, nitcsh_to_shares_outstanding: {:15}, num_employees: {:15}, enterprise_value: {:15}, nitcsh_to_num_employees: {:15}, earnings_quarterly_growth: {:15}, price_to_earnings_to_growth_ratio: {:15}'.format(stock_data.sector, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.sssssei_value, stock_data.enterprise_value_to_revenue, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.enterprise_value, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio))
         return return_value
@@ -379,7 +394,9 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
             print('[Existing DB: thread_id {}] Checking {:9} ({:4}/{:4}/{:4}): '.format(thread_id, symbol, len(rows), iteration, len(symbols)), end='')
             symbol = row[0]
 
-            stock_data = StockData(ticker=symbol, short_name=row[1], sector=row[2], sss_value=row[3], ssss_value=row[4], sssss_value=row[5], ssse_value=row[6], sssse_value=row[7], ssssse_value=row[8], sssi_value=row[9], ssssi_value=row[10], sssssi_value=row[11], sssei_value=row[12], ssssei_value=row[13], sssssei_value=row[14], enterprise_value_to_revenue=row[15], trailing_price_to_earnings=row[16], enterprise_value_to_ebitda=row[17], profit_margin=row[18], held_percent_institutions=row[19], forward_eps=row[20], trailing_eps=row[21], price_to_book=row[22], shares_outstanding=row[23], net_income_to_common_shareholders=row[24], nitcsh_to_shares_outstanding=row[25], num_employees=row[26], enterprise_value=row[27], nitcsh_to_num_employees=row[28], earnings_quarterly_growth=row[29], price_to_earnings_to_growth_ratio=row[30], last_4_dividends_0=row[31], last_4_dividends_1=row[32], last_4_dividends_2=row[33], last_4_dividends_3=row[34])
+            for fix_row_index in range(3,len(row)):  # for empty strings - convert value to 0
+                if row[fix_row_index] == '': row[fix_row_index] = 0
+            stock_data = StockData(ticker=symbol, short_name=row[1], sector=row[2], sss_value=float(row[3]), ssss_value=float(row[4]), sssss_value=float(row[5]), ssse_value=float(row[6]), sssse_value=float(row[7]), ssssse_value=float(row[8]), sssi_value=float(row[9]), ssssi_value=float(row[10]), sssssi_value=float(row[11]), sssei_value=float(row[12]), ssssei_value=float(row[13]), sssssei_value=float(row[14]), enterprise_value_to_revenue=float(row[15]), trailing_price_to_earnings=float(row[16]), enterprise_value_to_ebitda=float(row[17]), profit_margin=float(row[18]), held_percent_institutions=float(row[19]), forward_eps=float(row[20]), trailing_eps=float(row[21]), price_to_book=float(row[22]), shares_outstanding=float(row[23]), net_income_to_common_shareholders=float(row[24]), nitcsh_to_shares_outstanding=float(row[25]), num_employees=int(row[26]), enterprise_value=int(row[27]), nitcsh_to_num_employees=float(row[28]), earnings_quarterly_growth=float(row[29]), price_to_earnings_to_growth_ratio=float(row[30]), last_4_dividends_0=float(row[31]), last_4_dividends_1=float(row[32]), last_4_dividends_2=float(row[33]), last_4_dividends_3=float(row[34]))
             if not process_info(symbol=symbol, stock_data=stock_data):
                 continue
 
