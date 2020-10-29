@@ -5,6 +5,7 @@ import csv
 import os
 import itertools
 import sss_filenames
+import investpy
 
 from threading import Thread
 from dataclasses import dataclass
@@ -51,24 +52,26 @@ class StockData:
 
 # Working Mode:
 BUILD_CSV_DB                      = 1
-CSV_DB_PATH                       = 'Results/20201026-204503_TASE_Technology'
-READ_NASDAQ_INPUT_SYMBOLS         = 0            # when set, covers 7,000 stocks
-TASE_MODE                         = 1            # Work on the Israeli Market only
-NUM_THREADS                       = 5            # 1..5 Threads are supported
+CSV_DB_PATH                       = 'Results/20201027-085700'
+READ_UNITED_STATES_INPUT_SYMBOLS  = 0            # when set, covers 7,000 stocks
+TASE_MODE                         = 0            # Work on the Israeli Market only
+NUM_THREADS                       = 4            # 1..5 Threads are supported
+FORWARD_EPS_INCLUDED              = 1
+MARKET_CAP_INCLUDED               = 1
 
 # Working Parameters:
 MIN_ENTERPRISE_VALUE              = 500000000    # In $
 NUM_EMPLOYEES_UNKNOWN             = 10000000     # This will make the company very inefficient in terms of number of employees
 MUTUALFUND                        = 'MUTUALFUND' # Definition of a mutual fund 'quoteType' field in base.py, those are not interesting
 PROFIT_MARGIN_UNKNOWN             = 0.025        # This will make the company not profitable terms of profit margins, thus less attractive
-PROFIT_MARGIN_LIMIT               = (0.175 + 0.075*READ_NASDAQ_INPUT_SYMBOLS)/(1+2*TASE_MODE)
+PROFIT_MARGIN_LIMIT               = (0.175 + 0.075 * READ_UNITED_STATES_INPUT_SYMBOLS) / (1 + 2 * TASE_MODE)
 PERCENT_HELD_INSTITUTIONS_LOW     = 0.01         # low, to make less relevant
 PEG_UNKNOWN                       = 10           # use a rather high value, such that those companies with PEG - will be more attractive since the information exists for them
 SHARES_OUTSTANDING_UNKNOWN        = 100000000    # 100 Million Shares - just a value for calculation of a currently unused vaue
 EARNINGS_QUARTERLY_GROWTH_MIN     = -0.125*TASE_MODE       # The earnings can decrease by 1/8, but there is still a requirement that price_to_earnings_to_growth_ratio > 0
 NUM_ROUND_DECIMALS                = 4
 BEST_N_SELECT                     = 50                     # Select best N from each of the resulting sorted tables
-ENTERPRISE_VALUE_TO_REVENUE_LIMIT = 17.5 - 2.5*READ_NASDAQ_INPUT_SYMBOLS  - 2.5*TASE_MODE                    # Higher than that is too expensive
+ENTERPRISE_VALUE_TO_REVENUE_LIMIT = 17.5 - 2.5 * READ_UNITED_STATES_INPUT_SYMBOLS - 2.5 * TASE_MODE                    # Higher than that is too expensive
 SECTORS_LIST                      = [] # ['Technology', 'Consumer Cyclical', 'Consumer Defensive', 'Industrials', 'Consumer Goods']  # Allows filtering by sector(s)
 BAD_SSS                           = 10.0**10.0
 BAD_SSSE                          = 0
@@ -106,8 +109,12 @@ if TASE_MODE:
                     symbols_tase.append(row[1]+'.TA')
                     row_index += 1
 
-symbols_nasdaq = []
-if READ_NASDAQ_INPUT_SYMBOLS:
+    stocks_list_tase = investpy.get_stocks_list(country='israel')
+    for index, stock in enumerate(stocks_list_tase): stocks_list_tase[index] += '.TA'
+
+symbols_united_states     = []
+stocks_list_united_states = []
+if READ_UNITED_STATES_INPUT_SYMBOLS:
     nasdaq_filenames_list = ['Indices/nasdaqlisted.csv', 'Indices/otherlisted.csv']
 
     for filename in nasdaq_filenames_list:
@@ -119,17 +126,22 @@ if READ_NASDAQ_INPUT_SYMBOLS:
                     row_index += 1
                     continue
                 else:
-                    symbols_nasdaq.append(row[0])
+                    symbols_united_states.append(row[0])
                     row_index += 1
 
+    stocks_list_united_states = investpy.get_stocks_list(country='united states')
 
-symbols = symbols_snp500 + symbols_nasdaq100 + symbols_russel1000 + symbols_nasdaq
+
+symbols = symbols_snp500 + symbols_nasdaq100 + symbols_russel1000 + symbols_united_states + stocks_list_united_states
+
+if TASE_MODE:
+    symbols = symbols_tase + stocks_list_tase
+
 symbols = list(set(symbols))
 
-if TASE_MODE: symbols = symbols_tase
 
 # Temporary for test:
-# symbols = ['ARDM.TA', 'IGLD-M.TA', 'ALMA.TA', 'EMDV.TA', 'ISTA.TA', 'ALD.TA', 'ADGR.TA', 'HOLX', 'SKLN.TA', 'ALMA.TA', 'BR', 'GDI', 'LOGM', 'WRK', 'EBAY', 'RSPP', 'FB', 'AL', 'INTC', 'AES', 'MMM', 'ADBE', 'MS']
+# symbols = ['XOG', 'BKR', 'ALMA.TA', 'EMDV.TA', 'ISTA.TA', 'ALD.TA', 'ADGR.TA', 'HOLX', 'SKLN.TA', 'ALMA.TA', 'BR', 'GDI', 'LOGM', 'WRK', 'EBAY', 'RSPP', 'FB', 'AL', 'INTC', 'AES', 'MMM', 'ADBE', 'MS']
 
 print('\nSSS Symbols to Scan: {}\n'.format(symbols))
 
@@ -148,11 +160,46 @@ def check_sector(stock_data):
     return True
 
 
+def text_to_num(text):
+    d = {
+        'K': 1000,
+        'M': 1000000,
+        'B': 1000000000,
+        'T': 1000000000000
+    }
+    if not isinstance(text, str):
+        # Non-strings are bad are missing data in poster's submission
+        return 0
+
+    text = text.replace(' ','')
+
+    if text[-1] in d:  # separate out the K, M, B or T
+        num, magnitude = text[:-1], text[-1]
+        return int(float(num) * d[magnitude])
+    else:
+        return float(text)
+
+
 def process_info(symbol, stock_data):
     try:
         return_value = True
-        info = {}
-        if BUILD_CSV_DB: info = symbol.get_info()
+        info              = {}
+        stock_information = {}
+        if BUILD_CSV_DB:
+            try:
+                info = symbol.get_info()
+            except Exception as e:
+                print("              Exception in {} symbol.get_info(): {}".format(stock_data.ticker, e))
+                pass
+
+            try:
+                if TASE_MODE:
+                    stock_information = investpy.get_stock_information(stock=stock_data.ticker.replace('.TA',''), country='israel', as_json=True)
+                else:
+                    stock_information = investpy.get_stock_information(stock=stock_data.ticker, country='united states', as_json=True)
+            except Exception as e:
+                print("              Exception in {} get_stock_information(): {}".format(stock_data.ticker, e))
+                pass
 
         if BUILD_CSV_DB:
             if 'shortName' in info: stock_data.short_name = info['shortName']
@@ -196,8 +243,11 @@ def process_info(symbol, stock_data):
             if isinstance(stock_data.trailing_price_to_earnings,str):  stock_data.trailing_price_to_earnings  = None
 
         if stock_data.enterprise_value_to_revenue is None and stock_data.enterprise_value_to_ebitda is None and stock_data.trailing_price_to_earnings is None:
-            if return_value: print('              Skipping since trailing_price_to_earnings, enterprise_value_to_ebitda and enterprise_value_to_revenue are unknown')
-            return_value = False
+            if 'P/E Ratio' in stock_information and stock_information['P/E Ratio'] is not None:
+                stock_data.trailing_price_to_earnings = float(text_to_num(stock_information['P/E Ratio']))
+            else:
+                if return_value: print('              Skipping since trailing_price_to_earnings, enterprise_value_to_ebitda and enterprise_value_to_revenue are unknown')
+                return_value = False
 
         if BUILD_CSV_DB:
             if   stock_data.enterprise_value_to_revenue is None and stock_data.enterprise_value_to_ebitda  is not None: stock_data.enterprise_value_to_revenue = stock_data.enterprise_value_to_ebitda
@@ -231,20 +281,40 @@ def process_info(symbol, stock_data):
 
             if 'sharesOutstanding'                          in info: stock_data.shares_outstanding                = info['sharesOutstanding']
             else:                                                    stock_data.shares_outstanding                = SHARES_OUTSTANDING_UNKNOWN
-            if stock_data.shares_outstanding is None or stock_data.shares_outstanding == 0: stock_data.shares_outstanding = SHARES_OUTSTANDING_UNKNOWN
+            if stock_data.shares_outstanding is None or stock_data.shares_outstanding == 0:
+                if 'Shares Outstanding' in stock_information and stock_information['Shares Outstanding'] is not None:
+                    stock_data.shares_outstanding = int(text_to_num(stock_information['Shares Outstanding']))
+                else:
+                    stock_data.shares_outstanding = SHARES_OUTSTANDING_UNKNOWN
 
             if 'netIncomeToCommon' in info: stock_data.net_income_to_common_shareholders = info['netIncomeToCommon']
             else:                           stock_data.net_income_to_common_shareholders = None
 
-        if stock_data.enterprise_value_to_revenue is None or stock_data.enterprise_value_to_revenue < 0 or stock_data.enterprise_value_to_revenue > ENTERPRISE_VALUE_TO_REVENUE_LIMIT + ENTERPRISE_VALUE_TO_REVENUE_LIMIT*TASE_MODE:
+        if BUILD_CSV_DB:
+            if 'enterpriseValue' in info and info['enterpriseValue'] is not None: stock_data.enterprise_value = info['enterpriseValue']
+            if MARKET_CAP_INCLUDED:
+                if stock_data.enterprise_value is None or stock_data.enterprise_value == 0:
+                    if   'marketCap' in info and info['marketCap'] is not None:
+                        stock_data.enterprise_value = int(info['marketCap'])
+                    elif 'MarketCap' in stock_information and stock_information['MarketCap'] is not None:
+                        stock_data.enterprise_value = int(text_to_num(stock_information['MarketCap']))
+
+        if not TASE_MODE and (stock_data.enterprise_value is None or stock_data.enterprise_value < MIN_ENTERPRISE_VALUE):
+            if return_value: print('              Skipping enterprise_value: {}'.format(stock_data.enterprise_value))
+            return_value = False
+
+        if stock_data.enterprise_value_to_revenue is None and stock_data.enterprise_value is not None and 'Revenue' in stock_information and stock_information['Revenue'] is not None  and text_to_num(stock_information['Revenue']) > 0:
+            stock_data.enterprise_value_to_revenue = float(stock_data.enterprise_value)/float(text_to_num(stock_information['Revenue']))
+
+        if stock_data.enterprise_value_to_revenue is None or stock_data.enterprise_value_to_revenue <= 0 or stock_data.enterprise_value_to_revenue > ENTERPRISE_VALUE_TO_REVENUE_LIMIT:
             if return_value: print('              Skipping enterprise_value_to_revenue: {}'.format(stock_data.enterprise_value_to_revenue))
             return_value = False
 
-        if stock_data.enterprise_value_to_ebitda is None or stock_data.enterprise_value_to_ebitda < 0:
+        if stock_data.enterprise_value_to_ebitda is None or stock_data.enterprise_value_to_ebitda <= 0:
             if return_value: print('              Skipping enterprise_value_to_ebitda: {}'.format(stock_data.enterprise_value_to_ebitda))
             return_value = False
 
-        if stock_data.trailing_price_to_earnings is None or stock_data.trailing_price_to_earnings < 0:
+        if stock_data.trailing_price_to_earnings is None or stock_data.trailing_price_to_earnings <= 0:
             if return_value: print('              Skipping trailing_price_to_earnings: {}'.format(stock_data.trailing_price_to_earnings))
             return_value = False
 
@@ -253,8 +323,16 @@ def process_info(symbol, stock_data):
                 if return_value: print('              Skipping profit_margin: {}'.format(stock_data.profit_margin))
                 return_value = False
 
-        if stock_data.trailing_eps is None or stock_data.trailing_eps is not None and stock_data.trailing_eps < 0:
+        if stock_data.trailing_eps is None:
+            if 'EPS' in stock_information and stock_information['EPS'] is not None:
+                stock_data.trailing_eps = float(text_to_num(stock_information['EPS']))
+
+        if stock_data.trailing_eps is None or stock_data.trailing_eps is not None and stock_data.trailing_eps <= 0:
             if return_value: print('              Skipping trailing_eps: {}'.format(stock_data.trailing_eps))
+            return_value = False
+
+        if FORWARD_EPS_INCLUDED and (stock_data.forward_eps is None or stock_data.forward_eps is not None and stock_data.forward_eps <= 0):
+            if return_value: print('              Skipping forward_eps: {}'.format(stock_data.forward_eps))
             return_value = False
 
         if stock_data.earnings_quarterly_growth is None or stock_data.earnings_quarterly_growth < EARNINGS_QUARTERLY_GROWTH_MIN:
@@ -269,10 +347,6 @@ def process_info(symbol, stock_data):
             if return_value: print('              Skipping net_income_to_common_shareholders: {}'.format(stock_data.net_income_to_common_shareholders))
             if return_value: return_value = False
 
-        if BUILD_CSV_DB and 'enterpriseValue' in info: stock_data.enterprise_value = info['enterpriseValue']
-        if stock_data.enterprise_value is None or stock_data.enterprise_value < MIN_ENTERPRISE_VALUE:
-            if return_value: print('              Skipping enterprise_value: {}'.format(stock_data.enterprise_value))
-            return_value = False
 
         if return_value:
             stock_data.nitcsh_to_shares_outstanding = float(stock_data.net_income_to_common_shareholders) / float(stock_data.shares_outstanding)
@@ -369,11 +443,24 @@ def process_info(symbol, stock_data):
             stock_data.last_4_dividends_2 = 0
             stock_data.last_4_dividends_3 = 0
 
+            # try: TODO: ASAFR: Complete this backup data to the yfinance dividends information
+            #     if TASE_MODE:
+            #         stock_dividends = investpy.get_stock_dividends(stock=stock_data.ticker.replace('.TA',''), country='israel')
+            #     else:
+            #         stock_dividends = investpy.get_stock_dividends(stock=stock_data.ticker, country='united states')
+            #     # print("stock_dividends: {}".format(stock_dividends.values.tolist()))
+            # except Exception as e:
+            #     print("Exception in investpy symbol.dividends: {}".format(e))
+            #     pass
+
             try:
                 if len(symbol.dividends) > 0: stock_data.last_4_dividends_0 = symbol.dividends[0]
                 if len(symbol.dividends) > 1: stock_data.last_4_dividends_1 = symbol.dividends[1]
                 if len(symbol.dividends) > 2: stock_data.last_4_dividends_2 = symbol.dividends[2]
-                if len(symbol.dividends) > 3: stock_data.last_4_dividends_3 = symbol.dividends[3]
+                if len(symbol.dividends) > 3:
+                    stock_data.last_4_dividends_3 = symbol.dividends[3]
+                    # print("symbol.dividends[0..3]: {},{},{},{}".format(symbol.dividends[0], symbol.dividends[1], symbol.dividends[2], symbol.dividends[3]))
+
             except Exception as e:
                 print("Exception in symbol.dividends: {}".format(e))
                 pass
@@ -382,7 +469,7 @@ def process_info(symbol, stock_data):
         return return_value
 
     except Exception as e:  # More information is output when exception is used instead of Exception
-        print("              Exception in info: {}".format(e))
+        print("              Exception in {} info: {}".format(stock_data.ticker, e))
         return False
 
 
@@ -616,7 +703,7 @@ all_str     = ""
 csv_db_str  = ""
 if TASE_MODE:                 tase_str    = "_TASE"
 if len(SECTORS_LIST):         sectors_str = '_'+'_'.join(SECTORS_LIST)
-if READ_NASDAQ_INPUT_SYMBOLS: all_str     = '_OTHERS'
+if READ_UNITED_STATES_INPUT_SYMBOLS: all_str     = '_OTHERS'
 if BUILD_CSV_DB == 0:         csv_db_str  = '_DB_REUSED'
 date_and_time = time.strftime("Results/%Y%m%d-%H%M%S{}{}{}{}".format(tase_str, sectors_str, all_str, csv_db_str))
 
