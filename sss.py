@@ -51,13 +51,14 @@ class StockData:
     last_4_dividends_3:                float = 0.0
 
 # Working Mode:
-BUILD_CSV_DB                      = 0
+BUILD_CSV_DB                      = 1
 CSV_DB_PATH                       = 'Results/20201030-080126'
 READ_UNITED_STATES_INPUT_SYMBOLS  = 0            # when set, covers 7,000 stocks
-TASE_MODE                         = 0            # Work on the Israeli Market only
-NUM_THREADS                       = 1            # 1..5 Threads are supported
-FORWARD_EPS_INCLUDED              = 1
+TASE_MODE                         = 0            # Work on the Israeli Market only: https://info.tase.co.il/eng/MarketData/Stocks/MarketData/Pages/MarketData.aspx
+NUM_THREADS                       = 10            # 1..5 Threads are supported
+FORWARD_EPS_INCLUDED              = 0
 MARKET_CAP_INCLUDED               = 1
+USE_INVESTPY                      = 0
 
 # Working Parameters:
 MIN_ENTERPRISE_VALUE              = 500000000    # In $
@@ -95,7 +96,7 @@ symbols_russel1000 = ['TWOU', 'MMM', 'ABT', 'ABBV', 'ABMD', 'ACHC', 'ACN', 'ATVI
 
 symbols_tase = []  #symbols_tase       = ['ALD.TA', 'ABIL.TA', 'ACCL.TA', 'ADGR.TA', 'ADKA.TA', 'ARDM.TA', 'AFHL.TA', 'AFPR.TA', 'AFID.TA', 'AFRE.TA', 'AICS.TA', 'ARPT.TA', 'ALBA.TA', 'ALMD.TA', 'ALLT.TA', 'AMDA.L.TA', 'ALMA.TA', 'ALGS.TA', 'ALHE.TA', 'ALRPR.TA', 'ASPF.TA', 'AMAN.TA', 'AMRK.TA', 'AMOT.TA', 'ANLT.TA', 'ANGL.TA', 'APIO.M.TA', 'APLP.TA', 'ARD.TA', 'ARAD.TA', 'ARAN.TA', 'ARNA.TA', 'ARKO.TA', 'ARYT.TA', 'ASHO.TA', 'ASHG.TA', 'ASPR.TA', 'ASGR.TA', 'ATRY.TA', 'AUDC.TA', 'AUGN.TA', 'AURA.TA', 'SHVA.TA', 'AVER.TA', 'AVGL.TA', 'AVIA.TA', 'AVIV.TA', 'AVLN.TA', 'AVRT.TA', 'AYAL.TA', 'AZRM.TA', 'AZRG.TA', 'BCOM.TA', 'BYAR.TA', 'BBYL.TA', 'BRAN.TA', 'BVC.TA', 'BYSD.TA', 'ORL.TA', 'BSEN.TA', 'BEZQ.TA', 'BGI-M.TA', 'BIG.TA', 'BIOV.TA', 'BOLT.TA', 'BLRX.TA', 'PHGE.TA', 'BIRM.TA', 'BLSR.TA', 'BOTI.TA', 'BONS.TA', 'BCNV.TA', 'BWAY.TA', 'BRAM.TA', 'BRND.TA', 'BNRG.TA', 'BRIL.TA', 'BRMG.TA', 'CISY.TA', 'CAMT.TA', 'CANF.TA', 'CSURE.TA', 'CNMD.TA', 'CNZN.TA', 'CPTP.TA', 'CRSO.TA', 'CRMT.TA', 'CAST.TA', 'CEL.TA', 'CHAM.TA', 'CHR.TA', 'CMCT.TA', 'CMCTP.TA', 'CTPL5.TA', 'CTPL1.TA', 'CLBV.TA', 'CBI.TA', 'CLIS.TA', 'CFX.TA', 'CDEV.TA', 'CGEN.TA', 'CMDR.TA', 'DNA.TA', 'DANH.TA', 'DANE.TA', 'DCMA.TA', 'DLRL.TA', 'DLEA.TA', 'DEDR.L.TA', 'DLEKG.TA', 'DELT.TA', 'DIMRI.TA', 'DIFI.TA', 'DSCT.TA', 'DISI.TA', 'DRAL.TA', 'DORL.TA', 'DRSL.TA', 'DUNI.TA', 'EMCO.TA', 'EDRL.TA', 'ELAL.TA', 'EMITF.TA', 'EMTC.TA', 'ESLT.TA', 'ELCO.TA', 'ELDAV.TA', 'ELTR.TA', 'ECP.TA', 'ELCRE.TA', 'ELWS.TA', 'ELLO.TA', 'ELMR.TA', 'ELRN.TA', 'ELSPC.TA', 'EMDV.TA', 'ENDY.TA', 'ENOG.TA', 'ENRG.TA', 'ENLT.TA', 'ENLV.TA', 'EQTL.TA', 'EFNC.TA', 'EVGN.TA', 'EXPO.TA', 'FNTS.TA', 'FTAL.TA', 'FIBI.TA', 'FIBIH.TA', 'FGAS.TA', 'FBRT.TA', 'FRSX.TA', 'FORTY.TA', 'FOX.TA', 'FRSM.TA', 'FRDN.TA', 'GOSS.TA', 'GFC-L.TA', 'GPGB.TA', 'GADS.TA', 'GSFI.TA', 'GAON.TA', 'GAGR.TA', 'GZT.TA', 'GNRS.TA', 'GIBUI.TA', 'GILT.TA', 'GNGR.TA', 'GIVO.L.TA', 'GIX.TA', 'GLTC.TA', 'GLEX.L.TA', 'GKL.TA', 'GLRS.TA', 'GODM-M.TA', 'GLPL.TA', 'GOLD.TA', 'GOHO.TA', 'GOLF.TA', 'HDST.TA', 'HAP.TA', 'HGG.TA', 'HAIN.TA', 'HMAM.TA', 'MSBI.TA', 'HAMAT.TA', 'HAML.TA', 'HNMR.TA', 'HARL.TA', 'HLAN.TA', 'HRON.TA', 'HOD.TA', 'HLMS.TA', 'IBI.TA', 'IBITEC.F.TA', 'ICB.TA', 'ICCM.TA', 'ICL.TA', 'IDIN.TA', 'IES.TA', 'IFF.TA', 'ILDR.TA', 'ILX.TA', 'IMCO.TA', 'INBR.TA', 'INFR.TA', 'INRM.TA', 'INTL.TA', 'ININ.TA', 'INCR.TA', 'INTR.TA', 'IGLD-M.TA', 'ISCD.TA', 'ISCN.TA', 'ILCO.TA', 'ISOP.L.TA', 'ISHI.TA', 'ISRA.L.TA', 'ISRS.TA', 'ISRO.TA', 'ISTA.TA', 'ITMR.TA', 'JBNK.TA', 'KDST.TA', 'KAFR.TA', 'KMDA.TA', 'KRNV-L.TA', 'KARE.TA', 'KRDI.TA', 'KEN.TA', 'KRUR.TA', 'KTOV.TA', 'KLIL.TA', 'KMNK-M.TA', 'KNFM.TA', 'LHIS.TA', 'LAHAV.TA', 'ILDC.TA', 'LPHL.L.TA', 'LAPD.TA', 'LDER.TA', 'LSCO.TA', 'LUMI.TA', 'LEOF.TA', 'LEVI.TA', 'LVPR.TA', 'LBTL.TA', 'LCTX.TA', 'LPSN.TA', 'LODZ.TA', 'LUDN.TA', 'LUZN.TA', 'LZNR.TA', 'MGIC.TA', 'MLTM.TA', 'MMAN.TA', 'MSLA.TA', 'MTMY.TA', 'MTRX.TA', 'MAXO.TA', 'MTRN.TA', 'MEAT.TA', 'MDGS.TA', 'MDPR.TA', 'MDTR.TA', 'MDVI.TA', 'MGOR.TA', 'MEDN.TA', 'MTDS.TA', 'MLSR.TA', 'MNIN.TA', 'MNRT.TA', 'MMHD.TA', 'CMER.TA', 'MRHL.TA', 'MSKE.TA', 'MGRT.TA', 'MCRNT.TA', 'MGDL.TA', 'MIFT.TA', 'MNGN.TA', 'MNRV.TA', 'MLD.TA', 'MSHR.TA', 'MVNE.TA', 'MISH.TA', 'MZTF.TA', 'MBMX-M.TA', 'MDIN.L.TA', 'MRIN.TA', 'MYSZ.TA', 'MYDS.TA', 'NFTA.TA', 'NVPT.L.TA', 'NAWI.TA', 'NTGR.TA', 'NTO.TA', 'NTML.TA', 'NERZ-M.TA', 'NXTG.TA', 'NXTM.TA', 'NXGN-M.TA', 'NICE.TA', 'NISA.TA', 'NSTR.TA', 'NVMI.TA', 'NVLG.TA', 'ORTC.TA', 'ONE.TA', 'OPAL.TA', 'OPCE.TA', 'OPK.TA', 'OBAS.TA', 'ORAD.TA', 'ORMP.TA', 'ORBI.TA', 'ORIN.TA', 'ORA.TA', 'ORON.TA', 'OVRS.TA', 'PCBT.TA', 'PLTF.TA', 'PLRM.TA', 'PNAX.TA', 'PTNR.TA', 'PAYT.TA', 'PZOL.TA', 'PEN.TA', 'PFLT.TA', 'PERI.TA', 'PRGO.TA', 'PTCH.TA', 'PTX.TA', 'PMCN.TA', 'PHOE.TA', 'PLSN.TA', 'PLCR.TA', 'PPIL-M.TA', 'PLAZ-L.TA', 'PSTI.TA', 'POLI.TA', 'PIU.TA', 'POLY.TA', 'PWFL.TA', 'PRSK.TA', 'PRTC.TA', 'PTBL.TA', 'PLX.TA', 'QLTU.TA', 'QNCO.TA', 'RLCO.TA', 'RMN.TA', 'RMLI.TA', 'RANI.TA', 'RPAC.TA', 'RATI.L.TA', 'RTPT.L.TA', 'RAVD.TA', 'RVL.TA', 'RIT1.TA', 'AZRT.TA', 'REKA.TA', 'RIMO.TA', 'ROBO.TA', 'RTEN.L.TA', 'ROTS.TA', 'RSEL.TA', 'SRAC.TA', 'SFET.TA', 'SANO1.TA', 'SPNS.TA', 'SRFT.TA', 'STCM.TA', 'SAVR.TA', 'SHNP.TA', 'SCOP.TA', 'SEMG.TA', 'SLARL.TA', 'SHGR.TA', 'SALG.TA', 'SHAN.TA', 'SPEN.TA', 'SEFA.TA', 'SMNIN.TA', 'SKBN.TA', 'SHOM.TA', 'SAE.TA', 'SKLN.TA', 'SLGN.TA', 'SMTO.TA', 'SCC.TA', 'SPRG.TA', 'SPNTC.TA', 'STG.TA', 'STRS.TA', 'SMT.TA', 'SNFL.TA', 'SNCM.TA', 'SPGE.TA', 'SNEL.TA', 'TDGN-L.TA', 'TDRN.TA', 'TALD.TA', 'TMRP.TA', 'TASE.TA', 'TATT.TA', 'TAYA.TA', 'TNPV.TA', 'TEDE.TA', 'TFRLF.TA', 'TLRD.TA', 'TLSY.TA', 'TUZA.TA', 'TEVA.TA', 'TIGBUR.TA', 'TKUN.TA', 'TTAM.TA', 'TGTR.TA', 'TOPS.TA', 'TSEM.TA', 'TREN.TA', 'UNCR.TA', 'UNCT.L.TA', 'UNIT.TA', 'UNVO.TA', 'UTRN.TA', 'VCTR.TA', 'VILR.TA', 'VISN.TA', 'VTLC-M.TA', 'VTNA.TA', 'VNTZ-M.TA', 'WSMK.TA', 'WTS.TA', 'WILC.TA', 'WLFD.TA', 'XENA.TA', 'XTLB.TA', 'YAAC.TA', 'YBOX.TA', 'YHNF.TA', 'ZNKL.TA', 'ZMH.TA', 'ZUR.TA']
 if TASE_MODE:
-    tase_filenames_list = ['Indices/Data_20201023.csv']
+    tase_filenames_list = ['Indices/Data_20201104.csv']
 
     for filename in tase_filenames_list:
         with open(filename, mode='r', newline='') as engine:
@@ -192,14 +193,15 @@ def process_info(symbol, stock_data):
                 print("              Exception in {} symbol.get_info(): {}".format(stock_data.ticker, e))
                 pass
 
-            try:
-                if TASE_MODE:
-                    stock_information = investpy.get_stock_information(stock=stock_data.ticker.replace('.TA',''), country='israel', as_json=True)
-                else:
-                    stock_information = investpy.get_stock_information(stock=stock_data.ticker, country='united states', as_json=True)
-            except Exception as e:
-                print("              Exception in {} get_stock_information(): {}".format(stock_data.ticker, e))
-                pass
+            if USE_INVESTPY:
+                try:
+                    if TASE_MODE:
+                        stock_information = investpy.get_stock_information(stock=stock_data.ticker.replace('.TA',''), country='israel', as_json=True)
+                    else:
+                        stock_information = investpy.get_stock_information(stock=stock_data.ticker, country='united states', as_json=True)
+                except Exception as e:
+                    print("              Exception in {} get_stock_information(): {}".format(stock_data.ticker, e))
+                    pass
 
         if BUILD_CSV_DB:
             if 'shortName' in info: stock_data.short_name = info['shortName']
@@ -244,7 +246,7 @@ def process_info(symbol, stock_data):
             if isinstance(stock_data.trailing_price_to_earnings,str):  stock_data.trailing_price_to_earnings  = None
 
         if stock_data.enterprise_value_to_revenue is None and stock_data.enterprise_value_to_ebitda is None and stock_data.trailing_price_to_earnings is None:
-            if 'P/E Ratio' in stock_information and stock_information['P/E Ratio'] is not None:
+            if USE_INVESTPY and 'P/E Ratio' in stock_information and stock_information['P/E Ratio'] is not None:
                 stock_data.trailing_price_to_earnings = float(text_to_num(stock_information['P/E Ratio']))
             else:
                 if return_value: print('              Skipping since trailing_price_to_earnings, enterprise_value_to_ebitda and enterprise_value_to_revenue are unknown')
@@ -283,7 +285,7 @@ def process_info(symbol, stock_data):
             if 'sharesOutstanding'                          in info: stock_data.shares_outstanding                = info['sharesOutstanding']
             else:                                                    stock_data.shares_outstanding                = SHARES_OUTSTANDING_UNKNOWN
             if stock_data.shares_outstanding is None or stock_data.shares_outstanding == 0:
-                if 'Shares Outstanding' in stock_information and stock_information['Shares Outstanding'] is not None:
+                if USE_INVESTPY and 'Shares Outstanding' in stock_information and stock_information['Shares Outstanding'] is not None:
                     stock_data.shares_outstanding = int(text_to_num(stock_information['Shares Outstanding']))
                 else:
                     stock_data.shares_outstanding = SHARES_OUTSTANDING_UNKNOWN
@@ -299,14 +301,14 @@ def process_info(symbol, stock_data):
                 if stock_data.enterprise_value is None or stock_data.enterprise_value == 0:
                     if   'marketCap' in info and info['marketCap'] is not None:
                         stock_data.enterprise_value = int(info['marketCap'])
-                    elif 'MarketCap' in stock_information and stock_information['MarketCap'] is not None:
+                    elif USE_INVESTPY and 'MarketCap' in stock_information and stock_information['MarketCap'] is not None:
                         stock_data.enterprise_value = int(text_to_num(stock_information['MarketCap']))
 
         if not TASE_MODE and (stock_data.enterprise_value is None or stock_data.enterprise_value < MIN_ENTERPRISE_VALUE):
             if return_value: print('              Skipping enterprise_value: {}'.format(stock_data.enterprise_value))
             return_value = False
 
-        if stock_data.enterprise_value_to_revenue is None and stock_data.enterprise_value is not None and 'Revenue' in stock_information and stock_information['Revenue'] is not None  and text_to_num(stock_information['Revenue']) > 0:
+        if stock_data.enterprise_value_to_revenue is None and stock_data.enterprise_value is not None and USE_INVESTPY and 'Revenue' in stock_information and stock_information['Revenue'] is not None  and text_to_num(stock_information['Revenue']) > 0:
             stock_data.enterprise_value_to_revenue = float(stock_data.enterprise_value)/float(text_to_num(stock_information['Revenue']))
 
         if stock_data.enterprise_value_to_revenue is None or stock_data.enterprise_value_to_revenue <= 0 or stock_data.enterprise_value_to_revenue > ENTERPRISE_VALUE_TO_REVENUE_LIMIT:
@@ -327,7 +329,7 @@ def process_info(symbol, stock_data):
                 return_value = False
 
         if stock_data.trailing_eps is None:
-            if 'EPS' in stock_information and stock_information['EPS'] is not None:
+            if USE_INVESTPY and 'EPS' in stock_information and stock_information['EPS'] is not None:
                 stock_data.trailing_eps = float(text_to_num(stock_information['EPS']))
 
         if stock_data.trailing_eps is None or stock_data.trailing_eps is not None and stock_data.trailing_eps <= 0:
@@ -542,6 +544,26 @@ csv_db_data4   = []
 rows4          = []
 rows4_no_div   = []
 rows4_only_div = []
+csv_db_data5   = []
+rows5          = []
+rows5_no_div   = []
+rows5_only_div = []
+csv_db_data6   = []
+rows6          = []
+rows6_no_div   = []
+rows6_only_div = []
+csv_db_data7   = []
+rows7          = []
+rows7_no_div   = []
+rows7_only_div = []
+csv_db_data8   = []
+rows8          = []
+rows8_no_div   = []
+rows8_only_div = []
+csv_db_data9   = []
+rows9          = []
+rows9_no_div   = []
+rows9_only_div = []
 
 if BUILD_CSV_DB == 0: # if DB is already present, read from it and prepare input to threads
     csv_db_filename = CSV_DB_PATH+'/db.csv'
@@ -565,34 +587,54 @@ if BUILD_CSV_DB == 0: # if DB is already present, read from it and prepare input
                     csv_db_data4.append(row)
                 row_index += 1
 
-if NUM_THREADS >= 1: symbols0 = symbols[0:][::NUM_THREADS] # 0,   NUM_THREADS,   2*NUM_THREADS,   3*NUM_THREADS, ...
-if NUM_THREADS >= 2: symbols1 = symbols[1:][::NUM_THREADS] # 1, 1+NUM_THREADS, 2+2*NUM_THREADS, 2+3*NUM_THREADS, ...
-if NUM_THREADS >= 3: symbols2 = symbols[2:][::NUM_THREADS] # 2, 2+NUM_THREADS, 3+2*NUM_THREADS, 3+3*NUM_THREADS, ...
-if NUM_THREADS >= 4: symbols3 = symbols[3:][::NUM_THREADS] # 3, 3+NUM_THREADS, 4+2*NUM_THREADS, 4+3*NUM_THREADS, ...
-if NUM_THREADS >= 5: symbols4 = symbols[4:][::NUM_THREADS] # 4, 4+NUM_THREADS, 5+2*NUM_THREADS, 5+3*NUM_THREADS, ...
+if NUM_THREADS >=  1: symbols0 = symbols[0:][::NUM_THREADS] # 0,   NUM_THREADS,    2*NUM_THREADS,    3*NUM_THREADS, ...
+if NUM_THREADS >=  2: symbols1 = symbols[1:][::NUM_THREADS] # 1, 1+NUM_THREADS,  2+2*NUM_THREADS,  2+3*NUM_THREADS, ...
+if NUM_THREADS >=  3: symbols2 = symbols[2:][::NUM_THREADS] # 2, 2+NUM_THREADS,  3+2*NUM_THREADS,  3+3*NUM_THREADS, ...
+if NUM_THREADS >=  4: symbols3 = symbols[3:][::NUM_THREADS] # 3, 3+NUM_THREADS,  4+2*NUM_THREADS,  4+3*NUM_THREADS, ...
+if NUM_THREADS >=  5: symbols4 = symbols[4:][::NUM_THREADS] # 4, 4+NUM_THREADS,  5+2*NUM_THREADS,  5+3*NUM_THREADS, ...
+if NUM_THREADS >=  6: symbols5 = symbols[5:][::NUM_THREADS] # 5, 5+NUM_THREADS,  6+2*NUM_THREADS,  6+3*NUM_THREADS, ...
+if NUM_THREADS >=  7: symbols6 = symbols[6:][::NUM_THREADS] # 6, 6+NUM_THREADS,  7+2*NUM_THREADS,  7+3*NUM_THREADS, ...
+if NUM_THREADS >=  8: symbols7 = symbols[7:][::NUM_THREADS] # 7, 7+NUM_THREADS,  8+2*NUM_THREADS,  8+3*NUM_THREADS, ...
+if NUM_THREADS >=  9: symbols8 = symbols[8:][::NUM_THREADS] # 8, 8+NUM_THREADS,  9+2*NUM_THREADS,  9+3*NUM_THREADS, ...
+if NUM_THREADS >= 10: symbols9 = symbols[9:][::NUM_THREADS] # 9, 9+NUM_THREADS, 10+2*NUM_THREADS, 10+3*NUM_THREADS, ...
 
-if NUM_THREADS >= 1: thread0 = Thread(target=process_symbols, args=(symbols0, csv_db_data0, rows0, rows0_no_div, rows0_only_div, 0)) # process_symbols(symbols=symbols0, rows=rows0, rows_no_div=rows0_no_div, rows_only_div=rows0_only_div)
-if NUM_THREADS >= 2: thread1 = Thread(target=process_symbols, args=(symbols1, csv_db_data1, rows1, rows1_no_div, rows1_only_div, 1)) # process_symbols(symbols=symbols1, rows=rows1, rows_no_div=rows1_no_div, rows_only_div=rows1_only_div)
-if NUM_THREADS >= 3: thread2 = Thread(target=process_symbols, args=(symbols2, csv_db_data2, rows2, rows2_no_div, rows2_only_div, 2))
-if NUM_THREADS >= 4: thread3 = Thread(target=process_symbols, args=(symbols3, csv_db_data3, rows3, rows3_no_div, rows3_only_div, 3))
-if NUM_THREADS >= 5: thread4 = Thread(target=process_symbols, args=(symbols4, csv_db_data4, rows4, rows4_no_div, rows4_only_div, 4))
+if NUM_THREADS >=  1: thread0 = Thread(target=process_symbols, args=(symbols0, csv_db_data0, rows0, rows0_no_div, rows0_only_div, 0)) # process_symbols(symbols=symbols0, rows=rows0, rows_no_div=rows0_no_div, rows_only_div=rows0_only_div)
+if NUM_THREADS >=  2: thread1 = Thread(target=process_symbols, args=(symbols1, csv_db_data1, rows1, rows1_no_div, rows1_only_div, 1)) # process_symbols(symbols=symbols1, rows=rows1, rows_no_div=rows1_no_div, rows_only_div=rows1_only_div)
+if NUM_THREADS >=  3: thread2 = Thread(target=process_symbols, args=(symbols2, csv_db_data2, rows2, rows2_no_div, rows2_only_div, 2))
+if NUM_THREADS >=  4: thread3 = Thread(target=process_symbols, args=(symbols3, csv_db_data3, rows3, rows3_no_div, rows3_only_div, 3))
+if NUM_THREADS >=  5: thread4 = Thread(target=process_symbols, args=(symbols4, csv_db_data4, rows4, rows4_no_div, rows4_only_div, 4))
+if NUM_THREADS >=  6: thread5 = Thread(target=process_symbols, args=(symbols5, csv_db_data5, rows4, rows5_no_div, rows5_only_div, 5))
+if NUM_THREADS >=  7: thread6 = Thread(target=process_symbols, args=(symbols6, csv_db_data6, rows4, rows6_no_div, rows6_only_div, 6))
+if NUM_THREADS >=  8: thread7 = Thread(target=process_symbols, args=(symbols7, csv_db_data7, rows4, rows7_no_div, rows7_only_div, 7))
+if NUM_THREADS >=  9: thread8 = Thread(target=process_symbols, args=(symbols8, csv_db_data8, rows4, rows8_no_div, rows8_only_div, 8))
+if NUM_THREADS >= 10: thread9 = Thread(target=process_symbols, args=(symbols9, csv_db_data9, rows4, rows9_no_div, rows9_only_div, 9))
 
-if NUM_THREADS >= 1: thread0.start()
-if NUM_THREADS >= 2: thread1.start()
-if NUM_THREADS >= 3: thread2.start()
-if NUM_THREADS >= 4: thread3.start()
-if NUM_THREADS >= 5: thread4.start()
+if NUM_THREADS >=  1: thread0.start()
+if NUM_THREADS >=  2: thread1.start()
+if NUM_THREADS >=  3: thread2.start()
+if NUM_THREADS >=  4: thread3.start()
+if NUM_THREADS >=  5: thread4.start()
+if NUM_THREADS >=  6: thread5.start()
+if NUM_THREADS >=  7: thread6.start()
+if NUM_THREADS >=  8: thread7.start()
+if NUM_THREADS >=  9: thread8.start()
+if NUM_THREADS >= 10: thread9.start()
 
-if NUM_THREADS >= 1: thread0.join()
-if NUM_THREADS >= 2: thread1.join()
-if NUM_THREADS >= 3: thread2.join()
-if NUM_THREADS >= 4: thread3.join()
-if NUM_THREADS >= 5: thread4.join()
+if NUM_THREADS >=  1: thread0.join()
+if NUM_THREADS >=  2: thread1.join()
+if NUM_THREADS >=  3: thread2.join()
+if NUM_THREADS >=  4: thread3.join()
+if NUM_THREADS >=  5: thread4.join()
+if NUM_THREADS >=  6: thread5.join()
+if NUM_THREADS >=  7: thread6.join()
+if NUM_THREADS >=  8: thread7.join()
+if NUM_THREADS >=  9: thread8.join()
+if NUM_THREADS >= 10: thread9.join()
 
-csv_db_data.extend(  csv_db_data0   + csv_db_data1   + csv_db_data2   + csv_db_data3   + csv_db_data4)
-rows.extend(         rows0          + rows1          + rows2          + rows3          + rows4         )
-rows_no_div.extend(  rows0_no_div   + rows1_no_div   + rows2_no_div   + rows3_no_div   + rows4_no_div  )
-rows_only_div.extend(rows0_only_div + rows1_only_div + rows2_only_div + rows3_only_div + rows4_only_div)
+csv_db_data.extend(  csv_db_data0   + csv_db_data1   + csv_db_data2   + csv_db_data3   + csv_db_data4   + csv_db_data5   + csv_db_data6   + csv_db_data7   + csv_db_data8   + csv_db_data9  )
+rows.extend(         rows0          + rows1          + rows2          + rows3          + rows4          + rows5          + rows6          + rows7          + rows8          + rows9         )
+rows_no_div.extend(  rows0_no_div   + rows1_no_div   + rows2_no_div   + rows3_no_div   + rows4_no_div   + rows5_no_div   + rows6_no_div   + rows7_no_div   + rows8_no_div   + rows9_no_div  )
+rows_only_div.extend(rows0_only_div + rows1_only_div + rows2_only_div + rows3_only_div + rows4_only_div + rows5_only_div + rows6_only_div + rows7_only_div + rows8_only_div + rows9_only_div)
 
 # Now, Sort the rows using the sss_value and ssse_value formulas: [1:] skips the 1st title row
 sorted_list_db               = sorted(csv_db_data,   key=lambda row:          row[0],           reverse=False)  # Sort by ticker symbol
