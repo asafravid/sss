@@ -1,8 +1,9 @@
 #######
-# V50 #
+# V51 #
 #######
 
 import time
+import random
 import pandas   as pd
 import yfinance as yf
 import csv
@@ -59,10 +60,11 @@ BUILD_CSV_DB                      = 1
 CSV_DB_PATH                       = 'Results/20201030-080126'
 READ_UNITED_STATES_INPUT_SYMBOLS  = 1            # when set, covers 7,000 stocks
 TASE_MODE                         = 0            # Work on the Israeli Market only: https://info.tase.co.il/eng/MarketData/Stocks/MarketData/Pages/MarketData.aspx
-NUM_THREADS                       = 20            # 1..5 Threads are supported
+NUM_THREADS                       = 20           # 1..5 Threads are supported
 FORWARD_EPS_INCLUDED              = 0
 MARKET_CAP_INCLUDED               = 1
 USE_INVESTPY                      = 0
+RELAXED_ACCESS                    = 5            # In seconds
 
 # Working Parameters:
 MIN_ENTERPRISE_VALUE              = 500000000    # In $
@@ -487,7 +489,9 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
     if BUILD_CSV_DB:
         for symb in symbols:
             iteration += 1
-            print('[Building DB: thread_id {}] Checking {:9} ({:4}/{:4}/{:4}): '.format(thread_id, symb, len(rows), iteration, len(symbols)), end='')
+            sleep_seconds = round(random.uniform(float(RELAXED_ACCESS)/2, float(RELAXED_ACCESS)*2), NUM_ROUND_DECIMALS)
+            time.sleep(sleep_seconds)
+            print('\n[Building DB: thread_id {:2} Sleeping for {:10} sec] Checking {:9} ({:4}/{:4}/{:4}): '.format(thread_id, sleep_seconds, symb, len(rows), iteration, len(symbols)), end='')
             symbol = yf.Ticker(symb)
             stock_data = StockData(ticker=symb)
             if not process_info(symbol=symbol, stock_data=stock_data):
