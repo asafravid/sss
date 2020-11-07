@@ -1,3 +1,7 @@
+#######
+# V50 #
+#######
+
 import time
 import pandas   as pd
 import yfinance as yf
@@ -53,9 +57,9 @@ class StockData:
 # Working Mode:
 BUILD_CSV_DB                      = 1
 CSV_DB_PATH                       = 'Results/20201030-080126'
-READ_UNITED_STATES_INPUT_SYMBOLS  = 0            # when set, covers 7,000 stocks
+READ_UNITED_STATES_INPUT_SYMBOLS  = 1            # when set, covers 7,000 stocks
 TASE_MODE                         = 0            # Work on the Israeli Market only: https://info.tase.co.il/eng/MarketData/Stocks/MarketData/Pages/MarketData.aspx
-NUM_THREADS                       = 10            # 1..5 Threads are supported
+NUM_THREADS                       = 20            # 1..5 Threads are supported
 FORWARD_EPS_INCLUDED              = 0
 MARKET_CAP_INCLUDED               = 1
 USE_INVESTPY                      = 0
@@ -564,6 +568,46 @@ csv_db_data9   = []
 rows9          = []
 rows9_no_div   = []
 rows9_only_div = []
+csv_db_data10   = []
+rows10          = []
+rows10_no_div   = []
+rows10_only_div = []
+csv_db_data11   = []
+rows11          = []
+rows11_no_div   = []
+rows11_only_div = []
+csv_db_data12   = []
+rows12          = []
+rows12_no_div   = []
+rows12_only_div = []
+csv_db_data13   = []
+rows13          = []
+rows13_no_div   = []
+rows13_only_div = []
+csv_db_data14   = []
+rows14          = []
+rows14_no_div   = []
+rows14_only_div = []
+csv_db_data15   = []
+rows15          = []
+rows15_no_div   = []
+rows15_only_div = []
+csv_db_data16   = []
+rows16          = []
+rows16_no_div   = []
+rows16_only_div = []
+csv_db_data17   = []
+rows17          = []
+rows17_no_div   = []
+rows17_only_div = []
+csv_db_data18   = []
+rows18          = []
+rows18_no_div   = []
+rows18_only_div = []
+csv_db_data19   = []
+rows19          = []
+rows19_no_div   = []
+rows19_only_div = []
 
 if BUILD_CSV_DB == 0: # if DB is already present, read from it and prepare input to threads
     csv_db_filename = CSV_DB_PATH+'/db.csv'
@@ -575,39 +619,69 @@ if BUILD_CSV_DB == 0: # if DB is already present, read from it and prepare input
                 row_index += 1
                 continue
             else:
-                if   (row_index-1) % NUM_THREADS == 0:
-                    csv_db_data0.append(row)
-                elif (row_index-1) % NUM_THREADS == 1:
-                    csv_db_data1.append(row)
-                elif (row_index-1) % NUM_THREADS == 2:
-                    csv_db_data2.append(row)
-                elif (row_index-1) % NUM_THREADS == 3:
-                    csv_db_data3.append(row)
-                elif (row_index-1) % NUM_THREADS == 4:
-                    csv_db_data4.append(row)
+                if   (row_index-1) % NUM_THREADS ==  0: csv_db_data0.append(row)
+                elif (row_index-1) % NUM_THREADS ==  1: csv_db_data1.append(row)
+                elif (row_index-1) % NUM_THREADS ==  2: csv_db_data2.append(row)
+                elif (row_index-1) % NUM_THREADS ==  3: csv_db_data3.append(row)
+                elif (row_index-1) % NUM_THREADS ==  4: csv_db_data4.append(row)
+                elif (row_index-1) % NUM_THREADS ==  5: csv_db_data5.append(row)
+                elif (row_index-1) % NUM_THREADS ==  6: csv_db_data6.append(row)
+                elif (row_index-1) % NUM_THREADS ==  7: csv_db_data7.append(row)
+                elif (row_index-1) % NUM_THREADS ==  8: csv_db_data8.append(row)
+                elif (row_index-1) % NUM_THREADS ==  9: csv_db_data9.append(row)
+                elif (row_index-1) % NUM_THREADS == 10: csv_db_data10.append(row)
+                elif (row_index-1) % NUM_THREADS == 11: csv_db_data11.append(row)
+                elif (row_index-1) % NUM_THREADS == 12: csv_db_data12.append(row)
+                elif (row_index-1) % NUM_THREADS == 13: csv_db_data13.append(row)
+                elif (row_index-1) % NUM_THREADS == 14: csv_db_data14.append(row)
+                elif (row_index-1) % NUM_THREADS == 15: csv_db_data15.append(row)
+                elif (row_index-1) % NUM_THREADS == 16: csv_db_data16.append(row)
+                elif (row_index-1) % NUM_THREADS == 17: csv_db_data17.append(row)
+                elif (row_index-1) % NUM_THREADS == 18: csv_db_data18.append(row)
+                elif (row_index-1) % NUM_THREADS == 19: csv_db_data19.append(row)
                 row_index += 1
 
-if NUM_THREADS >=  1: symbols0 = symbols[0:][::NUM_THREADS] # 0,   NUM_THREADS,    2*NUM_THREADS,    3*NUM_THREADS, ...
-if NUM_THREADS >=  2: symbols1 = symbols[1:][::NUM_THREADS] # 1, 1+NUM_THREADS,  2+2*NUM_THREADS,  2+3*NUM_THREADS, ...
-if NUM_THREADS >=  3: symbols2 = symbols[2:][::NUM_THREADS] # 2, 2+NUM_THREADS,  3+2*NUM_THREADS,  3+3*NUM_THREADS, ...
-if NUM_THREADS >=  4: symbols3 = symbols[3:][::NUM_THREADS] # 3, 3+NUM_THREADS,  4+2*NUM_THREADS,  4+3*NUM_THREADS, ...
-if NUM_THREADS >=  5: symbols4 = symbols[4:][::NUM_THREADS] # 4, 4+NUM_THREADS,  5+2*NUM_THREADS,  5+3*NUM_THREADS, ...
-if NUM_THREADS >=  6: symbols5 = symbols[5:][::NUM_THREADS] # 5, 5+NUM_THREADS,  6+2*NUM_THREADS,  6+3*NUM_THREADS, ...
-if NUM_THREADS >=  7: symbols6 = symbols[6:][::NUM_THREADS] # 6, 6+NUM_THREADS,  7+2*NUM_THREADS,  7+3*NUM_THREADS, ...
-if NUM_THREADS >=  8: symbols7 = symbols[7:][::NUM_THREADS] # 7, 7+NUM_THREADS,  8+2*NUM_THREADS,  8+3*NUM_THREADS, ...
-if NUM_THREADS >=  9: symbols8 = symbols[8:][::NUM_THREADS] # 8, 8+NUM_THREADS,  9+2*NUM_THREADS,  9+3*NUM_THREADS, ...
-if NUM_THREADS >= 10: symbols9 = symbols[9:][::NUM_THREADS] # 9, 9+NUM_THREADS, 10+2*NUM_THREADS, 10+3*NUM_THREADS, ...
+if NUM_THREADS >=  1: symbols0  = symbols[ 0:][::NUM_THREADS] #  0,    NUM_THREADS,    2*NUM_THREADS,    3*NUM_THREADS, ...
+if NUM_THREADS >=  2: symbols1  = symbols[ 1:][::NUM_THREADS] #  1,  1+NUM_THREADS,  2+2*NUM_THREADS,  2+3*NUM_THREADS, ...
+if NUM_THREADS >=  3: symbols2  = symbols[ 2:][::NUM_THREADS] #  2,  2+NUM_THREADS,  3+2*NUM_THREADS,  3+3*NUM_THREADS, ...
+if NUM_THREADS >=  4: symbols3  = symbols[ 3:][::NUM_THREADS] #  3,  3+NUM_THREADS,  4+2*NUM_THREADS,  4+3*NUM_THREADS, ...
+if NUM_THREADS >=  5: symbols4  = symbols[ 4:][::NUM_THREADS] #  4,  4+NUM_THREADS,  5+2*NUM_THREADS,  5+3*NUM_THREADS, ...
+if NUM_THREADS >=  6: symbols5  = symbols[ 5:][::NUM_THREADS] #  5,  5+NUM_THREADS,  6+2*NUM_THREADS,  6+3*NUM_THREADS, ...
+if NUM_THREADS >=  7: symbols6  = symbols[ 6:][::NUM_THREADS] #  6,  6+NUM_THREADS,  7+2*NUM_THREADS,  7+3*NUM_THREADS, ...
+if NUM_THREADS >=  8: symbols7  = symbols[ 7:][::NUM_THREADS] #  7,  7+NUM_THREADS,  8+2*NUM_THREADS,  8+3*NUM_THREADS, ...
+if NUM_THREADS >=  9: symbols8  = symbols[ 8:][::NUM_THREADS] #  8,  8+NUM_THREADS,  9+2*NUM_THREADS,  9+3*NUM_THREADS, ...
+if NUM_THREADS >= 10: symbols9  = symbols[ 9:][::NUM_THREADS] #  9,  9+NUM_THREADS, 10+2*NUM_THREADS, 10+3*NUM_THREADS, ...
+if NUM_THREADS >= 11: symbols10 = symbols[10:][::NUM_THREADS] # 10, 10+NUM_THREADS, 11+2*NUM_THREADS, 11+3*NUM_THREADS, ...
+if NUM_THREADS >= 12: symbols11 = symbols[11:][::NUM_THREADS] # 11, 11+NUM_THREADS, 12+2*NUM_THREADS, 12+3*NUM_THREADS, ...
+if NUM_THREADS >= 13: symbols12 = symbols[12:][::NUM_THREADS] # 12, 12+NUM_THREADS, 13+2*NUM_THREADS, 13+3*NUM_THREADS, ...
+if NUM_THREADS >= 14: symbols13 = symbols[13:][::NUM_THREADS] # 13, 13+NUM_THREADS, 14+2*NUM_THREADS, 14+3*NUM_THREADS, ...
+if NUM_THREADS >= 15: symbols14 = symbols[14:][::NUM_THREADS] # 14, 14+NUM_THREADS, 15+2*NUM_THREADS, 15+3*NUM_THREADS, ...
+if NUM_THREADS >= 16: symbols15 = symbols[15:][::NUM_THREADS] # 15, 15+NUM_THREADS, 16+2*NUM_THREADS, 16+3*NUM_THREADS, ...
+if NUM_THREADS >= 17: symbols16 = symbols[16:][::NUM_THREADS] # 16, 16+NUM_THREADS, 17+2*NUM_THREADS, 17+3*NUM_THREADS, ...
+if NUM_THREADS >= 18: symbols17 = symbols[17:][::NUM_THREADS] # 17, 17+NUM_THREADS, 18+2*NUM_THREADS, 18+3*NUM_THREADS, ...
+if NUM_THREADS >= 19: symbols18 = symbols[18:][::NUM_THREADS] # 18, 18+NUM_THREADS, 19+2*NUM_THREADS, 19+3*NUM_THREADS, ...
+if NUM_THREADS >= 20: symbols19 = symbols[19:][::NUM_THREADS] # 19, 19+NUM_THREADS, 20+2*NUM_THREADS, 20+3*NUM_THREADS, ...
 
-if NUM_THREADS >=  1: thread0 = Thread(target=process_symbols, args=(symbols0, csv_db_data0, rows0, rows0_no_div, rows0_only_div, 0)) # process_symbols(symbols=symbols0, rows=rows0, rows_no_div=rows0_no_div, rows_only_div=rows0_only_div)
-if NUM_THREADS >=  2: thread1 = Thread(target=process_symbols, args=(symbols1, csv_db_data1, rows1, rows1_no_div, rows1_only_div, 1)) # process_symbols(symbols=symbols1, rows=rows1, rows_no_div=rows1_no_div, rows_only_div=rows1_only_div)
-if NUM_THREADS >=  3: thread2 = Thread(target=process_symbols, args=(symbols2, csv_db_data2, rows2, rows2_no_div, rows2_only_div, 2))
-if NUM_THREADS >=  4: thread3 = Thread(target=process_symbols, args=(symbols3, csv_db_data3, rows3, rows3_no_div, rows3_only_div, 3))
-if NUM_THREADS >=  5: thread4 = Thread(target=process_symbols, args=(symbols4, csv_db_data4, rows4, rows4_no_div, rows4_only_div, 4))
-if NUM_THREADS >=  6: thread5 = Thread(target=process_symbols, args=(symbols5, csv_db_data5, rows4, rows5_no_div, rows5_only_div, 5))
-if NUM_THREADS >=  7: thread6 = Thread(target=process_symbols, args=(symbols6, csv_db_data6, rows4, rows6_no_div, rows6_only_div, 6))
-if NUM_THREADS >=  8: thread7 = Thread(target=process_symbols, args=(symbols7, csv_db_data7, rows4, rows7_no_div, rows7_only_div, 7))
-if NUM_THREADS >=  9: thread8 = Thread(target=process_symbols, args=(symbols8, csv_db_data8, rows4, rows8_no_div, rows8_only_div, 8))
-if NUM_THREADS >= 10: thread9 = Thread(target=process_symbols, args=(symbols9, csv_db_data9, rows4, rows9_no_div, rows9_only_div, 9))
+if NUM_THREADS >=  1: thread0  = Thread(target=process_symbols, args=(symbols0,  csv_db_data0,  rows0,  rows0_no_div,  rows0_only_div,   0)) # process_symbols(symbols=symbols0, rows=rows0, rows_no_div=rows0_no_div, rows_only_div=rows0_only_div)
+if NUM_THREADS >=  2: thread1  = Thread(target=process_symbols, args=(symbols1,  csv_db_data1,  rows1,  rows1_no_div,  rows1_only_div,   1)) # process_symbols(symbols=symbols1, rows=rows1, rows_no_div=rows1_no_div, rows_only_div=rows1_only_div)
+if NUM_THREADS >=  3: thread2  = Thread(target=process_symbols, args=(symbols2,  csv_db_data2,  rows2,  rows2_no_div,  rows2_only_div,   2))
+if NUM_THREADS >=  4: thread3  = Thread(target=process_symbols, args=(symbols3,  csv_db_data3,  rows3,  rows3_no_div,  rows3_only_div,   3))
+if NUM_THREADS >=  5: thread4  = Thread(target=process_symbols, args=(symbols4,  csv_db_data4,  rows4,  rows4_no_div,  rows4_only_div,   4))
+if NUM_THREADS >=  6: thread5  = Thread(target=process_symbols, args=(symbols5,  csv_db_data5,  rows5,  rows5_no_div,  rows5_only_div,   5))
+if NUM_THREADS >=  7: thread6  = Thread(target=process_symbols, args=(symbols6,  csv_db_data6,  rows6,  rows6_no_div,  rows6_only_div,   6))
+if NUM_THREADS >=  8: thread7  = Thread(target=process_symbols, args=(symbols7,  csv_db_data7,  rows7,  rows7_no_div,  rows7_only_div,   7))
+if NUM_THREADS >=  9: thread8  = Thread(target=process_symbols, args=(symbols8,  csv_db_data8,  rows8,  rows8_no_div,  rows8_only_div,   8))
+if NUM_THREADS >= 10: thread9  = Thread(target=process_symbols, args=(symbols9,  csv_db_data9,  rows9,  rows9_no_div,  rows9_only_div,   9))
+if NUM_THREADS >= 11: thread10 = Thread(target=process_symbols, args=(symbols10, csv_db_data10, rows10, rows10_no_div, rows10_only_div, 10)) # process_symbols(symbols=symbols0, rows=rows0, rows_no_div=rows0_no_div, rows_only_div=rows0_only_div)
+if NUM_THREADS >= 12: thread11 = Thread(target=process_symbols, args=(symbols11, csv_db_data11, rows11, rows11_no_div, rows11_only_div, 11)) # process_symbols(symbols=symbols1, rows=rows1, rows_no_div=rows1_no_div, rows_only_div=rows1_only_div)
+if NUM_THREADS >= 13: thread12 = Thread(target=process_symbols, args=(symbols12, csv_db_data12, rows12, rows12_no_div, rows12_only_div, 12))
+if NUM_THREADS >= 14: thread13 = Thread(target=process_symbols, args=(symbols13, csv_db_data13, rows13, rows13_no_div, rows13_only_div, 13))
+if NUM_THREADS >= 15: thread14 = Thread(target=process_symbols, args=(symbols14, csv_db_data14, rows14, rows14_no_div, rows14_only_div, 14))
+if NUM_THREADS >= 16: thread15 = Thread(target=process_symbols, args=(symbols15, csv_db_data15, rows15, rows15_no_div, rows15_only_div, 15))
+if NUM_THREADS >= 17: thread16 = Thread(target=process_symbols, args=(symbols16, csv_db_data16, rows16, rows16_no_div, rows16_only_div, 16))
+if NUM_THREADS >= 18: thread17 = Thread(target=process_symbols, args=(symbols17, csv_db_data17, rows17, rows17_no_div, rows17_only_div, 17))
+if NUM_THREADS >= 19: thread18 = Thread(target=process_symbols, args=(symbols18, csv_db_data18, rows18, rows18_no_div, rows18_only_div, 18))
+if NUM_THREADS >= 20: thread19 = Thread(target=process_symbols, args=(symbols19, csv_db_data19, rows19, rows19_no_div, rows19_only_div, 19))
 
 if NUM_THREADS >=  1: thread0.start()
 if NUM_THREADS >=  2: thread1.start()
@@ -619,6 +693,16 @@ if NUM_THREADS >=  7: thread6.start()
 if NUM_THREADS >=  8: thread7.start()
 if NUM_THREADS >=  9: thread8.start()
 if NUM_THREADS >= 10: thread9.start()
+if NUM_THREADS >= 11: thread10.start()
+if NUM_THREADS >= 12: thread11.start()
+if NUM_THREADS >= 13: thread12.start()
+if NUM_THREADS >= 14: thread13.start()
+if NUM_THREADS >= 15: thread14.start()
+if NUM_THREADS >= 16: thread15.start()
+if NUM_THREADS >= 17: thread16.start()
+if NUM_THREADS >= 18: thread17.start()
+if NUM_THREADS >= 19: thread18.start()
+if NUM_THREADS >= 20: thread19.start()
 
 if NUM_THREADS >=  1: thread0.join()
 if NUM_THREADS >=  2: thread1.join()
@@ -630,11 +714,21 @@ if NUM_THREADS >=  7: thread6.join()
 if NUM_THREADS >=  8: thread7.join()
 if NUM_THREADS >=  9: thread8.join()
 if NUM_THREADS >= 10: thread9.join()
+if NUM_THREADS >= 11: thread10.join()
+if NUM_THREADS >= 12: thread11.join()
+if NUM_THREADS >= 13: thread12.join()
+if NUM_THREADS >= 14: thread13.join()
+if NUM_THREADS >= 15: thread14.join()
+if NUM_THREADS >= 16: thread15.join()
+if NUM_THREADS >= 17: thread16.join()
+if NUM_THREADS >= 18: thread17.join()
+if NUM_THREADS >= 19: thread18.join()
+if NUM_THREADS >= 20: thread19.join()
 
-csv_db_data.extend(  csv_db_data0   + csv_db_data1   + csv_db_data2   + csv_db_data3   + csv_db_data4   + csv_db_data5   + csv_db_data6   + csv_db_data7   + csv_db_data8   + csv_db_data9  )
-rows.extend(         rows0          + rows1          + rows2          + rows3          + rows4          + rows5          + rows6          + rows7          + rows8          + rows9         )
-rows_no_div.extend(  rows0_no_div   + rows1_no_div   + rows2_no_div   + rows3_no_div   + rows4_no_div   + rows5_no_div   + rows6_no_div   + rows7_no_div   + rows8_no_div   + rows9_no_div  )
-rows_only_div.extend(rows0_only_div + rows1_only_div + rows2_only_div + rows3_only_div + rows4_only_div + rows5_only_div + rows6_only_div + rows7_only_div + rows8_only_div + rows9_only_div)
+csv_db_data.extend(  csv_db_data0   + csv_db_data1   + csv_db_data2   + csv_db_data3   + csv_db_data4   + csv_db_data5   + csv_db_data6   + csv_db_data7   + csv_db_data8   + csv_db_data9   + csv_db_data10   + csv_db_data11   + csv_db_data12   + csv_db_data13   + csv_db_data14   + csv_db_data15   + csv_db_data16   + csv_db_data17   + csv_db_data18   + csv_db_data19  )
+rows.extend(         rows0          + rows1          + rows2          + rows3          + rows4          + rows5          + rows6          + rows7          + rows8          + rows9          + rows10          + rows11          + rows12          + rows13          + rows14          + rows15          + rows16          + rows17          + rows18          + rows19         )
+rows_no_div.extend(  rows0_no_div   + rows1_no_div   + rows2_no_div   + rows3_no_div   + rows4_no_div   + rows5_no_div   + rows6_no_div   + rows7_no_div   + rows8_no_div   + rows9_no_div   + rows10_no_div   + rows11_no_div   + rows12_no_div   + rows13_no_div   + rows14_no_div   + rows15_no_div   + rows16_no_div   + rows17_no_div   + rows18_no_div   + rows19_no_div  )
+rows_only_div.extend(rows0_only_div + rows1_only_div + rows2_only_div + rows3_only_div + rows4_only_div + rows5_only_div + rows6_only_div + rows7_only_div + rows8_only_div + rows9_only_div + rows10_only_div + rows11_only_div + rows12_only_div + rows13_only_div + rows14_only_div + rows15_only_div + rows16_only_div + rows17_only_div + rows18_only_div + rows19_only_div)
 
 # Now, Sort the rows using the sss_value and ssse_value formulas: [1:] skips the 1st title row
 sorted_list_db               = sorted(csv_db_data,   key=lambda row:          row[0],           reverse=False)  # Sort by ticker symbol
