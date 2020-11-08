@@ -1,5 +1,5 @@
 #######
-# V52 #
+# V53 #
 #######
 
 import time
@@ -58,15 +58,15 @@ class StockData:
 # Working Mode:
 BUILD_CSV_DB                       = 1
 CSV_DB_PATH                        = 'Results/20201030-080126'
-READ_UNITED_STATES_INPUT_SYMBOLS   = 0            # when set, covers 7,000 stocks
-TASE_MODE                          = 1            # Work on the Israeli Market only: https://info.tase.co.il/eng/MarketData/Stocks/MarketData/Pages/MarketData.aspx
+READ_UNITED_STATES_INPUT_SYMBOLS   = 1            # when set, covers 7,000 stocks
+TASE_MODE                          = 0            # Work on the Israeli Market only: https://info.tase.co.il/eng/MarketData/Stocks/MarketData/Pages/MarketData.aspx
 NUM_THREADS                        = 20           # 1..5 Threads are supported
 FORWARD_EPS_INCLUDED               = 0
 MARKET_CAP_INCLUDED                = 1
 USE_INVESTPY                       = 0
-RELAXED_ACCESS                     = 1            # In seconds
-INTERVAL_THREADS                   = 5
-INTERVAL_SECS_TO_AVOID_HTTP_ERRORS = 60*6         # Every INTERVAL_THREADS, a INTERVALS_TO_AVOID_HTTP_ERRORS sec sleep will take place
+RELAXED_ACCESS                     = 2            # In seconds
+INTERVAL_THREADS                   = 4 +     1*TASE_MODE -  2*READ_UNITED_STATES_INPUT_SYMBOLS
+INTERVAL_SECS_TO_AVOID_HTTP_ERRORS = 60*(6 - 1*TASE_MODE + 24*READ_UNITED_STATES_INPUT_SYMBOLS)         # Every INTERVAL_THREADS, a INTERVALS_TO_AVOID_HTTP_ERRORS sec sleep will take place
 
 # Working Parameters:
 MIN_ENTERPRISE_VALUE              = 500000000    # In $
@@ -216,7 +216,7 @@ def process_info(symbol, stock_data):
             if 'shortName' in info: stock_data.short_name = info['shortName']
             else:                   stock_data.short_name = 'None'
 
-        if stock_data.short_name is not None: print('{:35} - '.format(stock_data.short_name), end='')
+        if stock_data.short_name is not None: print('              {:35}:'.format(stock_data.short_name))
 
         if BUILD_CSV_DB and 'quoteType' in info: stock_data.quote_type = info['quoteType']
         if not check_quote_type(stock_data):     return False
@@ -258,7 +258,7 @@ def process_info(symbol, stock_data):
             if USE_INVESTPY and 'P/E Ratio' in stock_information and stock_information['P/E Ratio'] is not None:
                 stock_data.trailing_price_to_earnings = float(text_to_num(stock_information['P/E Ratio']))
             else:
-                if return_value: print('              Skipping since trailing_price_to_earnings, enterprise_value_to_ebitda and enterprise_value_to_revenue are unknown')
+                if return_value: print('                            Skipping since trailing_price_to_earnings, enterprise_value_to_ebitda and enterprise_value_to_revenue are unknown')
                 return_value = False
 
         if BUILD_CSV_DB:
@@ -314,27 +314,27 @@ def process_info(symbol, stock_data):
                         stock_data.enterprise_value = int(text_to_num(stock_information['MarketCap']))
 
         if not TASE_MODE and (stock_data.enterprise_value is None or stock_data.enterprise_value < MIN_ENTERPRISE_VALUE):
-            if return_value: print('              Skipping enterprise_value: {}'.format(stock_data.enterprise_value))
+            if return_value: print('                            Skipping enterprise_value: {}'.format(stock_data.enterprise_value))
             return_value = False
 
         if stock_data.enterprise_value_to_revenue is None and stock_data.enterprise_value is not None and USE_INVESTPY and 'Revenue' in stock_information and stock_information['Revenue'] is not None  and text_to_num(stock_information['Revenue']) > 0:
             stock_data.enterprise_value_to_revenue = float(stock_data.enterprise_value)/float(text_to_num(stock_information['Revenue']))
 
         if stock_data.enterprise_value_to_revenue is None or stock_data.enterprise_value_to_revenue <= 0 or stock_data.enterprise_value_to_revenue > ENTERPRISE_VALUE_TO_REVENUE_LIMIT:
-            if return_value: print('              Skipping enterprise_value_to_revenue: {}'.format(stock_data.enterprise_value_to_revenue))
+            if return_value: print('                            Skipping enterprise_value_to_revenue: {}'.format(stock_data.enterprise_value_to_revenue))
             return_value = False
 
         if stock_data.enterprise_value_to_ebitda is None or stock_data.enterprise_value_to_ebitda <= 0:
-            if return_value: print('              Skipping enterprise_value_to_ebitda: {}'.format(stock_data.enterprise_value_to_ebitda))
+            if return_value: print('                            Skipping enterprise_value_to_ebitda: {}'.format(stock_data.enterprise_value_to_ebitda))
             return_value = False
 
         if stock_data.trailing_price_to_earnings is None or stock_data.trailing_price_to_earnings <= 0:
-            if return_value: print('              Skipping trailing_price_to_earnings: {}'.format(stock_data.trailing_price_to_earnings))
+            if return_value: print('                            Skipping trailing_price_to_earnings: {}'.format(stock_data.trailing_price_to_earnings))
             return_value = False
 
         if stock_data.profit_margin is None or stock_data.profit_margin < PROFIT_MARGIN_LIMIT or stock_data.profit_margin <= 0:
             if stock_data.profit_margin is not None and (not TASE_MODE or stock_data.profit_margin <= 0):
-                if return_value: print('              Skipping profit_margin: {}'.format(stock_data.profit_margin))
+                if return_value: print('                            Skipping profit_margin: {}'.format(stock_data.profit_margin))
                 return_value = False
 
         if stock_data.trailing_eps is None:
@@ -342,23 +342,23 @@ def process_info(symbol, stock_data):
                 stock_data.trailing_eps = float(text_to_num(stock_information['EPS']))
 
         if stock_data.trailing_eps is None or stock_data.trailing_eps is not None and stock_data.trailing_eps <= 0:
-            if return_value: print('              Skipping trailing_eps: {}'.format(stock_data.trailing_eps))
+            if return_value: print('                            Skipping trailing_eps: {}'.format(stock_data.trailing_eps))
             return_value = False
 
         if FORWARD_EPS_INCLUDED and (stock_data.forward_eps is None or stock_data.forward_eps is not None and stock_data.forward_eps <= 0):
-            if return_value: print('              Skipping forward_eps: {}'.format(stock_data.forward_eps))
+            if return_value: print('                            Skipping forward_eps: {}'.format(stock_data.forward_eps))
             return_value = False
 
         if stock_data.earnings_quarterly_growth is None or stock_data.earnings_quarterly_growth < EARNINGS_QUARTERLY_GROWTH_MIN:
-            if return_value: print('              Skipping earnings_quarterly_growth: {}'.format(stock_data.earnings_quarterly_growth))
+            if return_value: print('                            Skipping earnings_quarterly_growth: {}'.format(stock_data.earnings_quarterly_growth))
             return_value = False
 
         if stock_data.price_to_earnings_to_growth_ratio is None or stock_data.price_to_earnings_to_growth_ratio < 0:
-            if return_value: print('              Skipping price_to_earnings_to_growth_ratio: {}'.format(stock_data.price_to_earnings_to_growth_ratio))
+            if return_value: print('                            Skipping price_to_earnings_to_growth_ratio: {}'.format(stock_data.price_to_earnings_to_growth_ratio))
             if return_value: return_value = False
 
         if stock_data.net_income_to_common_shareholders is None or stock_data.net_income_to_common_shareholders < 0:
-            if return_value: print('              Skipping net_income_to_common_shareholders: {}'.format(stock_data.net_income_to_common_shareholders))
+            if return_value: print('                            Skipping net_income_to_common_shareholders: {}'.format(stock_data.net_income_to_common_shareholders))
             if return_value: return_value = False
 
 
@@ -479,7 +479,7 @@ def process_info(symbol, stock_data):
                 print("Exception in symbol.dividends: {}".format(e))
                 pass
 
-        if return_value: print('              sector: {:15}, sss_value: {:15}, ssss_value: {:15}, sssss_value: {:15}, ssse_value: {:15}, sssse_value: {:15}, ssssse_value: {:15}, sssi_value: {:15}, ssssi_value: {:15}, sssssi_value: {:15}, sssei_value: {:15}, ssssei_value: {:15}, sssssei_value: {:15}, enterprise_value_to_revenue: {:15}, trailing_price_to_earnings: {:15}, enterprise_value_to_ebitda: {:15}, profit_margin: {:15}, held_percent_institutions: {:15}, forward_eps: {:15}, trailing_eps: {:15}, price_to_book: {:15}, shares_outstanding: {:15}, net_income_to_common_shareholders: {:15}, nitcsh_to_shares_outstanding: {:15}, num_employees: {:15}, enterprise_value: {:15}, nitcsh_to_num_employees: {:15}, earnings_quarterly_growth: {:15}, price_to_earnings_to_growth_ratio: {:15}'.format(stock_data.sector, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.sssssei_value, stock_data.enterprise_value_to_revenue, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.enterprise_value, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio))
+        if return_value: print('                                          sector: {:15}, sss_value: {:15}, ssss_value: {:15}, sssss_value: {:15}, ssse_value: {:15}, sssse_value: {:15}, ssssse_value: {:15}, sssi_value: {:15}, ssssi_value: {:15}, sssssi_value: {:15}, sssei_value: {:15}, ssssei_value: {:15}, sssssei_value: {:15}, enterprise_value_to_revenue: {:15}, trailing_price_to_earnings: {:15}, enterprise_value_to_ebitda: {:15}, profit_margin: {:15}, held_percent_institutions: {:15}, forward_eps: {:15}, trailing_eps: {:15}, price_to_book: {:15}, shares_outstanding: {:15}, net_income_to_common_shareholders: {:15}, nitcsh_to_shares_outstanding: {:15}, num_employees: {:15}, enterprise_value: {:15}, nitcsh_to_num_employees: {:15}, earnings_quarterly_growth: {:15}, price_to_earnings_to_growth_ratio: {:15}'.format(stock_data.sector, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.sssssei_value, stock_data.enterprise_value_to_revenue, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.enterprise_value, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio))
         return return_value
 
     except Exception as e:  # More information is output when exception is used instead of Exception
@@ -502,7 +502,7 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
             iteration += 1
             sleep_seconds = round(random.uniform(float(RELAXED_ACCESS)/2, float(RELAXED_ACCESS)*2), NUM_ROUND_DECIMALS)
             time.sleep(sleep_seconds)
-            print('\n[Building DB: thread_id {:2} Sleeping for {:10} sec] Checking {:9} ({:4}/{:4}/{:4}): '.format(thread_id, sleep_seconds, symb, len(rows), iteration, len(symbols)), end='')
+            print('[Building DB: thread_id {:2} Sleeping for {:10} sec] Checking {:9} ({:4}/{:4}/{:4}):'.format(thread_id, sleep_seconds, symb, len(rows), iteration, len(symbols)))
             symbol = yf.Ticker(symb)
             stock_data = StockData(ticker=symb)
             if not process_info(symbol=symbol, stock_data=stock_data):
@@ -520,7 +520,7 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
         for row in csv_db_data:
             iteration += 1
             symbol = row[0]
-            print('[Existing DB: thread_id {}] Checking {:9} ({:4}/{:4}/{:4}): '.format(thread_id, symbol, len(rows), iteration, len(symbols)), end='')
+            print('[Existing DB: thread_id {}] Checking {:9} ({:4}/{:4}/{:4}):'.format(thread_id, symbol, len(rows), iteration, len(symbols)))
             symbol = row[0]
 
             for fix_row_index in range(3,len(row)):  # for empty strings - convert value to 0
