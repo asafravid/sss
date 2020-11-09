@@ -1,5 +1,5 @@
 #######
-# V53 #
+# V54 #
 #######
 
 import time
@@ -61,7 +61,7 @@ CSV_DB_PATH                        = 'Results/20201030-080126'
 READ_UNITED_STATES_INPUT_SYMBOLS   = 1            # when set, covers 7,000 stocks
 TASE_MODE                          = 0            # Work on the Israeli Market only: https://info.tase.co.il/eng/MarketData/Stocks/MarketData/Pages/MarketData.aspx
 NUM_THREADS                        = 20           # 1..5 Threads are supported
-FORWARD_EPS_INCLUDED               = 0
+FORWARD_EPS_INCLUDED               = 1
 MARKET_CAP_INCLUDED                = 1
 USE_INVESTPY                       = 0
 RELAXED_ACCESS                     = 2            # In seconds
@@ -909,15 +909,21 @@ sorted_lists_list = [
 for sorted_list in sorted_lists_list:
     sorted_list.insert(0, header_row)
 
-tase_str    = ""
-sectors_str = ""
-all_str     = ""
-csv_db_str  = ""
-if TASE_MODE:                 tase_str    = "_TASE"
-if len(SECTORS_LIST):         sectors_str = '_'+'_'.join(SECTORS_LIST)
+tase_str       = ""
+sectors_str    = ""
+all_str        = ""
+csv_db_str     = ""
+investpy_str   = ""
+forwardeps_str = ""
+marketcap_str  = ""
+if TASE_MODE:                 tase_str       = "_TASE"
+if len(SECTORS_LIST):         sectors_str    = '_'+'_'.join(SECTORS_LIST)
 if READ_UNITED_STATES_INPUT_SYMBOLS: all_str     = '_OTHERS'
-if BUILD_CSV_DB == 0:         csv_db_str  = '_DB_REUSED'
-date_and_time = time.strftime("Results/%Y%m%d-%H%M%S{}{}{}{}".format(tase_str, sectors_str, all_str, csv_db_str))
+if BUILD_CSV_DB == 0:         csv_db_str     = '_DB_REUSED'
+if FORWARD_EPS_INCLUDED:      forwardeps_str = '_FORWARDEPS'
+if USE_INVESTPY:              investpy_str   = '_INVESTPY'
+if MARKET_CAP_INCLUDED:       marketcap_str  = '_MARKETCAP'
+date_and_time = time.strftime("Results/%Y%m%d-%H%M%S{}{}{}{}{}{}{}".format(tase_str, sectors_str, all_str, csv_db_str, marketcap_str, forwardeps_str, investpy_str))
 
 filenames_list = sss_filenames.create_filenames_list(date_and_time)
 
