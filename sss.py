@@ -1,5 +1,5 @@
 #######
-# V56 #
+# V60 #
 #######
 
 import time
@@ -11,6 +11,7 @@ import os
 import itertools
 import sss_filenames
 import investpy
+import math
 
 from threading import Thread
 from dataclasses import dataclass
@@ -35,6 +36,7 @@ class StockData:
     ssssei_value:                      float = 0.0
     sssssei_value:                     float = 0.0
     enterprise_value_to_revenue:       float = 0.0
+    evr_effective:                     float = 0.0
     trailing_price_to_earnings:        float = 0.0
     enterprise_value_to_ebitda:        float = 0.0
     profit_margin:                     float = 0.0
@@ -51,18 +53,20 @@ class StockData:
     nitcsh_to_num_employees:           float = 0.0
     earnings_quarterly_growth:         float = 0.0
     price_to_earnings_to_growth_ratio: float = 0.0
+    sqrt_peg_ratio:                    float = 0.0
     last_4_dividends_0:                float = 0.0
     last_4_dividends_1:                float = 0.0
     last_4_dividends_2:                float = 0.0
     last_4_dividends_3:                float = 0.0
 
 # Working Mode:
-BUILD_CSV_DB                       = 1
-CSV_DB_PATH                        = 'Results/20201030-080126'
+BUILD_CSV_DB_ONLY                  = 0
+BUILD_CSV_DB                       = 0
+CSV_DB_PATH                        = 'Results/20201112-195244_MARKETCAP'
 READ_UNITED_STATES_INPUT_SYMBOLS   = 0            # when set, covers 7,000 stocks
 TASE_MODE                          = 0            # Work on the Israeli Market only: https://info.tase.co.il/eng/MarketData/Stocks/MarketData/Pages/MarketData.aspx
-NUM_THREADS                        = 20           # 1..5 Threads are supported
-FORWARD_EPS_INCLUDED               = 1
+NUM_THREADS                        = 1           # 1..20 Threads are supported
+FORWARD_EPS_INCLUDED               = 0*(not TASE_MODE)
 MARKET_CAP_INCLUDED                = 1
 USE_INVESTPY                       = 0
 RELAXED_ACCESS                     = (NUM_THREADS-1)/10.0            # In seconds
@@ -75,11 +79,12 @@ MIN_ENTERPRISE_VALUE              = 500000000    # In $
 NUM_EMPLOYEES_UNKNOWN             = 10000000     # This will make the company very inefficient in terms of number of employees
 MUTUALFUND                        = 'MUTUALFUND' # Definition of a mutual fund 'quoteType' field in base.py, those are not interesting
 PROFIT_MARGIN_UNKNOWN             = 0.025        # This will make the company not profitable terms of profit margins, thus less attractive
-PROFIT_MARGIN_LIMIT               = round((0.17 + 0.07 * READ_UNITED_STATES_INPUT_SYMBOLS) / (1 + 2 * TASE_MODE), NUM_ROUND_DECIMALS)
+PROFIT_MARGIN_LIMIT               = round((0.15 + 0.05 * READ_UNITED_STATES_INPUT_SYMBOLS) / (1 + 2 * TASE_MODE), NUM_ROUND_DECIMALS)
 PERCENT_HELD_INSTITUTIONS_LOW     = 0.01         # low, to make less relevant
-PEG_UNKNOWN                       = 10           # use a rather high value, such that those companies with PEG - will be more attractive since the information exists for them
+PEG_UNKNOWN                       = 1            # use a neutral value when PEG is unknown
 SHARES_OUTSTANDING_UNKNOWN        = 100000000    # 100 Million Shares - just a value for calculation of a currently unused vaue
-EARNINGS_QUARTERLY_GROWTH_MIN     = -0.125*TASE_MODE       # The earnings can decrease by 1/8, but there is still a requirement that price_to_earnings_to_growth_ratio > 0
+EARNINGS_QUARTERLY_GROWTH_MIN     = -0.25-0.125*TASE_MODE       # The earnings can decrease by 1/4, but there is still a requirement that price_to_earnings_to_growth_ratio > 0
+EARNINGS_QUARTERLY_GROWTH_UNKNOWN = 2*EARNINGS_QUARTERLY_GROWTH_MIN
 BEST_N_SELECT                     = 50                     # Select best N from each of the resulting sorted tables
 ENTERPRISE_VALUE_TO_REVENUE_LIMIT = 17.5 - 2.5 * READ_UNITED_STATES_INPUT_SYMBOLS - 2.5 * TASE_MODE                    # Higher than that is too expensive
 SECTORS_LIST                      = [] # ['Technology', 'Consumer Cyclical', 'Consumer Defensive', 'Industrials', 'Consumer Goods']  # Allows filtering by sector(s)
@@ -188,8 +193,8 @@ if TASE_MODE:
 symbols = list(set(symbols))
 
 
-# Temporary for test:
-# symbols = ['SERV']
+# Temporary to test and debug:
+# symbols = ['DPS']
 
 print('\n{} SSS Symbols to Scan using {} threads: {}\n'.format(len(symbols), NUM_THREADS, symbols))
 
@@ -267,7 +272,7 @@ def process_info(symbol, stock_data):
         if stock_data.short_name is not None: print('              {:35}:'.format(stock_data.short_name))
 
         if BUILD_CSV_DB and 'quoteType' in info: stock_data.quote_type = info['quoteType']
-        if not check_quote_type(stock_data):     return False
+        if not check_quote_type(stock_data):     return_value = False
 
         if BUILD_CSV_DB and 'sector' in info:    stock_data.sector = info['sector']
         if not check_sector(stock_data):         return_value = False
@@ -324,7 +329,7 @@ def process_info(symbol, stock_data):
         if stock_data.enterprise_value_to_revenue is None and stock_data.enterprise_value_to_ebitda is None and stock_data.trailing_price_to_earnings is None:
             if USE_INVESTPY and 'P/E Ratio' in stock_information and stock_information['P/E Ratio'] is not None:
                 stock_data.trailing_price_to_earnings = float(text_to_num(stock_information['P/E Ratio']))
-            else:
+            elif not BUILD_CSV_DB_ONLY:
                 if return_value: print('                            Skipping since trailing_price_to_earnings, enterprise_value_to_ebitda and enterprise_value_to_revenue are unknown')
                 return_value = False
 
@@ -352,7 +357,7 @@ def process_info(symbol, stock_data):
 
             if 'earningsQuarterlyGrowth'                    in info: stock_data.earnings_quarterly_growth         = info['earningsQuarterlyGrowth']
             else:                                                    stock_data.earnings_quarterly_growth         = None
-            if stock_data.earnings_quarterly_growth         is None: stock_data.earnings_quarterly_growth         = EARNINGS_QUARTERLY_GROWTH_MIN
+            if stock_data.earnings_quarterly_growth         is None: stock_data.earnings_quarterly_growth         = EARNINGS_QUARTERLY_GROWTH_UNKNOWN
 
             if 'pegRatio'                                   in info: stock_data.price_to_earnings_to_growth_ratio = info['pegRatio']
             else:                                                    stock_data.price_to_earnings_to_growth_ratio = PEG_UNKNOWN
@@ -371,8 +376,6 @@ def process_info(symbol, stock_data):
 
         if BUILD_CSV_DB:
             if 'enterpriseValue' in info and info['enterpriseValue'] is not None: stock_data.enterprise_value = info['enterpriseValue']
-
-
             if MARKET_CAP_INCLUDED:
                 if stock_data.enterprise_value is None or stock_data.enterprise_value == 0:
                     if   'marketCap' in info and info['marketCap'] is not None:
@@ -380,73 +383,96 @@ def process_info(symbol, stock_data):
                     elif USE_INVESTPY and 'MarketCap' in stock_information and stock_information['MarketCap'] is not None:
                         stock_data.enterprise_value = int(text_to_num(stock_information['MarketCap']))
 
-        if not TASE_MODE and (stock_data.enterprise_value is None or stock_data.enterprise_value < MIN_ENTERPRISE_VALUE):
+        if not BUILD_CSV_DB_ONLY and not TASE_MODE and (stock_data.enterprise_value is None or stock_data.enterprise_value < MIN_ENTERPRISE_VALUE):
             if return_value: print('                            Skipping enterprise_value: {}'.format(stock_data.enterprise_value))
             return_value = False
 
         if stock_data.enterprise_value_to_revenue is None and stock_data.enterprise_value is not None and USE_INVESTPY and 'Revenue' in stock_information and stock_information['Revenue'] is not None  and text_to_num(stock_information['Revenue']) > 0:
             stock_data.enterprise_value_to_revenue = float(stock_data.enterprise_value)/float(text_to_num(stock_information['Revenue']))
 
-        if stock_data.enterprise_value_to_revenue is None or stock_data.enterprise_value_to_revenue <= 0 or stock_data.enterprise_value_to_revenue > ENTERPRISE_VALUE_TO_REVENUE_LIMIT:
+        if not BUILD_CSV_DB_ONLY and (stock_data.enterprise_value_to_revenue is None or stock_data.enterprise_value_to_revenue <= 0):  # or stock_data.enterprise_value_to_revenue > ENTERPRISE_VALUE_TO_REVENUE_LIMIT:
             if return_value: print('                            Skipping enterprise_value_to_revenue: {}'.format(stock_data.enterprise_value_to_revenue))
             return_value = False
 
-        if stock_data.enterprise_value_to_ebitda is None or stock_data.enterprise_value_to_ebitda <= 0:
+        if stock_data.enterprise_value_to_revenue is not None: stock_data.evr_effective = stock_data.enterprise_value_to_revenue  # ** 2
+
+        if not BUILD_CSV_DB_ONLY and (stock_data.enterprise_value_to_ebitda is None or stock_data.enterprise_value_to_ebitda <= 0):
             if return_value: print('                            Skipping enterprise_value_to_ebitda: {}'.format(stock_data.enterprise_value_to_ebitda))
             return_value = False
 
-        if stock_data.trailing_price_to_earnings is None or stock_data.trailing_price_to_earnings <= 0:
+        if not BUILD_CSV_DB_ONLY and (stock_data.trailing_price_to_earnings is None or stock_data.trailing_price_to_earnings <= 0):
             if return_value: print('                            Skipping trailing_price_to_earnings: {}'.format(stock_data.trailing_price_to_earnings))
             return_value = False
 
-        if stock_data.profit_margin is None or stock_data.profit_margin < PROFIT_MARGIN_LIMIT or stock_data.profit_margin <= 0:
+        if stock_data.profit_margin is None  or stock_data.profit_margin < PROFIT_MARGIN_LIMIT:
             if stock_data.profit_margin is not None and (not TASE_MODE or stock_data.profit_margin <= 0):
-                if stock_data.annualized_profit_margin < PROFIT_MARGIN_LIMIT:
+                if not BUILD_CSV_DB_ONLY and stock_data.annualized_profit_margin < PROFIT_MARGIN_LIMIT:
                     if return_value: print('                            Skipping profit_margin: {}'.format(stock_data.profit_margin))
                     return_value = False
 
         if stock_data.trailing_eps is None:
-            if USE_INVESTPY and 'EPS' in stock_information and stock_information['EPS'] is not None:
+            if not BUILD_CSV_DB_ONLY and USE_INVESTPY and 'EPS' in stock_information and stock_information['EPS'] is not None:
                 stock_data.trailing_eps = float(text_to_num(stock_information['EPS']))
 
-        if stock_data.trailing_eps is None or stock_data.trailing_eps is not None and stock_data.trailing_eps <= 0:
+        if not BUILD_CSV_DB_ONLY and (stock_data.trailing_eps is None or stock_data.trailing_eps is not None and stock_data.trailing_eps <= 0):
             if return_value: print('                            Skipping trailing_eps: {}'.format(stock_data.trailing_eps))
             return_value = False
 
-        if FORWARD_EPS_INCLUDED and (stock_data.forward_eps is None or stock_data.forward_eps is not None and stock_data.forward_eps <= 0):
+        if not BUILD_CSV_DB_ONLY and FORWARD_EPS_INCLUDED and (stock_data.forward_eps is None or stock_data.forward_eps is not None and stock_data.forward_eps <= 0):
             if return_value: print('                            Skipping forward_eps: {}'.format(stock_data.forward_eps))
             return_value = False
 
-        if stock_data.earnings_quarterly_growth is None or stock_data.earnings_quarterly_growth < EARNINGS_QUARTERLY_GROWTH_MIN:
+        if not BUILD_CSV_DB_ONLY and (stock_data.earnings_quarterly_growth is None or stock_data.earnings_quarterly_growth < EARNINGS_QUARTERLY_GROWTH_MIN):
             if return_value: print('                            Skipping earnings_quarterly_growth: {}'.format(stock_data.earnings_quarterly_growth))
             return_value = False
 
-        if stock_data.price_to_earnings_to_growth_ratio is None or stock_data.price_to_earnings_to_growth_ratio < 0:
+        if not BUILD_CSV_DB_ONLY and (stock_data.price_to_earnings_to_growth_ratio is None or stock_data.price_to_earnings_to_growth_ratio < 0):
             if return_value: print('                            Skipping price_to_earnings_to_growth_ratio: {}'.format(stock_data.price_to_earnings_to_growth_ratio))
             if return_value: return_value = False
 
-        if stock_data.net_income_to_common_shareholders is None or stock_data.net_income_to_common_shareholders < 0:
+        if stock_data.price_to_earnings_to_growth_ratio > 0: stock_data.sqrt_peg_ratio = math.sqrt(stock_data.price_to_earnings_to_growth_ratio)
+
+        if not BUILD_CSV_DB_ONLY and (stock_data.net_income_to_common_shareholders is None or stock_data.net_income_to_common_shareholders < 0):
             if return_value: print('                            Skipping net_income_to_common_shareholders: {}'.format(stock_data.net_income_to_common_shareholders))
             if return_value: return_value = False
 
 
         if return_value:
-            stock_data.nitcsh_to_shares_outstanding = float(stock_data.net_income_to_common_shareholders) / float(stock_data.shares_outstanding)
-            stock_data.nitcsh_to_num_employees      = float(stock_data.net_income_to_common_shareholders) / float(stock_data.num_employees)
+            if stock_data.shares_outstanding and stock_data.net_income_to_common_shareholders is not None: stock_data.nitcsh_to_shares_outstanding = float(stock_data.net_income_to_common_shareholders) / float(stock_data.shares_outstanding)
+            if stock_data.num_employees      and stock_data.net_income_to_common_shareholders is not None: stock_data.nitcsh_to_num_employees      = float(stock_data.net_income_to_common_shareholders) / float(stock_data.num_employees)
 
-            stock_data.sss_value     = stock_data.enterprise_value_to_revenue
-            stock_data.ssss_value    = stock_data.price_to_earnings_to_growth_ratio
-            stock_data.sssss_value   = stock_data.trailing_price_to_earnings
-            stock_data.ssse_value    = stock_data.profit_margin
-            stock_data.sssse_value   = stock_data.nitcsh_to_num_employees
-            stock_data.ssssse_value  = stock_data.nitcsh_to_num_employees
+            max_profit_margin_effective       = max(stock_data.profit_margin, stock_data.annualized_profit_margin)  # ** 2
+            earnings_qgrowth_factor_effective = (1 + stock_data.earnings_quarterly_growth)  # ** 2
 
-            stock_data.sssi_value    = stock_data.enterprise_value_to_revenue
-            stock_data.ssssi_value   = stock_data.price_to_earnings_to_growth_ratio
-            stock_data.sssssi_value  = stock_data.trailing_price_to_earnings
-            stock_data.sssei_value   = stock_data.profit_margin
-            stock_data.ssssei_value  = stock_data.nitcsh_to_num_employees
-            stock_data.sssssei_value = stock_data.nitcsh_to_num_employees
+            if max_profit_margin_effective and earnings_qgrowth_factor_effective and stock_data.price_to_earnings_to_growth_ratio > 0 and stock_data.trailing_price_to_earnings is not None and stock_data.enterprise_value_to_ebitda is not None:
+                stock_data.sss_value     = stock_data.enterprise_value_to_revenue
+                stock_data.ssss_value    = stock_data.price_to_earnings_to_growth_ratio
+                stock_data.sssss_value   = stock_data.trailing_price_to_earnings
+
+                stock_data.ssse_value    = stock_data.profit_margin
+                stock_data.sssse_value   = stock_data.nitcsh_to_num_employees
+                stock_data.ssssse_value  = stock_data.nitcsh_to_num_employees
+
+                stock_data.sssi_value    = stock_data.enterprise_value_to_revenue
+                stock_data.ssssi_value   = stock_data.price_to_earnings_to_growth_ratio
+                stock_data.sssssi_value  = stock_data.trailing_price_to_earnings
+
+                stock_data.sssei_value   = stock_data.profit_margin
+                stock_data.ssssei_value  = stock_data.nitcsh_to_num_employees
+                stock_data.sssssei_value = stock_data.nitcsh_to_num_employees
+            else:
+                stock_data.sss_value     = BAD_SSS
+                stock_data.ssss_value    = BAD_SSS
+                stock_data.sssss_value   = BAD_SSS
+                stock_data.ssse_value    = BAD_SSSE
+                stock_data.sssse_value   = BAD_SSSE
+                stock_data.ssssse_value  = BAD_SSSE
+                stock_data.sssi_value    = BAD_SSS
+                stock_data.ssssi_value   = BAD_SSS
+                stock_data.sssssi_value  = BAD_SSS
+                stock_data.sssei_value   = BAD_SSSE
+                stock_data.ssssei_value  = BAD_SSSE
+                stock_data.sssssei_value = BAD_SSSE
 
             # Rounding to non-None values + set None values to 0 for simplicity:
             if stock_data.sss_value                         is not None: stock_data.sss_value                         = round(stock_data.sss_value,                         NUM_ROUND_DECIMALS)
@@ -462,6 +488,7 @@ def process_info(symbol, stock_data):
             if stock_data.ssssei_value                      is not None: stock_data.ssssei_value                      = round(stock_data.ssssei_value,                      NUM_ROUND_DECIMALS)
             if stock_data.sssssei_value                     is not None: stock_data.sssssei_value                     = round(stock_data.sssssei_value,                     NUM_ROUND_DECIMALS)
             if stock_data.enterprise_value_to_revenue       is not None: stock_data.enterprise_value_to_revenue       = round(stock_data.enterprise_value_to_revenue,       NUM_ROUND_DECIMALS)
+            if stock_data.evr_effective                       is not None: stock_data.evr_effective                       = round(stock_data.evr_effective, NUM_ROUND_DECIMALS)
             if stock_data.trailing_price_to_earnings        is not None: stock_data.trailing_price_to_earnings        = round(stock_data.trailing_price_to_earnings,        NUM_ROUND_DECIMALS)
             if stock_data.enterprise_value_to_ebitda        is not None: stock_data.enterprise_value_to_ebitda        = round(stock_data.enterprise_value_to_ebitda,        NUM_ROUND_DECIMALS)
             if stock_data.profit_margin                     is not None: stock_data.profit_margin                     = round(stock_data.profit_margin,                     NUM_ROUND_DECIMALS)
@@ -477,6 +504,7 @@ def process_info(symbol, stock_data):
             if stock_data.nitcsh_to_num_employees           is not None: stock_data.nitcsh_to_num_employees           = round(stock_data.nitcsh_to_num_employees,           NUM_ROUND_DECIMALS)
             if stock_data.earnings_quarterly_growth         is not None: stock_data.earnings_quarterly_growth         = round(stock_data.earnings_quarterly_growth,         NUM_ROUND_DECIMALS)
             if stock_data.price_to_earnings_to_growth_ratio is not None: stock_data.price_to_earnings_to_growth_ratio = round(stock_data.price_to_earnings_to_growth_ratio, NUM_ROUND_DECIMALS)
+            if stock_data.sqrt_peg_ratio                    is not None: stock_data.sqrt_peg_ratio                    = round(stock_data.sqrt_peg_ratio, NUM_ROUND_DECIMALS)
         else:
             stock_data.sss_value     = BAD_SSSE
             stock_data.ssss_value    = BAD_SSSE
@@ -506,6 +534,7 @@ def process_info(symbol, stock_data):
             if stock_data.ssssei_value                      is     None: stock_data.ssssei_value                      = BAD_SSSE
             if stock_data.sssssei_value                     is     None: stock_data.sssssei_value                     = BAD_SSSE
             if stock_data.enterprise_value_to_revenue       is     None: stock_data.enterprise_value_to_revenue       = 0
+            if stock_data.evr_effective                     is     None: stock_data.evr_effective                     = 0
             if stock_data.trailing_price_to_earnings        is     None: stock_data.trailing_price_to_earnings        = 0
             if stock_data.enterprise_value_to_ebitda        is     None: stock_data.enterprise_value_to_ebitda        = 0
             if stock_data.profit_margin                     is     None: stock_data.profit_margin                     = 0
@@ -521,6 +550,7 @@ def process_info(symbol, stock_data):
             if stock_data.nitcsh_to_num_employees           is     None: stock_data.nitcsh_to_num_employees           = 0
             if stock_data.earnings_quarterly_growth         is     None: stock_data.earnings_quarterly_growth         = 0
             if stock_data.price_to_earnings_to_growth_ratio is     None: stock_data.price_to_earnings_to_growth_ratio = 0
+            if stock_data.sqrt_peg_ratio                    is     None: stock_data.sqrt_peg_ratio                    = 0
 
             stock_data.last_4_dividends_0 = 0
             stock_data.last_4_dividends_1 = 0
@@ -549,7 +579,7 @@ def process_info(symbol, stock_data):
                 print("Exception in symbol.dividends: {}".format(e))
                 pass
 
-        if return_value: print('                                          sector: {:15}, sss_value: {:15}, ssss_value: {:15}, sssss_value: {:15}, ssse_value: {:15}, sssse_value: {:15}, ssssse_value: {:15}, sssi_value: {:15}, ssssi_value: {:15}, sssssi_value: {:15}, sssei_value: {:15}, ssssei_value: {:15}, sssssei_value: {:15}, enterprise_value_to_revenue: {:15}, trailing_price_to_earnings: {:15}, enterprise_value_to_ebitda: {:15}, profit_margin: {:15}, annualized_profit_margin: {:15}, held_percent_institutions: {:15}, forward_eps: {:15}, trailing_eps: {:15}, price_to_book: {:15}, shares_outstanding: {:15}, net_income_to_common_shareholders: {:15}, nitcsh_to_shares_outstanding: {:15}, num_employees: {:15}, enterprise_value: {:15}, nitcsh_to_num_employees: {:15}, earnings_quarterly_growth: {:15}, price_to_earnings_to_growth_ratio: {:15}'.format(stock_data.sector, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.sssssei_value, stock_data.enterprise_value_to_revenue, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.annualized_profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.enterprise_value, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio))
+        if return_value: print('                                          sector: {:15}, sss_value: {:15}, ssss_value: {:15}, sssss_value: {:15}, ssse_value: {:15}, sssse_value: {:15}, ssssse_value: {:15}, sssi_value: {:15}, ssssi_value: {:15}, sssssi_value: {:15}, sssei_value: {:15}, ssssei_value: {:15}, sssssei_value: {:15}, enterprise_value_to_revenue: {:15}, evr_effective: {:15}, trailing_price_to_earnings: {:15}, enterprise_value_to_ebitda: {:15}, profit_margin: {:15}, annualized_profit_margin: {:15}, held_percent_institutions: {:15}, forward_eps: {:15}, trailing_eps: {:15}, price_to_book: {:15}, shares_outstanding: {:15}, net_income_to_common_shareholders: {:15}, nitcsh_to_shares_outstanding: {:15}, num_employees: {:15}, enterprise_value: {:15}, nitcsh_to_num_employees: {:15}, earnings_quarterly_growth: {:15}, price_to_earnings_to_growth_ratio: {:15}, sqrt_peg_ratio: {:15}'.format(stock_data.sector, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.sssssei_value, stock_data.enterprise_value_to_revenue, stock_data.evr_effective, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.annualized_profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.enterprise_value, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.sqrt_peg_ratio))
         return return_value
 
     except Exception as e:  # More information is output when exception is used instead of Exception
@@ -580,15 +610,15 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
             stock_data = StockData(ticker=symb)
             if not process_info(symbol=symbol, stock_data=stock_data):
                 if TASE_MODE and 'TLV:' not in stock_data.ticker: stock_data.ticker = 'TLV:' + stock_data.ticker.replace('.TA', '')
-                csv_db_data.append([stock_data.ticker, stock_data.short_name, stock_data.sector, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.ssssei_value, stock_data.enterprise_value_to_revenue, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.annualized_profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.enterprise_value, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.last_4_dividends_0, stock_data.last_4_dividends_1, stock_data.last_4_dividends_2, stock_data.last_4_dividends_3])
+                csv_db_data.append([stock_data.ticker, stock_data.short_name, stock_data.sector, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.ssssei_value, stock_data.enterprise_value_to_revenue, stock_data.evr_effective, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.annualized_profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.enterprise_value, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.last_4_dividends_0, stock_data.last_4_dividends_1, stock_data.last_4_dividends_2, stock_data.last_4_dividends_3])
                 continue
 
             if TASE_MODE and 'TLV:' not in stock_data.ticker: stock_data.ticker = 'TLV:' + stock_data.ticker.replace('.TA', '')
             dividends_sum = stock_data.last_4_dividends_0+stock_data.last_4_dividends_1+stock_data.last_4_dividends_2+stock_data.last_4_dividends_3
-            rows.append(                           [stock_data.ticker, stock_data.short_name, stock_data.sector, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.ssssei_value, stock_data.enterprise_value_to_revenue, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.annualized_profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.enterprise_value, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.last_4_dividends_0, stock_data.last_4_dividends_1, stock_data.last_4_dividends_2, stock_data.last_4_dividends_3])
-            if dividends_sum: rows_only_div.append([stock_data.ticker, stock_data.short_name, stock_data.sector, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.ssssei_value, stock_data.enterprise_value_to_revenue, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.annualized_profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.enterprise_value, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.last_4_dividends_0, stock_data.last_4_dividends_1, stock_data.last_4_dividends_2, stock_data.last_4_dividends_3])
-            else:             rows_no_div.append(  [stock_data.ticker, stock_data.short_name, stock_data.sector, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.ssssei_value, stock_data.enterprise_value_to_revenue, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.annualized_profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.enterprise_value, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.last_4_dividends_0, stock_data.last_4_dividends_1, stock_data.last_4_dividends_2, stock_data.last_4_dividends_3])
-            csv_db_data.append(                    [stock_data.ticker, stock_data.short_name, stock_data.sector, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.ssssei_value, stock_data.enterprise_value_to_revenue, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.annualized_profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.enterprise_value, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.last_4_dividends_0, stock_data.last_4_dividends_1, stock_data.last_4_dividends_2, stock_data.last_4_dividends_3])
+            rows.append(                           [stock_data.ticker, stock_data.short_name, stock_data.sector, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.ssssei_value, stock_data.enterprise_value_to_revenue, stock_data.evr_effective, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.annualized_profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.enterprise_value, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.sqrt_peg_ratio, stock_data.last_4_dividends_0, stock_data.last_4_dividends_1, stock_data.last_4_dividends_2, stock_data.last_4_dividends_3])
+            if dividends_sum: rows_only_div.append([stock_data.ticker, stock_data.short_name, stock_data.sector, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.ssssei_value, stock_data.enterprise_value_to_revenue, stock_data.evr_effective, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.annualized_profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.enterprise_value, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.sqrt_peg_ratio, stock_data.last_4_dividends_0, stock_data.last_4_dividends_1, stock_data.last_4_dividends_2, stock_data.last_4_dividends_3])
+            else:             rows_no_div.append(  [stock_data.ticker, stock_data.short_name, stock_data.sector, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.ssssei_value, stock_data.enterprise_value_to_revenue, stock_data.evr_effective, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.annualized_profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.enterprise_value, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.sqrt_peg_ratio, stock_data.last_4_dividends_0, stock_data.last_4_dividends_1, stock_data.last_4_dividends_2, stock_data.last_4_dividends_3])
+            csv_db_data.append(                    [stock_data.ticker, stock_data.short_name, stock_data.sector, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.ssssei_value, stock_data.enterprise_value_to_revenue, stock_data.evr_effective, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.annualized_profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.enterprise_value, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.sqrt_peg_ratio, stock_data.last_4_dividends_0, stock_data.last_4_dividends_1, stock_data.last_4_dividends_2, stock_data.last_4_dividends_3])
     else: # DB already present
         for row in csv_db_data:
             iteration += 1
@@ -598,18 +628,16 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
 
             for fix_row_index in range(3,len(row)):  # for empty strings - convert value to 0
                 if row[fix_row_index] == '': row[fix_row_index] = 0
-            stock_data = StockData(ticker=symbol, short_name=row[1], sector=row[2], sss_value=float(row[3]), ssss_value=float(row[4]), sssss_value=float(row[5]), ssse_value=float(row[6]), sssse_value=float(row[7]), ssssse_value=float(row[8]), sssi_value=float(row[9]), ssssi_value=float(row[10]), sssssi_value=float(row[11]), sssei_value=float(row[12]), ssssei_value=float(row[13]), sssssei_value=float(row[14]), enterprise_value_to_revenue=float(row[15]), trailing_price_to_earnings=float(row[16]), enterprise_value_to_ebitda=float(row[17]), profit_margin=float(row[18]), annualized_profit_margin=float(row[19]), held_percent_institutions=float(row[20]), forward_eps=float(row[21]), trailing_eps=float(row[22]), price_to_book=float(row[23]), shares_outstanding=float(row[24]), net_income_to_common_shareholders=float(row[25]), nitcsh_to_shares_outstanding=float(row[26]), num_employees=int(row[27]), enterprise_value=int(row[28]), nitcsh_to_num_employees=float(row[29]), earnings_quarterly_growth=float(row[30]), price_to_earnings_to_growth_ratio=float(row[31]), last_4_dividends_0=float(row[32]), last_4_dividends_1=float(row[33]), last_4_dividends_2=float(row[34]), last_4_dividends_3=float(row[35]))
+            stock_data = StockData(ticker=symbol, short_name=row[1], sector=row[2], sss_value=float(row[3]), ssss_value=float(row[4]), sssss_value=float(row[5]), ssse_value=float(row[6]), sssse_value=float(row[7]), ssssse_value=float(row[8]), sssi_value=float(row[9]), ssssi_value=float(row[10]), sssssi_value=float(row[11]), sssei_value=float(row[12]), ssssei_value=float(row[13]), sssssei_value=float(row[14]), enterprise_value_to_revenue=float(row[15]), evr_effective=float(row[16]), trailing_price_to_earnings=float(row[17]), enterprise_value_to_ebitda=float(row[18]), profit_margin=float(row[19]), annualized_profit_margin=float(row[20]), held_percent_institutions=float(row[21]), forward_eps=float(row[22]), trailing_eps=float(row[23]), price_to_book=float(row[24]), shares_outstanding=float(row[25]), net_income_to_common_shareholders=float(row[26]), nitcsh_to_shares_outstanding=float(row[27]), num_employees=int(row[28]), enterprise_value=float(row[29]), nitcsh_to_num_employees=float(row[30]), earnings_quarterly_growth=float(row[31]), price_to_earnings_to_growth_ratio=float(row[32]), sqrt_peg_ratio=float(row[33]), last_4_dividends_0=float(row[34]), last_4_dividends_1=float(row[35]), last_4_dividends_2=float(row[36]), last_4_dividends_3=float(row[37]))
             if not process_info(symbol=symbol, stock_data=stock_data):
                 continue
 
             if TASE_MODE: stock_data.ticker = 'TLV:' + stock_data.ticker.replace('.TA', '')
 
             dividends_sum = stock_data.last_4_dividends_0 + stock_data.last_4_dividends_1 + stock_data.last_4_dividends_2 + stock_data.last_4_dividends_3
-            rows.append(             [stock_data.ticker, stock_data.short_name, stock_data.sector, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.ssssei_value, stock_data.enterprise_value_to_revenue, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.annualized_profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.enterprise_value, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.last_4_dividends_0, stock_data.last_4_dividends_1, stock_data.last_4_dividends_2, stock_data.last_4_dividends_3])
-            if dividends_sum:
-                rows_only_div.append([stock_data.ticker, stock_data.short_name, stock_data.sector, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.ssssei_value, stock_data.enterprise_value_to_revenue, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.annualized_profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.enterprise_value, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.last_4_dividends_0, stock_data.last_4_dividends_1, stock_data.last_4_dividends_2, stock_data.last_4_dividends_3])
-            else:
-                rows_no_div.append(  [stock_data.ticker, stock_data.short_name, stock_data.sector, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.ssssei_value, stock_data.enterprise_value_to_revenue, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.annualized_profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.enterprise_value, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.last_4_dividends_0, stock_data.last_4_dividends_1, stock_data.last_4_dividends_2, stock_data.last_4_dividends_3])
+            rows.append(                           [stock_data.ticker, stock_data.short_name, stock_data.sector, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.ssssei_value, stock_data.enterprise_value_to_revenue, stock_data.evr_effective, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.annualized_profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.enterprise_value, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.sqrt_peg_ratio, stock_data.last_4_dividends_0, stock_data.last_4_dividends_1, stock_data.last_4_dividends_2, stock_data.last_4_dividends_3])
+            if dividends_sum: rows_only_div.append([stock_data.ticker, stock_data.short_name, stock_data.sector, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.ssssei_value, stock_data.enterprise_value_to_revenue, stock_data.evr_effective, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.annualized_profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.enterprise_value, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.sqrt_peg_ratio, stock_data.last_4_dividends_0, stock_data.last_4_dividends_1, stock_data.last_4_dividends_2, stock_data.last_4_dividends_3])
+            else:             rows_no_div.append(  [stock_data.ticker, stock_data.short_name, stock_data.sector, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.ssssei_value, stock_data.enterprise_value_to_revenue, stock_data.evr_effective, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.annualized_profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.enterprise_value, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.sqrt_peg_ratio, stock_data.last_4_dividends_0, stock_data.last_4_dividends_1, stock_data.last_4_dividends_2, stock_data.last_4_dividends_3])
 
 
 csv_db_data    = []
@@ -963,7 +991,7 @@ list_sss_best_only_div.extend(sorted_list_sssssei_only_div[:BEST_N_SELECT])
 sorted_list_sssss_best_only_div_with_duplicates = sorted(list_sss_best_only_div, key=lambda row: row[5], reverse=False)  # Sort by sssss_value   -> The lower  - the more attractive
 sorted_list_sssss_best_only_div = list(k for k, _ in itertools.groupby(sorted_list_sssss_best_only_div_with_duplicates))
 
-header_row = ["Ticker", "Name", "Sector", "sss_value", "ssss_value", "sssss_value", "ssse_value", "sssse_value", "ssssse_value", "sssi_value", "ssssi_value", "sssssi_value", "sssei_value", "ssssei_value", "sssssei_value", "enterprise_value_to_revenue", "trailing_price_to_earnings", "enterprise_value_to_ebitda", "profit_margin", "annualized_profit_margin", "held_percent_institutions", "forward_eps", "trailing_eps", "price_to_book", "shares_outstanding", "net_income_to_common_shareholders", "nitcsh_to_shares_outstanding", "employees", "enterprise_value", "nitcsh_to_num_employees", "earnings_quarterly_growth", "price_to_earnings_to_growth_ratio", "last_dividend_0", "last_dividend_1", "last_dividend_2", "last_dividend_3" ]
+header_row = ["Ticker", "Name", "Sector", "sss_value", "ssss_value", "sssss_value", "ssse_value", "sssse_value", "ssssse_value", "sssi_value", "ssssi_value", "sssssi_value", "sssei_value", "ssssei_value", "sssssei_value", "enterprise_value_to_revenue", "evr_effective", "trailing_price_to_earnings", "enterprise_value_to_ebitda", "profit_margin", "annualized_profit_margin", "held_percent_institutions", "forward_eps", "trailing_eps", "price_to_book", "shares_outstanding", "net_income_to_common_shareholders", "nitcsh_to_shares_outstanding", "employees", "enterprise_value", "nitcsh_to_num_employees", "earnings_quarterly_growth", "price_to_earnings_to_growth_ratio", "sqrt_peg_ratio", "last_dividend_0", "last_dividend_1", "last_dividend_2", "last_dividend_3" ]
 
 sorted_lists_list = [
     sorted_list_db,
@@ -989,7 +1017,7 @@ csv_db_str     = ""
 investpy_str   = ""
 forwardeps_str = ""
 marketcap_str  = ""
-pmargin_str    = "_PMARGIN{}".format(PROFIT_MARGIN_LIMIT)
+pmargin_str    = ""  # "_PMARGIN{}".format(PROFIT_MARGIN_LIMIT)
 if TASE_MODE:                 tase_str       = "_TASE"
 if len(SECTORS_LIST):         sectors_str    = '_'+'_'.join(SECTORS_LIST)
 if READ_UNITED_STATES_INPUT_SYMBOLS: all_str     = '_OTHERS'
