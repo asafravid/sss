@@ -1,5 +1,5 @@
 #######
-# V60 #
+# V62 #
 #######
 
 import time
@@ -15,6 +15,17 @@ import math
 
 from threading import Thread
 from dataclasses import dataclass
+
+NUM_ROUND_DECIMALS            = 4
+MIN_ENTERPRISE_VALUE          = 500000000  # In $
+NUM_EMPLOYEES_UNKNOWN         = 10000000  # This will make the company very inefficient in terms of number of employees
+PROFIT_MARGIN_UNKNOWN         = 0.025  # This will make the company not profitable terms of profit margins, thus less attractive
+PERCENT_HELD_INSTITUTIONS_LOW = 0.01         # low, to make less relevant
+PEG_UNKNOWN                   = 1  # use a neutral value when PEG is unknown
+SHARES_OUTSTANDING_UNKNOWN    = 100000000  # 100 Million Shares - just a value for calculation of a currently unused vaue
+BAD_SSS                       = 10.0 ** 10.0
+BAD_SSSE                      = 0
+PROFIT_MARGIN_WEIGHTS         = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]  # from oldest to newest
 
 
 @dataclass
@@ -59,155 +70,15 @@ class StockData:
     last_4_dividends_2:                float = 0.0
     last_4_dividends_3:                float = 0.0
 
-# Working Mode:
-BUILD_CSV_DB_ONLY                  = 0
-BUILD_CSV_DB                       = 0
-CSV_DB_PATH                        = 'Results/20201112-195244_MARKETCAP'
-READ_UNITED_STATES_INPUT_SYMBOLS   = 0            # when set, covers 7,000 stocks
-TASE_MODE                          = 0            # Work on the Israeli Market only: https://info.tase.co.il/eng/MarketData/Stocks/MarketData/Pages/MarketData.aspx
-NUM_THREADS                        = 1           # 1..20 Threads are supported
-FORWARD_EPS_INCLUDED               = 0*(not TASE_MODE)
-MARKET_CAP_INCLUDED                = 1
-USE_INVESTPY                       = 0
-RELAXED_ACCESS                     = (NUM_THREADS-1)/10.0            # In seconds
-INTERVAL_THREADS                   = 4 +     1*TASE_MODE -  2*READ_UNITED_STATES_INPUT_SYMBOLS
-INTERVAL_SECS_TO_AVOID_HTTP_ERRORS = 60*(7 - 1*TASE_MODE + 35*READ_UNITED_STATES_INPUT_SYMBOLS)         # Every INTERVAL_THREADS, a INTERVALS_TO_AVOID_HTTP_ERRORS sec sleep will take place
-
-# Working Parameters:
-NUM_ROUND_DECIMALS                = 4
-MIN_ENTERPRISE_VALUE              = 500000000    # In $
-NUM_EMPLOYEES_UNKNOWN             = 10000000     # This will make the company very inefficient in terms of number of employees
-MUTUALFUND                        = 'MUTUALFUND' # Definition of a mutual fund 'quoteType' field in base.py, those are not interesting
-PROFIT_MARGIN_UNKNOWN             = 0.025        # This will make the company not profitable terms of profit margins, thus less attractive
-PROFIT_MARGIN_LIMIT               = round((0.15 + 0.05 * READ_UNITED_STATES_INPUT_SYMBOLS) / (1 + 2 * TASE_MODE), NUM_ROUND_DECIMALS)
-PERCENT_HELD_INSTITUTIONS_LOW     = 0.01         # low, to make less relevant
-PEG_UNKNOWN                       = 1            # use a neutral value when PEG is unknown
-SHARES_OUTSTANDING_UNKNOWN        = 100000000    # 100 Million Shares - just a value for calculation of a currently unused vaue
-EARNINGS_QUARTERLY_GROWTH_MIN     = -0.25-0.125*TASE_MODE       # The earnings can decrease by 1/4, but there is still a requirement that price_to_earnings_to_growth_ratio > 0
-EARNINGS_QUARTERLY_GROWTH_UNKNOWN = 2*EARNINGS_QUARTERLY_GROWTH_MIN
-BEST_N_SELECT                     = 50                     # Select best N from each of the resulting sorted tables
-ENTERPRISE_VALUE_TO_REVENUE_LIMIT = 17.5 - 2.5 * READ_UNITED_STATES_INPUT_SYMBOLS - 2.5 * TASE_MODE                    # Higher than that is too expensive
-SECTORS_LIST                      = [] # ['Technology', 'Consumer Cyclical', 'Consumer Defensive', 'Industrials', 'Consumer Goods']  # Allows filtering by sector(s)
-BAD_SSS                           = 10.0**10.0
-BAD_SSSE                          = 0
-PROFIT_MARGIN_WEIGHTS             = [1,2,3,4,5,6,7,8,9,10]  # from oldest to newest
-
-
-if len(SECTORS_LIST):
-    ENTERPRISE_VALUE_TO_REVENUE_LIMIT *= 5
-    PROFIT_MARGIN_LIMIT               /= 3
-
-payload            = pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies') # There are 2 tables on the Wikipedia page, get the first table
-first_table        = payload[0]
-second_table       = payload[1]
-df                 = first_table
-symbols_snp500     = df['Symbol'].values.tolist()
-symbols_nasdaq100  = ['ATVI', 'ADBE', 'AMD', 'ALXN', 'ALGN', 'GOOG', 'GOOGL', 'AMZN', 'AMGN', 'ADI', 'ANSS', 'AAPL', 'AMAT', 'ASML', 'ADSK', 'ADP', 'BIDU', 'BIIB', 'BMRN', 'BKNG', 'AVGO', 'CDNS', 'CDW', 'CERN', 'CHTR', 'CHKP', 'CTAS', 'CSCO', 'CTXS', 'CTSH', 'CMCSA', 'CPRT', 'COST', 'CSX', 'DXCM', 'DOCU', 'DLTR', 'EBAY', 'EA', 'EXC', 'EXPE', 'FB', 'FAST', 'FISV', 'FOX', 'FOXA', 'GILD', 'IDXX', 'ILMN', 'INCY', 'INTC', 'INTU', 'ISRG', 'JD', 'KLAC', 'LRCX', 'LBTYA', 'LBTYK', 'LULU', 'MAR', 'MXIM', 'MELI', 'MCHP', 'MU', 'MSFT', 'MRNA', 'MDLZ', 'MNST', 'NTES', 'NFLX', 'NVDA', 'NXPI', 'ORLY', 'PCAR', 'PAYX', 'PYPL', 'PEP', 'PDD', 'QCOM', 'REGN', 'ROST', 'SGEN', 'SIRI', 'SWKS', 'SPLK', 'SBUX', 'SNPS', 'TMUS', 'TTWO', 'TSLA', 'TXN', 'KHC', 'TCOM', 'ULTA', 'VRSN', 'VRSK', 'VRTX', 'WBA', 'WDC', 'WDAY', 'XEL', 'XLNX', 'ZM']
-symbols_russel1000 = ['TWOU', 'MMM', 'ABT', 'ABBV', 'ABMD', 'ACHC', 'ACN', 'ATVI', 'AYI', 'ADNT', 'ADBE', 'ADT', 'AAP', 'AMD', 'ACM', 'AES', 'AMG', 'AFL', 'AGCO', 'A', 'AGIO', 'AGNC', 'AL', 'APD', 'AKAM', 'ALK', 'ALB', 'AA', 'ARE', 'ALXN', 'ALGN', 'ALKS', 'Y', 'ALLE', 'AGN', 'ADS', 'LNT', 'ALSN', 'ALL', 'ALLY', 'ALNY', 'GOOGL', 'GOOG', 'MO', 'AMZN', 'AMCX', 'DOX', 'UHAL', 'AEE', 'AAL', 'ACC', 'AEP', 'AXP', 'AFG', 'AMH', 'AIG', 'ANAT', 'AMT', 'AWK', 'AMP', 'ABC', 'AME', 'AMGN', 'APH', 'ADI', 'NLY', 'ANSS', 'AR', 'ANTM', 'AON', 'APA', 'AIV', 'APY', 'APLE', 'AAPL', 'AMAT', 'ATR', 'APTV', 'WTR', 'ARMK', 'ACGL', 'ADM', 'ARNC', 'ARD', 'ANET', 'AWI', 'ARW', 'ASH', 'AZPN', 'ASB', 'AIZ', 'AGO', 'T', 'ATH', 'TEAM', 'ATO', 'ADSK', 'ADP', 'AN', 'AZO', 'AVB', 'AGR', 'AVY', 'AVT', 'EQH', 'AXTA', 'AXS', 'BKR', 'BLL', 'BAC', 'BOH', 'BK', 'OZK', 'BKU', 'BAX', 'BDX', 'WRB', 'BRK.B', 'BERY', 'BBY', 'BYND', 'BGCP', 'BIIB', 'BMRN', 'BIO', 'TECH', 'BKI', 'BLK', 'HRB', 'BLUE', 'BA', 'BOKF', 'BKNG', 'BAH', 'BWA', 'BSX', 'BDN', 'BFAM', 'BHF', 'BMY', 'BRX', 'AVGO', 'BR', 'BPYU', 'BRO', 'BFA', 'BFB', 'BRKR', 'BC', 'BG', 'BURL', 'BWXT', 'CHRW', 'CABO', 'CBT', 'COG', 'CACI', 'CDNS', 'CZR', 'CPT', 'CPB', 'CMD', 'COF', 'CAH', 'CSL', 'KMX', 'CCL', 'CRI', 'CASY', 'CTLT', 'CAT', 'CBOE', 'CBRE', 'CBS', 'CDK', 'CDW', 'CE', 'CELG', 'CNC', 'CDEV', 'CNP', 'CTL', 'CDAY', 'BXP', 'CF', 'CRL', 'CHTR', 'CHE', 'LNG', 'CHK', 'CVX', 'CIM', 'CMG', 'CHH', 'CB', 'CHD', 'CI', 'XEC', 'CINF', 'CNK', 'CTAS', 'CSCO', 'CIT', 'C', 'CFG', 'CTXS', 'CLH', 'CLX', 'CME', 'CMS', 'CNA', 'CNX', 'KO', 'CGNX', 'CTSH', 'COHR', 'CFX', 'CL', 'CLNY', 'CXP', 'COLM', 'CMCSA', 'CMA', 'CBSH', 'COMM', 'CAG', 'CXO', 'CNDT', 'COP', 'ED', 'STZ', 'CERN', 'CPA', 'CPRT', 'CLGX', 'COR', 'GLW', 'OFC', 'CSGP', 'COST', 'COTY', 'CR', 'CACC', 'CCI', 'CCK', 'CSX', 'CUBE', 'CFR', 'CMI', 'CW', 'CVS', 'CY', 'CONE', 'DHI', 'DHR', 'DRI', 'DVA', 'SITC', 'DE', 'DELL', 'DAL', 'XRAY', 'DVN', 'DXCM', 'FANG', 'DKS', 'DLR', 'DFS', 'DISCA', 'DISCK', 'DISH', 'DIS', 'DHC', 'DOCU', 'DLB', 'DG', 'DLTR', 'D', 'DPZ', 'CLR', 'COO', 'DEI', 'DOV', 'DD', 'DPS', 'DTE', 'DUK', 'DRE', 'DNB', 'DNKN', 'DXC', 'ETFC', 'EXP', 'EWBC', 'EMN', 'ETN', 'EV', 'EBAY', 'SATS', 'ECL', 'EIX', 'EW', 'EA', 'EMR', 'ESRT', 'EHC', 'EGN', 'ENR', 'ETR', 'EVHC', 'EOG', 'EPAM', 'EPR', 'EQT', 'EFX', 'EQIX', 'EQC', 'ELS', 'EQR', 'ERIE', 'ESS', 'EL', 'EEFT', 'EVBG', 'EVR', 'RE', 'EVRG', 'ES', 'UFS', 'DCI', 'EXPE', 'EXPD', 'STAY', 'EXR', 'XOG', 'XOM', 'FFIV', 'FB', 'FDS', 'FICO', 'FAST', 'FRT', 'FDX', 'FIS', 'FITB', 'FEYE', 'FAF', 'FCNCA', 'FDC', 'FHB', 'FHN', 'FRC', 'FSLR', 'FE', 'FISV', 'FLT', 'FLIR', 'FND', 'FLO', 'FLS', 'FLR', 'FMC', 'FNB', 'FNF', 'FL', 'F', 'FTNT', 'FTV', 'FBHS', 'FOXA', 'FOX', 'BEN', 'FCX', 'AJG', 'GLPI', 'GPS', 'EXAS', 'EXEL', 'EXC', 'GTES', 'GLIBA', 'GD', 'GE', 'GIS', 'GM', 'GWR', 'G', 'GNTX', 'GPC', 'GILD', 'GPN', 'GL', 'GDDY', 'GS', 'GT', 'GRA', 'GGG', 'EAF', 'GHC', 'GWW', 'LOPE', 'GPK', 'GRUB', 'GWRE', 'HAIN', 'HAL', 'HBI', 'THG', 'HOG', 'HIG', 'HAS', 'HE', 'HCA', 'HDS', 'HTA', 'PEAK', 'HEI.A', 'HEI', 'HP', 'JKHY', 'HLF', 'HSY', 'HES', 'GDI', 'GRMN', 'IT', 'HGV', 'HLT', 'HFC', 'HOLX', 'HD', 'HON', 'HRL', 'HST', 'HHC', 'HPQ', 'HUBB', 'HPP', 'HUM', 'HBAN', 'HII', 'HUN', 'H', 'IAC', 'ICUI', 'IEX', 'IDXX', 'INFO', 'ITW', 'ILMN', 'INCY', 'IR', 'INGR', 'PODD', 'IART', 'INTC', 'IBKR', 'ICE', 'IGT', 'IP', 'IPG', 'IBM', 'IFF', 'INTU', 'ISRG', 'IVZ', 'INVH', 'IONS', 'IPGP', 'IQV', 'HPE', 'HXL', 'HIW', 'HRC', 'JAZZ', 'JBHT', 'JBGS', 'JEF', 'JBLU', 'JNJ', 'JCI', 'JLL', 'JPM', 'JNPR', 'KSU', 'KAR', 'K', 'KEY', 'KEYS', 'KRC', 'KMB', 'KIM', 'KMI', 'KEX', 'KLAC', 'KNX', 'KSS', 'KOS', 'KR', 'LB', 'LHX', 'LH', 'LRCX', 'LAMR', 'LW', 'LSTR', 'LVS', 'LAZ', 'LEA', 'LM', 'LEG', 'LDOS', 'LEN', 'LEN.B', 'LII', 'LBRDA', 'LBRDK', 'FWONA', 'IRM', 'ITT', 'JBL', 'JEC', 'LLY', 'LECO', 'LNC', 'LGF.A', 'LGF.B', 'LFUS', 'LYV', 'LKQ', 'LMT', 'L', 'LOGM', 'LOW', 'LPLA', 'LULU', 'LYFT', 'LYB', 'MTB', 'MAC', 'MIC', 'M', 'MSG', 'MANH', 'MAN', 'MRO', 'MPC', 'MKL', 'MKTX', 'MAR', 'MMC', 'MLM', 'MRVL', 'MAS', 'MASI', 'MA', 'MTCH', 'MAT', 'MXIM', 'MKC', 'MCD', 'MCK', 'MDU', 'MPW', 'MD', 'MDT', 'MRK', 'FWONK', 'LPT', 'LSXMA', 'LSXMK', 'LSI', 'CPRI', 'MIK', 'MCHP', 'MU', 'MSFT', 'MAA', 'MIDD', 'MKSI', 'MHK', 'MOH', 'TAP', 'MDLZ', 'MPWR', 'MNST', 'MCO', 'MS', 'MORN', 'MOS', 'MSI', 'MSM', 'MSCI', 'MUR', 'MYL', 'NBR', 'NDAQ', 'NFG', 'NATI', 'NOV', 'NNN', 'NAVI', 'NCR', 'NKTR', 'NTAP', 'NFLX', 'NBIX', 'NRZ', 'NYCB', 'NWL', 'NEU', 'NEM', 'NWSA', 'NWS', 'MCY', 'MET', 'MTD', 'MFA', 'MGM', 'JWN', 'NSC', 'NTRS', 'NOC', 'NLOK', 'NCLH', 'NRG', 'NUS', 'NUAN', 'NUE', 'NTNX', 'NVT', 'NVDA', 'NVR', 'NXPI', 'ORLY', 'OXY', 'OGE', 'OKTA', 'ODFL', 'ORI', 'OLN', 'OHI', 'OMC', 'ON', 'OMF', 'OKE', 'ORCL', 'OSK', 'OUT', 'OC', 'OI', 'PCAR', 'PKG', 'PACW', 'PANW', 'PGRE', 'PK', 'PH', 'PE', 'PTEN', 'PAYX', 'PAYC', 'PYPL', 'NEE', 'NLSN', 'NKE', 'NI', 'NBL', 'NDSN', 'PEP', 'PKI', 'PRGO', 'PFE', 'PCG', 'PM', 'PSX', 'PPC', 'PNFP', 'PF', 'PNW', 'PXD', 'ESI', 'PNC', 'PII', 'POOL', 'BPOP', 'POST', 'PPG', 'PPL', 'PRAH', 'PINC', 'TROW', 'PFG', 'PG', 'PGR', 'PLD', 'PFPT', 'PB', 'PRU', 'PTC', 'PSA', 'PEG', 'PHM', 'PSTG', 'PVH', 'QGEN', 'QRVO', 'QCOM', 'PWR', 'PBF', 'PEGA', 'PAG', 'PNR', 'PEN', 'PBCT', 'RLGY', 'RP', 'O', 'RBC', 'REG', 'REGN', 'RF', 'RGA', 'RS', 'RNR', 'RSG', 'RMD', 'RPAI', 'RNG', 'RHI', 'ROK', 'ROL', 'ROP', 'ROST', 'RCL', 'RGLD', 'RES', 'RPM', 'RSPP', 'R', 'SPGI', 'SABR', 'SAGE', 'CRM', 'SC', 'SRPT', 'SBAC', 'HSIC', 'SLB', 'SNDR', 'SCHW', 'SMG', 'SEB', 'SEE', 'DGX', 'QRTEA', 'RL', 'RRC', 'RJF', 'RYN', 'RTN', 'NOW', 'SVC', 'SHW', 'SBNY', 'SLGN', 'SPG', 'SIRI', 'SIX', 'SKX', 'SWKS', 'SLG', 'SLM', 'SM', 'AOS', 'SJM', 'SNA', 'SON', 'SO', 'SCCO', 'LUV', 'SPB', 'SPR', 'SRC', 'SPLK', 'S', 'SFM', 'SQ', 'SSNC', 'SWK', 'SBUX', 'STWD', 'STT', 'STLD', 'SRCL', 'STE', 'STL', 'STOR', 'SYK', 'SUI', 'STI', 'SIVB', 'SWCH', 'SGEN', 'SEIC', 'SRE', 'ST', 'SCI', 'SERV', 'TPR', 'TRGP', 'TGT', 'TCO', 'TCF', 'AMTD', 'TDY', 'TFX', 'TDS', 'TPX', 'TDC', 'TER', 'TEX', 'TSRO', 'TSLA', 'TCBI', 'TXN', 'TXT', 'TFSL', 'CC', 'KHC', 'WEN', 'TMO', 'THO', 'TIF', 'TKR', 'TJX', 'TOL', 'TTC', 'TSCO', 'TDG', 'RIG', 'TRU', 'TRV', 'THS', 'TPCO', 'TRMB', 'TRN', 'TRIP', 'SYF', 'SNPS', 'SNV', 'SYY', 'DATA', 'TTWO', 'TMUS', 'TFC', 'UBER', 'UGI', 'ULTA', 'ULTI', 'UMPQ', 'UAA', 'UA', 'UNP', 'UAL', 'UPS', 'URI', 'USM', 'X', 'UTX', 'UTHR', 'UNH', 'UNIT', 'UNVR', 'OLED', 'UHS', 'UNM', 'URBN', 'USB', 'USFD', 'VFC', 'MTN', 'VLO', 'VMI', 'VVV', 'VAR', 'VVC', 'VEEV', 'VTR', 'VER', 'VRSN', 'VRSK', 'VZ', 'VSM', 'VRTX', 'VIAC', 'TWLO', 'TWTR', 'TWO', 'TYL', 'TSN', 'USG', 'UI', 'UDR', 'VMC', 'WPC', 'WBC', 'WAB', 'WBA', 'WMT', 'WM', 'WAT', 'WSO', 'W', 'WFTLF', 'WBS', 'WEC', 'WRI', 'WBT', 'WCG', 'WFC', 'WELL', 'WCC', 'WST', 'WAL', 'WDC', 'WU', 'WLK', 'WRK', 'WEX', 'WY', 'WHR', 'WTM', 'WLL', 'JW.A', 'WMB', 'WSM', 'WLTW', 'WTFC', 'WDAY', 'WP', 'WPX', 'WYND', 'WH', 'VIAB', 'VICI', 'VIRT', 'V', 'VC', 'VST', 'VMW', 'VNO', 'VOYA', 'ZAYO', 'ZBRA', 'ZEN', 'ZG', 'Z', 'ZBH', 'ZION', 'ZTS', 'ZNGA', 'WYNN', 'XEL', 'XRX', 'XLNX', 'XPO', 'XYL', 'YUMC', 'YUM']
-
-# nasdaq100: https://www.barchart.com/stocks/quotes/$IUXX/components?viewName=main
-symbols_nasdaq_100_csv = [] # nasdaq100-components-11-10-2020.csv
-nasdq100_filenames_list = ['Indices/nasdaq100-components-11-10-2020.csv'] # https://www.barchart.com/stocks/indices/russell/russell1000
-for filename in nasdq100_filenames_list:
-    with open(filename, mode='r', newline='') as engine:
-        reader = csv.reader(engine, delimiter=',')
-        row_index = 0
-        for row in reader:
-            if row_index == 0:
-                row_index += 1
-                continue
-            else:
-                symbols_nasdaq_100_csv.append(row[0])
-                row_index += 1
-
-symbols_russel1000_wiki = [] # https://en.wikipedia.org/wiki/Russell_1000_Index
-russel1000_filenames_wiki_list = ['Indices/Russel_1000_index_wiki.csv'] # https://www.barchart.com/stocks/indices/russell/russell1000
-for filename in russel1000_filenames_wiki_list:
-    with open(filename, mode='r', newline='') as engine:
-        reader = csv.reader(engine, delimiter=',')
-        for row in reader:
-            symbols_russel1000_wiki.append(row[1])
-
-
-symbols_russel1000_csv = []  # TODO: ASAFR: Make a general CSV reading function (with title row and withour, and which component in row to take, etc...
-russel1000_filenames_list = ['Indices/russell-1000-index-11-10-2020.csv'] # https://www.barchart.com/stocks/indices/russell/russell1000
-for filename in russel1000_filenames_list:
-    with open(filename, mode='r', newline='') as engine:
-        reader = csv.reader(engine, delimiter=',')
-        row_index = 0
-        for row in reader:
-            if row_index == 0:
-                row_index += 1
-                continue
-            else:
-                symbols_russel1000_csv.append(row[0])
-                row_index += 1
-
-symbols_tase     = []  #symbols_tase       = ['ALD.TA', 'ABIL.TA', 'ACCL.TA', 'ADGR.TA', 'ADKA.TA', 'ARDM.TA', 'AFHL.TA', 'AFPR.TA', 'AFID.TA', 'AFRE.TA', 'AICS.TA', 'ARPT.TA', 'ALBA.TA', 'ALMD.TA', 'ALLT.TA', 'AMDA.L.TA', 'ALMA.TA', 'ALGS.TA', 'ALHE.TA', 'ALRPR.TA', 'ASPF.TA', 'AMAN.TA', 'AMRK.TA', 'AMOT.TA', 'ANLT.TA', 'ANGL.TA', 'APIO.M.TA', 'APLP.TA', 'ARD.TA', 'ARAD.TA', 'ARAN.TA', 'ARNA.TA', 'ARKO.TA', 'ARYT.TA', 'ASHO.TA', 'ASHG.TA', 'ASPR.TA', 'ASGR.TA', 'ATRY.TA', 'AUDC.TA', 'AUGN.TA', 'AURA.TA', 'SHVA.TA', 'AVER.TA', 'AVGL.TA', 'AVIA.TA', 'AVIV.TA', 'AVLN.TA', 'AVRT.TA', 'AYAL.TA', 'AZRM.TA', 'AZRG.TA', 'BCOM.TA', 'BYAR.TA', 'BBYL.TA', 'BRAN.TA', 'BVC.TA', 'BYSD.TA', 'ORL.TA', 'BSEN.TA', 'BEZQ.TA', 'BGI-M.TA', 'BIG.TA', 'BIOV.TA', 'BOLT.TA', 'BLRX.TA', 'PHGE.TA', 'BIRM.TA', 'BLSR.TA', 'BOTI.TA', 'BONS.TA', 'BCNV.TA', 'BWAY.TA', 'BRAM.TA', 'BRND.TA', 'BNRG.TA', 'BRIL.TA', 'BRMG.TA', 'CISY.TA', 'CAMT.TA', 'CANF.TA', 'CSURE.TA', 'CNMD.TA', 'CNZN.TA', 'CPTP.TA', 'CRSO.TA', 'CRMT.TA', 'CAST.TA', 'CEL.TA', 'CHAM.TA', 'CHR.TA', 'CMCT.TA', 'CMCTP.TA', 'CTPL5.TA', 'CTPL1.TA', 'CLBV.TA', 'CBI.TA', 'CLIS.TA', 'CFX.TA', 'CDEV.TA', 'CGEN.TA', 'CMDR.TA', 'DNA.TA', 'DANH.TA', 'DANE.TA', 'DCMA.TA', 'DLRL.TA', 'DLEA.TA', 'DEDR.L.TA', 'DLEKG.TA', 'DELT.TA', 'DIMRI.TA', 'DIFI.TA', 'DSCT.TA', 'DISI.TA', 'DRAL.TA', 'DORL.TA', 'DRSL.TA', 'DUNI.TA', 'EMCO.TA', 'EDRL.TA', 'ELAL.TA', 'EMITF.TA', 'EMTC.TA', 'ESLT.TA', 'ELCO.TA', 'ELDAV.TA', 'ELTR.TA', 'ECP.TA', 'ELCRE.TA', 'ELWS.TA', 'ELLO.TA', 'ELMR.TA', 'ELRN.TA', 'ELSPC.TA', 'EMDV.TA', 'ENDY.TA', 'ENOG.TA', 'ENRG.TA', 'ENLT.TA', 'ENLV.TA', 'EQTL.TA', 'EFNC.TA', 'EVGN.TA', 'EXPO.TA', 'FNTS.TA', 'FTAL.TA', 'FIBI.TA', 'FIBIH.TA', 'FGAS.TA', 'FBRT.TA', 'FRSX.TA', 'FORTY.TA', 'FOX.TA', 'FRSM.TA', 'FRDN.TA', 'GOSS.TA', 'GFC-L.TA', 'GPGB.TA', 'GADS.TA', 'GSFI.TA', 'GAON.TA', 'GAGR.TA', 'GZT.TA', 'GNRS.TA', 'GIBUI.TA', 'GILT.TA', 'GNGR.TA', 'GIVO.L.TA', 'GIX.TA', 'GLTC.TA', 'GLEX.L.TA', 'GKL.TA', 'GLRS.TA', 'GODM-M.TA', 'GLPL.TA', 'GOLD.TA', 'GOHO.TA', 'GOLF.TA', 'HDST.TA', 'HAP.TA', 'HGG.TA', 'HAIN.TA', 'HMAM.TA', 'MSBI.TA', 'HAMAT.TA', 'HAML.TA', 'HNMR.TA', 'HARL.TA', 'HLAN.TA', 'HRON.TA', 'HOD.TA', 'HLMS.TA', 'IBI.TA', 'IBITEC.F.TA', 'ICB.TA', 'ICCM.TA', 'ICL.TA', 'IDIN.TA', 'IES.TA', 'IFF.TA', 'ILDR.TA', 'ILX.TA', 'IMCO.TA', 'INBR.TA', 'INFR.TA', 'INRM.TA', 'INTL.TA', 'ININ.TA', 'INCR.TA', 'INTR.TA', 'IGLD-M.TA', 'ISCD.TA', 'ISCN.TA', 'ILCO.TA', 'ISOP.L.TA', 'ISHI.TA', 'ISRA.L.TA', 'ISRS.TA', 'ISRO.TA', 'ISTA.TA', 'ITMR.TA', 'JBNK.TA', 'KDST.TA', 'KAFR.TA', 'KMDA.TA', 'KRNV-L.TA', 'KARE.TA', 'KRDI.TA', 'KEN.TA', 'KRUR.TA', 'KTOV.TA', 'KLIL.TA', 'KMNK-M.TA', 'KNFM.TA', 'LHIS.TA', 'LAHAV.TA', 'ILDC.TA', 'LPHL.L.TA', 'LAPD.TA', 'LDER.TA', 'LSCO.TA', 'LUMI.TA', 'LEOF.TA', 'LEVI.TA', 'LVPR.TA', 'LBTL.TA', 'LCTX.TA', 'LPSN.TA', 'LODZ.TA', 'LUDN.TA', 'LUZN.TA', 'LZNR.TA', 'MGIC.TA', 'MLTM.TA', 'MMAN.TA', 'MSLA.TA', 'MTMY.TA', 'MTRX.TA', 'MAXO.TA', 'MTRN.TA', 'MEAT.TA', 'MDGS.TA', 'MDPR.TA', 'MDTR.TA', 'MDVI.TA', 'MGOR.TA', 'MEDN.TA', 'MTDS.TA', 'MLSR.TA', 'MNIN.TA', 'MNRT.TA', 'MMHD.TA', 'CMER.TA', 'MRHL.TA', 'MSKE.TA', 'MGRT.TA', 'MCRNT.TA', 'MGDL.TA', 'MIFT.TA', 'MNGN.TA', 'MNRV.TA', 'MLD.TA', 'MSHR.TA', 'MVNE.TA', 'MISH.TA', 'MZTF.TA', 'MBMX-M.TA', 'MDIN.L.TA', 'MRIN.TA', 'MYSZ.TA', 'MYDS.TA', 'NFTA.TA', 'NVPT.L.TA', 'NAWI.TA', 'NTGR.TA', 'NTO.TA', 'NTML.TA', 'NERZ-M.TA', 'NXTG.TA', 'NXTM.TA', 'NXGN-M.TA', 'NICE.TA', 'NISA.TA', 'NSTR.TA', 'NVMI.TA', 'NVLG.TA', 'ORTC.TA', 'ONE.TA', 'OPAL.TA', 'OPCE.TA', 'OPK.TA', 'OBAS.TA', 'ORAD.TA', 'ORMP.TA', 'ORBI.TA', 'ORIN.TA', 'ORA.TA', 'ORON.TA', 'OVRS.TA', 'PCBT.TA', 'PLTF.TA', 'PLRM.TA', 'PNAX.TA', 'PTNR.TA', 'PAYT.TA', 'PZOL.TA', 'PEN.TA', 'PFLT.TA', 'PERI.TA', 'PRGO.TA', 'PTCH.TA', 'PTX.TA', 'PMCN.TA', 'PHOE.TA', 'PLSN.TA', 'PLCR.TA', 'PPIL-M.TA', 'PLAZ-L.TA', 'PSTI.TA', 'POLI.TA', 'PIU.TA', 'POLY.TA', 'PWFL.TA', 'PRSK.TA', 'PRTC.TA', 'PTBL.TA', 'PLX.TA', 'QLTU.TA', 'QNCO.TA', 'RLCO.TA', 'RMN.TA', 'RMLI.TA', 'RANI.TA', 'RPAC.TA', 'RATI.L.TA', 'RTPT.L.TA', 'RAVD.TA', 'RVL.TA', 'RIT1.TA', 'AZRT.TA', 'REKA.TA', 'RIMO.TA', 'ROBO.TA', 'RTEN.L.TA', 'ROTS.TA', 'RSEL.TA', 'SRAC.TA', 'SFET.TA', 'SANO1.TA', 'SPNS.TA', 'SRFT.TA', 'STCM.TA', 'SAVR.TA', 'SHNP.TA', 'SCOP.TA', 'SEMG.TA', 'SLARL.TA', 'SHGR.TA', 'SALG.TA', 'SHAN.TA', 'SPEN.TA', 'SEFA.TA', 'SMNIN.TA', 'SKBN.TA', 'SHOM.TA', 'SAE.TA', 'SKLN.TA', 'SLGN.TA', 'SMTO.TA', 'SCC.TA', 'SPRG.TA', 'SPNTC.TA', 'STG.TA', 'STRS.TA', 'SMT.TA', 'SNFL.TA', 'SNCM.TA', 'SPGE.TA', 'SNEL.TA', 'TDGN-L.TA', 'TDRN.TA', 'TALD.TA', 'TMRP.TA', 'TASE.TA', 'TATT.TA', 'TAYA.TA', 'TNPV.TA', 'TEDE.TA', 'TFRLF.TA', 'TLRD.TA', 'TLSY.TA', 'TUZA.TA', 'TEVA.TA', 'TIGBUR.TA', 'TKUN.TA', 'TTAM.TA', 'TGTR.TA', 'TOPS.TA', 'TSEM.TA', 'TREN.TA', 'UNCR.TA', 'UNCT.L.TA', 'UNIT.TA', 'UNVO.TA', 'UTRN.TA', 'VCTR.TA', 'VILR.TA', 'VISN.TA', 'VTLC-M.TA', 'VTNA.TA', 'VNTZ-M.TA', 'WSMK.TA', 'WTS.TA', 'WILC.TA', 'WLFD.TA', 'XENA.TA', 'XTLB.TA', 'YAAC.TA', 'YBOX.TA', 'YHNF.TA', 'ZNKL.TA', 'ZMH.TA', 'ZUR.TA']
-stocks_list_tase = []  # https://info.tase.co.il/eng/MarketData/Stocks/MarketData/Pages/MarketData.aspx
-if TASE_MODE:
-    tase_filenames_list = ['Indices/Data_20201104.csv']
-
-    for filename in tase_filenames_list:
-        with open(filename, mode='r', newline='') as engine:
-            reader = csv.reader(engine, delimiter=',')
-            row_index = 0
-            for row in reader:
-                if row_index <= 3:
-                    row_index += 1
-                    continue
-                else:
-                    symbols_tase.append(row[1]+'.TA')
-                    row_index += 1
-    if USE_INVESTPY:
-        stocks_list_tase = investpy.get_stocks_list(country='israel')
-        for index, stock in enumerate(stocks_list_tase): stocks_list_tase[index] += '.TA'
-
-# All nasdaq and others: ftp://ftp.nasdaqtrader.com/symboldirectory/
-# ftp.nasdaqtrader.com/SymbolDirectory/nasdaqlisted.txt
-# ftp.nasdaqtrader.com/SymbolDirectory/otherlisted.txt
-symbols_united_states     = []
-stocks_list_united_states = []
-if READ_UNITED_STATES_INPUT_SYMBOLS:
-    nasdaq_filenames_list = ['Indices/nasdaqlisted.csv', 'Indices/otherlisted.csv']
-
-    for filename in nasdaq_filenames_list:
-        with open(filename, mode='r', newline='') as engine:
-            reader = csv.reader(engine, delimiter='|')
-            row_index = 0
-            for row in reader:
-                if row_index == 0 or 'ETF' in row[1]:
-                    row_index += 1
-                    continue
-                else:
-                    symbols_united_states.append(row[0])
-                    row_index += 1
-
-    stocks_list_united_states = investpy.get_stocks_list(country='united states')
-
-symbols = symbols_snp500 + symbols_nasdaq100 + symbols_nasdaq_100_csv + symbols_russel1000 + symbols_russel1000_csv + symbols_united_states + stocks_list_united_states
-
-if TASE_MODE:
-    symbols = symbols_tase + stocks_list_tase
-
-symbols = list(set(symbols))
-
-
-# Temporary to test and debug:
-# symbols = ['DPS']
-
-print('\n{} SSS Symbols to Scan using {} threads: {}\n'.format(len(symbols), NUM_THREADS, symbols))
-
-
 def check_quote_type(stock_data):
-    if stock_data.quote_type == MUTUALFUND:
+    if stock_data.quote_type == 'MUTUALFUND': # Definition of a mutual fund 'quoteType' field in base.py, those are not interesting
         print('Mutual Fund: Skip')
         return False  # Not interested in those and they lack all the below info[] properties so nothing to do with them anyways
     return True
 
 
-def check_sector(stock_data):
-    if len(SECTORS_LIST) and stock_data.sector not in SECTORS_LIST:
+def check_sector(stock_data, sectors_list):
+    if len(sectors_list) and stock_data.sector not in sectors_list:
         print('              Skipping Sector {}'.format(stock_data.sector))
         return False
     return True
@@ -233,13 +104,13 @@ def text_to_num(text):
         return float(text)
 
 
-def process_info(symbol, stock_data):
+def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown, enterprise_value_to_revenue_limit, market_cap_included, forward_eps_included):
     try:
         return_value = True
         info              = {}
         earnings          = {}
         stock_information = {}
-        if BUILD_CSV_DB:
+        if build_csv_db:
             try:
                 info                  = symbol.get_info()
                 # cash_flow             = symbol.get_cashflow(as_dict=True)
@@ -255,9 +126,9 @@ def process_info(symbol, stock_data):
                 print("              Exception in {} symbol.get_info(): {}".format(stock_data.ticker, e))
                 pass
 
-            if USE_INVESTPY:
+            if use_investpy:
                 try:
-                    if TASE_MODE:
+                    if tase_mode:
                         stock_information = investpy.get_stock_information(stock=stock_data.ticker.replace('.TA',''), country='israel', as_json=True)
                     else:
                         stock_information = investpy.get_stock_information(stock=stock_data.ticker, country='united states', as_json=True)
@@ -265,19 +136,19 @@ def process_info(symbol, stock_data):
                     print("              Exception in {} get_stock_information(): {}".format(stock_data.ticker, e))
                     pass
 
-        if BUILD_CSV_DB:
+        if build_csv_db:
             if 'shortName' in info: stock_data.short_name = info['shortName']
             else:                   stock_data.short_name = 'None'
 
         if stock_data.short_name is not None: print('              {:35}:'.format(stock_data.short_name))
 
-        if BUILD_CSV_DB and 'quoteType' in info: stock_data.quote_type = info['quoteType']
+        if build_csv_db and 'quoteType' in info: stock_data.quote_type = info['quoteType']
         if not check_quote_type(stock_data):     return_value = False
 
-        if BUILD_CSV_DB and 'sector' in info:    stock_data.sector = info['sector']
-        if not check_sector(stock_data):         return_value = False
+        if build_csv_db and 'sector' in info:    stock_data.sector = info['sector']
+        if not check_sector(stock_data, sectors_list):         return_value = False
 
-        if BUILD_CSV_DB:
+        if build_csv_db:
             if 'fullTimeEmployees' in info:      stock_data.num_employees = info['fullTimeEmployees']
             else:                                stock_data.num_employees = NUM_EMPLOYEES_UNKNOWN
             if stock_data.num_employees is None: stock_data.num_employees = NUM_EMPLOYEES_UNKNOWN
@@ -286,7 +157,7 @@ def process_info(symbol, stock_data):
             if stock_data.ticker == 'INTC' and stock_data.num_employees < 1000:
                 stock_data.num_employees *= 1000
 
-        if BUILD_CSV_DB:
+        if build_csv_db:
             if earnings is not None and 'Revenue' in earnings and 'Earnings'in earnings:
                 len_revenue_list  = len(earnings['Revenue'])
                 len_earnings_list = len(earnings['Earnings'])
@@ -327,13 +198,13 @@ def process_info(symbol, stock_data):
             if isinstance(stock_data.trailing_price_to_earnings,str):  stock_data.trailing_price_to_earnings  = None
 
         if stock_data.enterprise_value_to_revenue is None and stock_data.enterprise_value_to_ebitda is None and stock_data.trailing_price_to_earnings is None:
-            if USE_INVESTPY and 'P/E Ratio' in stock_information and stock_information['P/E Ratio'] is not None:
+            if use_investpy and 'P/E Ratio' in stock_information and stock_information['P/E Ratio'] is not None:
                 stock_data.trailing_price_to_earnings = float(text_to_num(stock_information['P/E Ratio']))
-            elif not BUILD_CSV_DB_ONLY:
+            elif not build_csv_db_only:
                 if return_value: print('                            Skipping since trailing_price_to_earnings, enterprise_value_to_ebitda and enterprise_value_to_revenue are unknown')
                 return_value = False
 
-        if BUILD_CSV_DB:
+        if build_csv_db:
             if   stock_data.enterprise_value_to_revenue is None and stock_data.enterprise_value_to_ebitda  is not None: stock_data.enterprise_value_to_revenue = stock_data.enterprise_value_to_ebitda
             elif stock_data.enterprise_value_to_revenue is None and stock_data.trailing_price_to_earnings  is not None: stock_data.enterprise_value_to_revenue = stock_data.trailing_price_to_earnings
 
@@ -357,7 +228,7 @@ def process_info(symbol, stock_data):
 
             if 'earningsQuarterlyGrowth'                    in info: stock_data.earnings_quarterly_growth         = info['earningsQuarterlyGrowth']
             else:                                                    stock_data.earnings_quarterly_growth         = None
-            if stock_data.earnings_quarterly_growth         is None: stock_data.earnings_quarterly_growth         = EARNINGS_QUARTERLY_GROWTH_UNKNOWN
+            if stock_data.earnings_quarterly_growth         is None: stock_data.earnings_quarterly_growth         = earnings_quarterly_growth_unknown
 
             if 'pegRatio'                                   in info: stock_data.price_to_earnings_to_growth_ratio = info['pegRatio']
             else:                                                    stock_data.price_to_earnings_to_growth_ratio = PEG_UNKNOWN
@@ -366,7 +237,7 @@ def process_info(symbol, stock_data):
             if 'sharesOutstanding'                          in info: stock_data.shares_outstanding                = info['sharesOutstanding']
             else:                                                    stock_data.shares_outstanding                = SHARES_OUTSTANDING_UNKNOWN
             if stock_data.shares_outstanding is None or stock_data.shares_outstanding == 0:
-                if USE_INVESTPY and 'Shares Outstanding' in stock_information and stock_information['Shares Outstanding'] is not None:
+                if use_investpy and 'Shares Outstanding' in stock_information and stock_information['Shares Outstanding'] is not None:
                     stock_data.shares_outstanding = int(text_to_num(stock_information['Shares Outstanding']))
                 else:
                     stock_data.shares_outstanding = SHARES_OUTSTANDING_UNKNOWN
@@ -374,65 +245,65 @@ def process_info(symbol, stock_data):
             if 'netIncomeToCommon' in info: stock_data.net_income_to_common_shareholders = info['netIncomeToCommon']
             else:                           stock_data.net_income_to_common_shareholders = None
 
-        if BUILD_CSV_DB:
+        if build_csv_db:
             if 'enterpriseValue' in info and info['enterpriseValue'] is not None: stock_data.enterprise_value = info['enterpriseValue']
-            if MARKET_CAP_INCLUDED:
+            if market_cap_included:
                 if stock_data.enterprise_value is None or stock_data.enterprise_value == 0:
                     if   'marketCap' in info and info['marketCap'] is not None:
                         stock_data.enterprise_value = int(info['marketCap'])
-                    elif USE_INVESTPY and 'MarketCap' in stock_information and stock_information['MarketCap'] is not None:
+                    elif use_investpy and 'MarketCap' in stock_information and stock_information['MarketCap'] is not None:
                         stock_data.enterprise_value = int(text_to_num(stock_information['MarketCap']))
 
-        if not BUILD_CSV_DB_ONLY and not TASE_MODE and (stock_data.enterprise_value is None or stock_data.enterprise_value < MIN_ENTERPRISE_VALUE):
+        if not build_csv_db_only and not tase_mode and (stock_data.enterprise_value is None or stock_data.enterprise_value < MIN_ENTERPRISE_VALUE):
             if return_value: print('                            Skipping enterprise_value: {}'.format(stock_data.enterprise_value))
             return_value = False
 
-        if stock_data.enterprise_value_to_revenue is None and stock_data.enterprise_value is not None and USE_INVESTPY and 'Revenue' in stock_information and stock_information['Revenue'] is not None  and text_to_num(stock_information['Revenue']) > 0:
+        if stock_data.enterprise_value_to_revenue is None and stock_data.enterprise_value is not None and use_investpy and 'Revenue' in stock_information and stock_information['Revenue'] is not None  and text_to_num(stock_information['Revenue']) > 0:
             stock_data.enterprise_value_to_revenue = float(stock_data.enterprise_value)/float(text_to_num(stock_information['Revenue']))
 
-        if not BUILD_CSV_DB_ONLY and (stock_data.enterprise_value_to_revenue is None or stock_data.enterprise_value_to_revenue <= 0):  # or stock_data.enterprise_value_to_revenue > ENTERPRISE_VALUE_TO_REVENUE_LIMIT:
+        if not build_csv_db_only and (stock_data.enterprise_value_to_revenue is None or stock_data.enterprise_value_to_revenue <= 0 or stock_data.enterprise_value_to_revenue > enterprise_value_to_revenue_limit):
             if return_value: print('                            Skipping enterprise_value_to_revenue: {}'.format(stock_data.enterprise_value_to_revenue))
             return_value = False
 
         if stock_data.enterprise_value_to_revenue is not None: stock_data.evr_effective = stock_data.enterprise_value_to_revenue  # ** 2
 
-        if not BUILD_CSV_DB_ONLY and (stock_data.enterprise_value_to_ebitda is None or stock_data.enterprise_value_to_ebitda <= 0):
+        if not build_csv_db_only and (stock_data.enterprise_value_to_ebitda is None or stock_data.enterprise_value_to_ebitda <= 0):
             if return_value: print('                            Skipping enterprise_value_to_ebitda: {}'.format(stock_data.enterprise_value_to_ebitda))
             return_value = False
 
-        if not BUILD_CSV_DB_ONLY and (stock_data.trailing_price_to_earnings is None or stock_data.trailing_price_to_earnings <= 0):
+        if not build_csv_db_only and (stock_data.trailing_price_to_earnings is None or stock_data.trailing_price_to_earnings <= 0):
             if return_value: print('                            Skipping trailing_price_to_earnings: {}'.format(stock_data.trailing_price_to_earnings))
             return_value = False
 
-        if stock_data.profit_margin is None  or stock_data.profit_margin < PROFIT_MARGIN_LIMIT:
-            if stock_data.profit_margin is not None and (not TASE_MODE or stock_data.profit_margin <= 0):
-                if not BUILD_CSV_DB_ONLY and stock_data.annualized_profit_margin < PROFIT_MARGIN_LIMIT:
+        if stock_data.profit_margin is None  or stock_data.profit_margin < profit_margin_limit:
+            if stock_data.profit_margin is not None and (not tase_mode or stock_data.profit_margin <= 0):
+                if not build_csv_db_only and stock_data.annualized_profit_margin < profit_margin_limit:
                     if return_value: print('                            Skipping profit_margin: {}'.format(stock_data.profit_margin))
                     return_value = False
 
         if stock_data.trailing_eps is None:
-            if not BUILD_CSV_DB_ONLY and USE_INVESTPY and 'EPS' in stock_information and stock_information['EPS'] is not None:
+            if not build_csv_db_only and use_investpy and 'EPS' in stock_information and stock_information['EPS'] is not None:
                 stock_data.trailing_eps = float(text_to_num(stock_information['EPS']))
 
-        if not BUILD_CSV_DB_ONLY and (stock_data.trailing_eps is None or stock_data.trailing_eps is not None and stock_data.trailing_eps <= 0):
+        if not build_csv_db_only and (stock_data.trailing_eps is None or stock_data.trailing_eps is not None and stock_data.trailing_eps <= 0):
             if return_value: print('                            Skipping trailing_eps: {}'.format(stock_data.trailing_eps))
             return_value = False
 
-        if not BUILD_CSV_DB_ONLY and FORWARD_EPS_INCLUDED and (stock_data.forward_eps is None or stock_data.forward_eps is not None and stock_data.forward_eps <= 0):
+        if not build_csv_db_only and forward_eps_included and (stock_data.forward_eps is None or stock_data.forward_eps is not None and stock_data.forward_eps <= 0):
             if return_value: print('                            Skipping forward_eps: {}'.format(stock_data.forward_eps))
             return_value = False
 
-        if not BUILD_CSV_DB_ONLY and (stock_data.earnings_quarterly_growth is None or stock_data.earnings_quarterly_growth < EARNINGS_QUARTERLY_GROWTH_MIN):
+        if not build_csv_db_only and (stock_data.earnings_quarterly_growth is None or stock_data.earnings_quarterly_growth < earnings_quarterly_growth_min):
             if return_value: print('                            Skipping earnings_quarterly_growth: {}'.format(stock_data.earnings_quarterly_growth))
             return_value = False
 
-        if not BUILD_CSV_DB_ONLY and (stock_data.price_to_earnings_to_growth_ratio is None or stock_data.price_to_earnings_to_growth_ratio < 0):
+        if not build_csv_db_only and (stock_data.price_to_earnings_to_growth_ratio is None or stock_data.price_to_earnings_to_growth_ratio < 0):
             if return_value: print('                            Skipping price_to_earnings_to_growth_ratio: {}'.format(stock_data.price_to_earnings_to_growth_ratio))
             if return_value: return_value = False
 
         if stock_data.price_to_earnings_to_growth_ratio > 0: stock_data.sqrt_peg_ratio = math.sqrt(stock_data.price_to_earnings_to_growth_ratio)
 
-        if not BUILD_CSV_DB_ONLY and (stock_data.net_income_to_common_shareholders is None or stock_data.net_income_to_common_shareholders < 0):
+        if not build_csv_db_only and (stock_data.net_income_to_common_shareholders is None or stock_data.net_income_to_common_shareholders < 0):
             if return_value: print('                            Skipping net_income_to_common_shareholders: {}'.format(stock_data.net_income_to_common_shareholders))
             if return_value: return_value = False
 
@@ -488,7 +359,7 @@ def process_info(symbol, stock_data):
             if stock_data.ssssei_value                      is not None: stock_data.ssssei_value                      = round(stock_data.ssssei_value,                      NUM_ROUND_DECIMALS)
             if stock_data.sssssei_value                     is not None: stock_data.sssssei_value                     = round(stock_data.sssssei_value,                     NUM_ROUND_DECIMALS)
             if stock_data.enterprise_value_to_revenue       is not None: stock_data.enterprise_value_to_revenue       = round(stock_data.enterprise_value_to_revenue,       NUM_ROUND_DECIMALS)
-            if stock_data.evr_effective                       is not None: stock_data.evr_effective                       = round(stock_data.evr_effective, NUM_ROUND_DECIMALS)
+            if stock_data.evr_effective                     is not None: stock_data.evr_effective                     = round(stock_data.evr_effective,                     NUM_ROUND_DECIMALS)
             if stock_data.trailing_price_to_earnings        is not None: stock_data.trailing_price_to_earnings        = round(stock_data.trailing_price_to_earnings,        NUM_ROUND_DECIMALS)
             if stock_data.enterprise_value_to_ebitda        is not None: stock_data.enterprise_value_to_ebitda        = round(stock_data.enterprise_value_to_ebitda,        NUM_ROUND_DECIMALS)
             if stock_data.profit_margin                     is not None: stock_data.profit_margin                     = round(stock_data.profit_margin,                     NUM_ROUND_DECIMALS)
@@ -504,7 +375,7 @@ def process_info(symbol, stock_data):
             if stock_data.nitcsh_to_num_employees           is not None: stock_data.nitcsh_to_num_employees           = round(stock_data.nitcsh_to_num_employees,           NUM_ROUND_DECIMALS)
             if stock_data.earnings_quarterly_growth         is not None: stock_data.earnings_quarterly_growth         = round(stock_data.earnings_quarterly_growth,         NUM_ROUND_DECIMALS)
             if stock_data.price_to_earnings_to_growth_ratio is not None: stock_data.price_to_earnings_to_growth_ratio = round(stock_data.price_to_earnings_to_growth_ratio, NUM_ROUND_DECIMALS)
-            if stock_data.sqrt_peg_ratio                    is not None: stock_data.sqrt_peg_ratio                    = round(stock_data.sqrt_peg_ratio, NUM_ROUND_DECIMALS)
+            if stock_data.sqrt_peg_ratio                    is not None: stock_data.sqrt_peg_ratio                    = round(stock_data.sqrt_peg_ratio,                    NUM_ROUND_DECIMALS)
         else:
             stock_data.sss_value     = BAD_SSSE
             stock_data.ssss_value    = BAD_SSSE
@@ -520,7 +391,7 @@ def process_info(symbol, stock_data):
             stock_data.sssssei_value = BAD_SSS
 
 
-        if BUILD_CSV_DB:
+        if build_csv_db:
             if stock_data.sss_value                         is     None: stock_data.sss_value                         = BAD_SSS
             if stock_data.ssss_value                        is     None: stock_data.ssss_value                        = BAD_SSS
             if stock_data.sssss_value                       is     None: stock_data.sssss_value                       = BAD_SSS
@@ -558,7 +429,7 @@ def process_info(symbol, stock_data):
             stock_data.last_4_dividends_3 = 0
 
             # try: TODO: ASAFR: Complete this backup data to the yfinance dividends information
-            #     if TASE_MODE:
+            #     if tase_mode:
             #         stock_dividends = investpy.get_stock_dividends(stock=stock_data.ticker.replace('.TA',''), country='israel')
             #     else:
             #         stock_dividends = investpy.get_stock_dividends(stock=stock_data.ticker, country='united states')
@@ -587,33 +458,33 @@ def process_info(symbol, stock_data):
         return False
 
 
-def check_interval(thread_id):
-    if thread_id > 0 and thread_id % INTERVAL_THREADS == 0:
+def check_interval(thread_id, interval_threads, interval_secs_to_avoid_http_errors):
+    if thread_id > 0 and thread_id % interval_threads == 0:
         print("\n===========================================================================")
-        print(  "[thread_id {:2} is an interval {} point, going to sleep for {} seconds]".format(thread_id, INTERVAL_THREADS, INTERVAL_SECS_TO_AVOID_HTTP_ERRORS))
+        print(  "[thread_id {:2} is an interval {} point, going to sleep for {} seconds]".format(thread_id, interval_threads, interval_secs_to_avoid_http_errors))
         print(  "===========================================================================\n")
-        time.sleep(INTERVAL_SECS_TO_AVOID_HTTP_ERRORS)
+        time.sleep(interval_secs_to_avoid_http_errors)
 
 
-def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thread_id):
+def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thread_id, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown, enterprise_value_to_revenue_limit, market_cap_included, forward_eps_included):
     iteration = 0
-    if BUILD_CSV_DB:
+    if build_csv_db:
         for symb in symbols:
             iteration += 1
-            sleep_seconds = round(random.uniform(float(RELAXED_ACCESS)/2, float(RELAXED_ACCESS)*2), NUM_ROUND_DECIMALS)
+            sleep_seconds = round(random.uniform(float(relaxed_access)/2, float(relaxed_access)*2), NUM_ROUND_DECIMALS)
             time.sleep(sleep_seconds)
             print('[Building DB: thread_id {:2} Sleeping for {:10} sec] Checking {:9} ({:4}/{:4}/{:4}):'.format(thread_id, sleep_seconds, symb, len(rows), iteration, len(symbols)))
-            if TASE_MODE:
+            if tase_mode:
                 symbol = yf.Ticker(symb)
             else:
                 symbol = yf.Ticker(symb.replace('.','-'))
             stock_data = StockData(ticker=symb)
-            if not process_info(symbol=symbol, stock_data=stock_data):
-                if TASE_MODE and 'TLV:' not in stock_data.ticker: stock_data.ticker = 'TLV:' + stock_data.ticker.replace('.TA', '')
+            if not process_info(symbol=symbol, stock_data=stock_data, build_csv_db_only=build_csv_db_only, use_investpy=use_investpy, tase_mode=tase_mode, sectors_list=sectors_list, build_csv_db=build_csv_db, profit_margin_limit=profit_margin_limit, earnings_quarterly_growth_min=earnings_quarterly_growth_min, earnings_quarterly_growth_unknown=earnings_quarterly_growth_unknown, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, market_cap_included=market_cap_included, forward_eps_included=forward_eps_included):
+                if tase_mode and 'TLV:' not in stock_data.ticker: stock_data.ticker = 'TLV:' + stock_data.ticker.replace('.TA', '')
                 csv_db_data.append([stock_data.ticker, stock_data.short_name, stock_data.sector, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.ssssei_value, stock_data.enterprise_value_to_revenue, stock_data.evr_effective, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.annualized_profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.enterprise_value, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.last_4_dividends_0, stock_data.last_4_dividends_1, stock_data.last_4_dividends_2, stock_data.last_4_dividends_3])
                 continue
 
-            if TASE_MODE and 'TLV:' not in stock_data.ticker: stock_data.ticker = 'TLV:' + stock_data.ticker.replace('.TA', '')
+            if tase_mode and 'TLV:' not in stock_data.ticker: stock_data.ticker = 'TLV:' + stock_data.ticker.replace('.TA', '')
             dividends_sum = stock_data.last_4_dividends_0+stock_data.last_4_dividends_1+stock_data.last_4_dividends_2+stock_data.last_4_dividends_3
             rows.append(                           [stock_data.ticker, stock_data.short_name, stock_data.sector, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.ssssei_value, stock_data.enterprise_value_to_revenue, stock_data.evr_effective, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.annualized_profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.enterprise_value, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.sqrt_peg_ratio, stock_data.last_4_dividends_0, stock_data.last_4_dividends_1, stock_data.last_4_dividends_2, stock_data.last_4_dividends_3])
             if dividends_sum: rows_only_div.append([stock_data.ticker, stock_data.short_name, stock_data.sector, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.ssssei_value, stock_data.enterprise_value_to_revenue, stock_data.evr_effective, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.annualized_profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.enterprise_value, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.sqrt_peg_ratio, stock_data.last_4_dividends_0, stock_data.last_4_dividends_1, stock_data.last_4_dividends_2, stock_data.last_4_dividends_3])
@@ -629,10 +500,10 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
             for fix_row_index in range(3,len(row)):  # for empty strings - convert value to 0
                 if row[fix_row_index] == '': row[fix_row_index] = 0
             stock_data = StockData(ticker=symbol, short_name=row[1], sector=row[2], sss_value=float(row[3]), ssss_value=float(row[4]), sssss_value=float(row[5]), ssse_value=float(row[6]), sssse_value=float(row[7]), ssssse_value=float(row[8]), sssi_value=float(row[9]), ssssi_value=float(row[10]), sssssi_value=float(row[11]), sssei_value=float(row[12]), ssssei_value=float(row[13]), sssssei_value=float(row[14]), enterprise_value_to_revenue=float(row[15]), evr_effective=float(row[16]), trailing_price_to_earnings=float(row[17]), enterprise_value_to_ebitda=float(row[18]), profit_margin=float(row[19]), annualized_profit_margin=float(row[20]), held_percent_institutions=float(row[21]), forward_eps=float(row[22]), trailing_eps=float(row[23]), price_to_book=float(row[24]), shares_outstanding=float(row[25]), net_income_to_common_shareholders=float(row[26]), nitcsh_to_shares_outstanding=float(row[27]), num_employees=int(row[28]), enterprise_value=float(row[29]), nitcsh_to_num_employees=float(row[30]), earnings_quarterly_growth=float(row[31]), price_to_earnings_to_growth_ratio=float(row[32]), sqrt_peg_ratio=float(row[33]), last_4_dividends_0=float(row[34]), last_4_dividends_1=float(row[35]), last_4_dividends_2=float(row[36]), last_4_dividends_3=float(row[37]))
-            if not process_info(symbol=symbol, stock_data=stock_data):
+            if not process_info(symbol=symbol, stock_data=stock_data, build_csv_db_only=build_csv_db_only, use_investpy=use_investpy, tase_mode=tase_mode, sectors_list=sectors_list, build_csv_db=build_csv_db, profit_margin_limit=profit_margin_limit, earnings_quarterly_growth_min=earnings_quarterly_growth_min, earnings_quarterly_growth_unknown=earnings_quarterly_growth_unknown, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, market_cap_included=market_cap_included, forward_eps_included=forward_eps_included):
                 continue
 
-            if TASE_MODE: stock_data.ticker = 'TLV:' + stock_data.ticker.replace('.TA', '')
+            if tase_mode: stock_data.ticker = 'TLV:' + stock_data.ticker.replace('.TA', '')
 
             dividends_sum = stock_data.last_4_dividends_0 + stock_data.last_4_dividends_1 + stock_data.last_4_dividends_2 + stock_data.last_4_dividends_3
             rows.append(                           [stock_data.ticker, stock_data.short_name, stock_data.sector, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.ssssei_value, stock_data.enterprise_value_to_revenue, stock_data.evr_effective, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.annualized_profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.enterprise_value, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.sqrt_peg_ratio, stock_data.last_4_dividends_0, stock_data.last_4_dividends_1, stock_data.last_4_dividends_2, stock_data.last_4_dividends_3])
@@ -640,397 +511,510 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
             else:             rows_no_div.append(  [stock_data.ticker, stock_data.short_name, stock_data.sector, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.ssssei_value, stock_data.enterprise_value_to_revenue, stock_data.evr_effective, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.annualized_profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.enterprise_value, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.sqrt_peg_ratio, stock_data.last_4_dividends_0, stock_data.last_4_dividends_1, stock_data.last_4_dividends_2, stock_data.last_4_dividends_3])
 
 
-csv_db_data    = []
-rows           = []
-rows_no_div    = []
-rows_only_div  = []
-csv_db_data0   = []
-rows0          = []
-rows0_no_div   = []
-rows0_only_div = []
-csv_db_data1   = []
-rows1          = []
-rows1_no_div   = []
-rows1_only_div = []
-csv_db_data2   = []
-rows2          = []
-rows2_no_div   = []
-rows2_only_div = []
-csv_db_data3   = []
-rows3          = []
-rows3_no_div   = []
-rows3_only_div = []
-csv_db_data4   = []
-rows4          = []
-rows4_no_div   = []
-rows4_only_div = []
-csv_db_data5   = []
-rows5          = []
-rows5_no_div   = []
-rows5_only_div = []
-csv_db_data6   = []
-rows6          = []
-rows6_no_div   = []
-rows6_only_div = []
-csv_db_data7   = []
-rows7          = []
-rows7_no_div   = []
-rows7_only_div = []
-csv_db_data8   = []
-rows8          = []
-rows8_no_div   = []
-rows8_only_div = []
-csv_db_data9   = []
-rows9          = []
-rows9_no_div   = []
-rows9_only_div = []
-csv_db_data10   = []
-rows10          = []
-rows10_no_div   = []
-rows10_only_div = []
-csv_db_data11   = []
-rows11          = []
-rows11_no_div   = []
-rows11_only_div = []
-csv_db_data12   = []
-rows12          = []
-rows12_no_div   = []
-rows12_only_div = []
-csv_db_data13   = []
-rows13          = []
-rows13_no_div   = []
-rows13_only_div = []
-csv_db_data14   = []
-rows14          = []
-rows14_no_div   = []
-rows14_only_div = []
-csv_db_data15   = []
-rows15          = []
-rows15_no_div   = []
-rows15_only_div = []
-csv_db_data16   = []
-rows16          = []
-rows16_no_div   = []
-rows16_only_div = []
-csv_db_data17   = []
-rows17          = []
-rows17_no_div   = []
-rows17_only_div = []
-csv_db_data18   = []
-rows18          = []
-rows18_no_div   = []
-rows18_only_div = []
-csv_db_data19   = []
-rows19          = []
-rows19_no_div   = []
-rows19_only_div = []
+#     BEST_N_SELECT                     = 50                     # Select best N from each of the resulting sorted tables
+#     USE_INVESTPY                      = 0
+#     MARKET_CAP_INCLUDED               = 1
+#     FORWARD_EPS_INCLUDED              = 0*(not tase_mode)
+#     NUM_THREADS                       = 20           # 1..20 Threads are supported
+#     TASE_MODE                         = 0            # Work on the Israeli Market only: https://info.tase.co.il/eng/MarketData/Stocks/MarketData/Pages/MarketData.aspx
+#     READ_UNITED_STATES_INPUT_SYMBOLS  = 1            # when set, covers 7,000 stocks
+#     CSV_DB_PATH                       = 'Results/20201112-195244_MARKETCAP'
+#     BUILD_CSV_DB                      = 1
+#     BUILD_CSV_DB_ONLY                 = 1
+#     SECTORS_LIST                      = [] # ['Technology', 'Consumer Cyclical', 'Consumer Defensive', 'Industrials', 'Consumer Goods']  # Allows filtering by sector(s)
+def sss_run(sectors_list, build_csv_db_only, build_csv_db, csv_db_path, read_united_states_input_symbols, tase_mode, num_threads, forward_eps_included, market_cap_included, use_investpy, research_mode, profit_margin_limit, best_n_select, enterprise_value_to_revenue_limit):
+    # Working Mode:
+    forward_eps_included              *= (not tase_mode)
+    relaxed_access                     = (num_threads-1)/10.0            # In seconds
+    interval_threads                   = 4 +     1*tase_mode -  2*read_united_states_input_symbols
+    interval_secs_to_avoid_http_errors = 60*(7 - 1*tase_mode + 35*read_united_states_input_symbols)         # Every interval_threads, a INTERVALS_TO_AVOID_HTTP_ERRORS sec sleep will take place
 
-if BUILD_CSV_DB == 0: # if DB is already present, read from it and prepare input to threads
-    csv_db_filename = CSV_DB_PATH+'/db.csv'
-    with open(csv_db_filename, mode='r', newline='') as engine:
-        reader = csv.reader(engine, delimiter=',')
-        row_index = 0
-        for row in reader:
-            if row_index == 0:
-                row_index += 1
-                continue
-            else:
-                if   (row_index-1) % NUM_THREADS ==  0: csv_db_data0.append(row)
-                elif (row_index-1) % NUM_THREADS ==  1: csv_db_data1.append(row)
-                elif (row_index-1) % NUM_THREADS ==  2: csv_db_data2.append(row)
-                elif (row_index-1) % NUM_THREADS ==  3: csv_db_data3.append(row)
-                elif (row_index-1) % NUM_THREADS ==  4: csv_db_data4.append(row)
-                elif (row_index-1) % NUM_THREADS ==  5: csv_db_data5.append(row)
-                elif (row_index-1) % NUM_THREADS ==  6: csv_db_data6.append(row)
-                elif (row_index-1) % NUM_THREADS ==  7: csv_db_data7.append(row)
-                elif (row_index-1) % NUM_THREADS ==  8: csv_db_data8.append(row)
-                elif (row_index-1) % NUM_THREADS ==  9: csv_db_data9.append(row)
-                elif (row_index-1) % NUM_THREADS == 10: csv_db_data10.append(row)
-                elif (row_index-1) % NUM_THREADS == 11: csv_db_data11.append(row)
-                elif (row_index-1) % NUM_THREADS == 12: csv_db_data12.append(row)
-                elif (row_index-1) % NUM_THREADS == 13: csv_db_data13.append(row)
-                elif (row_index-1) % NUM_THREADS == 14: csv_db_data14.append(row)
-                elif (row_index-1) % NUM_THREADS == 15: csv_db_data15.append(row)
-                elif (row_index-1) % NUM_THREADS == 16: csv_db_data16.append(row)
-                elif (row_index-1) % NUM_THREADS == 17: csv_db_data17.append(row)
-                elif (row_index-1) % NUM_THREADS == 18: csv_db_data18.append(row)
-                elif (row_index-1) % NUM_THREADS == 19: csv_db_data19.append(row)
-                row_index += 1
+    # Working Parameters:
+    if not research_mode: profit_margin_limit               = round((0.17 + 0.07 * read_united_states_input_symbols) / (1 + 2 * tase_mode), NUM_ROUND_DECIMALS)
+    earnings_quarterly_growth_min                           = 0.01-0.125*tase_mode       # The earnings can decrease by 1/4, but there is still a requirement that price_to_earnings_to_growth_ratio > 0
+    earnings_quarterly_growth_unknown                       = 2*earnings_quarterly_growth_min
+    if not research_mode: enterprise_value_to_revenue_limit = 17.5 - 2.5 * read_united_states_input_symbols - 2.5 * tase_mode                    # Higher than that is too expensive
 
-if NUM_THREADS >=  1: symbols0  = symbols[ 0:][::NUM_THREADS] #  0,    NUM_THREADS,    2*NUM_THREADS,    3*NUM_THREADS, ...
-if NUM_THREADS >=  2: symbols1  = symbols[ 1:][::NUM_THREADS] #  1,  1+NUM_THREADS,  2+2*NUM_THREADS,  2+3*NUM_THREADS, ...
-if NUM_THREADS >=  3: symbols2  = symbols[ 2:][::NUM_THREADS] #  2,  2+NUM_THREADS,  3+2*NUM_THREADS,  3+3*NUM_THREADS, ...
-if NUM_THREADS >=  4: symbols3  = symbols[ 3:][::NUM_THREADS] #  3,  3+NUM_THREADS,  4+2*NUM_THREADS,  4+3*NUM_THREADS, ...
-if NUM_THREADS >=  5: symbols4  = symbols[ 4:][::NUM_THREADS] #  4,  4+NUM_THREADS,  5+2*NUM_THREADS,  5+3*NUM_THREADS, ...
-if NUM_THREADS >=  6: symbols5  = symbols[ 5:][::NUM_THREADS] #  5,  5+NUM_THREADS,  6+2*NUM_THREADS,  6+3*NUM_THREADS, ...
-if NUM_THREADS >=  7: symbols6  = symbols[ 6:][::NUM_THREADS] #  6,  6+NUM_THREADS,  7+2*NUM_THREADS,  7+3*NUM_THREADS, ...
-if NUM_THREADS >=  8: symbols7  = symbols[ 7:][::NUM_THREADS] #  7,  7+NUM_THREADS,  8+2*NUM_THREADS,  8+3*NUM_THREADS, ...
-if NUM_THREADS >=  9: symbols8  = symbols[ 8:][::NUM_THREADS] #  8,  8+NUM_THREADS,  9+2*NUM_THREADS,  9+3*NUM_THREADS, ...
-if NUM_THREADS >= 10: symbols9  = symbols[ 9:][::NUM_THREADS] #  9,  9+NUM_THREADS, 10+2*NUM_THREADS, 10+3*NUM_THREADS, ...
-if NUM_THREADS >= 11: symbols10 = symbols[10:][::NUM_THREADS] # 10, 10+NUM_THREADS, 11+2*NUM_THREADS, 11+3*NUM_THREADS, ...
-if NUM_THREADS >= 12: symbols11 = symbols[11:][::NUM_THREADS] # 11, 11+NUM_THREADS, 12+2*NUM_THREADS, 12+3*NUM_THREADS, ...
-if NUM_THREADS >= 13: symbols12 = symbols[12:][::NUM_THREADS] # 12, 12+NUM_THREADS, 13+2*NUM_THREADS, 13+3*NUM_THREADS, ...
-if NUM_THREADS >= 14: symbols13 = symbols[13:][::NUM_THREADS] # 13, 13+NUM_THREADS, 14+2*NUM_THREADS, 14+3*NUM_THREADS, ...
-if NUM_THREADS >= 15: symbols14 = symbols[14:][::NUM_THREADS] # 14, 14+NUM_THREADS, 15+2*NUM_THREADS, 15+3*NUM_THREADS, ...
-if NUM_THREADS >= 16: symbols15 = symbols[15:][::NUM_THREADS] # 15, 15+NUM_THREADS, 16+2*NUM_THREADS, 16+3*NUM_THREADS, ...
-if NUM_THREADS >= 17: symbols16 = symbols[16:][::NUM_THREADS] # 16, 16+NUM_THREADS, 17+2*NUM_THREADS, 17+3*NUM_THREADS, ...
-if NUM_THREADS >= 18: symbols17 = symbols[17:][::NUM_THREADS] # 17, 17+NUM_THREADS, 18+2*NUM_THREADS, 18+3*NUM_THREADS, ...
-if NUM_THREADS >= 19: symbols18 = symbols[18:][::NUM_THREADS] # 18, 18+NUM_THREADS, 19+2*NUM_THREADS, 19+3*NUM_THREADS, ...
-if NUM_THREADS >= 20: symbols19 = symbols[19:][::NUM_THREADS] # 19, 19+NUM_THREADS, 20+2*NUM_THREADS, 20+3*NUM_THREADS, ...
+    if len(sectors_list):
+        enterprise_value_to_revenue_limit *= 5
+        profit_margin_limit               /= 3
 
-if NUM_THREADS >=  1:
-    check_interval(0)
-    thread0  = Thread(target=process_symbols, args=(symbols0,  csv_db_data0,  rows0,  rows0_no_div,  rows0_only_div,   0)) # process_symbols(symbols=symbols0, rows=rows0, rows_no_div=rows0_no_div, rows_only_div=rows0_only_div)
-    thread0.start()
+    payload            = pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies') # There are 2 tables on the Wikipedia page, get the first table
+    first_table        = payload[0]
+    second_table       = payload[1]
+    df                 = first_table
+    symbols_snp500     = df['Symbol'].values.tolist()
+    symbols_nasdaq100  = ['ATVI', 'ADBE', 'AMD', 'ALXN', 'ALGN', 'GOOG', 'GOOGL', 'AMZN', 'AMGN', 'ADI', 'ANSS', 'AAPL', 'AMAT', 'ASML', 'ADSK', 'ADP', 'BIDU', 'BIIB', 'BMRN', 'BKNG', 'AVGO', 'CDNS', 'CDW', 'CERN', 'CHTR', 'CHKP', 'CTAS', 'CSCO', 'CTXS', 'CTSH', 'CMCSA', 'CPRT', 'COST', 'CSX', 'DXCM', 'DOCU', 'DLTR', 'EBAY', 'EA', 'EXC', 'EXPE', 'FB', 'FAST', 'FISV', 'FOX', 'FOXA', 'GILD', 'IDXX', 'ILMN', 'INCY', 'INTC', 'INTU', 'ISRG', 'JD', 'KLAC', 'LRCX', 'LBTYA', 'LBTYK', 'LULU', 'MAR', 'MXIM', 'MELI', 'MCHP', 'MU', 'MSFT', 'MRNA', 'MDLZ', 'MNST', 'NTES', 'NFLX', 'NVDA', 'NXPI', 'ORLY', 'PCAR', 'PAYX', 'PYPL', 'PEP', 'PDD', 'QCOM', 'REGN', 'ROST', 'SGEN', 'SIRI', 'SWKS', 'SPLK', 'SBUX', 'SNPS', 'TMUS', 'TTWO', 'TSLA', 'TXN', 'KHC', 'TCOM', 'ULTA', 'VRSN', 'VRSK', 'VRTX', 'WBA', 'WDC', 'WDAY', 'XEL', 'XLNX', 'ZM']
+    symbols_russel1000 = ['TWOU', 'MMM', 'ABT', 'ABBV', 'ABMD', 'ACHC', 'ACN', 'ATVI', 'AYI', 'ADNT', 'ADBE', 'ADT', 'AAP', 'AMD', 'ACM', 'AES', 'AMG', 'AFL', 'AGCO', 'A', 'AGIO', 'AGNC', 'AL', 'APD', 'AKAM', 'ALK', 'ALB', 'AA', 'ARE', 'ALXN', 'ALGN', 'ALKS', 'Y', 'ALLE', 'AGN', 'ADS', 'LNT', 'ALSN', 'ALL', 'ALLY', 'ALNY', 'GOOGL', 'GOOG', 'MO', 'AMZN', 'AMCX', 'DOX', 'UHAL', 'AEE', 'AAL', 'ACC', 'AEP', 'AXP', 'AFG', 'AMH', 'AIG', 'ANAT', 'AMT', 'AWK', 'AMP', 'ABC', 'AME', 'AMGN', 'APH', 'ADI', 'NLY', 'ANSS', 'AR', 'ANTM', 'AON', 'APA', 'AIV', 'APY', 'APLE', 'AAPL', 'AMAT', 'ATR', 'APTV', 'WTR', 'ARMK', 'ACGL', 'ADM', 'ARNC', 'ARD', 'ANET', 'AWI', 'ARW', 'ASH', 'AZPN', 'ASB', 'AIZ', 'AGO', 'T', 'ATH', 'TEAM', 'ATO', 'ADSK', 'ADP', 'AN', 'AZO', 'AVB', 'AGR', 'AVY', 'AVT', 'EQH', 'AXTA', 'AXS', 'BKR', 'BLL', 'BAC', 'BOH', 'BK', 'OZK', 'BKU', 'BAX', 'BDX', 'WRB', 'BRK.B', 'BERY', 'BBY', 'BYND', 'BGCP', 'BIIB', 'BMRN', 'BIO', 'TECH', 'BKI', 'BLK', 'HRB', 'BLUE', 'BA', 'BOKF', 'BKNG', 'BAH', 'BWA', 'BSX', 'BDN', 'BFAM', 'BHF', 'BMY', 'BRX', 'AVGO', 'BR', 'BPYU', 'BRO', 'BFA', 'BFB', 'BRKR', 'BC', 'BG', 'BURL', 'BWXT', 'CHRW', 'CABO', 'CBT', 'COG', 'CACI', 'CDNS', 'CZR', 'CPT', 'CPB', 'CMD', 'COF', 'CAH', 'CSL', 'KMX', 'CCL', 'CRI', 'CASY', 'CTLT', 'CAT', 'CBOE', 'CBRE', 'CBS', 'CDK', 'CDW', 'CE', 'CELG', 'CNC', 'CDEV', 'CNP', 'CTL', 'CDAY', 'BXP', 'CF', 'CRL', 'CHTR', 'CHE', 'LNG', 'CHK', 'CVX', 'CIM', 'CMG', 'CHH', 'CB', 'CHD', 'CI', 'XEC', 'CINF', 'CNK', 'CTAS', 'CSCO', 'CIT', 'C', 'CFG', 'CTXS', 'CLH', 'CLX', 'CME', 'CMS', 'CNA', 'CNX', 'KO', 'CGNX', 'CTSH', 'COHR', 'CFX', 'CL', 'CLNY', 'CXP', 'COLM', 'CMCSA', 'CMA', 'CBSH', 'COMM', 'CAG', 'CXO', 'CNDT', 'COP', 'ED', 'STZ', 'CERN', 'CPA', 'CPRT', 'CLGX', 'COR', 'GLW', 'OFC', 'CSGP', 'COST', 'COTY', 'CR', 'CACC', 'CCI', 'CCK', 'CSX', 'CUBE', 'CFR', 'CMI', 'CW', 'CVS', 'CY', 'CONE', 'DHI', 'DHR', 'DRI', 'DVA', 'SITC', 'DE', 'DELL', 'DAL', 'XRAY', 'DVN', 'DXCM', 'FANG', 'DKS', 'DLR', 'DFS', 'DISCA', 'DISCK', 'DISH', 'DIS', 'DHC', 'DOCU', 'DLB', 'DG', 'DLTR', 'D', 'DPZ', 'CLR', 'COO', 'DEI', 'DOV', 'DD', 'DPS', 'DTE', 'DUK', 'DRE', 'DNB', 'DNKN', 'DXC', 'ETFC', 'EXP', 'EWBC', 'EMN', 'ETN', 'EV', 'EBAY', 'SATS', 'ECL', 'EIX', 'EW', 'EA', 'EMR', 'ESRT', 'EHC', 'EGN', 'ENR', 'ETR', 'EVHC', 'EOG', 'EPAM', 'EPR', 'EQT', 'EFX', 'EQIX', 'EQC', 'ELS', 'EQR', 'ERIE', 'ESS', 'EL', 'EEFT', 'EVBG', 'EVR', 'RE', 'EVRG', 'ES', 'UFS', 'DCI', 'EXPE', 'EXPD', 'STAY', 'EXR', 'XOG', 'XOM', 'FFIV', 'FB', 'FDS', 'FICO', 'FAST', 'FRT', 'FDX', 'FIS', 'FITB', 'FEYE', 'FAF', 'FCNCA', 'FDC', 'FHB', 'FHN', 'FRC', 'FSLR', 'FE', 'FISV', 'FLT', 'FLIR', 'FND', 'FLO', 'FLS', 'FLR', 'FMC', 'FNB', 'FNF', 'FL', 'F', 'FTNT', 'FTV', 'FBHS', 'FOXA', 'FOX', 'BEN', 'FCX', 'AJG', 'GLPI', 'GPS', 'EXAS', 'EXEL', 'EXC', 'GTES', 'GLIBA', 'GD', 'GE', 'GIS', 'GM', 'GWR', 'G', 'GNTX', 'GPC', 'GILD', 'GPN', 'GL', 'GDDY', 'GS', 'GT', 'GRA', 'GGG', 'EAF', 'GHC', 'GWW', 'LOPE', 'GPK', 'GRUB', 'GWRE', 'HAIN', 'HAL', 'HBI', 'THG', 'HOG', 'HIG', 'HAS', 'HE', 'HCA', 'HDS', 'HTA', 'PEAK', 'HEI.A', 'HEI', 'HP', 'JKHY', 'HLF', 'HSY', 'HES', 'GDI', 'GRMN', 'IT', 'HGV', 'HLT', 'HFC', 'HOLX', 'HD', 'HON', 'HRL', 'HST', 'HHC', 'HPQ', 'HUBB', 'HPP', 'HUM', 'HBAN', 'HII', 'HUN', 'H', 'IAC', 'ICUI', 'IEX', 'IDXX', 'INFO', 'ITW', 'ILMN', 'INCY', 'IR', 'INGR', 'PODD', 'IART', 'INTC', 'IBKR', 'ICE', 'IGT', 'IP', 'IPG', 'IBM', 'IFF', 'INTU', 'ISRG', 'IVZ', 'INVH', 'IONS', 'IPGP', 'IQV', 'HPE', 'HXL', 'HIW', 'HRC', 'JAZZ', 'JBHT', 'JBGS', 'JEF', 'JBLU', 'JNJ', 'JCI', 'JLL', 'JPM', 'JNPR', 'KSU', 'KAR', 'K', 'KEY', 'KEYS', 'KRC', 'KMB', 'KIM', 'KMI', 'KEX', 'KLAC', 'KNX', 'KSS', 'KOS', 'KR', 'LB', 'LHX', 'LH', 'LRCX', 'LAMR', 'LW', 'LSTR', 'LVS', 'LAZ', 'LEA', 'LM', 'LEG', 'LDOS', 'LEN', 'LEN.B', 'LII', 'LBRDA', 'LBRDK', 'FWONA', 'IRM', 'ITT', 'JBL', 'JEC', 'LLY', 'LECO', 'LNC', 'LGF.A', 'LGF.B', 'LFUS', 'LYV', 'LKQ', 'LMT', 'L', 'LOGM', 'LOW', 'LPLA', 'LULU', 'LYFT', 'LYB', 'MTB', 'MAC', 'MIC', 'M', 'MSG', 'MANH', 'MAN', 'MRO', 'MPC', 'MKL', 'MKTX', 'MAR', 'MMC', 'MLM', 'MRVL', 'MAS', 'MASI', 'MA', 'MTCH', 'MAT', 'MXIM', 'MKC', 'MCD', 'MCK', 'MDU', 'MPW', 'MD', 'MDT', 'MRK', 'FWONK', 'LPT', 'LSXMA', 'LSXMK', 'LSI', 'CPRI', 'MIK', 'MCHP', 'MU', 'MSFT', 'MAA', 'MIDD', 'MKSI', 'MHK', 'MOH', 'TAP', 'MDLZ', 'MPWR', 'MNST', 'MCO', 'MS', 'MORN', 'MOS', 'MSI', 'MSM', 'MSCI', 'MUR', 'MYL', 'NBR', 'NDAQ', 'NFG', 'NATI', 'NOV', 'NNN', 'NAVI', 'NCR', 'NKTR', 'NTAP', 'NFLX', 'NBIX', 'NRZ', 'NYCB', 'NWL', 'NEU', 'NEM', 'NWSA', 'NWS', 'MCY', 'MET', 'MTD', 'MFA', 'MGM', 'JWN', 'NSC', 'NTRS', 'NOC', 'NLOK', 'NCLH', 'NRG', 'NUS', 'NUAN', 'NUE', 'NTNX', 'NVT', 'NVDA', 'NVR', 'NXPI', 'ORLY', 'OXY', 'OGE', 'OKTA', 'ODFL', 'ORI', 'OLN', 'OHI', 'OMC', 'ON', 'OMF', 'OKE', 'ORCL', 'OSK', 'OUT', 'OC', 'OI', 'PCAR', 'PKG', 'PACW', 'PANW', 'PGRE', 'PK', 'PH', 'PE', 'PTEN', 'PAYX', 'PAYC', 'PYPL', 'NEE', 'NLSN', 'NKE', 'NI', 'NBL', 'NDSN', 'PEP', 'PKI', 'PRGO', 'PFE', 'PCG', 'PM', 'PSX', 'PPC', 'PNFP', 'PF', 'PNW', 'PXD', 'ESI', 'PNC', 'PII', 'POOL', 'BPOP', 'POST', 'PPG', 'PPL', 'PRAH', 'PINC', 'TROW', 'PFG', 'PG', 'PGR', 'PLD', 'PFPT', 'PB', 'PRU', 'PTC', 'PSA', 'PEG', 'PHM', 'PSTG', 'PVH', 'QGEN', 'QRVO', 'QCOM', 'PWR', 'PBF', 'PEGA', 'PAG', 'PNR', 'PEN', 'PBCT', 'RLGY', 'RP', 'O', 'RBC', 'REG', 'REGN', 'RF', 'RGA', 'RS', 'RNR', 'RSG', 'RMD', 'RPAI', 'RNG', 'RHI', 'ROK', 'ROL', 'ROP', 'ROST', 'RCL', 'RGLD', 'RES', 'RPM', 'RSPP', 'R', 'SPGI', 'SABR', 'SAGE', 'CRM', 'SC', 'SRPT', 'SBAC', 'HSIC', 'SLB', 'SNDR', 'SCHW', 'SMG', 'SEB', 'SEE', 'DGX', 'QRTEA', 'RL', 'RRC', 'RJF', 'RYN', 'RTN', 'NOW', 'SVC', 'SHW', 'SBNY', 'SLGN', 'SPG', 'SIRI', 'SIX', 'SKX', 'SWKS', 'SLG', 'SLM', 'SM', 'AOS', 'SJM', 'SNA', 'SON', 'SO', 'SCCO', 'LUV', 'SPB', 'SPR', 'SRC', 'SPLK', 'S', 'SFM', 'SQ', 'SSNC', 'SWK', 'SBUX', 'STWD', 'STT', 'STLD', 'SRCL', 'STE', 'STL', 'STOR', 'SYK', 'SUI', 'STI', 'SIVB', 'SWCH', 'SGEN', 'SEIC', 'SRE', 'ST', 'SCI', 'SERV', 'TPR', 'TRGP', 'TGT', 'TCO', 'TCF', 'AMTD', 'TDY', 'TFX', 'TDS', 'TPX', 'TDC', 'TER', 'TEX', 'TSRO', 'TSLA', 'TCBI', 'TXN', 'TXT', 'TFSL', 'CC', 'KHC', 'WEN', 'TMO', 'THO', 'TIF', 'TKR', 'TJX', 'TOL', 'TTC', 'TSCO', 'TDG', 'RIG', 'TRU', 'TRV', 'THS', 'TPCO', 'TRMB', 'TRN', 'TRIP', 'SYF', 'SNPS', 'SNV', 'SYY', 'DATA', 'TTWO', 'TMUS', 'TFC', 'UBER', 'UGI', 'ULTA', 'ULTI', 'UMPQ', 'UAA', 'UA', 'UNP', 'UAL', 'UPS', 'URI', 'USM', 'X', 'UTX', 'UTHR', 'UNH', 'UNIT', 'UNVR', 'OLED', 'UHS', 'UNM', 'URBN', 'USB', 'USFD', 'VFC', 'MTN', 'VLO', 'VMI', 'VVV', 'VAR', 'VVC', 'VEEV', 'VTR', 'VER', 'VRSN', 'VRSK', 'VZ', 'VSM', 'VRTX', 'VIAC', 'TWLO', 'TWTR', 'TWO', 'TYL', 'TSN', 'USG', 'UI', 'UDR', 'VMC', 'WPC', 'WBC', 'WAB', 'WBA', 'WMT', 'WM', 'WAT', 'WSO', 'W', 'WFTLF', 'WBS', 'WEC', 'WRI', 'WBT', 'WCG', 'WFC', 'WELL', 'WCC', 'WST', 'WAL', 'WDC', 'WU', 'WLK', 'WRK', 'WEX', 'WY', 'WHR', 'WTM', 'WLL', 'JW.A', 'WMB', 'WSM', 'WLTW', 'WTFC', 'WDAY', 'WP', 'WPX', 'WYND', 'WH', 'VIAB', 'VICI', 'VIRT', 'V', 'VC', 'VST', 'VMW', 'VNO', 'VOYA', 'ZAYO', 'ZBRA', 'ZEN', 'ZG', 'Z', 'ZBH', 'ZION', 'ZTS', 'ZNGA', 'WYNN', 'XEL', 'XRX', 'XLNX', 'XPO', 'XYL', 'YUMC', 'YUM']
 
-if NUM_THREADS >=  2:
-    check_interval(1)
-    thread1  = Thread(target=process_symbols, args=(symbols1,  csv_db_data1,  rows1,  rows1_no_div,  rows1_only_div,   1)) # process_symbols(symbols=symbols1, rows=rows1, rows_no_div=rows1_no_div, rows_only_div=rows1_only_div)
-    thread1.start()
+    # nasdaq100: https://www.barchart.com/stocks/quotes/$IUXX/components?viewName=main
+    symbols_nasdaq_100_csv = [] # nasdaq100-components-11-10-2020.csv
+    nasdq100_filenames_list = ['Indices/nasdaq100-components-11-10-2020.csv'] # https://www.barchart.com/stocks/indices/russell/russell1000
+    for filename in nasdq100_filenames_list:
+        with open(filename, mode='r', newline='') as engine:
+            reader = csv.reader(engine, delimiter=',')
+            row_index = 0
+            for row in reader:
+                if row_index == 0:
+                    row_index += 1
+                    continue
+                else:
+                    symbols_nasdaq_100_csv.append(row[0])
+                    row_index += 1
 
-if NUM_THREADS >=  3:
-    check_interval(2)
-    thread2  = Thread(target=process_symbols, args=(symbols2,  csv_db_data2,  rows2,  rows2_no_div,  rows2_only_div,   2))
-    thread2.start()
+    symbols_russel1000_wiki = [] # https://en.wikipedia.org/wiki/Russell_1000_Index
+    russel1000_filenames_wiki_list = ['Indices/Russel_1000_index_wiki.csv'] # https://www.barchart.com/stocks/indices/russell/russell1000
+    for filename in russel1000_filenames_wiki_list:
+        with open(filename, mode='r', newline='') as engine:
+            reader = csv.reader(engine, delimiter=',')
+            for row in reader:
+                symbols_russel1000_wiki.append(row[1])
 
-if NUM_THREADS >=  4:
-    check_interval(3)
-    thread3  = Thread(target=process_symbols, args=(symbols3,  csv_db_data3,  rows3,  rows3_no_div,  rows3_only_div,   3))
-    thread3.start()
 
-if NUM_THREADS >=  5:
-    check_interval(4)
-    thread4  = Thread(target=process_symbols, args=(symbols4,  csv_db_data4,  rows4,  rows4_no_div,  rows4_only_div,   4))
-    thread4.start()
+    symbols_russel1000_csv = []  # TODO: ASAFR: Make a general CSV reading function (with title row and withour, and which component in row to take, etc...
+    russel1000_filenames_list = ['Indices/russell-1000-index-11-10-2020.csv'] # https://www.barchart.com/stocks/indices/russell/russell1000
+    for filename in russel1000_filenames_list:
+        with open(filename, mode='r', newline='') as engine:
+            reader = csv.reader(engine, delimiter=',')
+            row_index = 0
+            for row in reader:
+                if row_index == 0:
+                    row_index += 1
+                    continue
+                else:
+                    symbols_russel1000_csv.append(row[0])
+                    row_index += 1
 
-if NUM_THREADS >=  6:
-    check_interval(5)
-    thread5  = Thread(target=process_symbols, args=(symbols5,  csv_db_data5,  rows5,  rows5_no_div,  rows5_only_div,   5))
-    thread5.start()
+    symbols_tase     = []  #symbols_tase       = ['ALD.TA', 'ABIL.TA', 'ACCL.TA', 'ADGR.TA', 'ADKA.TA', 'ARDM.TA', 'AFHL.TA', 'AFPR.TA', 'AFID.TA', 'AFRE.TA', 'AICS.TA', 'ARPT.TA', 'ALBA.TA', 'ALMD.TA', 'ALLT.TA', 'AMDA.L.TA', 'ALMA.TA', 'ALGS.TA', 'ALHE.TA', 'ALRPR.TA', 'ASPF.TA', 'AMAN.TA', 'AMRK.TA', 'AMOT.TA', 'ANLT.TA', 'ANGL.TA', 'APIO.M.TA', 'APLP.TA', 'ARD.TA', 'ARAD.TA', 'ARAN.TA', 'ARNA.TA', 'ARKO.TA', 'ARYT.TA', 'ASHO.TA', 'ASHG.TA', 'ASPR.TA', 'ASGR.TA', 'ATRY.TA', 'AUDC.TA', 'AUGN.TA', 'AURA.TA', 'SHVA.TA', 'AVER.TA', 'AVGL.TA', 'AVIA.TA', 'AVIV.TA', 'AVLN.TA', 'AVRT.TA', 'AYAL.TA', 'AZRM.TA', 'AZRG.TA', 'BCOM.TA', 'BYAR.TA', 'BBYL.TA', 'BRAN.TA', 'BVC.TA', 'BYSD.TA', 'ORL.TA', 'BSEN.TA', 'BEZQ.TA', 'BGI-M.TA', 'BIG.TA', 'BIOV.TA', 'BOLT.TA', 'BLRX.TA', 'PHGE.TA', 'BIRM.TA', 'BLSR.TA', 'BOTI.TA', 'BONS.TA', 'BCNV.TA', 'BWAY.TA', 'BRAM.TA', 'BRND.TA', 'BNRG.TA', 'BRIL.TA', 'BRMG.TA', 'CISY.TA', 'CAMT.TA', 'CANF.TA', 'CSURE.TA', 'CNMD.TA', 'CNZN.TA', 'CPTP.TA', 'CRSO.TA', 'CRMT.TA', 'CAST.TA', 'CEL.TA', 'CHAM.TA', 'CHR.TA', 'CMCT.TA', 'CMCTP.TA', 'CTPL5.TA', 'CTPL1.TA', 'CLBV.TA', 'CBI.TA', 'CLIS.TA', 'CFX.TA', 'CDEV.TA', 'CGEN.TA', 'CMDR.TA', 'DNA.TA', 'DANH.TA', 'DANE.TA', 'DCMA.TA', 'DLRL.TA', 'DLEA.TA', 'DEDR.L.TA', 'DLEKG.TA', 'DELT.TA', 'DIMRI.TA', 'DIFI.TA', 'DSCT.TA', 'DISI.TA', 'DRAL.TA', 'DORL.TA', 'DRSL.TA', 'DUNI.TA', 'EMCO.TA', 'EDRL.TA', 'ELAL.TA', 'EMITF.TA', 'EMTC.TA', 'ESLT.TA', 'ELCO.TA', 'ELDAV.TA', 'ELTR.TA', 'ECP.TA', 'ELCRE.TA', 'ELWS.TA', 'ELLO.TA', 'ELMR.TA', 'ELRN.TA', 'ELSPC.TA', 'EMDV.TA', 'ENDY.TA', 'ENOG.TA', 'ENRG.TA', 'ENLT.TA', 'ENLV.TA', 'EQTL.TA', 'EFNC.TA', 'EVGN.TA', 'EXPO.TA', 'FNTS.TA', 'FTAL.TA', 'FIBI.TA', 'FIBIH.TA', 'FGAS.TA', 'FBRT.TA', 'FRSX.TA', 'FORTY.TA', 'FOX.TA', 'FRSM.TA', 'FRDN.TA', 'GOSS.TA', 'GFC-L.TA', 'GPGB.TA', 'GADS.TA', 'GSFI.TA', 'GAON.TA', 'GAGR.TA', 'GZT.TA', 'GNRS.TA', 'GIBUI.TA', 'GILT.TA', 'GNGR.TA', 'GIVO.L.TA', 'GIX.TA', 'GLTC.TA', 'GLEX.L.TA', 'GKL.TA', 'GLRS.TA', 'GODM-M.TA', 'GLPL.TA', 'GOLD.TA', 'GOHO.TA', 'GOLF.TA', 'HDST.TA', 'HAP.TA', 'HGG.TA', 'HAIN.TA', 'HMAM.TA', 'MSBI.TA', 'HAMAT.TA', 'HAML.TA', 'HNMR.TA', 'HARL.TA', 'HLAN.TA', 'HRON.TA', 'HOD.TA', 'HLMS.TA', 'IBI.TA', 'IBITEC.F.TA', 'ICB.TA', 'ICCM.TA', 'ICL.TA', 'IDIN.TA', 'IES.TA', 'IFF.TA', 'ILDR.TA', 'ILX.TA', 'IMCO.TA', 'INBR.TA', 'INFR.TA', 'INRM.TA', 'INTL.TA', 'ININ.TA', 'INCR.TA', 'INTR.TA', 'IGLD-M.TA', 'ISCD.TA', 'ISCN.TA', 'ILCO.TA', 'ISOP.L.TA', 'ISHI.TA', 'ISRA.L.TA', 'ISRS.TA', 'ISRO.TA', 'ISTA.TA', 'ITMR.TA', 'JBNK.TA', 'KDST.TA', 'KAFR.TA', 'KMDA.TA', 'KRNV-L.TA', 'KARE.TA', 'KRDI.TA', 'KEN.TA', 'KRUR.TA', 'KTOV.TA', 'KLIL.TA', 'KMNK-M.TA', 'KNFM.TA', 'LHIS.TA', 'LAHAV.TA', 'ILDC.TA', 'LPHL.L.TA', 'LAPD.TA', 'LDER.TA', 'LSCO.TA', 'LUMI.TA', 'LEOF.TA', 'LEVI.TA', 'LVPR.TA', 'LBTL.TA', 'LCTX.TA', 'LPSN.TA', 'LODZ.TA', 'LUDN.TA', 'LUZN.TA', 'LZNR.TA', 'MGIC.TA', 'MLTM.TA', 'MMAN.TA', 'MSLA.TA', 'MTMY.TA', 'MTRX.TA', 'MAXO.TA', 'MTRN.TA', 'MEAT.TA', 'MDGS.TA', 'MDPR.TA', 'MDTR.TA', 'MDVI.TA', 'MGOR.TA', 'MEDN.TA', 'MTDS.TA', 'MLSR.TA', 'MNIN.TA', 'MNRT.TA', 'MMHD.TA', 'CMER.TA', 'MRHL.TA', 'MSKE.TA', 'MGRT.TA', 'MCRNT.TA', 'MGDL.TA', 'MIFT.TA', 'MNGN.TA', 'MNRV.TA', 'MLD.TA', 'MSHR.TA', 'MVNE.TA', 'MISH.TA', 'MZTF.TA', 'MBMX-M.TA', 'MDIN.L.TA', 'MRIN.TA', 'MYSZ.TA', 'MYDS.TA', 'NFTA.TA', 'NVPT.L.TA', 'NAWI.TA', 'NTGR.TA', 'NTO.TA', 'NTML.TA', 'NERZ-M.TA', 'NXTG.TA', 'NXTM.TA', 'NXGN-M.TA', 'NICE.TA', 'NISA.TA', 'NSTR.TA', 'NVMI.TA', 'NVLG.TA', 'ORTC.TA', 'ONE.TA', 'OPAL.TA', 'OPCE.TA', 'OPK.TA', 'OBAS.TA', 'ORAD.TA', 'ORMP.TA', 'ORBI.TA', 'ORIN.TA', 'ORA.TA', 'ORON.TA', 'OVRS.TA', 'PCBT.TA', 'PLTF.TA', 'PLRM.TA', 'PNAX.TA', 'PTNR.TA', 'PAYT.TA', 'PZOL.TA', 'PEN.TA', 'PFLT.TA', 'PERI.TA', 'PRGO.TA', 'PTCH.TA', 'PTX.TA', 'PMCN.TA', 'PHOE.TA', 'PLSN.TA', 'PLCR.TA', 'PPIL-M.TA', 'PLAZ-L.TA', 'PSTI.TA', 'POLI.TA', 'PIU.TA', 'POLY.TA', 'PWFL.TA', 'PRSK.TA', 'PRTC.TA', 'PTBL.TA', 'PLX.TA', 'QLTU.TA', 'QNCO.TA', 'RLCO.TA', 'RMN.TA', 'RMLI.TA', 'RANI.TA', 'RPAC.TA', 'RATI.L.TA', 'RTPT.L.TA', 'RAVD.TA', 'RVL.TA', 'RIT1.TA', 'AZRT.TA', 'REKA.TA', 'RIMO.TA', 'ROBO.TA', 'RTEN.L.TA', 'ROTS.TA', 'RSEL.TA', 'SRAC.TA', 'SFET.TA', 'SANO1.TA', 'SPNS.TA', 'SRFT.TA', 'STCM.TA', 'SAVR.TA', 'SHNP.TA', 'SCOP.TA', 'SEMG.TA', 'SLARL.TA', 'SHGR.TA', 'SALG.TA', 'SHAN.TA', 'SPEN.TA', 'SEFA.TA', 'SMNIN.TA', 'SKBN.TA', 'SHOM.TA', 'SAE.TA', 'SKLN.TA', 'SLGN.TA', 'SMTO.TA', 'SCC.TA', 'SPRG.TA', 'SPNTC.TA', 'STG.TA', 'STRS.TA', 'SMT.TA', 'SNFL.TA', 'SNCM.TA', 'SPGE.TA', 'SNEL.TA', 'TDGN-L.TA', 'TDRN.TA', 'TALD.TA', 'TMRP.TA', 'TASE.TA', 'TATT.TA', 'TAYA.TA', 'TNPV.TA', 'TEDE.TA', 'TFRLF.TA', 'TLRD.TA', 'TLSY.TA', 'TUZA.TA', 'TEVA.TA', 'TIGBUR.TA', 'TKUN.TA', 'TTAM.TA', 'TGTR.TA', 'TOPS.TA', 'TSEM.TA', 'TREN.TA', 'UNCR.TA', 'UNCT.L.TA', 'UNIT.TA', 'UNVO.TA', 'UTRN.TA', 'VCTR.TA', 'VILR.TA', 'VISN.TA', 'VTLC-M.TA', 'VTNA.TA', 'VNTZ-M.TA', 'WSMK.TA', 'WTS.TA', 'WILC.TA', 'WLFD.TA', 'XENA.TA', 'XTLB.TA', 'YAAC.TA', 'YBOX.TA', 'YHNF.TA', 'ZNKL.TA', 'ZMH.TA', 'ZUR.TA']
+    stocks_list_tase = []  # https://info.tase.co.il/eng/MarketData/Stocks/MarketData/Pages/MarketData.aspx
+    if tase_mode:
+        tase_filenames_list = ['Indices/Data_20201104.csv']
 
-if NUM_THREADS >=  7:
-    check_interval(6)
-    thread6  = Thread(target=process_symbols, args=(symbols6,  csv_db_data6,  rows6,  rows6_no_div,  rows6_only_div,   6))
-    thread6.start()
+        for filename in tase_filenames_list:
+            with open(filename, mode='r', newline='') as engine:
+                reader = csv.reader(engine, delimiter=',')
+                row_index = 0
+                for row in reader:
+                    if row_index <= 3:
+                        row_index += 1
+                        continue
+                    else:
+                        symbols_tase.append(row[1]+'.TA')
+                        row_index += 1
+        if use_investpy:
+            stocks_list_tase = investpy.get_stocks_list(country='israel')
+            for index, stock in enumerate(stocks_list_tase): stocks_list_tase[index] += '.TA'
 
-if NUM_THREADS >=  8:
-    check_interval(7)
-    thread7  = Thread(target=process_symbols, args=(symbols7,  csv_db_data7,  rows7,  rows7_no_div,  rows7_only_div,   7))
-    thread7.start()
+    # All nasdaq and others: ftp://ftp.nasdaqtrader.com/symboldirectory/
+    # ftp.nasdaqtrader.com/SymbolDirectory/nasdaqlisted.txt
+    # ftp.nasdaqtrader.com/SymbolDirectory/otherlisted.txt
+    symbols_united_states     = []
+    stocks_list_united_states = []
+    if read_united_states_input_symbols:
+        nasdaq_filenames_list = ['Indices/nasdaqlisted.csv', 'Indices/otherlisted.csv']
 
-if NUM_THREADS >=  9:
-    check_interval(8)
-    thread8  = Thread(target=process_symbols, args=(symbols8,  csv_db_data8,  rows8,  rows8_no_div,  rows8_only_div,   8))
-    thread8.start()
+        for filename in nasdaq_filenames_list:
+            with open(filename, mode='r', newline='') as engine:
+                reader = csv.reader(engine, delimiter='|')
+                row_index = 0
+                for row in reader:
+                    if row_index == 0 or 'ETF' in row[1]:
+                        row_index += 1
+                        continue
+                    else:
+                        symbols_united_states.append(row[0])
+                        row_index += 1
 
-if NUM_THREADS >= 10:
-    check_interval(9)
-    thread9  = Thread(target=process_symbols, args=(symbols9,  csv_db_data9,  rows9,  rows9_no_div,  rows9_only_div,   9))
-    thread9.start()
+        stocks_list_united_states = investpy.get_stocks_list(country='united states')
 
-if NUM_THREADS >= 11:
-    check_interval(10)
-    thread10 = Thread(target=process_symbols, args=(symbols10, csv_db_data10, rows10, rows10_no_div, rows10_only_div, 10)) # process_symbols(symbols=symbols0, rows=rows0, rows_no_div=rows0_no_div, rows_only_div=rows0_only_div)
-    thread10.start()
+    symbols = symbols_snp500 + symbols_nasdaq100 + symbols_nasdaq_100_csv + symbols_russel1000 + symbols_russel1000_csv + symbols_united_states + stocks_list_united_states
 
-if NUM_THREADS >= 12:
-    check_interval(11)
-    thread11 = Thread(target=process_symbols, args=(symbols11, csv_db_data11, rows11, rows11_no_div, rows11_only_div, 11)) # process_symbols(symbols=symbols1, rows=rows1, rows_no_div=rows1_no_div, rows_only_div=rows1_only_div)
-    thread11.start()
+    if tase_mode:
+        symbols = symbols_tase + stocks_list_tase
 
-if NUM_THREADS >= 13:
-    check_interval(12)
-    thread12 = Thread(target=process_symbols, args=(symbols12, csv_db_data12, rows12, rows12_no_div, rows12_only_div, 12))
-    thread12.start()
+    symbols = list(set(symbols))
 
-if NUM_THREADS >= 14:
-    check_interval(13)
-    thread13 = Thread(target=process_symbols, args=(symbols13, csv_db_data13, rows13, rows13_no_div, rows13_only_div, 13))
-    thread13.start()
 
-if NUM_THREADS >= 15:
-    check_interval(14)
-    thread14 = Thread(target=process_symbols, args=(symbols14, csv_db_data14, rows14, rows14_no_div, rows14_only_div, 14))
-    thread14.start()
+    # Temporary to test and debug:
+    # symbols = ['CMSA']
 
-if NUM_THREADS >= 16:
-    check_interval(15)
-    thread15 = Thread(target=process_symbols, args=(symbols15, csv_db_data15, rows15, rows15_no_div, rows15_only_div, 15))
-    thread15.start()
+    print('\n{} SSS Symbols to Scan using {} threads: {}\n'.format(len(symbols), num_threads, symbols))
 
-if NUM_THREADS >= 17:
-    check_interval(16)
-    thread16 = Thread(target=process_symbols, args=(symbols16, csv_db_data16, rows16, rows16_no_div, rows16_only_div, 16))
-    thread16.start()
 
-if NUM_THREADS >= 18:
-    check_interval(17)
-    thread17 = Thread(target=process_symbols, args=(symbols17, csv_db_data17, rows17, rows17_no_div, rows17_only_div, 17))
-    thread17.start()
+    csv_db_data    = []
+    rows           = []
+    rows_no_div    = []
+    rows_only_div  = []
+    csv_db_data0   = []
+    rows0          = []
+    rows0_no_div   = []
+    rows0_only_div = []
+    csv_db_data1   = []
+    rows1          = []
+    rows1_no_div   = []
+    rows1_only_div = []
+    csv_db_data2   = []
+    rows2          = []
+    rows2_no_div   = []
+    rows2_only_div = []
+    csv_db_data3   = []
+    rows3          = []
+    rows3_no_div   = []
+    rows3_only_div = []
+    csv_db_data4   = []
+    rows4          = []
+    rows4_no_div   = []
+    rows4_only_div = []
+    csv_db_data5   = []
+    rows5          = []
+    rows5_no_div   = []
+    rows5_only_div = []
+    csv_db_data6   = []
+    rows6          = []
+    rows6_no_div   = []
+    rows6_only_div = []
+    csv_db_data7   = []
+    rows7          = []
+    rows7_no_div   = []
+    rows7_only_div = []
+    csv_db_data8   = []
+    rows8          = []
+    rows8_no_div   = []
+    rows8_only_div = []
+    csv_db_data9   = []
+    rows9          = []
+    rows9_no_div   = []
+    rows9_only_div = []
+    csv_db_data10   = []
+    rows10          = []
+    rows10_no_div   = []
+    rows10_only_div = []
+    csv_db_data11   = []
+    rows11          = []
+    rows11_no_div   = []
+    rows11_only_div = []
+    csv_db_data12   = []
+    rows12          = []
+    rows12_no_div   = []
+    rows12_only_div = []
+    csv_db_data13   = []
+    rows13          = []
+    rows13_no_div   = []
+    rows13_only_div = []
+    csv_db_data14   = []
+    rows14          = []
+    rows14_no_div   = []
+    rows14_only_div = []
+    csv_db_data15   = []
+    rows15          = []
+    rows15_no_div   = []
+    rows15_only_div = []
+    csv_db_data16   = []
+    rows16          = []
+    rows16_no_div   = []
+    rows16_only_div = []
+    csv_db_data17   = []
+    rows17          = []
+    rows17_no_div   = []
+    rows17_only_div = []
+    csv_db_data18   = []
+    rows18          = []
+    rows18_no_div   = []
+    rows18_only_div = []
+    csv_db_data19   = []
+    rows19          = []
+    rows19_no_div   = []
+    rows19_only_div = []
 
-if NUM_THREADS >= 19:
-    check_interval(18)
-    thread18 = Thread(target=process_symbols, args=(symbols18, csv_db_data18, rows18, rows18_no_div, rows18_only_div, 18))
-    thread18.start()
+    if build_csv_db == 0: # if DB is already present, read from it and prepare input to threads
+        csv_db_filename = csv_db_path+'/db.csv'
+        with open(csv_db_filename, mode='r', newline='') as engine:
+            reader = csv.reader(engine, delimiter=',')
+            row_index = 0
+            for row in reader:
+                if row_index == 0:
+                    row_index += 1
+                    continue
+                else:
+                    if   (row_index-1) % num_threads ==  0: csv_db_data0.append(row)
+                    elif (row_index-1) % num_threads ==  1: csv_db_data1.append(row)
+                    elif (row_index-1) % num_threads ==  2: csv_db_data2.append(row)
+                    elif (row_index-1) % num_threads ==  3: csv_db_data3.append(row)
+                    elif (row_index-1) % num_threads ==  4: csv_db_data4.append(row)
+                    elif (row_index-1) % num_threads ==  5: csv_db_data5.append(row)
+                    elif (row_index-1) % num_threads ==  6: csv_db_data6.append(row)
+                    elif (row_index-1) % num_threads ==  7: csv_db_data7.append(row)
+                    elif (row_index-1) % num_threads ==  8: csv_db_data8.append(row)
+                    elif (row_index-1) % num_threads ==  9: csv_db_data9.append(row)
+                    elif (row_index-1) % num_threads == 10: csv_db_data10.append(row)
+                    elif (row_index-1) % num_threads == 11: csv_db_data11.append(row)
+                    elif (row_index-1) % num_threads == 12: csv_db_data12.append(row)
+                    elif (row_index-1) % num_threads == 13: csv_db_data13.append(row)
+                    elif (row_index-1) % num_threads == 14: csv_db_data14.append(row)
+                    elif (row_index-1) % num_threads == 15: csv_db_data15.append(row)
+                    elif (row_index-1) % num_threads == 16: csv_db_data16.append(row)
+                    elif (row_index-1) % num_threads == 17: csv_db_data17.append(row)
+                    elif (row_index-1) % num_threads == 18: csv_db_data18.append(row)
+                    elif (row_index-1) % num_threads == 19: csv_db_data19.append(row)
+                    row_index += 1
 
-if NUM_THREADS >= 20:
-    check_interval(19)
-    thread19 = Thread(target=process_symbols, args=(symbols19, csv_db_data19, rows19, rows19_no_div, rows19_only_div, 19))
-    thread19.start()
+    if num_threads >=  1: symbols0  = symbols[ 0:][::num_threads] #  0,    num_threads,    2*num_threads,    3*num_threads, ...
+    if num_threads >=  2: symbols1  = symbols[ 1:][::num_threads] #  1,  1+num_threads,  2+2*num_threads,  2+3*num_threads, ...
+    if num_threads >=  3: symbols2  = symbols[ 2:][::num_threads] #  2,  2+num_threads,  3+2*num_threads,  3+3*num_threads, ...
+    if num_threads >=  4: symbols3  = symbols[ 3:][::num_threads] #  3,  3+num_threads,  4+2*num_threads,  4+3*num_threads, ...
+    if num_threads >=  5: symbols4  = symbols[ 4:][::num_threads] #  4,  4+num_threads,  5+2*num_threads,  5+3*num_threads, ...
+    if num_threads >=  6: symbols5  = symbols[ 5:][::num_threads] #  5,  5+num_threads,  6+2*num_threads,  6+3*num_threads, ...
+    if num_threads >=  7: symbols6  = symbols[ 6:][::num_threads] #  6,  6+num_threads,  7+2*num_threads,  7+3*num_threads, ...
+    if num_threads >=  8: symbols7  = symbols[ 7:][::num_threads] #  7,  7+num_threads,  8+2*num_threads,  8+3*num_threads, ...
+    if num_threads >=  9: symbols8  = symbols[ 8:][::num_threads] #  8,  8+num_threads,  9+2*num_threads,  9+3*num_threads, ...
+    if num_threads >= 10: symbols9  = symbols[ 9:][::num_threads] #  9,  9+num_threads, 10+2*num_threads, 10+3*num_threads, ...
+    if num_threads >= 11: symbols10 = symbols[10:][::num_threads] # 10, 10+num_threads, 11+2*num_threads, 11+3*num_threads, ...
+    if num_threads >= 12: symbols11 = symbols[11:][::num_threads] # 11, 11+num_threads, 12+2*num_threads, 12+3*num_threads, ...
+    if num_threads >= 13: symbols12 = symbols[12:][::num_threads] # 12, 12+num_threads, 13+2*num_threads, 13+3*num_threads, ...
+    if num_threads >= 14: symbols13 = symbols[13:][::num_threads] # 13, 13+num_threads, 14+2*num_threads, 14+3*num_threads, ...
+    if num_threads >= 15: symbols14 = symbols[14:][::num_threads] # 14, 14+num_threads, 15+2*num_threads, 15+3*num_threads, ...
+    if num_threads >= 16: symbols15 = symbols[15:][::num_threads] # 15, 15+num_threads, 16+2*num_threads, 16+3*num_threads, ...
+    if num_threads >= 17: symbols16 = symbols[16:][::num_threads] # 16, 16+num_threads, 17+2*num_threads, 17+3*num_threads, ...
+    if num_threads >= 18: symbols17 = symbols[17:][::num_threads] # 17, 17+num_threads, 18+2*num_threads, 18+3*num_threads, ...
+    if num_threads >= 19: symbols18 = symbols[18:][::num_threads] # 18, 18+num_threads, 19+2*num_threads, 19+3*num_threads, ...
+    if num_threads >= 20: symbols19 = symbols[19:][::num_threads] # 19, 19+num_threads, 20+2*num_threads, 20+3*num_threads, ...
 
-if NUM_THREADS >=  1: thread0.join()
-if NUM_THREADS >=  2: thread1.join()
-if NUM_THREADS >=  3: thread2.join()
-if NUM_THREADS >=  4: thread3.join()
-if NUM_THREADS >=  5: thread4.join()
-if NUM_THREADS >=  6: thread5.join()
-if NUM_THREADS >=  7: thread6.join()
-if NUM_THREADS >=  8: thread7.join()
-if NUM_THREADS >=  9: thread8.join()
-if NUM_THREADS >= 10: thread9.join()
-if NUM_THREADS >= 11: thread10.join()
-if NUM_THREADS >= 12: thread11.join()
-if NUM_THREADS >= 13: thread12.join()
-if NUM_THREADS >= 14: thread13.join()
-if NUM_THREADS >= 15: thread14.join()
-if NUM_THREADS >= 16: thread15.join()
-if NUM_THREADS >= 17: thread16.join()
-if NUM_THREADS >= 18: thread17.join()
-if NUM_THREADS >= 19: thread18.join()
-if NUM_THREADS >= 20: thread19.join()
+    if num_threads >=  1:
+        check_interval(0, interval_threads, interval_secs_to_avoid_http_errors)
+        thread0  = Thread(target=process_symbols, args=(symbols0,  csv_db_data0,  rows0,  rows0_no_div,  rows0_only_div,   0, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included)) # process_symbols(symbols=symbols0, rows=rows0, rows_no_div=rows0_no_div, rows_only_div=rows0_only_div)
+        thread0.start()                               # symbols,   csv_db_data,   rows,   rows_no_div,   rows_only_div, thread_id, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown, enterprise_value_to_revenue_limit, market_cap_included, forward_eps_included
+    if num_threads >=  2:
+        check_interval(1, interval_threads, interval_secs_to_avoid_http_errors)
+        thread1  = Thread(target=process_symbols, args=(symbols1,  csv_db_data1,  rows1,  rows1_no_div,  rows1_only_div,   1, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included)) # process_symbols(symbols=symbols1, rows=rows1, rows_no_div=rows1_no_div, rows_only_div=rows1_only_div)
+        thread1.start()
+    if num_threads >=  3:
+        check_interval(2, interval_threads, interval_secs_to_avoid_http_errors)
+        thread2  = Thread(target=process_symbols, args=(symbols2,  csv_db_data2,  rows2,  rows2_no_div,  rows2_only_div,   2, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included))
+        thread2.start()
+    if num_threads >=  4:
+        check_interval(3, interval_threads, interval_secs_to_avoid_http_errors)
+        thread3  = Thread(target=process_symbols, args=(symbols3,  csv_db_data3,  rows3,  rows3_no_div,  rows3_only_div,   3, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included))
+        thread3.start()
+    if num_threads >=  5:
+        check_interval(4, interval_threads, interval_secs_to_avoid_http_errors)
+        thread4  = Thread(target=process_symbols, args=(symbols4,  csv_db_data4,  rows4,  rows4_no_div,  rows4_only_div,   4, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included))
+        thread4.start()
+    if num_threads >=  6:
+        check_interval(5, interval_threads, interval_secs_to_avoid_http_errors)
+        thread5  = Thread(target=process_symbols, args=(symbols5,  csv_db_data5,  rows5,  rows5_no_div,  rows5_only_div,   5, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included))
+        thread5.start()
+    if num_threads >=  7:
+        check_interval(6, interval_threads, interval_secs_to_avoid_http_errors)
+        thread6  = Thread(target=process_symbols, args=(symbols6,  csv_db_data6,  rows6,  rows6_no_div,  rows6_only_div,   6, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included))
+        thread6.start()
+    if num_threads >=  8:
+        check_interval(7, interval_threads, interval_secs_to_avoid_http_errors)
+        thread7  = Thread(target=process_symbols, args=(symbols7,  csv_db_data7,  rows7,  rows7_no_div,  rows7_only_div,   7, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included))
+        thread7.start()
+    if num_threads >=  9:
+        check_interval(8, interval_threads, interval_secs_to_avoid_http_errors)
+        thread8  = Thread(target=process_symbols, args=(symbols8,  csv_db_data8,  rows8,  rows8_no_div,  rows8_only_div,   8, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included))
+        thread8.start()
+    if num_threads >= 10:
+        check_interval(9, interval_threads, interval_secs_to_avoid_http_errors)
+        thread9  = Thread(target=process_symbols, args=(symbols9,  csv_db_data9,  rows9,  rows9_no_div,  rows9_only_div,   9, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included))
+        thread9.start()
+    if num_threads >= 11:
+        check_interval(10, interval_threads, interval_secs_to_avoid_http_errors)
+        thread10 = Thread(target=process_symbols, args=(symbols10, csv_db_data10, rows10, rows10_no_div, rows10_only_div, 10, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included)) # process_symbols(symbols=symbols0, rows=rows0, rows_no_div=rows0_no_div, rows_only_div=rows0_only_div)
+        thread10.start()
+    if num_threads >= 12:
+        check_interval(11, interval_threads, interval_secs_to_avoid_http_errors)
+        thread11 = Thread(target=process_symbols, args=(symbols11, csv_db_data11, rows11, rows11_no_div, rows11_only_div, 11, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included)) # process_symbols(symbols=symbols1, rows=rows1, rows_no_div=rows1_no_div, rows_only_div=rows1_only_div)
+        thread11.start()
+    if num_threads >= 13:
+        check_interval(12, interval_threads, interval_secs_to_avoid_http_errors)
+        thread12 = Thread(target=process_symbols, args=(symbols12, csv_db_data12, rows12, rows12_no_div, rows12_only_div, 12, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included))
+        thread12.start()
+    if num_threads >= 14:
+        check_interval(13, interval_threads, interval_secs_to_avoid_http_errors)
+        thread13 = Thread(target=process_symbols, args=(symbols13, csv_db_data13, rows13, rows13_no_div, rows13_only_div, 13, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included))
+        thread13.start()
+    if num_threads >= 15:
+        check_interval(14, interval_threads, interval_secs_to_avoid_http_errors)
+        thread14 = Thread(target=process_symbols, args=(symbols14, csv_db_data14, rows14, rows14_no_div, rows14_only_div, 14, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included))
+        thread14.start()
+    if num_threads >= 16:
+        check_interval(15, interval_threads, interval_secs_to_avoid_http_errors)
+        thread15 = Thread(target=process_symbols, args=(symbols15, csv_db_data15, rows15, rows15_no_div, rows15_only_div, 15, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included))
+        thread15.start()
+    if num_threads >= 17:
+        check_interval(16, interval_threads, interval_secs_to_avoid_http_errors)
+        thread16 = Thread(target=process_symbols, args=(symbols16, csv_db_data16, rows16, rows16_no_div, rows16_only_div, 16, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included))
+        thread16.start()
+    if num_threads >= 18:
+        check_interval(17, interval_threads, interval_secs_to_avoid_http_errors)
+        thread17 = Thread(target=process_symbols, args=(symbols17, csv_db_data17, rows17, rows17_no_div, rows17_only_div, 17, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included))
+        thread17.start()
+    if num_threads >= 19:
+        check_interval(18, interval_threads, interval_secs_to_avoid_http_errors)
+        thread18 = Thread(target=process_symbols, args=(symbols18, csv_db_data18, rows18, rows18_no_div, rows18_only_div, 18, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included))
+        thread18.start()
+    if num_threads >= 20:
+        check_interval(19, interval_threads, interval_secs_to_avoid_http_errors)
+        thread19 = Thread(target=process_symbols, args=(symbols19, csv_db_data19, rows19, rows19_no_div, rows19_only_div, 19, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included))
+        thread19.start()
 
-csv_db_data.extend(  csv_db_data0   + csv_db_data1   + csv_db_data2   + csv_db_data3   + csv_db_data4   + csv_db_data5   + csv_db_data6   + csv_db_data7   + csv_db_data8   + csv_db_data9   + csv_db_data10   + csv_db_data11   + csv_db_data12   + csv_db_data13   + csv_db_data14   + csv_db_data15   + csv_db_data16   + csv_db_data17   + csv_db_data18   + csv_db_data19  )
-rows.extend(         rows0          + rows1          + rows2          + rows3          + rows4          + rows5          + rows6          + rows7          + rows8          + rows9          + rows10          + rows11          + rows12          + rows13          + rows14          + rows15          + rows16          + rows17          + rows18          + rows19         )
-rows_no_div.extend(  rows0_no_div   + rows1_no_div   + rows2_no_div   + rows3_no_div   + rows4_no_div   + rows5_no_div   + rows6_no_div   + rows7_no_div   + rows8_no_div   + rows9_no_div   + rows10_no_div   + rows11_no_div   + rows12_no_div   + rows13_no_div   + rows14_no_div   + rows15_no_div   + rows16_no_div   + rows17_no_div   + rows18_no_div   + rows19_no_div  )
-rows_only_div.extend(rows0_only_div + rows1_only_div + rows2_only_div + rows3_only_div + rows4_only_div + rows5_only_div + rows6_only_div + rows7_only_div + rows8_only_div + rows9_only_div + rows10_only_div + rows11_only_div + rows12_only_div + rows13_only_div + rows14_only_div + rows15_only_div + rows16_only_div + rows17_only_div + rows18_only_div + rows19_only_div)
+    if num_threads >=  1: thread0.join()
+    if num_threads >=  2: thread1.join()
+    if num_threads >=  3: thread2.join()
+    if num_threads >=  4: thread3.join()
+    if num_threads >=  5: thread4.join()
+    if num_threads >=  6: thread5.join()
+    if num_threads >=  7: thread6.join()
+    if num_threads >=  8: thread7.join()
+    if num_threads >=  9: thread8.join()
+    if num_threads >= 10: thread9.join()
+    if num_threads >= 11: thread10.join()
+    if num_threads >= 12: thread11.join()
+    if num_threads >= 13: thread12.join()
+    if num_threads >= 14: thread13.join()
+    if num_threads >= 15: thread14.join()
+    if num_threads >= 16: thread15.join()
+    if num_threads >= 17: thread16.join()
+    if num_threads >= 18: thread17.join()
+    if num_threads >= 19: thread18.join()
+    if num_threads >= 20: thread19.join()
 
-# Now, Sort the rows using the sss_value and ssse_value formulas: [1:] skips the 1st title row
-sorted_list_db               = sorted(csv_db_data,   key=lambda row:          row[0],           reverse=False)  # Sort by ticker symbol
-sorted_list_sss              = sorted(rows,          key=lambda row:          row[3],           reverse=False)  # Sort by sss_value     -> The lower  - the more attractive
-sorted_list_ssss             = sorted(rows,          key=lambda row:          row[4],           reverse=False)  # Sort by ssss_value    -> The lower  - the more attractive
-sorted_list_sssss            = sorted(rows,          key=lambda row:          row[5],           reverse=False)  # Sort by sssss_value   -> The lower  - the more attractive
-sorted_list_ssse             = sorted(rows,          key=lambda row:          row[6],           reverse=True )  # Sort by ssse_value    -> The higher - the more attractive
-sorted_list_sssse            = sorted(rows,          key=lambda row:          row[7],           reverse=True )  # Sort by sssse_value   -> The higher - the more attractive
-sorted_list_ssssse           = sorted(rows,          key=lambda row:          row[8],           reverse=True )  # Sort by ssssse_value  -> The higher - the more attractive
-sorted_list_sss_no_div       = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[3],    reverse=False)  # Sort by sss_value     -> The lower  - the more attractive
-sorted_list_ssss_no_div      = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[4],    reverse=False)  # Sort by ssss_value    -> The lower  - the more attractive
-sorted_list_sssss_no_div     = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[5],    reverse=False)  # Sort by sssss_value   -> The lower  - the more attractive
-sorted_list_ssse_no_div      = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[6],    reverse=True )  # Sort by ssse_value    -> The higher - the more attractive
-sorted_list_sssse_no_div     = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[7],    reverse=True )  # Sort by sssse_value   -> The higher - the more attractive
-sorted_list_ssssse_no_div    = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[8],    reverse=True )  # Sort by ssssse_value  -> The higher - the more attractive
-sorted_list_sss_only_div     = sorted(rows_only_div, key=lambda row_only_div: row_only_div[3],  reverse=False)  # Sort by sss_value     -> The lower  - the more attractive
-sorted_list_ssss_only_div    = sorted(rows_only_div, key=lambda row_only_div: row_only_div[4],  reverse=False)  # Sort by ssss_value    -> The lower  - the more attractive
-sorted_list_sssss_only_div   = sorted(rows_only_div, key=lambda row_only_div: row_only_div[5],  reverse=False)  # Sort by sssss_value   -> The lower  - the more attractive
-sorted_list_ssse_only_div    = sorted(rows_only_div, key=lambda row_only_div: row_only_div[6],  reverse=True )  # Sort by ssse_value    -> The higher - the more attractive
-sorted_list_sssse_only_div   = sorted(rows_only_div, key=lambda row_only_div: row_only_div[7],  reverse=True )  # Sort by sssse_value   -> The higher - the more attractive
-sorted_list_ssssse_only_div  = sorted(rows_only_div, key=lambda row_only_div: row_only_div[8],  reverse=True )  # Sort by ssssse_value  -> The higher - the more attractive
-sorted_list_sssi             = sorted(rows,          key=lambda row:          row[9],           reverse=False)  # Sort by sssi_value    -> The lower  - the more attractive
-sorted_list_ssssi            = sorted(rows,          key=lambda row:          row[10],          reverse=False)  # Sort by ssssi_value   -> The lower  - the more attractive
-sorted_list_sssssi           = sorted(rows,          key=lambda row:          row[11],          reverse=False)  # Sort by sssssi_value  -> The lower  - the more attractive
-sorted_list_sssei            = sorted(rows,          key=lambda row:          row[12],          reverse=True )  # Sort by sssei_value   -> The higher - the more attractive
-sorted_list_ssssei           = sorted(rows,          key=lambda row:          row[13],          reverse=True )  # Sort by ssssei_value  -> The higher - the more attractive
-sorted_list_sssssei          = sorted(rows,          key=lambda row:          row[14],          reverse=True )  # Sort by sssssei_value -> The higher - the more attractive
-sorted_list_sssi_no_div      = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[9],    reverse=False)  # Sort by sssi_value    -> The lower  - the more attractive
-sorted_list_ssssi_no_div     = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[10],   reverse=False)  # Sort by ssssi_value   -> The lower  - the more attractive
-sorted_list_sssssi_no_div    = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[11],   reverse=False)  # Sort by sssssi_value  -> The lower  - the more attractive
-sorted_list_sssei_no_div     = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[12],   reverse=True )  # Sort by sssei_value   -> The higher - the more attractive
-sorted_list_ssssei_no_div    = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[13],   reverse=True )  # Sort by ssssei_value  -> The higher - the more attractive
-sorted_list_sssssei_no_div   = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[14],   reverse=True )  # Sort by sssssei_value -> The higher - the more attractive
-sorted_list_sssi_only_div    = sorted(rows_only_div, key=lambda row_only_div: row_only_div[9],  reverse=False)  # Sort by sssi_value    -> The lower  - the more attractive
-sorted_list_ssssi_only_div   = sorted(rows_only_div, key=lambda row_only_div: row_only_div[10], reverse=False)  # Sort by ssssi_value   -> The lower  - the more attractive
-sorted_list_sssssi_only_div  = sorted(rows_only_div, key=lambda row_only_div: row_only_div[11], reverse=False)  # Sort by sssssi_value  -> The lower  - the more attractive
-sorted_list_sssei_only_div   = sorted(rows_only_div, key=lambda row_only_div: row_only_div[12], reverse=True )  # Sort by sssei_value   -> The higher - the more attractive
-sorted_list_ssssei_only_div  = sorted(rows_only_div, key=lambda row_only_div: row_only_div[13], reverse=True )  # Sort by ssssei_value  -> The higher - the more attractive
-sorted_list_sssssei_only_div = sorted(rows_only_div, key=lambda row_only_div: row_only_div[14], reverse=True )  # Sort by sssssei_value -> The higher - the more attractive
+    csv_db_data.extend(  csv_db_data0   + csv_db_data1   + csv_db_data2   + csv_db_data3   + csv_db_data4   + csv_db_data5   + csv_db_data6   + csv_db_data7   + csv_db_data8   + csv_db_data9   + csv_db_data10   + csv_db_data11   + csv_db_data12   + csv_db_data13   + csv_db_data14   + csv_db_data15   + csv_db_data16   + csv_db_data17   + csv_db_data18   + csv_db_data19  )
+    rows.extend(         rows0          + rows1          + rows2          + rows3          + rows4          + rows5          + rows6          + rows7          + rows8          + rows9          + rows10          + rows11          + rows12          + rows13          + rows14          + rows15          + rows16          + rows17          + rows18          + rows19         )
+    rows_no_div.extend(  rows0_no_div   + rows1_no_div   + rows2_no_div   + rows3_no_div   + rows4_no_div   + rows5_no_div   + rows6_no_div   + rows7_no_div   + rows8_no_div   + rows9_no_div   + rows10_no_div   + rows11_no_div   + rows12_no_div   + rows13_no_div   + rows14_no_div   + rows15_no_div   + rows16_no_div   + rows17_no_div   + rows18_no_div   + rows19_no_div  )
+    rows_only_div.extend(rows0_only_div + rows1_only_div + rows2_only_div + rows3_only_div + rows4_only_div + rows5_only_div + rows6_only_div + rows7_only_div + rows8_only_div + rows9_only_div + rows10_only_div + rows11_only_div + rows12_only_div + rows13_only_div + rows14_only_div + rows15_only_div + rows16_only_div + rows17_only_div + rows18_only_div + rows19_only_div)
 
-list_sss_best = []
-list_sss_best.extend(sorted_list_sss             [:BEST_N_SELECT])
-list_sss_best.extend(sorted_list_ssss            [:BEST_N_SELECT])
-list_sss_best.extend(sorted_list_sssss           [:BEST_N_SELECT])
-list_sss_best.extend(sorted_list_ssse            [:BEST_N_SELECT])
-list_sss_best.extend(sorted_list_sssse           [:BEST_N_SELECT])
-list_sss_best.extend(sorted_list_ssssse          [:BEST_N_SELECT])
-list_sss_best.extend(sorted_list_sssi            [:BEST_N_SELECT])
-list_sss_best.extend(sorted_list_ssssi           [:BEST_N_SELECT])
-list_sss_best.extend(sorted_list_sssssi          [:BEST_N_SELECT])
-list_sss_best.extend(sorted_list_sssei           [:BEST_N_SELECT])
-list_sss_best.extend(sorted_list_ssssei          [:BEST_N_SELECT])
-list_sss_best.extend(sorted_list_sssssei         [:BEST_N_SELECT])
-sorted_list_sssss_best_with_duplicates = sorted(list_sss_best, key=lambda row: row[5], reverse=False)  # Sort by sssss_value   -> The lower  - the more attractive
-sorted_list_sssss_best = list(k for k, _ in itertools.groupby(sorted_list_sssss_best_with_duplicates))
+    # Now, Sort the rows using the sss_value and ssse_value formulas: [1:] skips the 1st title row
+    sorted_list_db               = sorted(csv_db_data,   key=lambda row:          row[0],           reverse=False)  # Sort by ticker symbol
+    sorted_list_sss              = sorted(rows,          key=lambda row:          row[3],           reverse=False)  # Sort by sss_value     -> The lower  - the more attractive
+    sorted_list_ssss             = sorted(rows,          key=lambda row:          row[4],           reverse=False)  # Sort by ssss_value    -> The lower  - the more attractive
+    sorted_list_sssss            = sorted(rows,          key=lambda row:          row[5],           reverse=False)  # Sort by sssss_value   -> The lower  - the more attractive
+    sorted_list_ssse             = sorted(rows,          key=lambda row:          row[6],           reverse=True )  # Sort by ssse_value    -> The higher - the more attractive
+    sorted_list_sssse            = sorted(rows,          key=lambda row:          row[7],           reverse=True )  # Sort by sssse_value   -> The higher - the more attractive
+    sorted_list_ssssse           = sorted(rows,          key=lambda row:          row[8],           reverse=True )  # Sort by ssssse_value  -> The higher - the more attractive
+    sorted_list_sss_no_div       = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[3],    reverse=False)  # Sort by sss_value     -> The lower  - the more attractive
+    sorted_list_ssss_no_div      = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[4],    reverse=False)  # Sort by ssss_value    -> The lower  - the more attractive
+    sorted_list_sssss_no_div     = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[5],    reverse=False)  # Sort by sssss_value   -> The lower  - the more attractive
+    sorted_list_ssse_no_div      = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[6],    reverse=True )  # Sort by ssse_value    -> The higher - the more attractive
+    sorted_list_sssse_no_div     = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[7],    reverse=True )  # Sort by sssse_value   -> The higher - the more attractive
+    sorted_list_ssssse_no_div    = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[8],    reverse=True )  # Sort by ssssse_value  -> The higher - the more attractive
+    sorted_list_sss_only_div     = sorted(rows_only_div, key=lambda row_only_div: row_only_div[3],  reverse=False)  # Sort by sss_value     -> The lower  - the more attractive
+    sorted_list_ssss_only_div    = sorted(rows_only_div, key=lambda row_only_div: row_only_div[4],  reverse=False)  # Sort by ssss_value    -> The lower  - the more attractive
+    sorted_list_sssss_only_div   = sorted(rows_only_div, key=lambda row_only_div: row_only_div[5],  reverse=False)  # Sort by sssss_value   -> The lower  - the more attractive
+    sorted_list_ssse_only_div    = sorted(rows_only_div, key=lambda row_only_div: row_only_div[6],  reverse=True )  # Sort by ssse_value    -> The higher - the more attractive
+    sorted_list_sssse_only_div   = sorted(rows_only_div, key=lambda row_only_div: row_only_div[7],  reverse=True )  # Sort by sssse_value   -> The higher - the more attractive
+    sorted_list_ssssse_only_div  = sorted(rows_only_div, key=lambda row_only_div: row_only_div[8],  reverse=True )  # Sort by ssssse_value  -> The higher - the more attractive
+    sorted_list_sssi             = sorted(rows,          key=lambda row:          row[9],           reverse=False)  # Sort by sssi_value    -> The lower  - the more attractive
+    sorted_list_ssssi            = sorted(rows,          key=lambda row:          row[10],          reverse=False)  # Sort by ssssi_value   -> The lower  - the more attractive
+    sorted_list_sssssi           = sorted(rows,          key=lambda row:          row[11],          reverse=False)  # Sort by sssssi_value  -> The lower  - the more attractive
+    sorted_list_sssei            = sorted(rows,          key=lambda row:          row[12],          reverse=True )  # Sort by sssei_value   -> The higher - the more attractive
+    sorted_list_ssssei           = sorted(rows,          key=lambda row:          row[13],          reverse=True )  # Sort by ssssei_value  -> The higher - the more attractive
+    sorted_list_sssssei          = sorted(rows,          key=lambda row:          row[14],          reverse=True )  # Sort by sssssei_value -> The higher - the more attractive
+    sorted_list_sssi_no_div      = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[9],    reverse=False)  # Sort by sssi_value    -> The lower  - the more attractive
+    sorted_list_ssssi_no_div     = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[10],   reverse=False)  # Sort by ssssi_value   -> The lower  - the more attractive
+    sorted_list_sssssi_no_div    = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[11],   reverse=False)  # Sort by sssssi_value  -> The lower  - the more attractive
+    sorted_list_sssei_no_div     = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[12],   reverse=True )  # Sort by sssei_value   -> The higher - the more attractive
+    sorted_list_ssssei_no_div    = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[13],   reverse=True )  # Sort by ssssei_value  -> The higher - the more attractive
+    sorted_list_sssssei_no_div   = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[14],   reverse=True )  # Sort by sssssei_value -> The higher - the more attractive
+    sorted_list_sssi_only_div    = sorted(rows_only_div, key=lambda row_only_div: row_only_div[9],  reverse=False)  # Sort by sssi_value    -> The lower  - the more attractive
+    sorted_list_ssssi_only_div   = sorted(rows_only_div, key=lambda row_only_div: row_only_div[10], reverse=False)  # Sort by ssssi_value   -> The lower  - the more attractive
+    sorted_list_sssssi_only_div  = sorted(rows_only_div, key=lambda row_only_div: row_only_div[11], reverse=False)  # Sort by sssssi_value  -> The lower  - the more attractive
+    sorted_list_sssei_only_div   = sorted(rows_only_div, key=lambda row_only_div: row_only_div[12], reverse=True )  # Sort by sssei_value   -> The higher - the more attractive
+    sorted_list_ssssei_only_div  = sorted(rows_only_div, key=lambda row_only_div: row_only_div[13], reverse=True )  # Sort by ssssei_value  -> The higher - the more attractive
+    sorted_list_sssssei_only_div = sorted(rows_only_div, key=lambda row_only_div: row_only_div[14], reverse=True )  # Sort by sssssei_value -> The higher - the more attractive
 
-list_sss_best_no_div = []
-list_sss_best_no_div.extend(sorted_list_sss_no_div    [:BEST_N_SELECT])
-list_sss_best_no_div.extend(sorted_list_ssss_no_div   [:BEST_N_SELECT])
-list_sss_best_no_div.extend(sorted_list_sssss_no_div  [:BEST_N_SELECT])
-list_sss_best_no_div.extend(sorted_list_ssse_no_div   [:BEST_N_SELECT])
-list_sss_best_no_div.extend(sorted_list_sssse_no_div  [:BEST_N_SELECT])
-list_sss_best_no_div.extend(sorted_list_ssssse_no_div [:BEST_N_SELECT])
-list_sss_best_no_div.extend(sorted_list_sssi_no_div   [:BEST_N_SELECT])
-list_sss_best_no_div.extend(sorted_list_ssssi_no_div  [:BEST_N_SELECT])
-list_sss_best_no_div.extend(sorted_list_sssssi_no_div [:BEST_N_SELECT])
-list_sss_best_no_div.extend(sorted_list_sssei_no_div  [:BEST_N_SELECT])
-list_sss_best_no_div.extend(sorted_list_ssssei_no_div [:BEST_N_SELECT])
-list_sss_best_no_div.extend(sorted_list_sssssei_no_div[:BEST_N_SELECT])
-sorted_list_sssss_best_no_div_with_duplicates = sorted(list_sss_best_no_div, key=lambda row: row[5], reverse=False)  # Sort by sssss_value   -> The lower  - the more attractive
-sorted_list_sssss_best_no_div = list(k for k, _ in itertools.groupby(sorted_list_sssss_best_no_div_with_duplicates))
+    list_sss_best = []
+    list_sss_best.extend(sorted_list_sss             [:best_n_select])
+    list_sss_best.extend(sorted_list_ssss            [:best_n_select])
+    list_sss_best.extend(sorted_list_sssss           [:best_n_select])
+    list_sss_best.extend(sorted_list_ssse            [:best_n_select])
+    list_sss_best.extend(sorted_list_sssse           [:best_n_select])
+    list_sss_best.extend(sorted_list_ssssse          [:best_n_select])
+    list_sss_best.extend(sorted_list_sssi            [:best_n_select])
+    list_sss_best.extend(sorted_list_ssssi           [:best_n_select])
+    list_sss_best.extend(sorted_list_sssssi          [:best_n_select])
+    list_sss_best.extend(sorted_list_sssei           [:best_n_select])
+    list_sss_best.extend(sorted_list_ssssei          [:best_n_select])
+    list_sss_best.extend(sorted_list_sssssei         [:best_n_select])
+    sorted_list_sssss_best_with_duplicates = sorted(list_sss_best, key=lambda row: row[5], reverse=False)  # Sort by sssss_value   -> The lower  - the more attractive
+    sorted_list_sssss_best = list(k for k, _ in itertools.groupby(sorted_list_sssss_best_with_duplicates))
 
-list_sss_best_only_div = []
-list_sss_best_only_div.extend(sorted_list_sss_only_div    [:BEST_N_SELECT])
-list_sss_best_only_div.extend(sorted_list_ssss_only_div   [:BEST_N_SELECT])
-list_sss_best_only_div.extend(sorted_list_sssss_only_div  [:BEST_N_SELECT])
-list_sss_best_only_div.extend(sorted_list_ssse_only_div   [:BEST_N_SELECT])
-list_sss_best_only_div.extend(sorted_list_sssse_only_div  [:BEST_N_SELECT])
-list_sss_best_only_div.extend(sorted_list_ssssse_only_div [:BEST_N_SELECT])
-list_sss_best_only_div.extend(sorted_list_sssi_only_div   [:BEST_N_SELECT])
-list_sss_best_only_div.extend(sorted_list_ssssi_only_div  [:BEST_N_SELECT])
-list_sss_best_only_div.extend(sorted_list_sssssi_only_div [:BEST_N_SELECT])
-list_sss_best_only_div.extend(sorted_list_sssei_only_div  [:BEST_N_SELECT])
-list_sss_best_only_div.extend(sorted_list_ssssei_only_div [:BEST_N_SELECT])
-list_sss_best_only_div.extend(sorted_list_sssssei_only_div[:BEST_N_SELECT])
-sorted_list_sssss_best_only_div_with_duplicates = sorted(list_sss_best_only_div, key=lambda row: row[5], reverse=False)  # Sort by sssss_value   -> The lower  - the more attractive
-sorted_list_sssss_best_only_div = list(k for k, _ in itertools.groupby(sorted_list_sssss_best_only_div_with_duplicates))
+    list_sss_best_no_div = []
+    list_sss_best_no_div.extend(sorted_list_sss_no_div    [:best_n_select])
+    list_sss_best_no_div.extend(sorted_list_ssss_no_div   [:best_n_select])
+    list_sss_best_no_div.extend(sorted_list_sssss_no_div  [:best_n_select])
+    list_sss_best_no_div.extend(sorted_list_ssse_no_div   [:best_n_select])
+    list_sss_best_no_div.extend(sorted_list_sssse_no_div  [:best_n_select])
+    list_sss_best_no_div.extend(sorted_list_ssssse_no_div [:best_n_select])
+    list_sss_best_no_div.extend(sorted_list_sssi_no_div   [:best_n_select])
+    list_sss_best_no_div.extend(sorted_list_ssssi_no_div  [:best_n_select])
+    list_sss_best_no_div.extend(sorted_list_sssssi_no_div [:best_n_select])
+    list_sss_best_no_div.extend(sorted_list_sssei_no_div  [:best_n_select])
+    list_sss_best_no_div.extend(sorted_list_ssssei_no_div [:best_n_select])
+    list_sss_best_no_div.extend(sorted_list_sssssei_no_div[:best_n_select])
+    sorted_list_sssss_best_no_div_with_duplicates = sorted(list_sss_best_no_div, key=lambda row: row[5], reverse=False)  # Sort by sssss_value   -> The lower  - the more attractive
+    sorted_list_sssss_best_no_div = list(k for k, _ in itertools.groupby(sorted_list_sssss_best_no_div_with_duplicates))
 
-header_row = ["Ticker", "Name", "Sector", "sss_value", "ssss_value", "sssss_value", "ssse_value", "sssse_value", "ssssse_value", "sssi_value", "ssssi_value", "sssssi_value", "sssei_value", "ssssei_value", "sssssei_value", "enterprise_value_to_revenue", "evr_effective", "trailing_price_to_earnings", "enterprise_value_to_ebitda", "profit_margin", "annualized_profit_margin", "held_percent_institutions", "forward_eps", "trailing_eps", "price_to_book", "shares_outstanding", "net_income_to_common_shareholders", "nitcsh_to_shares_outstanding", "employees", "enterprise_value", "nitcsh_to_num_employees", "earnings_quarterly_growth", "price_to_earnings_to_growth_ratio", "sqrt_peg_ratio", "last_dividend_0", "last_dividend_1", "last_dividend_2", "last_dividend_3" ]
+    list_sss_best_only_div = []
+    list_sss_best_only_div.extend(sorted_list_sss_only_div    [:best_n_select])
+    list_sss_best_only_div.extend(sorted_list_ssss_only_div   [:best_n_select])
+    list_sss_best_only_div.extend(sorted_list_sssss_only_div  [:best_n_select])
+    list_sss_best_only_div.extend(sorted_list_ssse_only_div   [:best_n_select])
+    list_sss_best_only_div.extend(sorted_list_sssse_only_div  [:best_n_select])
+    list_sss_best_only_div.extend(sorted_list_ssssse_only_div [:best_n_select])
+    list_sss_best_only_div.extend(sorted_list_sssi_only_div   [:best_n_select])
+    list_sss_best_only_div.extend(sorted_list_ssssi_only_div  [:best_n_select])
+    list_sss_best_only_div.extend(sorted_list_sssssi_only_div [:best_n_select])
+    list_sss_best_only_div.extend(sorted_list_sssei_only_div  [:best_n_select])
+    list_sss_best_only_div.extend(sorted_list_ssssei_only_div [:best_n_select])
+    list_sss_best_only_div.extend(sorted_list_sssssei_only_div[:best_n_select])
+    sorted_list_sssss_best_only_div_with_duplicates = sorted(list_sss_best_only_div, key=lambda row: row[5], reverse=False)  # Sort by sssss_value   -> The lower  - the more attractive
+    sorted_list_sssss_best_only_div = list(k for k, _ in itertools.groupby(sorted_list_sssss_best_only_div_with_duplicates))
 
-sorted_lists_list = [
-    sorted_list_db,
-    sorted_list_sss,                        sorted_list_ssss,                       sorted_list_sssss,                      sorted_list_ssse,
-    sorted_list_sssse,                      sorted_list_ssssse,                     sorted_list_sss_no_div,                 sorted_list_ssss_no_div,
-    sorted_list_sssss_no_div,               sorted_list_ssse_no_div,                sorted_list_sssse_no_div,               sorted_list_ssssse_no_div,
-    sorted_list_sss_only_div,               sorted_list_ssss_only_div,              sorted_list_sssss_only_div,             sorted_list_ssse_only_div,
-    sorted_list_sssse_only_div,             sorted_list_ssssse_only_div,            sorted_list_sssi,                       sorted_list_ssssi,
-    sorted_list_sssssi,                     sorted_list_sssei,                      sorted_list_ssssei,                     sorted_list_sssssei,
-    sorted_list_sssi_no_div,                sorted_list_ssssi_no_div,               sorted_list_sssssi_no_div,              sorted_list_sssei_no_div,
-    sorted_list_ssssei_no_div,              sorted_list_sssssei_no_div,             sorted_list_sssi_only_div,              sorted_list_ssssi_only_div,
-    sorted_list_sssssi_only_div,            sorted_list_sssei_only_div,             sorted_list_ssssei_only_div,            sorted_list_sssssei_only_div,
-    sorted_list_sssss_best,                 sorted_list_sssss_best_no_div,          sorted_list_sssss_best_only_div
-]
+    header_row = ["Ticker", "Name", "Sector", "sss_value", "ssss_value", "sssss_value", "ssse_value", "sssse_value", "ssssse_value", "sssi_value", "ssssi_value", "sssssi_value", "sssei_value", "ssssei_value", "sssssei_value", "enterprise_value_to_revenue", "evr_effective", "trailing_price_to_earnings", "enterprise_value_to_ebitda", "profit_margin", "annualized_profit_margin", "held_percent_institutions", "forward_eps", "trailing_eps", "price_to_book", "shares_outstanding", "net_income_to_common_shareholders", "nitcsh_to_shares_outstanding", "employees", "enterprise_value", "nitcsh_to_num_employees", "earnings_quarterly_growth", "price_to_earnings_to_growth_ratio", "sqrt_peg_ratio", "last_dividend_0", "last_dividend_1", "last_dividend_2", "last_dividend_3" ]
 
-for sorted_list in sorted_lists_list:
-    sorted_list.insert(0, header_row)
+    sorted_lists_list = [
+        sorted_list_db,
+        sorted_list_sss,                        sorted_list_ssss,                       sorted_list_sssss,                      sorted_list_ssse,
+        sorted_list_sssse,                      sorted_list_ssssse,                     sorted_list_sss_no_div,                 sorted_list_ssss_no_div,
+        sorted_list_sssss_no_div,               sorted_list_ssse_no_div,                sorted_list_sssse_no_div,               sorted_list_ssssse_no_div,
+        sorted_list_sss_only_div,               sorted_list_ssss_only_div,              sorted_list_sssss_only_div,             sorted_list_ssse_only_div,
+        sorted_list_sssse_only_div,             sorted_list_ssssse_only_div,            sorted_list_sssi,                       sorted_list_ssssi,
+        sorted_list_sssssi,                     sorted_list_sssei,                      sorted_list_ssssei,                     sorted_list_sssssei,
+        sorted_list_sssi_no_div,                sorted_list_ssssi_no_div,               sorted_list_sssssi_no_div,              sorted_list_sssei_no_div,
+        sorted_list_ssssei_no_div,              sorted_list_sssssei_no_div,             sorted_list_sssi_only_div,              sorted_list_ssssi_only_div,
+        sorted_list_sssssi_only_div,            sorted_list_sssei_only_div,             sorted_list_ssssei_only_div,            sorted_list_sssssei_only_div,
+        sorted_list_sssss_best,                 sorted_list_sssss_best_no_div,          sorted_list_sssss_best_only_div
+    ]
 
-tase_str       = ""
-sectors_str    = ""
-all_str        = ""
-csv_db_str     = ""
-investpy_str   = ""
-forwardeps_str = ""
-marketcap_str  = ""
-pmargin_str    = ""  # "_PMARGIN{}".format(PROFIT_MARGIN_LIMIT)
-if TASE_MODE:                 tase_str       = "_TASE"
-if len(SECTORS_LIST):         sectors_str    = '_'+'_'.join(SECTORS_LIST)
-if READ_UNITED_STATES_INPUT_SYMBOLS: all_str     = '_OTHERS'
-if BUILD_CSV_DB == 0:         csv_db_str     = '_DB_REUSED'
-if FORWARD_EPS_INCLUDED:      forwardeps_str = '_FORWARDEPS'
-if USE_INVESTPY:              investpy_str   = '_INVESTPY'
-if MARKET_CAP_INCLUDED:       marketcap_str  = '_MARKETCAP'
-date_and_time = time.strftime("Results/%Y%m%d-%H%M%S{}{}{}{}{}{}{}{}".format(tase_str, sectors_str, all_str, csv_db_str, marketcap_str, forwardeps_str, investpy_str, pmargin_str))
+    for sorted_list in sorted_lists_list:
+        sorted_list.insert(0, header_row)
 
-filenames_list = sss_filenames.create_filenames_list(date_and_time)
+    tase_str              = ""
+    sectors_str           = ""
+    all_str               = ""
+    csv_db_str            = ""
+    investpy_str          = ""
+    forwardeps_str        = ""
+    marketcap_str         = ""
+    pmargin_str           = ""  # "_PMARGIN{}".format(profit_margin_limit)
+    build_csv_db_only_str = ""
+    if tase_mode:                        tase_str              = "_TASE"
+    if len(sectors_list):                sectors_str           = '_'+'_'.join(sectors_list)
+    if read_united_states_input_symbols: all_str               = '_OTHERS'
+    if build_csv_db == 0:                csv_db_str            = '_DB_REUSED'
+    if forward_eps_included:             forwardeps_str        = '_FORWARDEPS'
+    if use_investpy:                     investpy_str          = '_INVESTPY'
+    if market_cap_included:              marketcap_str         = '_MARKETCAP'
+    if build_csv_db_only:                build_csv_db_only_str = '_BUILD_DB_ONLY'
+    date_and_time = time.strftime("Results/%Y%m%d-%H%M%S{}{}{}{}{}{}{}{}{}".format(tase_str, sectors_str, all_str, csv_db_str, marketcap_str, forwardeps_str, investpy_str, pmargin_str, build_csv_db_only_str))
 
-for index in range(len(filenames_list)):
-    os.makedirs(os.path.dirname(filenames_list[index]), exist_ok=True)
-    with open(filenames_list[index], mode='w', newline='') as engine:
-        writer = csv.writer(engine)
-        writer.writerows(sorted_lists_list[index])
+    filenames_list = sss_filenames.create_filenames_list(date_and_time)
+
+    for index in range(len(filenames_list)):
+        os.makedirs(os.path.dirname(filenames_list[index]), exist_ok=True)
+        with open(filenames_list[index], mode='w', newline='') as engine:
+            writer = csv.writer(engine)
+            writer.writerows(sorted_lists_list[index])
