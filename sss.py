@@ -1,5 +1,5 @@
 #######
-# V64 #
+# V65 #
 #######
 
 import time
@@ -26,6 +26,7 @@ SHARES_OUTSTANDING_UNKNOWN    = 100000000  # 100 Million Shares - just a value f
 BAD_SSS                       = 10.0 ** 10.0
 BAD_SSSE                      = 0
 PROFIT_MARGIN_WEIGHTS         = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]  # from oldest to newest
+FAVOR_TECHNOLOGY_SECTOR_EVR   = 3  # For Technology sectors, favor EVR by deviding it by this factor
 
 
 @dataclass
@@ -265,7 +266,11 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
             if return_value and not research_mode: print('                            Skipping enterprise_value_to_revenue: {}'.format(stock_data.enterprise_value_to_revenue))
             return_value = False
 
-        if stock_data.enterprise_value_to_revenue is not None: stock_data.evr_effective = stock_data.enterprise_value_to_revenue  # ** 2
+        if stock_data.enterprise_value_to_revenue is not None:
+            if FAVOR_TECHNOLOGY_SECTOR_EVR and stock_data.sector == 'Technology':
+                stock_data.evr_effective = stock_data.enterprise_value_to_revenue/float(FAVOR_TECHNOLOGY_SECTOR_EVR)  # ** 2
+            else:
+                stock_data.evr_effective = stock_data.enterprise_value_to_revenue  # ** 2
 
         if not build_csv_db_only and (stock_data.enterprise_value_to_ebitda is None or stock_data.enterprise_value_to_ebitda <= 0):
             if return_value and not research_mode: print('                            Skipping enterprise_value_to_ebitda: {}'.format(stock_data.enterprise_value_to_ebitda))
@@ -458,7 +463,7 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
         return False
 
 
-def check_interval(thread_id, interval_threads, interval_secs_to_avoid_http_errors):
+def check_interval(thread_id, interval_threads, interval_secs_to_avoid_http_errors, research_mode):
     if thread_id > 0 and thread_id % interval_threads == 0 and not research_mode:
         print("\n===========================================================================")
         print(  "[thread_id {:2} is an interval {} point, going to sleep for {} seconds]".format(thread_id, interval_threads, interval_secs_to_avoid_http_errors))
@@ -780,83 +785,83 @@ def sss_run(sectors_list, build_csv_db_only, build_csv_db, csv_db_path, read_uni
     if num_threads >= 20: symbols19 = symbols[19:][::num_threads] # 19, 19+num_threads, 20+2*num_threads, 20+3*num_threads, ...
 
     if num_threads >=  1:
-        check_interval(0, interval_threads, interval_secs_to_avoid_http_errors)
+        check_interval(0, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
         thread0  = Thread(target=process_symbols, args=(symbols0,  csv_db_data0,  rows0,  rows0_no_div,  rows0_only_div,   0, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included, research_mode)) # process_symbols(symbols=symbols0, rows=rows0, rows_no_div=rows0_no_div, rows_only_div=rows0_only_div)
         thread0.start()                               # symbols,   csv_db_data,   rows,   rows_no_div,   rows_only_div, thread_id, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown, enterprise_value_to_revenue_limit, market_cap_included, forward_eps_included
     if num_threads >=  2:
-        check_interval(1, interval_threads, interval_secs_to_avoid_http_errors)
+        check_interval(1, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
         thread1  = Thread(target=process_symbols, args=(symbols1,  csv_db_data1,  rows1,  rows1_no_div,  rows1_only_div,   1, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included, research_mode)) # process_symbols(symbols=symbols1, rows=rows1, rows_no_div=rows1_no_div, rows_only_div=rows1_only_div)
         thread1.start()
     if num_threads >=  3:
-        check_interval(2, interval_threads, interval_secs_to_avoid_http_errors)
+        check_interval(2, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
         thread2  = Thread(target=process_symbols, args=(symbols2,  csv_db_data2,  rows2,  rows2_no_div,  rows2_only_div,   2, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included, research_mode))
         thread2.start()
     if num_threads >=  4:
-        check_interval(3, interval_threads, interval_secs_to_avoid_http_errors)
+        check_interval(3, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
         thread3  = Thread(target=process_symbols, args=(symbols3,  csv_db_data3,  rows3,  rows3_no_div,  rows3_only_div,   3, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included, research_mode))
         thread3.start()
     if num_threads >=  5:
-        check_interval(4, interval_threads, interval_secs_to_avoid_http_errors)
+        check_interval(4, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
         thread4  = Thread(target=process_symbols, args=(symbols4,  csv_db_data4,  rows4,  rows4_no_div,  rows4_only_div,   4, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included, research_mode))
         thread4.start()
     if num_threads >=  6:
-        check_interval(5, interval_threads, interval_secs_to_avoid_http_errors)
+        check_interval(5, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
         thread5  = Thread(target=process_symbols, args=(symbols5,  csv_db_data5,  rows5,  rows5_no_div,  rows5_only_div,   5, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included, research_mode))
         thread5.start()
     if num_threads >=  7:
-        check_interval(6, interval_threads, interval_secs_to_avoid_http_errors)
+        check_interval(6, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
         thread6  = Thread(target=process_symbols, args=(symbols6,  csv_db_data6,  rows6,  rows6_no_div,  rows6_only_div,   6, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included, research_mode))
         thread6.start()
     if num_threads >=  8:
-        check_interval(7, interval_threads, interval_secs_to_avoid_http_errors)
+        check_interval(7, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
         thread7  = Thread(target=process_symbols, args=(symbols7,  csv_db_data7,  rows7,  rows7_no_div,  rows7_only_div,   7, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included, research_mode))
         thread7.start()
     if num_threads >=  9:
-        check_interval(8, interval_threads, interval_secs_to_avoid_http_errors)
+        check_interval(8, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
         thread8  = Thread(target=process_symbols, args=(symbols8,  csv_db_data8,  rows8,  rows8_no_div,  rows8_only_div,   8, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included, research_mode))
         thread8.start()
     if num_threads >= 10:
-        check_interval(9, interval_threads, interval_secs_to_avoid_http_errors)
+        check_interval(9, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
         thread9  = Thread(target=process_symbols, args=(symbols9,  csv_db_data9,  rows9,  rows9_no_div,  rows9_only_div,   9, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included, research_mode))
         thread9.start()
     if num_threads >= 11:
-        check_interval(10, interval_threads, interval_secs_to_avoid_http_errors)
+        check_interval(10, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
         thread10 = Thread(target=process_symbols, args=(symbols10, csv_db_data10, rows10, rows10_no_div, rows10_only_div, 10, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included, research_mode)) # process_symbols(symbols=symbols0, rows=rows0, rows_no_div=rows0_no_div, rows_only_div=rows0_only_div)
         thread10.start()
     if num_threads >= 12:
-        check_interval(11, interval_threads, interval_secs_to_avoid_http_errors)
+        check_interval(11, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
         thread11 = Thread(target=process_symbols, args=(symbols11, csv_db_data11, rows11, rows11_no_div, rows11_only_div, 11, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included, research_mode)) # process_symbols(symbols=symbols1, rows=rows1, rows_no_div=rows1_no_div, rows_only_div=rows1_only_div)
         thread11.start()
     if num_threads >= 13:
-        check_interval(12, interval_threads, interval_secs_to_avoid_http_errors)
+        check_interval(12, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
         thread12 = Thread(target=process_symbols, args=(symbols12, csv_db_data12, rows12, rows12_no_div, rows12_only_div, 12, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included, research_mode))
         thread12.start()
     if num_threads >= 14:
-        check_interval(13, interval_threads, interval_secs_to_avoid_http_errors)
+        check_interval(13, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
         thread13 = Thread(target=process_symbols, args=(symbols13, csv_db_data13, rows13, rows13_no_div, rows13_only_div, 13, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included, research_mode))
         thread13.start()
     if num_threads >= 15:
-        check_interval(14, interval_threads, interval_secs_to_avoid_http_errors)
+        check_interval(14, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
         thread14 = Thread(target=process_symbols, args=(symbols14, csv_db_data14, rows14, rows14_no_div, rows14_only_div, 14, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included, research_mode))
         thread14.start()
     if num_threads >= 16:
-        check_interval(15, interval_threads, interval_secs_to_avoid_http_errors)
+        check_interval(15, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
         thread15 = Thread(target=process_symbols, args=(symbols15, csv_db_data15, rows15, rows15_no_div, rows15_only_div, 15, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included, research_mode))
         thread15.start()
     if num_threads >= 17:
-        check_interval(16, interval_threads, interval_secs_to_avoid_http_errors)
+        check_interval(16, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
         thread16 = Thread(target=process_symbols, args=(symbols16, csv_db_data16, rows16, rows16_no_div, rows16_only_div, 16, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included, research_mode))
         thread16.start()
     if num_threads >= 18:
-        check_interval(17, interval_threads, interval_secs_to_avoid_http_errors)
+        check_interval(17, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
         thread17 = Thread(target=process_symbols, args=(symbols17, csv_db_data17, rows17, rows17_no_div, rows17_only_div, 17, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included, research_mode))
         thread17.start()
     if num_threads >= 19:
-        check_interval(18, interval_threads, interval_secs_to_avoid_http_errors)
+        check_interval(18, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
         thread18 = Thread(target=process_symbols, args=(symbols18, csv_db_data18, rows18, rows18_no_div, rows18_only_div, 18, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included, research_mode))
         thread18.start()
     if num_threads >= 20:
-        check_interval(19, interval_threads, interval_secs_to_avoid_http_errors)
+        check_interval(19, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
         thread19 = Thread(target=process_symbols, args=(symbols19, csv_db_data19, rows19, rows19_no_div, rows19_only_div, 19, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  market_cap_included, forward_eps_included, research_mode))
         thread19.start()
 
@@ -925,51 +930,52 @@ def sss_run(sectors_list, build_csv_db_only, build_csv_db, csv_db_path, read_uni
     sorted_list_ssssei_only_div  = sorted(rows_only_div, key=lambda row_only_div: row_only_div[13], reverse=True )  # Sort by ssssei_value  -> The higher - the more attractive
     sorted_list_sssssei_only_div = sorted(rows_only_div, key=lambda row_only_div: row_only_div[14], reverse=True )  # Sort by sssssei_value -> The higher - the more attractive
 
+    best_nrows = int(len(rows)/best_n_select)
     list_sss_best = []
-    list_sss_best.extend(sorted_list_sss             [:best_n_select])
-    list_sss_best.extend(sorted_list_ssss            [:best_n_select])
-    list_sss_best.extend(sorted_list_sssss           [:best_n_select])
-    list_sss_best.extend(sorted_list_ssse            [:best_n_select])
-    list_sss_best.extend(sorted_list_sssse           [:best_n_select])
-    list_sss_best.extend(sorted_list_ssssse          [:best_n_select])
-    list_sss_best.extend(sorted_list_sssi            [:best_n_select])
-    list_sss_best.extend(sorted_list_ssssi           [:best_n_select])
-    list_sss_best.extend(sorted_list_sssssi          [:best_n_select])
-    list_sss_best.extend(sorted_list_sssei           [:best_n_select])
-    list_sss_best.extend(sorted_list_ssssei          [:best_n_select])
-    list_sss_best.extend(sorted_list_sssssei         [:best_n_select])
+    list_sss_best.extend(sorted_list_sss             [:best_nrows])
+    list_sss_best.extend(sorted_list_ssss            [:best_nrows])
+    list_sss_best.extend(sorted_list_sssss           [:best_nrows])
+    list_sss_best.extend(sorted_list_ssse            [:best_nrows])
+    list_sss_best.extend(sorted_list_sssse           [:best_nrows])
+    list_sss_best.extend(sorted_list_ssssse          [:best_nrows])
+    list_sss_best.extend(sorted_list_sssi            [:best_nrows])
+    list_sss_best.extend(sorted_list_ssssi           [:best_nrows])
+    list_sss_best.extend(sorted_list_sssssi          [:best_nrows])
+    list_sss_best.extend(sorted_list_sssei           [:best_nrows])
+    list_sss_best.extend(sorted_list_ssssei          [:best_nrows])
+    list_sss_best.extend(sorted_list_sssssei         [:best_nrows])
     sorted_list_sssss_best_with_duplicates = sorted(list_sss_best, key=lambda row: row[5], reverse=False)  # Sort by sssss_value   -> The lower  - the more attractive
     sorted_list_sssss_best = list(k for k, _ in itertools.groupby(sorted_list_sssss_best_with_duplicates))
 
     list_sss_best_no_div = []
-    list_sss_best_no_div.extend(sorted_list_sss_no_div    [:best_n_select])
-    list_sss_best_no_div.extend(sorted_list_ssss_no_div   [:best_n_select])
-    list_sss_best_no_div.extend(sorted_list_sssss_no_div  [:best_n_select])
-    list_sss_best_no_div.extend(sorted_list_ssse_no_div   [:best_n_select])
-    list_sss_best_no_div.extend(sorted_list_sssse_no_div  [:best_n_select])
-    list_sss_best_no_div.extend(sorted_list_ssssse_no_div [:best_n_select])
-    list_sss_best_no_div.extend(sorted_list_sssi_no_div   [:best_n_select])
-    list_sss_best_no_div.extend(sorted_list_ssssi_no_div  [:best_n_select])
-    list_sss_best_no_div.extend(sorted_list_sssssi_no_div [:best_n_select])
-    list_sss_best_no_div.extend(sorted_list_sssei_no_div  [:best_n_select])
-    list_sss_best_no_div.extend(sorted_list_ssssei_no_div [:best_n_select])
-    list_sss_best_no_div.extend(sorted_list_sssssei_no_div[:best_n_select])
+    list_sss_best_no_div.extend(sorted_list_sss_no_div    [:best_nrows])
+    list_sss_best_no_div.extend(sorted_list_ssss_no_div   [:best_nrows])
+    list_sss_best_no_div.extend(sorted_list_sssss_no_div  [:best_nrows])
+    list_sss_best_no_div.extend(sorted_list_ssse_no_div   [:best_nrows])
+    list_sss_best_no_div.extend(sorted_list_sssse_no_div  [:best_nrows])
+    list_sss_best_no_div.extend(sorted_list_ssssse_no_div [:best_nrows])
+    list_sss_best_no_div.extend(sorted_list_sssi_no_div   [:best_nrows])
+    list_sss_best_no_div.extend(sorted_list_ssssi_no_div  [:best_nrows])
+    list_sss_best_no_div.extend(sorted_list_sssssi_no_div [:best_nrows])
+    list_sss_best_no_div.extend(sorted_list_sssei_no_div  [:best_nrows])
+    list_sss_best_no_div.extend(sorted_list_ssssei_no_div [:best_nrows])
+    list_sss_best_no_div.extend(sorted_list_sssssei_no_div[:best_nrows])
     sorted_list_sssss_best_no_div_with_duplicates = sorted(list_sss_best_no_div, key=lambda row: row[5], reverse=False)  # Sort by sssss_value   -> The lower  - the more attractive
     sorted_list_sssss_best_no_div = list(k for k, _ in itertools.groupby(sorted_list_sssss_best_no_div_with_duplicates))
 
     list_sss_best_only_div = []
-    list_sss_best_only_div.extend(sorted_list_sss_only_div    [:best_n_select])
-    list_sss_best_only_div.extend(sorted_list_ssss_only_div   [:best_n_select])
-    list_sss_best_only_div.extend(sorted_list_sssss_only_div  [:best_n_select])
-    list_sss_best_only_div.extend(sorted_list_ssse_only_div   [:best_n_select])
-    list_sss_best_only_div.extend(sorted_list_sssse_only_div  [:best_n_select])
-    list_sss_best_only_div.extend(sorted_list_ssssse_only_div [:best_n_select])
-    list_sss_best_only_div.extend(sorted_list_sssi_only_div   [:best_n_select])
-    list_sss_best_only_div.extend(sorted_list_ssssi_only_div  [:best_n_select])
-    list_sss_best_only_div.extend(sorted_list_sssssi_only_div [:best_n_select])
-    list_sss_best_only_div.extend(sorted_list_sssei_only_div  [:best_n_select])
-    list_sss_best_only_div.extend(sorted_list_ssssei_only_div [:best_n_select])
-    list_sss_best_only_div.extend(sorted_list_sssssei_only_div[:best_n_select])
+    list_sss_best_only_div.extend(sorted_list_sss_only_div    [:best_nrows])
+    list_sss_best_only_div.extend(sorted_list_ssss_only_div   [:best_nrows])
+    list_sss_best_only_div.extend(sorted_list_sssss_only_div  [:best_nrows])
+    list_sss_best_only_div.extend(sorted_list_ssse_only_div   [:best_nrows])
+    list_sss_best_only_div.extend(sorted_list_sssse_only_div  [:best_nrows])
+    list_sss_best_only_div.extend(sorted_list_ssssse_only_div [:best_nrows])
+    list_sss_best_only_div.extend(sorted_list_sssi_only_div   [:best_nrows])
+    list_sss_best_only_div.extend(sorted_list_ssssi_only_div  [:best_nrows])
+    list_sss_best_only_div.extend(sorted_list_sssssi_only_div [:best_nrows])
+    list_sss_best_only_div.extend(sorted_list_sssei_only_div  [:best_nrows])
+    list_sss_best_only_div.extend(sorted_list_ssssei_only_div [:best_nrows])
+    list_sss_best_only_div.extend(sorted_list_sssssei_only_div[:best_nrows])
     sorted_list_sssss_best_only_div_with_duplicates = sorted(list_sss_best_only_div, key=lambda row: row[5], reverse=False)  # Sort by sssss_value   -> The lower  - the more attractive
     sorted_list_sssss_best_only_div = list(k for k, _ in itertools.groupby(sorted_list_sssss_best_only_div_with_duplicates))
 
@@ -1005,6 +1011,7 @@ def sss_run(sectors_list, build_csv_db_only, build_csv_db, csv_db_path, read_uni
     build_csv_db_only_str = ""
     if tase_mode:                        tase_str              = "_TASE"
     if len(sectors_list):                sectors_str           = '_'+'_'.join(sectors_list)
+    elif FAVOR_TECHNOLOGY_SECTOR_EVR:    sectors_str           = '_FAVOR_TECH_BY{}'.format(FAVOR_TECHNOLOGY_SECTOR_EVR)
     if read_united_states_input_symbols: all_str               = '_OTHERS'
     if build_csv_db == 0:                csv_db_str            = '_DB_REUSED'
     if forward_eps_included:             forwardeps_str        = '_FORWARDEPS'
@@ -1015,10 +1022,13 @@ def sss_run(sectors_list, build_csv_db_only, build_csv_db, csv_db_path, read_uni
 
     filenames_list = sss_filenames.create_filenames_list(date_and_time)
 
+    evr_pm_col_title_row = ['Maximal enterprise_value_to_revenue_limit: {}, Minimal profit_margin_limit: {}'.format(enterprise_value_to_revenue_limit, profit_margin_limit)]
+
     for index in range(len(filenames_list)):
         os.makedirs(os.path.dirname(filenames_list[index]), exist_ok=True)
         with open(filenames_list[index], mode='w', newline='') as engine:
             writer = csv.writer(engine)
+            sorted_lists_list[index].insert(0, evr_pm_col_title_row)
             writer.writerows(sorted_lists_list[index])
 
     return len(rows)
