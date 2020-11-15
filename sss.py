@@ -1,5 +1,5 @@
 #######
-# V63 #
+# V64 #
 #######
 
 import time
@@ -1001,6 +1001,7 @@ def sss_run(sectors_list, build_csv_db_only, build_csv_db, csv_db_path, read_uni
     marketcap_str         = ""
     pmargin_str           = "_PMARGIN{}".format(profit_margin_limit)
     evr_str               = "_EVR{}".format(enterprise_value_to_revenue_limit)
+    num_results_str       = "_NUM_RESULTS_{}".format(len(rows))
     build_csv_db_only_str = ""
     if tase_mode:                        tase_str              = "_TASE"
     if len(sectors_list):                sectors_str           = '_'+'_'.join(sectors_list)
@@ -1010,7 +1011,7 @@ def sss_run(sectors_list, build_csv_db_only, build_csv_db, csv_db_path, read_uni
     if use_investpy:                     investpy_str          = '_INVESTPY'
     if market_cap_included:              marketcap_str         = '_MARKETCAP'
     if build_csv_db_only:                build_csv_db_only_str = '_BUILD_DB_ONLY'
-    date_and_time = time.strftime("Results/%Y%m%d-%H%M%S{}{}{}{}{}{}{}{}{}{}".format(tase_str, sectors_str, all_str, csv_db_str, marketcap_str, forwardeps_str, investpy_str, pmargin_str, evr_str, build_csv_db_only_str))
+    date_and_time = time.strftime("Results/%Y%m%d-%H%M%S{}{}{}{}{}{}{}{}{}{}{}".format(tase_str, sectors_str, all_str, csv_db_str, marketcap_str, forwardeps_str, investpy_str, pmargin_str, evr_str, build_csv_db_only_str, num_results_str))
 
     filenames_list = sss_filenames.create_filenames_list(date_and_time)
 
