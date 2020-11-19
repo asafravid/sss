@@ -1,5 +1,5 @@
 #######
-# V66 #
+# V68 #
 #######
 
 import time
@@ -141,6 +141,7 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
             if 'shortName' in info: stock_data.short_name = info['shortName']
             else:                   stock_data.short_name = 'None'
 
+        if stock_data.short_name is     None:                       stock_data.short_name = 'None'
         if stock_data.short_name is not None and not research_mode: print('              {:35}:'.format(stock_data.short_name))
 
         if build_csv_db and 'quoteType' in info: stock_data.quote_type = info['quoteType']
@@ -486,7 +487,8 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
             stock_data = StockData(ticker=symb)
             if not process_info(symbol=symbol, stock_data=stock_data, build_csv_db_only=build_csv_db_only, use_investpy=use_investpy, tase_mode=tase_mode, sectors_list=sectors_list, build_csv_db=build_csv_db, profit_margin_limit=profit_margin_limit, earnings_quarterly_growth_min=earnings_quarterly_growth_min, earnings_quarterly_growth_unknown=earnings_quarterly_growth_unknown, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, market_cap_included=market_cap_included, forward_eps_included=forward_eps_included, research_mode=research_mode):
                 if tase_mode and 'TLV:' not in stock_data.ticker: stock_data.ticker = 'TLV:' + stock_data.ticker.replace('.TA', '')
-                csv_db_data.append([stock_data.ticker, stock_data.short_name, stock_data.sector, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.ssssei_value, stock_data.enterprise_value_to_revenue, stock_data.evr_effective, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.annualized_profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.enterprise_value, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.last_4_dividends_0, stock_data.last_4_dividends_1, stock_data.last_4_dividends_2, stock_data.last_4_dividends_3])
+                #                              Ticker	          Name	                 Sector	            sss_value	          ssss_value	         sssss_value	         ssse_value	            sssse_value	            ssssse_value	         sssi_value	            ssssi_value	            sssssi_value	         sssei_value	         ssssei_value	          sssssei_value	            enterprise_value_to_revenue	            evr_effective	          trailing_price_to_earnings	         enterprise_value_to_ebitda	            profit_margin	          annualized_profit_margin	           held_percent_institutions	         forward_eps	         trailing_eps	          price_to_book	            shares_outstanding	           net_income_to_common_shareholders	         nitcsh_to_shares_outstanding	          employees	                enterprise_value	         nitcsh_to_num_employees	         earnings_quarterly_growth	           price_to_earnings_to_growth_ratio  sqrt_peg_ratio	                    last_dividend_0	               last_dividend_1	              last_dividend_2	             last_dividend_3
+                csv_db_data.append([stock_data.ticker, stock_data.short_name, stock_data.sector, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.sssssei_value, stock_data.enterprise_value_to_revenue, stock_data.evr_effective, stock_data.trailing_price_to_earnings, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.annualized_profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.enterprise_value, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.sqrt_peg_ratio, stock_data.last_4_dividends_0, stock_data.last_4_dividends_1, stock_data.last_4_dividends_2, stock_data.last_4_dividends_3])
                 continue
 
             if tase_mode and 'TLV:' not in stock_data.ticker: stock_data.ticker = 'TLV:' + stock_data.ticker.replace('.TA', '')
@@ -531,7 +533,7 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
 #     BUILD_CSV_DB                      = 1
 #     BUILD_CSV_DB_ONLY                 = 1
 #     SECTORS_LIST                      = [] # ['Technology', 'Consumer Cyclical', 'Consumer Defensive', 'Industrials', 'Consumer Goods']  # Allows filtering by sector(s)
-def sss_run(sectors_list, build_csv_db_only, build_csv_db, csv_db_path, read_united_states_input_symbols, tase_mode, num_threads, forward_eps_included, market_cap_included, use_investpy, research_mode, profit_margin_limit, best_n_select, enterprise_value_to_revenue_limit):
+def sss_run(sectors_list, build_csv_db_only, build_csv_db, csv_db_path, read_united_states_input_symbols, tase_mode, num_threads, forward_eps_included, market_cap_included, use_investpy, research_mode, profit_margin_limit, best_n_select, enterprise_value_to_revenue_limit, generate_result_folders=1, appearance_counter_dict={}):
     # Working Mode:
     forward_eps_included              *= (not tase_mode)
     relaxed_access                     = (num_threads-1)/10.0            # In seconds
@@ -548,7 +550,14 @@ def sss_run(sectors_list, build_csv_db_only, build_csv_db, csv_db_path, read_uni
         enterprise_value_to_revenue_limit *= 5
         profit_margin_limit               /= 3
 
-    symbols = []
+    symbols                = []
+    symbols_tase           = []
+    symbols_snp500         = []
+    symbols_nasdaq100      = []
+    symbols_nasdaq_100_csv = []
+    symbols_russel1000     = []
+    symbols_russel1000_csv = []
+    stocks_list_tase       = []
 
     if not tase_mode and not research_mode:
         payload            = pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies') # There are 2 tables on the Wikipedia page, get the first table
@@ -649,8 +658,10 @@ def sss_run(sectors_list, build_csv_db_only, build_csv_db, csv_db_path, read_uni
     if not research_mode: symbols = list(set(symbols))
 
 
-    # Temporary to test and debug:
-    # symbols = ['CMSA']
+    # Temporary to test and debug: DEBUG MODE
+    # =======================================
+    # symbols     = ['DPS', 'EVHC']
+    # num_threads = 1
 
     if not research_mode: print('\n{} SSS Symbols to Scan using {} threads: {}\n'.format(len(symbols), num_threads, symbols))
 
@@ -991,6 +1002,11 @@ def sss_run(sectors_list, build_csv_db_only, build_csv_db, csv_db_path, read_uni
 
     header_row = ["Ticker", "Name", "Sector", "sss_value", "ssss_value", "sssss_value", "ssse_value", "sssse_value", "ssssse_value", "sssi_value", "ssssi_value", "sssssi_value", "sssei_value", "ssssei_value", "sssssei_value", "enterprise_value_to_revenue", "evr_effective", "trailing_price_to_earnings", "enterprise_value_to_ebitda", "profit_margin", "annualized_profit_margin", "held_percent_institutions", "forward_eps", "trailing_eps", "price_to_book", "shares_outstanding", "net_income_to_common_shareholders", "nitcsh_to_shares_outstanding", "employees", "enterprise_value", "nitcsh_to_num_employees", "earnings_quarterly_growth", "price_to_earnings_to_growth_ratio", "sqrt_peg_ratio", "last_dividend_0", "last_dividend_1", "last_dividend_2", "last_dividend_3" ]
 
+    if research_mode: # Update the appearance counter using sssss
+        list_len = len(sorted_list_sssss)
+        for row in sorted_list_sssss:
+            appearance_counter_dict[row[0]] = appearance_counter_dict[row[0]]+1.0/float(list_len)
+
     sorted_lists_list = [
         sorted_list_db,
         sorted_list_sss,                        sorted_list_ssss,                       sorted_list_sssss,                      sorted_list_ssse,
@@ -1034,11 +1050,12 @@ def sss_run(sectors_list, build_csv_db_only, build_csv_db, csv_db_path, read_uni
 
     evr_pm_col_title_row = ['Maximal enterprise_value_to_revenue_limit: {}, Minimal profit_margin_limit: {}'.format(enterprise_value_to_revenue_limit, profit_margin_limit)]
 
-    for index in range(len(filenames_list)):
-        os.makedirs(os.path.dirname(filenames_list[index]), exist_ok=True)
-        with open(filenames_list[index], mode='w', newline='') as engine:
-            writer = csv.writer(engine)
-            sorted_lists_list[index].insert(0, evr_pm_col_title_row)
-            writer.writerows(sorted_lists_list[index])
+    if generate_result_folders:
+        for index in range(len(filenames_list)):
+            os.makedirs(os.path.dirname(filenames_list[index]), exist_ok=True)
+            with open(filenames_list[index], mode='w', newline='') as engine:
+                writer = csv.writer(engine)
+                sorted_lists_list[index].insert(0, evr_pm_col_title_row)
+                writer.writerows(sorted_lists_list[index])
 
     return len(rows)
