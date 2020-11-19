@@ -1,5 +1,5 @@
 #######
-# V68 #
+# V69 #
 #######
 
 import time
@@ -533,7 +533,7 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
 #     BUILD_CSV_DB                      = 1
 #     BUILD_CSV_DB_ONLY                 = 1
 #     SECTORS_LIST                      = [] # ['Technology', 'Consumer Cyclical', 'Consumer Defensive', 'Industrials', 'Consumer Goods']  # Allows filtering by sector(s)
-def sss_run(sectors_list, build_csv_db_only, build_csv_db, csv_db_path, read_united_states_input_symbols, tase_mode, num_threads, forward_eps_included, market_cap_included, use_investpy, research_mode, profit_margin_limit, best_n_select, enterprise_value_to_revenue_limit, generate_result_folders=1, appearance_counter_dict={}):
+def sss_run(sectors_list, build_csv_db_only, build_csv_db, csv_db_path, read_united_states_input_symbols, tase_mode, num_threads, forward_eps_included, market_cap_included, use_investpy, research_mode, profit_margin_limit, best_n_select, enterprise_value_to_revenue_limit, generate_result_folders=1, appearance_counter_dict={}, appearance_counter_min=25, appearance_counter_max=35):
     # Working Mode:
     forward_eps_included              *= (not tase_mode)
     relaxed_access                     = (num_threads-1)/10.0            # In seconds
@@ -1004,8 +1004,9 @@ def sss_run(sectors_list, build_csv_db_only, build_csv_db, csv_db_path, read_uni
 
     if research_mode: # Update the appearance counter using sssss
         list_len = len(sorted_list_sssss)
-        for row in sorted_list_sssss:
-            appearance_counter_dict[row[0]] = appearance_counter_dict[row[0]]+1.0/float(list_len)
+        if appearance_counter_min <= list_len and list_len <= appearance_counter_max:
+            for row in sorted_list_sssss:
+                appearance_counter_dict[row[0]] = appearance_counter_dict[row[0]]+1.0/float(list_len)
 
     sorted_lists_list = [
         sorted_list_db,
