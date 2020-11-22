@@ -1,5 +1,5 @@
 #######
-# V69 #
+# V70 #
 #######
 
 import time
@@ -25,7 +25,7 @@ PEG_UNKNOWN                   = 1  # use a neutral value when PEG is unknown
 SHARES_OUTSTANDING_UNKNOWN    = 100000000  # 100 Million Shares - just a value for calculation of a currently unused vaue
 BAD_SSS                       = 10.0 ** 10.0
 BAD_SSSE                      = 0
-PROFIT_MARGIN_WEIGHTS         = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]  # from oldest to newest
+PROFIT_MARGIN_WEIGHTS         = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0, 512.0]  # from oldest to newest
 FAVOR_TECHNOLOGY_SECTOR_EVR   = 3  # For Technology sectors, favor EVR by deviding it by this factor
 
 
@@ -164,20 +164,17 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
                 len_revenue_list  = len(earnings['Revenue'])
                 len_earnings_list = len(earnings['Earnings'])
                 if len_earnings_list == len_revenue_list:
-                    weight_index = 0
-                    revenue_sum  = 0
-                    earnings_sum = 0
-                    weights_sum  = 0
-                    for key in earnings['Revenue']:
-                        if earnings['Revenue'][key] < 0 or earnings['Earnings'][key] < 0:
-                            break
-                        revenue_sum  += earnings['Revenue'][key]*PROFIT_MARGIN_WEIGHTS[weight_index]
-                        earnings_sum += earnings['Earnings'][key]*PROFIT_MARGIN_WEIGHTS[weight_index]
-                        # key_profit_margin = earnings['Earnings'][key]/earnings['Revenue'][key]
-                        weights_sum  += PROFIT_MARGIN_WEIGHTS[weight_index]
-                        weight_index += 1
-                    if revenue_sum:
-                        stock_data.annualized_profit_margin = earnings_sum/revenue_sum
+                    weight_index              = 0
+                    earnings_to_revenues_list = []
+                    weights_sum               = 0
+                    try:
+                        for key in earnings['Revenue']:
+                            earnings_to_revenues_list.append((float(earnings['Earnings'][key])/float(earnings['Revenue'][key]))*PROFIT_MARGIN_WEIGHTS[weight_index])
+                            weights_sum  += PROFIT_MARGIN_WEIGHTS[weight_index]
+                            weight_index += 1
+                        stock_data.annualized_profit_margin = sum(earnings_to_revenues_list)/weights_sum
+                    except Exception as e:
+                        pass
 
             if 'profitMargins' in info:          stock_data.profit_margin = info['profitMargins']
             else:                                stock_data.profit_margin = PROFIT_MARGIN_UNKNOWN
@@ -660,7 +657,7 @@ def sss_run(sectors_list, build_csv_db_only, build_csv_db, csv_db_path, read_uni
 
     # Temporary to test and debug: DEBUG MODE
     # =======================================
-    # symbols     = ['DPS', 'EVHC']
+    # symbols     = ['MO']
     # num_threads = 1
 
     if not research_mode: print('\n{} SSS Symbols to Scan using {} threads: {}\n'.format(len(symbols), num_threads, symbols))
