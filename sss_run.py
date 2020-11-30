@@ -1,5 +1,5 @@
 #######
-# V10 #
+# V11 #
 #######
 
 
@@ -39,7 +39,7 @@ def prepare_appearance_counters_dictionary(csv_db_path, appearance_counter_dict)
                 row_index += 1
                 continue
             else:
-                appearance_counter_dict[row[0]] = 0.0
+                appearance_counter_dict[(row[0],row[1])] = 0.0 # [row[1], 0.0] # Short Name + 0.0 count
 
 
 def research_db(min_evr, max_evr, pm_min, pm_max, csv_db_path, read_united_states_input_symbols, tase_mode, forward_eps_included, generate_result_folders, appearance_counter_min, appearance_counter_max):
@@ -80,16 +80,16 @@ def research_db(min_evr, max_evr, pm_min, pm_max, csv_db_path, read_united_state
     reccomendation_list_filename = csv_db_path+'/reccomendation_list_sssss_'+results_filename.replace('research_results_','')
     with open(reccomendation_list_filename, 'w') as f:
         for key in result_sorted_appearance_counter_dict.keys():
-            f.write("%s,%s\n"%(key,result_sorted_appearance_counter_dict[key]))
+            f.write("%s,%s,%s\n"%(key[0],key[1],result_sorted_appearance_counter_dict[key]))
 
 # TASE:
 # =====
-# research_db(min_evr=1, max_evr=25, pm_min=5,  pm_max=45, csv_db_path='Results/20201122-053359_TASE_FAVOR_TECH_BY3_MARKETCAP_PMARGIN0.0567_EVR15.0_BUILD_DB_ONLY_NUM_RESULTS_443',              read_united_states_input_symbols=0, tase_mode=1, forward_eps_included=0, generate_result_folders=0, appearance_counter_min=20, appearance_counter_max=35)
+research_db(min_evr=1, max_evr=25, pm_min=5,  pm_max=45, csv_db_path='Results/20201130-074823_TASE_FAVOR_TECH_BY3_MARKETCAP_PMARGIN0.0567_EVR15.0_BUILD_DB_ONLY_NUM_RESULTS_445',              read_united_states_input_symbols=0, tase_mode=1, forward_eps_included=0, generate_result_folders=0, appearance_counter_min=20, appearance_counter_max=35)
 
 # NASDAQ100+S&P500+RUSSEL1000:
 # ============================
-research_db(min_evr=1, max_evr=30, pm_min=10, pm_max=45, csv_db_path='Results/20201122-150215_FAVOR_TECH_BY3_MARKETCAP_FORWARDEPS_PMARGIN0.17_EVR17.5_BUILD_DB_ONLY_NUM_RESULTS_1116',           read_united_states_input_symbols=0, tase_mode=0, forward_eps_included=0, generate_result_folders=0, appearance_counter_min=20, appearance_counter_max=35)
+research_db(min_evr=1, max_evr=45, pm_min=10, pm_max=45, csv_db_path='Results/20201129-140415_FAVOR_TECH_BY3_MARKETCAP_FORWARDEPS_PMARGIN0.17_EVR17.5_BUILD_DB_ONLY_NUM_RESULTS_1116',           read_united_states_input_symbols=0, tase_mode=0, forward_eps_included=0, generate_result_folders=0, appearance_counter_min=20, appearance_counter_max=35)
 
 # ALL:
 # ====
-# research_db(min_evr=1, max_evr=25, pm_min=10, pm_max=45, csv_db_path='Results/20201122-051143_FAVOR_TECH_BY3_OTHERS_MARKETCAP_FORWARDEPS_PMARGIN0.24_EVR15.0_BUILD_DB_ONLY_NUM_RESULTS_8401',  read_united_states_input_symbols=1, tase_mode=0, forward_eps_included=1, generate_result_folders=0, appearance_counter_min=20, appearance_counter_max=35)
+research_db(min_evr=1, max_evr=45, pm_min=10, pm_max=45, csv_db_path='Results/20201130-171542_FAVOR_TECH_BY3_OTHERS_MARKETCAP_FORWARDEPS_PMARGIN0.24_EVR15.0_BUILD_DB_ONLY_NUM_RESULTS_8555',  read_united_states_input_symbols=1, tase_mode=0, forward_eps_included=1, generate_result_folders=0, appearance_counter_min=20, appearance_counter_max=35)
