@@ -1,5 +1,5 @@
 #######
-# V70 #
+# V71 #
 #######
 
 import time
@@ -607,7 +607,7 @@ def sss_run(sectors_list, build_csv_db_only, build_csv_db, csv_db_path, read_uni
         stocks_list_tase = []  # https://info.tase.co.il/eng/MarketData/Stocks/MarketData/Pages/MarketData.aspx
 
     if tase_mode and not research_mode:
-        tase_filenames_list = ['Indices/Data_20201104.csv']
+        tase_filenames_list = ['Indices/Data_20201129.csv']
 
         for filename in tase_filenames_list:
             with open(filename, mode='r', newline='') as engine:
@@ -1003,7 +1003,7 @@ def sss_run(sectors_list, build_csv_db_only, build_csv_db, csv_db_path, read_uni
         list_len = len(sorted_list_sssss)
         if appearance_counter_min <= list_len and list_len <= appearance_counter_max:
             for row in sorted_list_sssss:
-                appearance_counter_dict[row[0]] = appearance_counter_dict[row[0]]+1.0/float(list_len)
+                appearance_counter_dict[(row[0],row[1])] = appearance_counter_dict[(row[0],row[1])]+1.0/float(list_len)
 
     sorted_lists_list = [
         sorted_list_db,
