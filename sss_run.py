@@ -1,5 +1,5 @@
 #######
-# V11 #
+# V12 #
 #######
 
 
@@ -53,7 +53,9 @@ def research_db(min_evr, max_evr, pm_min, pm_max, csv_db_path, read_united_state
             research_rows[enterprise_value_to_revenue_limit-min_evr][profit_margin_limit-pm_min] = int(num_results)
             print('row {:3} -> (enterprise_value_to_revenue_limit {:3}) | col {:3} -> (profit_margin_limit {:3}%): num_results = {}'.format(enterprise_value_to_revenue_limit-min_evr, enterprise_value_to_revenue_limit, profit_margin_limit-pm_min, profit_margin_limit, num_results))
     results_foldername = 'Results/'
-    results_filename   = 'research_results_evr{}to{}_pm{}to{}.csv'.format(min_evr,max_evr,pm_min,pm_max)
+    forward_eps_str = 'forward_eps_not_included'
+    if forward_eps_included: forward_eps_str = 'forward_eps_included'
+    results_filename   = 'research_results_evr{}to{}_pm{}to{}_{}.csv'.format(min_evr,max_evr,pm_min,pm_max,forward_eps_str)
     np.savetxt(csv_db_path+'/'+results_filename, research_rows.astype(int), fmt='%d', delimiter=',')
     title_row = list(range(pm_min,pm_max+1))
     title_row.insert(0, 'evr / pm')
@@ -80,16 +82,18 @@ def research_db(min_evr, max_evr, pm_min, pm_max, csv_db_path, read_united_state
     reccomendation_list_filename = csv_db_path+'/reccomendation_list_sssss_'+results_filename.replace('research_results_','')
     with open(reccomendation_list_filename, 'w') as f:
         for key in result_sorted_appearance_counter_dict.keys():
-            f.write("%s,%s,%s\n"%(key[0],key[1],result_sorted_appearance_counter_dict[key]))
+            f.write("%s,%s,%s\n"%(key[0],str(key[1]).replace(',',' '),result_sorted_appearance_counter_dict[key]))
 
 # TASE:
 # =====
-research_db(min_evr=1, max_evr=25, pm_min=5,  pm_max=45, csv_db_path='Results/20201130-074823_TASE_FAVOR_TECH_BY3_MARKETCAP_PMARGIN0.0567_EVR15.0_BUILD_DB_ONLY_NUM_RESULTS_445',              read_united_states_input_symbols=0, tase_mode=1, forward_eps_included=0, generate_result_folders=0, appearance_counter_min=20, appearance_counter_max=35)
+# research_db(min_evr=1, max_evr=25, pm_min=5,  pm_max=45, csv_db_path='Results/20201208-194114_TASE_FAVOR_TECH_BY3_MARKETCAP_PMARGIN0.0567_EVR15.0_BUILD_DB_ONLY_NUM_RESULTS_450',              read_united_states_input_symbols=0, tase_mode=1, forward_eps_included=0, generate_result_folders=0, appearance_counter_min=20, appearance_counter_max=40)
 
 # NASDAQ100+S&P500+RUSSEL1000:
 # ============================
-research_db(min_evr=1, max_evr=45, pm_min=10, pm_max=45, csv_db_path='Results/20201129-140415_FAVOR_TECH_BY3_MARKETCAP_FORWARDEPS_PMARGIN0.17_EVR17.5_BUILD_DB_ONLY_NUM_RESULTS_1116',           read_united_states_input_symbols=0, tase_mode=0, forward_eps_included=0, generate_result_folders=0, appearance_counter_min=20, appearance_counter_max=35)
+research_db(min_evr=1, max_evr=45, pm_min=10, pm_max=45, csv_db_path='Results/20201208-191604_FAVOR_TECH_BY3_MARKETCAP_FORWARDEPS_PMARGIN0.17_EVR17.5_BUILD_DB_ONLY_NUM_RESULTS_1116',           read_united_states_input_symbols=0, tase_mode=0, forward_eps_included=0, generate_result_folders=0, appearance_counter_min=20, appearance_counter_max=40)
+research_db(min_evr=1, max_evr=45, pm_min=10, pm_max=45, csv_db_path='Results/20201208-191604_FAVOR_TECH_BY3_MARKETCAP_FORWARDEPS_PMARGIN0.17_EVR17.5_BUILD_DB_ONLY_NUM_RESULTS_1116',           read_united_states_input_symbols=0, tase_mode=0, forward_eps_included=1, generate_result_folders=0, appearance_counter_min=20, appearance_counter_max=40)
+
 
 # ALL:
 # ====
-research_db(min_evr=1, max_evr=45, pm_min=10, pm_max=45, csv_db_path='Results/20201130-171542_FAVOR_TECH_BY3_OTHERS_MARKETCAP_FORWARDEPS_PMARGIN0.24_EVR15.0_BUILD_DB_ONLY_NUM_RESULTS_8555',  read_united_states_input_symbols=1, tase_mode=0, forward_eps_included=1, generate_result_folders=0, appearance_counter_min=20, appearance_counter_max=35)
+# research_db(min_evr=1, max_evr=45, pm_min=10, pm_max=45, csv_db_path='Results/20201210-043440_FAVOR_TECH_BY3_OTHERS_MARKETCAP_FORWARDEPS_PMARGIN0.24_EVR15.0_BUILD_DB_ONLY_NUM_RESULTS_8600',  read_united_states_input_symbols=1, tase_mode=0, forward_eps_included=1, generate_result_folders=0, appearance_counter_min=20, appearance_counter_max=40)
