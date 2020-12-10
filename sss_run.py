@@ -1,5 +1,5 @@
 #######
-# V12 #
+# V13 #
 #######
 
 
@@ -52,10 +52,9 @@ def research_db(min_evr, max_evr, pm_min, pm_max, csv_db_path, read_united_state
             if num_results < 1: break  # already 0 results. With higher profit margin limit there will still be 0
             research_rows[enterprise_value_to_revenue_limit-min_evr][profit_margin_limit-pm_min] = int(num_results)
             print('row {:3} -> (enterprise_value_to_revenue_limit {:3}) | col {:3} -> (profit_margin_limit {:3}%): num_results = {}'.format(enterprise_value_to_revenue_limit-min_evr, enterprise_value_to_revenue_limit, profit_margin_limit-pm_min, profit_margin_limit, num_results))
-    results_foldername = 'Results/'
-    forward_eps_str = 'forward_eps_not_included'
-    if forward_eps_included: forward_eps_str = 'forward_eps_included'
-    results_filename   = 'research_results_evr{}to{}_pm{}to{}_{}.csv'.format(min_evr,max_evr,pm_min,pm_max,forward_eps_str)
+    forward_eps_str = 'fweps_ninc'
+    if forward_eps_included: forward_eps_str = 'fweps_inc'
+    results_filename   = 'results_evr{}-{}_pm{}-{}_{}.csv'.format(min_evr,max_evr,pm_min,pm_max,forward_eps_str)
     np.savetxt(csv_db_path+'/'+results_filename, research_rows.astype(int), fmt='%d', delimiter=',')
     title_row = list(range(pm_min,pm_max+1))
     title_row.insert(0, 'evr / pm')
@@ -79,7 +78,7 @@ def research_db(min_evr, max_evr, pm_min, pm_max, csv_db_path, read_united_state
     sorted_appearance_counter_dict = {k: v for k, v in sorted(appearance_counter_dict.items(), key=lambda item: item[1], reverse=True)}
     result_sorted_appearance_counter_dict = {k: v for k, v in sorted_appearance_counter_dict.items() if v > 0.0}
 
-    reccomendation_list_filename = csv_db_path+'/reccomendation_list_sssss_'+results_filename.replace('research_results_','')
+    reccomendation_list_filename = csv_db_path+'/reccomendation_sssss_'+results_filename.replace('results_','')
     with open(reccomendation_list_filename, 'w') as f:
         for key in result_sorted_appearance_counter_dict.keys():
             f.write("%s,%s,%s\n"%(key[0],str(key[1]).replace(',',' '),result_sorted_appearance_counter_dict[key]))
@@ -90,9 +89,11 @@ def research_db(min_evr, max_evr, pm_min, pm_max, csv_db_path, read_united_state
 
 # NASDAQ100+S&P500+RUSSEL1000:
 # ============================
-research_db(min_evr=1, max_evr=45, pm_min=10, pm_max=45, csv_db_path='Results/20201208-191604_FAVOR_TECH_BY3_MARKETCAP_FORWARDEPS_PMARGIN0.17_EVR17.5_BUILD_DB_ONLY_NUM_RESULTS_1116',           read_united_states_input_symbols=0, tase_mode=0, forward_eps_included=0, generate_result_folders=0, appearance_counter_min=20, appearance_counter_max=40)
-research_db(min_evr=1, max_evr=45, pm_min=10, pm_max=45, csv_db_path='Results/20201208-191604_FAVOR_TECH_BY3_MARKETCAP_FORWARDEPS_PMARGIN0.17_EVR17.5_BUILD_DB_ONLY_NUM_RESULTS_1116',           read_united_states_input_symbols=0, tase_mode=0, forward_eps_included=1, generate_result_folders=0, appearance_counter_min=20, appearance_counter_max=40)
+# research_db(min_evr=1, max_evr=45, pm_min=10, pm_max=45, csv_db_path='Results/20201208-191604_FAVOR_TECH_BY3_MARKETCAP_FORWARDEPS_PMARGIN0.17_EVR17.5_BUILD_DB_ONLY_NUM_RESULTS_1116',           read_united_states_input_symbols=0, tase_mode=0, forward_eps_included=0, generate_result_folders=0, appearance_counter_min=20, appearance_counter_max=40)
+# research_db(min_evr=1, max_evr=45, pm_min=10, pm_max=45, csv_db_path='Results/20201208-191604_FAVOR_TECH_BY3_MARKETCAP_FORWARDEPS_PMARGIN0.17_EVR17.5_BUILD_DB_ONLY_NUM_RESULTS_1116',           read_united_states_input_symbols=0, tase_mode=0, forward_eps_included=1, generate_result_folders=0, appearance_counter_min=20, appearance_counter_max=40)
 
+# Generate SSSSS:
+research_db(min_evr=6, max_evr=6, pm_min=20, pm_max=20, csv_db_path='Results/20201208-191604_FAVOR_TECH_BY3_MARKETCAP_FORWARDEPS_PMARGIN0.17_EVR17.5_BUILD_DB_ONLY_NUM_RESULTS_1116',           read_united_states_input_symbols=0, tase_mode=0, forward_eps_included=1, generate_result_folders=1, appearance_counter_min=20, appearance_counter_max=40)
 
 # ALL:
 # ====
