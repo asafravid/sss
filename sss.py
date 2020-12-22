@@ -1,5 +1,5 @@
 #######
-# V74 #
+# V75 #
 #######
 
 import time
@@ -580,7 +580,7 @@ def sss_run(sectors_list, build_csv_db_only, build_csv_db, csv_db_path, read_uni
         symbols_russel1000_wiki = [] # https://en.wikipedia.org/wiki/Russell_1000_Index
         russel1000_filenames_wiki_list = ['Indices/Russel_1000_index_wiki.csv'] # https://www.barchart.com/stocks/indices/russell/russell1000
         for filename in russel1000_filenames_wiki_list:
-            with open(filename, mode='r', newline='') as engine:
+            with open(filename, mode='r', newline='', encoding='cp1252') as engine:
                 reader = csv.reader(engine, delimiter=',')
                 for row in reader:
                     symbols_russel1000_wiki.append(row[1])
