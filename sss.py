@@ -1,5 +1,5 @@
 #######
-# V75 #
+# V76 #
 #######
 
 import time
@@ -309,88 +309,88 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
             if return_value and not research_mode: print('                            Skipping net_income_to_common_shareholders: {}'.format(stock_data.net_income_to_common_shareholders))
             if return_value: return_value = False
 
+        if build_csv_db:
+            if return_value:
+                if stock_data.shares_outstanding and stock_data.net_income_to_common_shareholders is not None: stock_data.nitcsh_to_shares_outstanding = float(stock_data.net_income_to_common_shareholders) / float(stock_data.shares_outstanding)
+                if stock_data.num_employees      and stock_data.net_income_to_common_shareholders is not None: stock_data.nitcsh_to_num_employees      = float(stock_data.net_income_to_common_shareholders) / float(stock_data.num_employees)
 
-        if return_value:
-            if stock_data.shares_outstanding and stock_data.net_income_to_common_shareholders is not None: stock_data.nitcsh_to_shares_outstanding = float(stock_data.net_income_to_common_shareholders) / float(stock_data.shares_outstanding)
-            if stock_data.num_employees      and stock_data.net_income_to_common_shareholders is not None: stock_data.nitcsh_to_num_employees      = float(stock_data.net_income_to_common_shareholders) / float(stock_data.num_employees)
+                max_profit_margin_effective       = max(stock_data.profit_margin, stock_data.annualized_profit_margin)  # ** 2
+                earnings_qgrowth_factor_effective = (1 + stock_data.earnings_quarterly_growth)  # ** 2
 
-            max_profit_margin_effective       = max(stock_data.profit_margin, stock_data.annualized_profit_margin)  # ** 2
-            earnings_qgrowth_factor_effective = (1 + stock_data.earnings_quarterly_growth)  # ** 2
+                if max_profit_margin_effective and earnings_qgrowth_factor_effective and stock_data.price_to_earnings_to_growth_ratio > 0 and stock_data.trailing_price_to_earnings is not None and stock_data.enterprise_value_to_ebitda is not None:
+                    stock_data.sss_value     = float(((stock_data.evr_effective                                                                                ) / (max_profit_margin_effective                                       )) * (stock_data.sqrt_peg_ratio / earnings_qgrowth_factor_effective))  # The lower  the better
+                    stock_data.ssss_value    = float(((stock_data.evr_effective * stock_data.trailing_price_to_earnings                                        ) / (max_profit_margin_effective                                       )) * (stock_data.sqrt_peg_ratio / earnings_qgrowth_factor_effective))  # the lower  the better
+                    stock_data.sssss_value   = float(((stock_data.evr_effective * stock_data.trailing_price_to_earnings * stock_data.enterprise_value_to_ebitda) / (max_profit_margin_effective                                       )) * (stock_data.sqrt_peg_ratio / earnings_qgrowth_factor_effective))  # the lower  the better
 
-            if max_profit_margin_effective and earnings_qgrowth_factor_effective and stock_data.price_to_earnings_to_growth_ratio > 0 and stock_data.trailing_price_to_earnings is not None and stock_data.enterprise_value_to_ebitda is not None:
-                stock_data.sss_value     = float(((stock_data.evr_effective                                                                                ) / (max_profit_margin_effective                                       )) * (stock_data.sqrt_peg_ratio / earnings_qgrowth_factor_effective))  # The lower  the better
-                stock_data.ssss_value    = float(((stock_data.evr_effective * stock_data.trailing_price_to_earnings                                        ) / (max_profit_margin_effective                                       )) * (stock_data.sqrt_peg_ratio / earnings_qgrowth_factor_effective))  # the lower  the better
-                stock_data.sssss_value   = float(((stock_data.evr_effective * stock_data.trailing_price_to_earnings * stock_data.enterprise_value_to_ebitda) / (max_profit_margin_effective                                       )) * (stock_data.sqrt_peg_ratio / earnings_qgrowth_factor_effective))  # the lower  the better
+                    stock_data.ssse_value    = float(stock_data.nitcsh_to_num_employees / stock_data.sss_value  )                                                                                                                                                                                          # the higher the better
+                    stock_data.sssse_value   = float(stock_data.nitcsh_to_num_employees / stock_data.ssss_value )                                                                                                                                                                                          # the higher the better
+                    stock_data.ssssse_value  = float(stock_data.nitcsh_to_num_employees / stock_data.sssss_value)                                                                                                                                                                                          # the higher the better
 
-                stock_data.ssse_value    = float(stock_data.nitcsh_to_num_employees / stock_data.sss_value  )                                                                                                                                                                                          # the higher the better
-                stock_data.sssse_value   = float(stock_data.nitcsh_to_num_employees / stock_data.ssss_value )                                                                                                                                                                                          # the higher the better
-                stock_data.ssssse_value  = float(stock_data.nitcsh_to_num_employees / stock_data.sssss_value)                                                                                                                                                                                          # the higher the better
+                    stock_data.sssi_value    = float(((stock_data.evr_effective                                                                                ) / (max_profit_margin_effective * stock_data.held_percent_institutions)) * (stock_data.sqrt_peg_ratio / earnings_qgrowth_factor_effective))  # The lower  the better
+                    stock_data.ssssi_value   = float(((stock_data.evr_effective * stock_data.trailing_price_to_earnings                                        ) / (max_profit_margin_effective * stock_data.held_percent_institutions)) * (stock_data.sqrt_peg_ratio / earnings_qgrowth_factor_effective))  # the lower  the better
+                    stock_data.sssssi_value  = float(((stock_data.evr_effective * stock_data.trailing_price_to_earnings * stock_data.enterprise_value_to_ebitda) / (max_profit_margin_effective * stock_data.held_percent_institutions)) * (stock_data.sqrt_peg_ratio / earnings_qgrowth_factor_effective))  # the lower  the better
 
-                stock_data.sssi_value    = float(((stock_data.evr_effective                                                                                ) / (max_profit_margin_effective * stock_data.held_percent_institutions)) * (stock_data.sqrt_peg_ratio / earnings_qgrowth_factor_effective))  # The lower  the better
-                stock_data.ssssi_value   = float(((stock_data.evr_effective * stock_data.trailing_price_to_earnings                                        ) / (max_profit_margin_effective * stock_data.held_percent_institutions)) * (stock_data.sqrt_peg_ratio / earnings_qgrowth_factor_effective))  # the lower  the better
-                stock_data.sssssi_value  = float(((stock_data.evr_effective * stock_data.trailing_price_to_earnings * stock_data.enterprise_value_to_ebitda) / (max_profit_margin_effective * stock_data.held_percent_institutions)) * (stock_data.sqrt_peg_ratio / earnings_qgrowth_factor_effective))  # the lower  the better
+                    stock_data.sssei_value   = float(stock_data.nitcsh_to_num_employees / stock_data.sssi_value  )                                                                                                                                                                                         # the higher the better
+                    stock_data.ssssei_value  = float(stock_data.nitcsh_to_num_employees / stock_data.ssssi_value )                                                                                                                                                                                         # the higher the better
+                    stock_data.sssssei_value = float(stock_data.nitcsh_to_num_employees / stock_data.sssssi_value)                                                                                                                                                                                         # the higher the better
+                else:
+                    stock_data.sss_value     = BAD_SSS
+                    stock_data.ssss_value    = BAD_SSS
+                    stock_data.sssss_value   = BAD_SSS
+                    stock_data.ssse_value    = BAD_SSSE
+                    stock_data.sssse_value   = BAD_SSSE
+                    stock_data.ssssse_value  = BAD_SSSE
+                    stock_data.sssi_value    = BAD_SSS
+                    stock_data.ssssi_value   = BAD_SSS
+                    stock_data.sssssi_value  = BAD_SSS
+                    stock_data.sssei_value   = BAD_SSSE
+                    stock_data.ssssei_value  = BAD_SSSE
+                    stock_data.sssssei_value = BAD_SSSE
 
-                stock_data.sssei_value   = float(stock_data.nitcsh_to_num_employees / stock_data.sssi_value  )                                                                                                                                                                                         # the higher the better
-                stock_data.ssssei_value  = float(stock_data.nitcsh_to_num_employees / stock_data.ssssi_value )                                                                                                                                                                                         # the higher the better
-                stock_data.sssssei_value = float(stock_data.nitcsh_to_num_employees / stock_data.sssssi_value)                                                                                                                                                                                         # the higher the better
+                # Rounding to non-None values + set None values to 0 for simplicity:
+                if stock_data.sss_value                         is not None: stock_data.sss_value                         = round(stock_data.sss_value,                         NUM_ROUND_DECIMALS)
+                if stock_data.ssss_value                        is not None: stock_data.ssss_value                        = round(stock_data.ssss_value,                        NUM_ROUND_DECIMALS)
+                if stock_data.sssss_value                       is not None: stock_data.sssss_value                       = round(stock_data.sssss_value,                       NUM_ROUND_DECIMALS)
+                if stock_data.ssse_value                        is not None: stock_data.ssse_value                        = round(stock_data.ssse_value,                        NUM_ROUND_DECIMALS)
+                if stock_data.sssse_value                       is not None: stock_data.sssse_value                       = round(stock_data.sssse_value,                       NUM_ROUND_DECIMALS)
+                if stock_data.ssssse_value                      is not None: stock_data.ssssse_value                      = round(stock_data.ssssse_value,                      NUM_ROUND_DECIMALS)
+                if stock_data.sssi_value                        is not None: stock_data.sssi_value                        = round(stock_data.sssi_value,                        NUM_ROUND_DECIMALS)
+                if stock_data.ssssi_value                       is not None: stock_data.ssssi_value                       = round(stock_data.ssssi_value,                       NUM_ROUND_DECIMALS)
+                if stock_data.sssssi_value                      is not None: stock_data.sssssi_value                      = round(stock_data.sssssi_value,                      NUM_ROUND_DECIMALS)
+                if stock_data.sssei_value                       is not None: stock_data.sssei_value                       = round(stock_data.sssei_value,                       NUM_ROUND_DECIMALS)
+                if stock_data.ssssei_value                      is not None: stock_data.ssssei_value                      = round(stock_data.ssssei_value,                      NUM_ROUND_DECIMALS)
+                if stock_data.sssssei_value                     is not None: stock_data.sssssei_value                     = round(stock_data.sssssei_value,                     NUM_ROUND_DECIMALS)
+                if stock_data.enterprise_value_to_revenue       is not None: stock_data.enterprise_value_to_revenue       = round(stock_data.enterprise_value_to_revenue,       NUM_ROUND_DECIMALS)
+                if stock_data.evr_effective                     is not None: stock_data.evr_effective                     = round(stock_data.evr_effective,                     NUM_ROUND_DECIMALS)
+                if stock_data.trailing_price_to_earnings        is not None: stock_data.trailing_price_to_earnings        = round(stock_data.trailing_price_to_earnings,        NUM_ROUND_DECIMALS)
+                if stock_data.enterprise_value_to_ebitda        is not None: stock_data.enterprise_value_to_ebitda        = round(stock_data.enterprise_value_to_ebitda,        NUM_ROUND_DECIMALS)
+                if stock_data.profit_margin                     is not None: stock_data.profit_margin                     = round(stock_data.profit_margin,                     NUM_ROUND_DECIMALS)
+                if stock_data.annualized_profit_margin          is not None: stock_data.annualized_profit_margin          = round(stock_data.annualized_profit_margin,          NUM_ROUND_DECIMALS)
+                if stock_data.held_percent_institutions         is not None: stock_data.held_percent_institutions         = round(stock_data.held_percent_institutions,         NUM_ROUND_DECIMALS)
+                if stock_data.forward_eps                       is not None: stock_data.forward_eps                       = round(stock_data.forward_eps,                       NUM_ROUND_DECIMALS)
+                if stock_data.trailing_eps                      is not None: stock_data.trailing_eps                      = round(stock_data.trailing_eps,                      NUM_ROUND_DECIMALS)
+                if stock_data.price_to_book                     is not None: stock_data.price_to_book                     = round(stock_data.price_to_book,                     NUM_ROUND_DECIMALS)
+                if stock_data.shares_outstanding                is not None: stock_data.shares_outstanding                = round(stock_data.shares_outstanding,                NUM_ROUND_DECIMALS)
+                if stock_data.net_income_to_common_shareholders is not None: stock_data.net_income_to_common_shareholders = round(stock_data.net_income_to_common_shareholders, NUM_ROUND_DECIMALS)
+                if stock_data.nitcsh_to_shares_outstanding      is not None: stock_data.nitcsh_to_shares_outstanding      = round(stock_data.nitcsh_to_shares_outstanding,      NUM_ROUND_DECIMALS)
+                if stock_data.num_employees                     is not None: stock_data.num_employees                     = round(stock_data.num_employees,                     NUM_ROUND_DECIMALS)
+                if stock_data.nitcsh_to_num_employees           is not None: stock_data.nitcsh_to_num_employees           = round(stock_data.nitcsh_to_num_employees,           NUM_ROUND_DECIMALS)
+                if stock_data.earnings_quarterly_growth         is not None: stock_data.earnings_quarterly_growth         = round(stock_data.earnings_quarterly_growth,         NUM_ROUND_DECIMALS)
+                if stock_data.price_to_earnings_to_growth_ratio is not None: stock_data.price_to_earnings_to_growth_ratio = round(stock_data.price_to_earnings_to_growth_ratio, NUM_ROUND_DECIMALS)
+                if stock_data.sqrt_peg_ratio                    is not None: stock_data.sqrt_peg_ratio                    = round(stock_data.sqrt_peg_ratio,                    NUM_ROUND_DECIMALS)
             else:
-                stock_data.sss_value     = BAD_SSS
-                stock_data.ssss_value    = BAD_SSS
-                stock_data.sssss_value   = BAD_SSS
+                stock_data.sss_value     = BAD_SSSE
+                stock_data.ssss_value    = BAD_SSSE
+                stock_data.sssss_value   = BAD_SSSE
                 stock_data.ssse_value    = BAD_SSSE
                 stock_data.sssse_value   = BAD_SSSE
                 stock_data.ssssse_value  = BAD_SSSE
                 stock_data.sssi_value    = BAD_SSS
                 stock_data.ssssi_value   = BAD_SSS
                 stock_data.sssssi_value  = BAD_SSS
-                stock_data.sssei_value   = BAD_SSSE
-                stock_data.ssssei_value  = BAD_SSSE
-                stock_data.sssssei_value = BAD_SSSE
-
-            # Rounding to non-None values + set None values to 0 for simplicity:
-            if stock_data.sss_value                         is not None: stock_data.sss_value                         = round(stock_data.sss_value,                         NUM_ROUND_DECIMALS)
-            if stock_data.ssss_value                        is not None: stock_data.ssss_value                        = round(stock_data.ssss_value,                        NUM_ROUND_DECIMALS)
-            if stock_data.sssss_value                       is not None: stock_data.sssss_value                       = round(stock_data.sssss_value,                       NUM_ROUND_DECIMALS)
-            if stock_data.ssse_value                        is not None: stock_data.ssse_value                        = round(stock_data.ssse_value,                        NUM_ROUND_DECIMALS)
-            if stock_data.sssse_value                       is not None: stock_data.sssse_value                       = round(stock_data.sssse_value,                       NUM_ROUND_DECIMALS)
-            if stock_data.ssssse_value                      is not None: stock_data.ssssse_value                      = round(stock_data.ssssse_value,                      NUM_ROUND_DECIMALS)
-            if stock_data.sssi_value                        is not None: stock_data.sssi_value                        = round(stock_data.sssi_value,                        NUM_ROUND_DECIMALS)
-            if stock_data.ssssi_value                       is not None: stock_data.ssssi_value                       = round(stock_data.ssssi_value,                       NUM_ROUND_DECIMALS)
-            if stock_data.sssssi_value                      is not None: stock_data.sssssi_value                      = round(stock_data.sssssi_value,                      NUM_ROUND_DECIMALS)
-            if stock_data.sssei_value                       is not None: stock_data.sssei_value                       = round(stock_data.sssei_value,                       NUM_ROUND_DECIMALS)
-            if stock_data.ssssei_value                      is not None: stock_data.ssssei_value                      = round(stock_data.ssssei_value,                      NUM_ROUND_DECIMALS)
-            if stock_data.sssssei_value                     is not None: stock_data.sssssei_value                     = round(stock_data.sssssei_value,                     NUM_ROUND_DECIMALS)
-            if stock_data.enterprise_value_to_revenue       is not None: stock_data.enterprise_value_to_revenue       = round(stock_data.enterprise_value_to_revenue,       NUM_ROUND_DECIMALS)
-            if stock_data.evr_effective                     is not None: stock_data.evr_effective                     = round(stock_data.evr_effective,                     NUM_ROUND_DECIMALS)
-            if stock_data.trailing_price_to_earnings        is not None: stock_data.trailing_price_to_earnings        = round(stock_data.trailing_price_to_earnings,        NUM_ROUND_DECIMALS)
-            if stock_data.enterprise_value_to_ebitda        is not None: stock_data.enterprise_value_to_ebitda        = round(stock_data.enterprise_value_to_ebitda,        NUM_ROUND_DECIMALS)
-            if stock_data.profit_margin                     is not None: stock_data.profit_margin                     = round(stock_data.profit_margin,                     NUM_ROUND_DECIMALS)
-            if stock_data.annualized_profit_margin          is not None: stock_data.annualized_profit_margin          = round(stock_data.annualized_profit_margin,          NUM_ROUND_DECIMALS)
-            if stock_data.held_percent_institutions         is not None: stock_data.held_percent_institutions         = round(stock_data.held_percent_institutions,         NUM_ROUND_DECIMALS)
-            if stock_data.forward_eps                       is not None: stock_data.forward_eps                       = round(stock_data.forward_eps,                       NUM_ROUND_DECIMALS)
-            if stock_data.trailing_eps                      is not None: stock_data.trailing_eps                      = round(stock_data.trailing_eps,                      NUM_ROUND_DECIMALS)
-            if stock_data.price_to_book                     is not None: stock_data.price_to_book                     = round(stock_data.price_to_book,                     NUM_ROUND_DECIMALS)
-            if stock_data.shares_outstanding                is not None: stock_data.shares_outstanding                = round(stock_data.shares_outstanding,                NUM_ROUND_DECIMALS)
-            if stock_data.net_income_to_common_shareholders is not None: stock_data.net_income_to_common_shareholders = round(stock_data.net_income_to_common_shareholders, NUM_ROUND_DECIMALS)
-            if stock_data.nitcsh_to_shares_outstanding      is not None: stock_data.nitcsh_to_shares_outstanding      = round(stock_data.nitcsh_to_shares_outstanding,      NUM_ROUND_DECIMALS)
-            if stock_data.num_employees                     is not None: stock_data.num_employees                     = round(stock_data.num_employees,                     NUM_ROUND_DECIMALS)
-            if stock_data.nitcsh_to_num_employees           is not None: stock_data.nitcsh_to_num_employees           = round(stock_data.nitcsh_to_num_employees,           NUM_ROUND_DECIMALS)
-            if stock_data.earnings_quarterly_growth         is not None: stock_data.earnings_quarterly_growth         = round(stock_data.earnings_quarterly_growth,         NUM_ROUND_DECIMALS)
-            if stock_data.price_to_earnings_to_growth_ratio is not None: stock_data.price_to_earnings_to_growth_ratio = round(stock_data.price_to_earnings_to_growth_ratio, NUM_ROUND_DECIMALS)
-            if stock_data.sqrt_peg_ratio                    is not None: stock_data.sqrt_peg_ratio                    = round(stock_data.sqrt_peg_ratio,                    NUM_ROUND_DECIMALS)
-        else:
-            stock_data.sss_value     = BAD_SSSE
-            stock_data.ssss_value    = BAD_SSSE
-            stock_data.sssss_value   = BAD_SSSE
-            stock_data.ssse_value    = BAD_SSSE
-            stock_data.sssse_value   = BAD_SSSE
-            stock_data.ssssse_value  = BAD_SSSE
-            stock_data.sssi_value    = BAD_SSS
-            stock_data.ssssi_value   = BAD_SSS
-            stock_data.sssssi_value  = BAD_SSS
-            stock_data.sssei_value   = BAD_SSS
-            stock_data.ssssei_value  = BAD_SSS
-            stock_data.sssssei_value = BAD_SSS
+                stock_data.sssei_value   = BAD_SSS
+                stock_data.ssssei_value  = BAD_SSS
+                stock_data.sssssei_value = BAD_SSS
 
 
         if build_csv_db:
@@ -1000,7 +1000,7 @@ def sss_run(sectors_list, build_csv_db_only, build_csv_db, csv_db_path, read_uni
         list_len = len(sorted_list_sssss)
         if appearance_counter_min <= list_len and list_len <= appearance_counter_max:
             for row in sorted_list_sssss:
-                appearance_counter_dict[(row[0],row[1])] = appearance_counter_dict[(row[0],row[1])]+1.0/float(list_len)
+                appearance_counter_dict[(row[0],row[1],row[2],row[5])] = appearance_counter_dict[(row[0],row[1],row[2],row[5])]+1.0/float(list_len)
 
     sorted_lists_list = [
         sorted_list_db,
