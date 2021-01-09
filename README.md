@@ -1,6 +1,9 @@
 # sss
 Sure Stock Scanner: A yfinance+investpy combined-based Stock Scanner for the Israeli and US Stock Markets
 
+# SSS Core Equation
+http://bit.ly/SssCoreEquation
+
 # Setup
 - No steps requried apart from pip-installing relevant libraries
 - Note that for yfinance - I'm providing updated sources since they take time to update by the developers, 
@@ -17,6 +20,6 @@ Sure Stock Scanner: A yfinance+investpy combined-based Stock Scanner for the Isr
 - This Stock Screener/Scanner shall only provide reccomendations
 - Buying the reccommended stocks is at your own risk
 - Study the companies reccommended - read their financial reports, and only then decide if and how much to buy
-- Good luck and you are welcome to contrigute to this project:
+- Good luck and you are welcome to contribute to this project:
   - Add other contries stocks, for instance
   - Past reccomendations and present results - for proving that the model works
