@@ -23,3 +23,8 @@ http://bit.ly/SssCoreEquation
 - Good luck and you are welcome to contribute to this project:
   - Add other contries stocks, for instance
   - Past reccomendations and present results - for proving that the model works
+
+# yfinance.7z Usage
+- `yfinance` is a known library which this scanner uses
+- Several Bugs were found upon examining the code of `yfinance`, and I have created pull requests for those.
+- For simplicity, unzip `yfinance.7z` and beyond[or other comparison software]-compare it with the official [`pip3` it] one, and take the changes provided within this library's `yfinance.7z`.
