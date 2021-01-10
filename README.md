@@ -19,7 +19,7 @@ http://bit.ly/SssCoreEquation
 # Indices Maintenance (Once per month)
 - Download TASE latest components via https://info.tase.co.il/eng/MarketData/Stocks/MarketData/Pages/MarketData.aspx into `Indices/Data_TASE.csv`
 - Download NASDAQ100 latest components via https://www.barchart.com/stocks/quotes/$IUXX/components?viewName=main or https://www.nasdaq.com/market-activity/quotes/nasdaq-ndx-index into `Indices/nasdaq100-components.csv`
-- Download Russel1000 latest components via https://www.barchart.com/stocks/indices/russell/russell1000 into `russell-1000-index.csv`
+- Download Russel1000 latest components via https://www.barchart.com/stocks/indices/russell/russell1000 or https://en.wikipedia.org/wiki/Russell_1000_Index into `russell-1000-index.csv`
 - Download NASDAQ latest components via ftp://ftp.nasdaqtrader.com/symboldirectory/ into `Indices/nasdaqlisted.csv`
 - Download NASDAQ Other Listed components via ftp://ftp.nasdaqtrader.com/symboldirectory/ into `Indices/otherlisted.csv`
 
