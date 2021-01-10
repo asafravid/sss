@@ -20,8 +20,8 @@ http://bit.ly/SssCoreEquation
 - Download TASE latest components via https://info.tase.co.il/eng/MarketData/Stocks/MarketData/Pages/MarketData.aspx into `Indices/Data_TASE.csv`
 - Download NASDAQ100 latest components via https://www.barchart.com/stocks/quotes/$IUXX/components?viewName=main into `Indices/nasdaq100-components.csv`
 - Download Russel1000 latest components via https://www.barchart.com/stocks/indices/russell/russell1000 into `russell-1000-index.csv`
-- Download NASDAQ latest components via [ftp.nasdaqtrader.com/SymbolDirectory/nasdaqlisted.txt into](ftp.nasdaqtrader.com/SymbolDirectory/nasdaqlisted.txt) `Indices/nasdaqlisted.csv`
-- Download NASDAQ Other Listed components via [ftp.nasdaqtrader.com/SymbolDirectory/otherlisted.txt into](ftp.nasdaqtrader.com/SymbolDirectory/otherlisted.txt) `Indices/otherlisted.csv`
+- Download NASDAQ latest components via [ftp.nasdaqtrader.com/SymbolDirectory/nasdaqlisted.txt into](ftp://ftp.nasdaqtrader.com/SymbolDirectory/nasdaqlisted.txt) `Indices/nasdaqlisted.csv`
+- Download NASDAQ Other Listed components via [ftp.nasdaqtrader.com/SymbolDirectory/otherlisted.txt into](ftp://ftp.nasdaqtrader.com/SymbolDirectory/otherlisted.txt) `Indices/otherlisted.csv`
 
 # Make your analysis before buying the reccommended stocks
 - This Stock Screener/Scanner shall only provide reccomendations
