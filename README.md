@@ -1,4 +1,4 @@
-# sss
+# SSS Overview
 Sure Stock Scanner: A yfinance+investpy combined-based Stock Scanner for the Israeli and US Stock Markets
 
 # SSS Core Equation
@@ -15,6 +15,13 @@ http://bit.ly/SssCoreEquation
 - 2: A result folder shall be created under `Results` Folder
 - 3: Run research mode, selecting profit margin (`pm`) Enterprise value to Revenue Ratio ('evr') scanning parameters (just use the defaults - they are fine)
 - 4: Reccomendation list shall appear in the result folder fed to the Research Mode
+
+# Indices Maintenance (Once per month)
+- Download TASE latest components via https://info.tase.co.il/eng/MarketData/Stocks/MarketData/Pages/MarketData.aspx into `Indices/Data_TASE.csv`
+- Download NASDAQ100 latest components via https://www.barchart.com/stocks/quotes/$IUXX/components?viewName=main into `Indices/nasdaq100-components.csv`
+- Download Russel1000 latest components via https://www.barchart.com/stocks/indices/russell/russell1000 into `russell-1000-index.csv`
+- Download NASDAQ latest components via ftp.nasdaqtrader.com/SymbolDirectory/nasdaqlisted.txt into `Indices/nasdaqlisted.csv`
+- Download NASDAQ Other Listed components via ftp.nasdaqtrader.com/SymbolDirectory/otherlisted.txt into `Indices/otherlisted.csv`
 
 # Make your analysis before buying the reccommended stocks
 - This Stock Screener/Scanner shall only provide reccomendations
