@@ -1,5 +1,5 @@
 # SSS Overview
-Sure Stock Scanner: A yfinance+investpy combined-based Stock Scanner for the Israeli and US Stock Markets
+ Stock Scanner & Screener: A yfinance+investpy combined-based Stock Scanner & Screener for the Israeli and US Stock Markets (Extendable to other stock markets as well)
 
 # SSS Core Equation
 http://bit.ly/SssCoreEquation
