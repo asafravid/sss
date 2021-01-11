@@ -5,7 +5,11 @@
 http://bit.ly/SssCoreEquation
 
 # Setup
-- No steps requried apart from pip-installing relevant libraries
+- No steps requried apart from `pip3` installing relevant libraries:
+  - `cd <[path to]Python 3.7>`
+  - `pip3 install pandas`
+  - `pip3 install yfinance`
+  - `pip3 install investpy`
 - Note that for yfinance - I'm providing updated sources since they take time to update by the developers, 
   and my forks are, well - mine, and I prefer one to pip install yfinance from the origin, and then update 
   (using comparison SW) the necessary changes I made (not too many) to run the SSS smoothly and gracefuly.
