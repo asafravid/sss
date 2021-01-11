@@ -31,13 +31,11 @@ http://bit.ly/SssCoreEquation
 - Download NASDAQ latest components via ftp://ftp.nasdaqtrader.com/symboldirectory/ into `Indices/nasdaqlisted.csv`
 - Download NASDAQ Other Listed components via ftp://ftp.nasdaqtrader.com/symboldirectory/ into `Indices/otherlisted.csv`
 
-# Make your analysis before buying the reccommended stocks
+# Disclaimer
+- Make your analysis before buying the reccommended stocks
 - This Stock Screener/Scanner shall only provide reccomendations
 - Buying the reccommended stocks is at your own risk
 - Study the companies reccommended - read their financial reports, and only then decide if and how much to buy
-- Good luck and you are welcome to contribute to this project:
-  - Add other contries stocks, for instance
-  - Past reccomendations and present results - for proving that the model works
 
 # yfinance.7z Usage
 - `yfinance` is a known library which this scanner uses
@@ -47,3 +45,9 @@ http://bit.ly/SssCoreEquation
 # Understanding and Verifying Units of yfinance parameters
 - Units can compared to https://www.macroaxis.com/stock-analysis/CMRE/Costamare (i.e. CMRE can be replaced for any stock ticker/symbol)
 - Use case: `CMRE`'s `yfinance` `earningsQuarterlyGrowth` is `-0.298`, and website shows `-29.80%` so the match yields that `yfinance` reports in direct ratio (not `%`)
+
+# Looking Forward for Contributions
+- Good luck and you are welcome to contribute to this project:
+  - Add other contries' stocks
+  - Past reccomendations and present results - for proving that the model works
+  - Multi-Dimentional Big Data research mode (scan over `EQG`s, etc)
