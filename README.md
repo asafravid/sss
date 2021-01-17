@@ -29,6 +29,9 @@ http://bit.ly/SssBigDataAnalysis
 - 3: Run research mode, selecting profit margin (`pm`) Enterprise value to Revenue Ratio (`evr`) scanning parameters (just use the defaults - they are fine)
 - 4: Reccomendation list shall appear in the result folder fed to the Research Mode
 
+# Track Your Investments - Reference Sheet
+http://bit.ly/SssResultsInvestmentTracking
+
 # Indices Maintenance (Once per month)
 - Download TASE latest components via https://info.tase.co.il/eng/MarketData/Stocks/MarketData/Pages/MarketData.aspx into `Indices/Data_TASE.csv`
 - Download NASDAQ100 latest components via https://www.barchart.com/stocks/quotes/$IUXX/components?viewName=main or https://www.nasdaq.com/market-activity/quotes/nasdaq-ndx-index into `Indices/nasdaq100-components.csv`
