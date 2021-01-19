@@ -59,3 +59,4 @@ http://bit.ly/SssResultsInvestmentTracking
   - Add other contries' stocks
   - Past reccomendations and present results - for proving that the model works
   - Multi-Dimentional Big Data research mode (scan over `EQG`s, etc)
+  - For any questions / issues / suggestions: You can reach me here: asaf.rvd@gmail.com
