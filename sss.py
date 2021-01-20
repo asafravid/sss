@@ -1,5 +1,5 @@
 #################################################
-# V83 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# V84 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #################################################
 
 import time
@@ -573,7 +573,7 @@ def sss_run(sectors_list, build_csv_db_only, build_csv_db, csv_db_path, read_uni
     if not research_mode: profit_margin_limit               = round((0.17 + 0.07 * read_united_states_input_symbols) / (1 + 2 * tase_mode), NUM_ROUND_DECIMALS)
     # ev_to_cfo_ratio_limit                                   = 100  # TODO: ASAFR: Multi-dimentional checks requried here as well
     earnings_quarterly_growth_min                           = 0.01-0.125*tase_mode       # The earnings can decrease by 1/4, but there is still a requirement that price_to_earnings_to_growth_ratio > 0
-    earnings_quarterly_growth_unknown                       = earnings_quarterly_growth_min  # TODO: ASAFR: 1. Set to earnings_quarterly_growth_min/2 and test/check. 2. Scan (like pm and ever) values of earnings_quarterly_growth for big data research better reccomendations
+    earnings_quarterly_growth_unknown                       = earnings_quarterly_growth_min  # TODO: ASAFR: 1. Set to earnings_quarterly_growth_min/2 and test/check. 2. Scan (like pm and ever) values of earnings_quarterly_growth for big data research better recommendations
     if not research_mode: enterprise_value_to_revenue_limit = 17.5 - 2.5 * read_united_states_input_symbols - 2.5 * tase_mode                    # Higher than that is too expensive
 
     if len(sectors_list):
