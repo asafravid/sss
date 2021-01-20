@@ -28,6 +28,7 @@ http://bit.ly/SssBigDataAnalysis
 - 2: A result folder shall be created under `Results` Folder
 - 3: Run research mode, selecting profit margin (`pm`) Enterprise value to Revenue Ratio (`evr`) scanning parameters (just use the defaults - they are fine)
 - 4: Reccomendation list shall appear in the result folder fed to the Research Mode
+- 5: Optional (and recommended) - Run `diff` module (`sss_diff.run()`) to observe differnces (new/removed/moved up/down stocks) from last run
 
 # Track Your Investments - Reference Sheet
 http://bit.ly/SssResultsInvestmentTracking
