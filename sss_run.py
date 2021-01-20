@@ -1,13 +1,13 @@
 #################################################
-# V20 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# V21 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #################################################
 
 
 import sss
 import numpy as np
-import time
 import csv
 import os
+import sss_diff
 
 
 
@@ -20,7 +20,7 @@ import os
 
 # Run Build DB Only: All/Others
 # =============================
-sss.sss_run(sectors_list=[], build_csv_db_only=1, build_csv_db=1, csv_db_path='None', read_united_states_input_symbols=1, tase_mode=0, num_threads=20, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.10, ev_to_cfo_ratio_limit = 100.0, best_n_select=3, enterprise_value_to_revenue_limit=20, generate_result_folders=1)
+# sss.sss_run(sectors_list=[], build_csv_db_only=1, build_csv_db=1, csv_db_path='None', read_united_states_input_symbols=1, tase_mode=0, num_threads=20, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.10, ev_to_cfo_ratio_limit = 100.0, best_n_select=3, enterprise_value_to_revenue_limit=20, generate_result_folders=1)
 
 # Run Build DB Only: TASE
 # =============================
@@ -84,14 +84,14 @@ def research_db(min_evr, max_evr, pm_min, pm_max, csv_db_path, read_united_state
     sorted_appearance_counter_dict_sssss        = {k: v for k, v in sorted(appearance_counter_dict_sssss.items(), key=lambda item: item[1], reverse=True)}
     result_sorted_appearance_counter_dict_sssss = {k: v for k, v in sorted_appearance_counter_dict_sssss.items() if v > 0.0}
 
-    reccomendation_list_filename_ssss = csv_db_path+'/reccomendation_ssss_'+results_filename.replace('results_','')
-    with open(reccomendation_list_filename_ssss, 'w') as f:
+    recommendation_list_filename_ssss = csv_db_path+'/recommendation_ssss_'+results_filename.replace('results_','')
+    with open(recommendation_list_filename_ssss, 'w') as f:
         f.write("Ticker,Name,Sector,ssss_value,appearance_counter\n")
         for key in result_sorted_appearance_counter_dict_ssss.keys():
             f.write("%s,%s,%s,%s,%s\n"%(key[0],str(key[1]).replace(',',' '),key[2],key[3],result_sorted_appearance_counter_dict_ssss[key]))
 
-    reccomendation_list_filename_sssss = csv_db_path+'/reccomendation_sssss_'+results_filename.replace('results_','')
-    with open(reccomendation_list_filename_sssss, 'w') as f:
+    recommendation_list_filename_sssss = csv_db_path+'/recommendation_sssss_'+results_filename.replace('results_','')
+    with open(recommendation_list_filename_sssss, 'w') as f:
         f.write("Ticker,Name,Sector,sssss_value,appearance_counter\n")
         for key in result_sorted_appearance_counter_dict_sssss.keys():
             f.write("%s,%s,%s,%s,%s\n"%(key[0],str(key[1]).replace(',',' '),key[2],key[3],result_sorted_appearance_counter_dict_sssss[key]))
@@ -109,7 +109,12 @@ def research_db(min_evr, max_evr, pm_min, pm_max, csv_db_path, read_united_state
 
 # ALL:
 # ====
-# research_db(min_evr=1, max_evr=45, pm_min=5, pm_max=45, csv_db_path='Results/20210111-231110_FavorTechBy3_All_MCap_pm0.24_evr15.0_BuildDb_nResults8724',  read_united_states_input_symbols=1, tase_mode=0, generate_result_folders=0, appearance_counter_min=20, appearance_counter_max=40)
+# research_db(min_evr=1, max_evr=55, pm_min=5, pm_max=45, csv_db_path='Results/20210117-150719_FavorTechBy3_All_MCap_pm0.24_evr15.0_BuildDb_nResults6501',  read_united_states_input_symbols=1, tase_mode=0, generate_result_folders=0, appearance_counter_min=5, appearance_counter_max=55)
+sss_diff.run(newer_path='Results/20210117-150719_FavorTechBy3_All_MCap_pm0.24_evr15.0_BuildDb_nResults6501', older_path='Results/20210111-231110_FavorTechBy3_All_MCap_pm0.24_evr15.0_BuildDb_nResults8724', db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=3, newer_rec=[1,55,5,45], older_rec=[1,45,5,45], rec_length=60)
 
-# Generate SSSSS ALL:
-# research_db(min_evr=12, max_evr=12, pm_min=36, pm_max=36, csv_db_path='Results/20210111-231110_FavorTechBy3_All_MCap_pm0.24_evr15.0_BuildDb_nResults8724',  read_united_states_input_symbols=1, tase_mode=0, generate_result_folders=1, appearance_counter_min=20, appearance_counter_max=40)
+# Generate ALL:
+# research_db(min_evr=7, max_evr=7, pm_min=32, pm_max=32, csv_db_path='Results/20210117-150719_FavorTechBy3_All_MCap_pm0.24_evr15.0_BuildDb_nResults6501',  read_united_states_input_symbols=1, tase_mode=0, generate_result_folders=1, appearance_counter_min=20, appearance_counter_max=40)
+
+
+# Comparisons:
+# sss_diff.run(newer_path='', older_path='', db_exists_in_both_folders=1, ticker_index=0, name_index=1, movement_threshold=3, rec_pm_min=1, rec_ever_max=55, rec_pm_min=5, rec_pm_max=45)
