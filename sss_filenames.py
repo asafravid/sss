@@ -1,3 +1,6 @@
+#################################################
+# V44 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+#################################################
 
 def create_filenames_list(date_and_time):
     filename_csv_db                     = "{}/db.csv".format(date_and_time)
