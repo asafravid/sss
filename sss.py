@@ -1,5 +1,5 @@
 #################################################
-# V84 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# V85 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #################################################
 
 import time
@@ -581,14 +581,15 @@ def sss_run(sectors_list, build_csv_db_only, build_csv_db, csv_db_path, read_uni
         profit_margin_limit               /= 3
         ev_to_cfo_ratio_limit             *= 3
 
-    symbols                = []
-    symbols_tase           = []
-    symbols_snp500         = []
-    symbols_nasdaq100      = []
-    symbols_nasdaq_100_csv = []
-    symbols_russel1000     = []
-    symbols_russel1000_csv = []
-    stocks_list_tase       = []
+    symbols                 = []
+    symbols_tase            = []
+    symbols_snp500          = []
+    symbols_snp500_download = []
+    symbols_nasdaq100       = []
+    symbols_nasdaq_100_csv  = []
+    symbols_russel1000      = []
+    symbols_russel1000_csv  = []
+    stocks_list_tase        = []
 
     if not tase_mode and not research_mode:
         payload            = pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies') # There are 2 tables on the Wikipedia page, get the first table
@@ -612,6 +613,21 @@ def sss_run(sectors_list, build_csv_db_only, build_csv_db, csv_db_path, read_uni
                         continue
                     else:
                         symbols_nasdaq_100_csv.append(row[0])
+                        row_index += 1
+
+        # s&p500: https://www.barchart.com/stocks/quotes/$SPX/components
+        symbols_snp500_download_csv = [] # snp500-components.csv
+        symbols_snp500_download_filenames_list = ['Indices/snp500-components.csv']
+        for filename in symbols_snp500_download_filenames_list:
+            with open(filename, mode='r', newline='') as engine:
+                reader = csv.reader(engine, delimiter=',')
+                row_index = 0
+                for row in reader:
+                    if row_index == 0:
+                        row_index += 1
+                        continue
+                    else:
+                        symbols_snp500_download_csv.append(row[0])
                         row_index += 1
 
         symbols_russel1000_wiki = [] # https://en.wikipedia.org/wiki/Russell_1000_Index
@@ -681,7 +697,7 @@ def sss_run(sectors_list, build_csv_db_only, build_csv_db, csv_db_path, read_uni
 
             stocks_list_united_states = investpy.get_stocks_list(country='united states')
 
-        symbols = symbols_snp500 + symbols_nasdaq100 + symbols_nasdaq_100_csv + symbols_russel1000 + symbols_russel1000_csv + symbols_united_states + stocks_list_united_states
+        symbols = symbols_snp500 + symbols_snp500_download + symbols_nasdaq100 + symbols_nasdaq_100_csv + symbols_russel1000 + symbols_russel1000_csv + symbols_united_states + stocks_list_united_states
 
     if not research_mode and tase_mode:
         symbols = symbols_tase + stocks_list_tase
