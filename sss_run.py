@@ -1,5 +1,5 @@
 #################################################
-# V21 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# V22 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #################################################
 
 
@@ -14,8 +14,8 @@ import sss_diff
 # Reuse:
 # sss.sss_run(sectors_list=[], build_csv_db_only=0, build_csv_db=0, csv_db_path='None', read_united_states_input_symbols=0, tase_mode=0, num_threads=1, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.17, ev_to_cfo_ratio_limit = 100.0, best_n_select=50, enterprise_value_to_revenue_limit=15, generate_result_folders=1)
 
-# Run Build DB Only: Nasdaq100/S&P500
-# ===================================
+# Run Build DB Only: Nasdaq100+S&P500+Russel1000
+# ==============================================
 # sss.sss_run(sectors_list=[], build_csv_db_only=1, build_csv_db=1, csv_db_path='None', read_united_states_input_symbols=0, tase_mode=0, num_threads=20, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.12, ev_to_cfo_ratio_limit = 100.0, best_n_select=3, enterprise_value_to_revenue_limit=20, generate_result_folders=1)
 
 # Run Build DB Only: All/Others
@@ -98,19 +98,27 @@ def research_db(min_evr, max_evr, pm_min, pm_max, csv_db_path, read_united_state
 
 # TASE:
 # =====
-# research_db(min_evr=1, max_evr=25, pm_min=5,  pm_max=45, csv_db_path='Results/20210117-021721_Tase_FavorTechBy3_MCap_pm0.0567_evr15.0_BuildDb_nResults438',   read_united_states_input_symbols=0, tase_mode=1, generate_result_folders=0, appearance_counter_min=5, appearance_counter_max=55)
+# old_run = 'Results/20210117-021721_Tase_FavorTechBy3_MCap_pm0.0567_evr15.0_BuildDb_nResults438'
+# new_run = 'Results/20210120-235652_Tase_FavorTechBy3_MCap_pm0.0567_evr15.0_BuildDb_nResults439'
+# research_db(min_evr=1, max_evr=25, pm_min=5,  pm_max=45, csv_db_path=new_run,   read_united_states_input_symbols=0, tase_mode=1, generate_result_folders=0, appearance_counter_min=5, appearance_counter_max=55)
+# sss_diff.run(newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=3, newer_rec=[1,25,5,45], older_rec=[1,25,5,45], rec_length=60)
 
 # NASDAQ100+S&P500+RUSSEL1000:
 # ============================
-# research_db(min_evr=1, max_evr=45, pm_min=5, pm_max=50, csv_db_path='Results/20210116-220250_FavorTechBy3_MCap_pm0.17_evr17.5_BuildDb_nResults1083',         read_united_states_input_symbols=0, tase_mode=0, generate_result_folders=0, appearance_counter_min=5, appearance_counter_max=55)
+# old_run = 'Results/20210116-220250_FavorTechBy3_MCap_pm0.17_evr17.5_BuildDb_nResults1083'
+# new_run = 'Results/20210121-010319_FavorTechBy3_MCap_pm0.17_evr17.5_BuildDb_nResults1092'
+# research_db(min_evr=1, max_evr=45, pm_min=5, pm_max=50, csv_db_path=new_run,         read_united_states_input_symbols=0, tase_mode=0, generate_result_folders=0, appearance_counter_min=5, appearance_counter_max=55)
+# sss_diff.run(newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=3, newer_rec=[1,45,5,50], older_rec=[1,45,5,50], rec_length=60)
 
 # Generate:
 # research_db(min_evr=6, max_evr=6,  pm_min=19, pm_max=19, csv_db_path='Results/20210116-220250_FavorTechBy3_MCap_pm0.17_evr17.5_BuildDb_nResults1083',         read_united_states_input_symbols=0, tase_mode=0, generate_result_folders=1, appearance_counter_min=20, appearance_counter_max=40)
 
 # ALL:
 # ====
-# research_db(min_evr=1, max_evr=55, pm_min=5, pm_max=45, csv_db_path='Results/20210117-150719_FavorTechBy3_All_MCap_pm0.24_evr15.0_BuildDb_nResults6501',  read_united_states_input_symbols=1, tase_mode=0, generate_result_folders=0, appearance_counter_min=5, appearance_counter_max=55)
-sss_diff.run(newer_path='Results/20210117-150719_FavorTechBy3_All_MCap_pm0.24_evr15.0_BuildDb_nResults6501', older_path='Results/20210111-231110_FavorTechBy3_All_MCap_pm0.24_evr15.0_BuildDb_nResults8724', db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=3, newer_rec=[1,55,5,45], older_rec=[1,45,5,45], rec_length=60)
+old_run = 'Results/20210117-150719_FavorTechBy3_All_MCap_pm0.24_evr15.0_BuildDb_nResults6501'
+new_run = 'Results/20210121-085550_FavorTechBy3_All_MCap_pm0.24_evr15.0_BuildDb_nResults6552'
+research_db(min_evr=1, max_evr=55, pm_min=5, pm_max=45, csv_db_path=new_run,  read_united_states_input_symbols=1, tase_mode=0, generate_result_folders=0, appearance_counter_min=5, appearance_counter_max=55)
+sss_diff.run(newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=3, newer_rec=[1,55,5,45], older_rec=[1,55,5,45], rec_length=60)
 
 # Generate ALL:
 # research_db(min_evr=7, max_evr=7, pm_min=32, pm_max=32, csv_db_path='Results/20210117-150719_FavorTechBy3_All_MCap_pm0.24_evr15.0_BuildDb_nResults6501',  read_united_states_input_symbols=1, tase_mode=0, generate_result_folders=1, appearance_counter_min=20, appearance_counter_max=40)
