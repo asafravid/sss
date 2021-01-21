@@ -1,5 +1,5 @@
 #################################################
-# V44 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# V45 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #################################################
 
 
@@ -24,9 +24,9 @@ def run(newer_path, older_path, db_exists_in_both_folders, diff_only_recommendat
     compact_diff_path = diff_path.replace('FavorTechBy3','FTB3').replace('MCap_','').replace('BuildDb_','').replace('nResults','')
     diff_filenames_list  = sss_filenames.create_filenames_list(compact_diff_path)
     #                                                                              evr_min,      evr_max,      pm_min,       pm_max
-    #newer_filenames_list.insert(0,newer_path+'/recommendation_ssss_evr{}-{}_pm{}-{}.csv'.format( newer_rec[0], newer_rec[1], newer_rec[2], newer_rec[3]))
+    newer_filenames_list.insert(0,newer_path+'/recommendation_ssss_evr{}-{}_pm{}-{}.csv'.format( newer_rec[0], newer_rec[1], newer_rec[2], newer_rec[3]))
     newer_filenames_list.insert(0,newer_path+'/recommendation_sssss_evr{}-{}_pm{}-{}.csv'.format(newer_rec[0], newer_rec[1], newer_rec[2], newer_rec[3]))
-    #older_filenames_list.insert(0,older_path+'/recommendation_ssss_evr{}-{}_pm{}-{}.csv'.format( older_rec[0], older_rec[1], older_rec[2], older_rec[3]))
+    older_filenames_list.insert(0,older_path+'/recommendation_ssss_evr{}-{}_pm{}-{}.csv'.format( older_rec[0], older_rec[1], older_rec[2], older_rec[3]))
     older_filenames_list.insert(0,older_path+'/recommendation_sssss_evr{}-{}_pm{}-{}.csv'.format(older_rec[0], older_rec[1], older_rec[2], older_rec[3]))
 
     diff_filenames_list.insert(0,'{}/recommendation.csv'.format(compact_diff_path))
@@ -34,7 +34,7 @@ def run(newer_path, older_path, db_exists_in_both_folders, diff_only_recommendat
     if len(older_filenames_list) != len(newer_filenames_list):
         raise Exception("Different Lengths of lists - Unacceptable")
 
-    if diff_only_recommendation: length_to_iterate = 1
+    if diff_only_recommendation: length_to_iterate = 2  # SSSS and SSSSS
     else:                        length_to_iterate = len(newer_filenames_list)
     for index in range(length_to_iterate):
         if db_exists_in_both_folders == 0 and index == 0: continue
