@@ -1,6 +1,6 @@
-#################################################
-# V85 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
-#################################################
+#########################################################
+# Version 101 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+#########################################################
 
 import time
 import random
@@ -1088,7 +1088,7 @@ def sss_run(sectors_list, build_csv_db_only, build_csv_db, csv_db_path, read_uni
     build_csv_db_only_str = ""
     if tase_mode:                        tase_str              = "_Tase"
     if len(sectors_list):                sectors_str           = '_'+'_'.join(sectors_list)
-    elif FAVOR_TECHNOLOGY_SECTOR_EVR:    sectors_str           = '_FavorTechBy{}'.format(FAVOR_TECHNOLOGY_SECTOR_EVR)
+    elif FAVOR_TECHNOLOGY_SECTOR_EVR:    sectors_str           = 'FTB{}'.format(FAVOR_TECHNOLOGY_SECTOR_EVR)
     if read_united_states_input_symbols: all_str               = '_All'
     if build_csv_db == 0:                csv_db_str            = '_DBR'
     if use_investpy:                     investpy_str          = '_Investpy'

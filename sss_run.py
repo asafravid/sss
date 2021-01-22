@@ -1,6 +1,6 @@
-#################################################
-# V23 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
-#################################################
+#########################################################
+# Version 101 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+#########################################################
 
 
 import sss
@@ -43,22 +43,22 @@ def prepare_appearance_counters_dictionaries(csv_db_path, appearance_counter_dic
                 appearance_counter_dict_sssss[(row[0],row[1],row[2],float(row[5]))] = 0.0  # Symbol, Short Name, Sector, SSSSS Value
 
 
-def research_db(min_evr, max_evr, pm_min, pm_max, csv_db_path, read_united_states_input_symbols, tase_mode, generate_result_folders, appearance_counter_min, appearance_counter_max):
+def research_db(evr_range, pm_range, csv_db_path, read_united_states_input_symbols, tase_mode, generate_result_folders, appearance_counter_min, appearance_counter_max):
     appearance_counter_dict_ssss  = {}
     appearance_counter_dict_sssss = {}
     prepare_appearance_counters_dictionaries(csv_db_path, appearance_counter_dict_ssss, appearance_counter_dict_sssss)
-    research_rows_ssss  = np.zeros( (max_evr-min_evr+1, pm_max-pm_min+1), dtype=int )
-    research_rows_sssss = np.zeros( (max_evr-min_evr+1, pm_max-pm_min+1), dtype=int )
-    for enterprise_value_to_revenue_limit in range(min_evr,max_evr+1):
-        for profit_margin_limit in range(pm_max,pm_min-1,-1):
+    research_rows_ssss  = np.zeros( (evr_range[1]-evr_range[0]+1, pm_range[1]-pm_range[0]+1), dtype=int )
+    research_rows_sssss = np.zeros( (evr_range[1]-evr_range[0]+1, pm_range[1]-pm_range[0]+1), dtype=int )
+    for enterprise_value_to_revenue_limit in range(evr_range[0],evr_range[1]+1):
+        for profit_margin_limit in range(pm_range[1],pm_range[0]-1,-1):
             num_results_for_evr_and_pm = sss.sss_run(sectors_list=[], build_csv_db_only=0, build_csv_db=0, csv_db_path=csv_db_path, read_united_states_input_symbols=read_united_states_input_symbols, tase_mode=tase_mode, num_threads=1, market_cap_included=1, use_investpy=0, research_mode=1, profit_margin_limit=float(profit_margin_limit)/100.0, ev_to_cfo_ratio_limit = 100.0, best_n_select=3, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, generate_result_folders=generate_result_folders, appearance_counter_dict_ssss=appearance_counter_dict_ssss, appearance_counter_dict_sssss=appearance_counter_dict_sssss, appearance_counter_min=appearance_counter_min, appearance_counter_max=appearance_counter_max)
             if num_results_for_evr_and_pm > appearance_counter_max: break  # already appearance_counter_max results. With lower profit margin limit there will always be more results -> saves running time
-            research_rows_ssss[ enterprise_value_to_revenue_limit-min_evr][profit_margin_limit-pm_min] = int(num_results_for_evr_and_pm)
-            research_rows_sssss[enterprise_value_to_revenue_limit-min_evr][profit_margin_limit-pm_min] = int(num_results_for_evr_and_pm)
-            print('row {:3} -> (enterprise_value_to_revenue_limit {:3}) | col {:3} -> (profit_margin_limit {:3}%): num_results_for_evr_and_pm = {}'.format(enterprise_value_to_revenue_limit-min_evr, enterprise_value_to_revenue_limit, profit_margin_limit-pm_min, profit_margin_limit, num_results_for_evr_and_pm))
-    results_filename    = 'results_evr{}-{}_pm{}-{}.csv'.format(min_evr,max_evr,pm_min,pm_max)
+            research_rows_ssss[ enterprise_value_to_revenue_limit-evr_range[0]][profit_margin_limit-pm_range[0]] = int(num_results_for_evr_and_pm)
+            research_rows_sssss[enterprise_value_to_revenue_limit-evr_range[0]][profit_margin_limit-pm_range[0]] = int(num_results_for_evr_and_pm)
+            print('row {:3} -> (enterprise_value_to_revenue_limit {:3}) | col {:3} -> (profit_margin_limit {:3}%): num_results_for_evr_and_pm = {}'.format(enterprise_value_to_revenue_limit-evr_range[0], enterprise_value_to_revenue_limit, profit_margin_limit-pm_range[0], profit_margin_limit, num_results_for_evr_and_pm))
+    results_filename    = 'results_evr{}-{}_pm{}-{}.csv'.format(evr_range[0],evr_range[1],pm_range[0],pm_range[1])
     np.savetxt(csv_db_path+'/'+results_filename,  research_rows_ssss.astype(int), fmt='%d', delimiter=',')
-    title_row = list(range(pm_min,pm_max+1))
+    title_row = list(range(pm_range[0],pm_range[1]+1))
     title_row.insert(0, 'evr / pm')
     evr_rows_pm_cols_filenames_list = [csv_db_path+'/'+results_filename]
     # Read Results, and add row and col axis:
@@ -68,7 +68,7 @@ def research_db(min_evr, max_evr, pm_min, pm_max, csv_db_path, read_united_state
             reader = csv.reader(engine, delimiter=',')
             row_index = 0
             for row in reader:
-                row.insert(0, min_evr+row_index)
+                row.insert(0, evr_range[0]+row_index)
                 evr_rows_pm_cols.append(row)
                 row_index += 1
     for index in range(len(evr_rows_pm_cols_filenames_list)):
@@ -100,29 +100,27 @@ def research_db(min_evr, max_evr, pm_min, pm_max, csv_db_path, read_united_state
 # =====
 # old_run = 'Results/20210117-021721_Tase_FavorTechBy3_MCap_pm0.0567_evr15.0_BuildDb_nResults438'
 # new_run = 'Results/20210120-235652_Tase_FavorTechBy3_MCap_pm0.0567_evr15.0_BuildDb_nResults439'
-# research_db(min_evr=1, max_evr=25, pm_min=5,  pm_max=45, csv_db_path=new_run,   read_united_states_input_symbols=0, tase_mode=1, generate_result_folders=0, appearance_counter_min=5, appearance_counter_max=55)
-# sss_diff.run(newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=3, newer_rec=[1,25,5,45], older_rec=[1,25,5,45], rec_length=60)
+# research_db(evr_range=[1,25], pm_range=[5,45], csv_db_path=new_run,   read_united_states_input_symbols=0, tase_mode=1, generate_result_folders=0, appearance_counter_min=5, appearance_counter_max=55)
+# sss_diff.run(newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=3, newer_rec_ranges=[1,25,5,45], older_rec_ranges=[1,25,5,45], rec_length=60)
 
 # NASDAQ100+S&P500+RUSSEL1000:
 # ============================
 # old_run = 'Results/20210116-220250_FavorTechBy3_MCap_pm0.17_evr17.5_BuildDb_nResults1083'
 # new_run = 'Results/20210121-010319_FavorTechBy3_MCap_pm0.17_evr17.5_BuildDb_nResults1092'
-# research_db(min_evr=1, max_evr=45, pm_min=5, pm_max=50, csv_db_path=new_run,         read_united_states_input_symbols=0, tase_mode=0, generate_result_folders=0, appearance_counter_min=5, appearance_counter_max=55)
-# sss_diff.run(newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=3, newer_rec=[1,45,5,50], older_rec=[1,45,5,50], rec_length=60)
+# research_db(evr_range=[1,45], pm_range=[5,50], csv_db_path=new_run,         read_united_states_input_symbols=0, tase_mode=0, generate_result_folders=0, appearance_counter_min=5, appearance_counter_max=55)
+# sss_diff.run(newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=3, newer_rec_ranges=[1,45,5,50], older_rec_ranges=[1,45,5,50], rec_length=60)
 
 # Generate:
-# research_db(min_evr=6, max_evr=6,  pm_min=19, pm_max=19, csv_db_path='Results/20210116-220250_FavorTechBy3_MCap_pm0.17_evr17.5_BuildDb_nResults1083',         read_united_states_input_symbols=0, tase_mode=0, generate_result_folders=1, appearance_counter_min=20, appearance_counter_max=40)
+# research_db(evr_range[6,6], pm_range[19,19], csv_db_path='Results/20210116-220250_FavorTechBy3_MCap_pm0.17_evr17.5_BuildDb_nResults1083',         read_united_states_input_symbols=0, tase_mode=0, generate_result_folders=1, appearance_counter_min=20, appearance_counter_max=40)
 
 # ALL:
 # ====
 old_run = 'Results/20210117-150719_FavorTechBy3_All_MCap_pm0.24_evr15.0_BuildDb_nResults6501'
 new_run = 'Results/20210121-085550_FavorTechBy3_All_MCap_pm0.24_evr15.0_BuildDb_nResults6552'
-research_db(min_evr=1, max_evr=55, pm_min=5, pm_max=45, csv_db_path=new_run,  read_united_states_input_symbols=1, tase_mode=0, generate_result_folders=0, appearance_counter_min=5, appearance_counter_max=55)
-sss_diff.run(newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=3, newer_rec=[1,55,5,45], older_rec=[1,55,5,45], rec_length=60)
+research_db(evr_range=[1,55], pm_range=[5,45], csv_db_path=new_run,  read_united_states_input_symbols=1, tase_mode=0, generate_result_folders=0, appearance_counter_min=5, appearance_counter_max=55)
+sss_diff.run(newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=3, newer_rec_ranges=[1, 55, 5, 45], older_rec_ranges=[1, 55, 5, 45], rec_length=60)
 
 # Generate ALL:
-# research_db(min_evr=7, max_evr=7, pm_min=32, pm_max=32, csv_db_path='Results/20210117-150719_FavorTechBy3_All_MCap_pm0.24_evr15.0_BuildDb_nResults6501',  read_united_states_input_symbols=1, tase_mode=0, generate_result_folders=1, appearance_counter_min=20, appearance_counter_max=40)
+# research_db(evr_range=[7,7], pm_range=[32,32], csv_db_path='Results/20210117-150719_FavorTechBy3_All_MCap_pm0.24_evr15.0_BuildDb_nResults6501',  read_united_states_input_symbols=1, tase_mode=0, generate_result_folders=1, appearance_counter_min=20, appearance_counter_max=40)
 
 
-# Comparisons:
-# sss_diff.run(newer_path='', older_path='', db_exists_in_both_folders=1, ticker_index=0, name_index=1, movement_threshold=3, rec_pm_min=1, rec_ever_max=55, rec_pm_min=5, rec_pm_max=45)
