@@ -1,5 +1,5 @@
 #################################################
-# V22 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# V23 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #################################################
 
 
@@ -50,9 +50,9 @@ def research_db(min_evr, max_evr, pm_min, pm_max, csv_db_path, read_united_state
     research_rows_ssss  = np.zeros( (max_evr-min_evr+1, pm_max-pm_min+1), dtype=int )
     research_rows_sssss = np.zeros( (max_evr-min_evr+1, pm_max-pm_min+1), dtype=int )
     for enterprise_value_to_revenue_limit in range(min_evr,max_evr+1):
-        for profit_margin_limit in range(pm_min,pm_max+1):
+        for profit_margin_limit in range(pm_max,pm_min-1,-1):
             num_results_for_evr_and_pm = sss.sss_run(sectors_list=[], build_csv_db_only=0, build_csv_db=0, csv_db_path=csv_db_path, read_united_states_input_symbols=read_united_states_input_symbols, tase_mode=tase_mode, num_threads=1, market_cap_included=1, use_investpy=0, research_mode=1, profit_margin_limit=float(profit_margin_limit)/100.0, ev_to_cfo_ratio_limit = 100.0, best_n_select=3, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, generate_result_folders=generate_result_folders, appearance_counter_dict_ssss=appearance_counter_dict_ssss, appearance_counter_dict_sssss=appearance_counter_dict_sssss, appearance_counter_min=appearance_counter_min, appearance_counter_max=appearance_counter_max)
-            if num_results_for_evr_and_pm < 1: break  # already 0 results. With higher profit margin limit there will still be 0
+            if num_results_for_evr_and_pm > appearance_counter_max: break  # already appearance_counter_max results. With lower profit margin limit there will always be more results -> saves running time
             research_rows_ssss[ enterprise_value_to_revenue_limit-min_evr][profit_margin_limit-pm_min] = int(num_results_for_evr_and_pm)
             research_rows_sssss[enterprise_value_to_revenue_limit-min_evr][profit_margin_limit-pm_min] = int(num_results_for_evr_and_pm)
             print('row {:3} -> (enterprise_value_to_revenue_limit {:3}) | col {:3} -> (profit_margin_limit {:3}%): num_results_for_evr_and_pm = {}'.format(enterprise_value_to_revenue_limit-min_evr, enterprise_value_to_revenue_limit, profit_margin_limit-pm_min, profit_margin_limit, num_results_for_evr_and_pm))
