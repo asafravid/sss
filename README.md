@@ -6,7 +6,7 @@
 # SSS Core Equation
 http://bit.ly/SssCoreEquation
 
-# SSS Big Data Analysis (2D)
+# SSS Big Data Analysis Ranking Equation
 http://bit.ly/SssBigDataAnalysis
 
 # Setup
