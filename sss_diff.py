@@ -1,7 +1,9 @@
 #########################################################
-# Version 121 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# Version 125 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #########################################################
 
+# TODO: ASAFR: Must fix the fact that only 3 files are output in the diff folder: db.csv, recommendation.csv and sss_engine.csv
+#              - Those are actually sss, ssss, sssss so just get the correct indices from the lists of names
 
 import sss_filenames
 import csv
