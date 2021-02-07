@@ -1,5 +1,5 @@
 #########################################################
-# Version 125 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# Version 126 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #########################################################
 
 
@@ -37,7 +37,7 @@ EV_MILLIONS_STEP = 100
 
 # Run Build DB Only: All/Others
 # =============================
-sss.sss_run(sectors_list=[], build_csv_db_only=1, build_csv_db=1, csv_db_path='None', read_united_states_input_symbols=1, tase_mode=0, num_threads=20, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.10, ev_to_cfo_ratio_limit = 100.0, min_enterprise_value_millions_usd=100, best_n_select=3, enterprise_value_to_revenue_limit=20, favor_technology_sector=4.5, generate_result_folders=1)
+# sss.sss_run(sectors_list=[], build_csv_db_only=1, build_csv_db=1, csv_db_path='None', read_united_states_input_symbols=1, tase_mode=0, num_threads=20, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.10, ev_to_cfo_ratio_limit = 100.0, min_enterprise_value_millions_usd=100, best_n_select=3, enterprise_value_to_revenue_limit=20, favor_technology_sector=4.5, generate_result_folders=1)
 
 # Research Mode:
 # ==============
@@ -137,26 +137,26 @@ def research_db(evr_range, pm_range, ev_millions_range, csv_db_path, read_united
 
 # NASDAQ100+S&P500+RUSSEL1000:
 # ============================
-# old_run = 'Results/20210205-002145_FTB4.5_MCap_pm0.17_evr17.5_BuildDb_nResults1126'
-# new_run = 'Results/20210207-002556_FTB4.5_MCap_pm0.17_evr17.5_BuildDb_nResults1126'
+old_run = 'Results/20210205-002145_FTB4.5_MCap_pm0.17_evr17.5_BuildDb_nResults1126'
+new_run = 'Results/20210207-002556_FTB4.5_MCap_pm0.17_evr17.5_BuildDb_nResults1126'
 # evr_range = [1, 2, 3, 4, 5, 7,10,14,19,24,30,37,45,54]
 # pm_range  = [1,10,18,25,31,36,40,43,45,46,47,48,49,50]
 # research_db(evr_range=evr_range, pm_range=pm_range, ev_millions_range=100,  csv_db_path=new_run,   read_united_states_input_symbols=0, tase_mode=0, generate_result_folders=0, appearance_counter_min=1, appearance_counter_max=1000, favor_technology_sector=4.5)
-# sss_diff.run(newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=3, newer_rec_ranges=[100,1,54,1,50], older_rec_ranges=[100,1,50,5,60], rec_length=80)
+sss_diff.run(newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=3, newer_rec_ranges=[100,1,54,1,50], older_rec_ranges=[100,1,50,5,60], rec_length=80)
 
 # Generate:
-# research_db(evr_range=[11,11],  pm_range=[29,29], ev_millions_range=100, csv_db_path=new_run,   read_united_states_input_symbols=0, tase_mode=0, generate_result_folders=1, appearance_counter_min=15, appearance_counter_max=45, favor_technology_sector=4.5)
+# research_db(evr_range=[19,19],  pm_range=[31,31], ev_millions_range=100, csv_db_path=new_run,   read_united_states_input_symbols=0, tase_mode=0, generate_result_folders=1, appearance_counter_min=15, appearance_counter_max=45, favor_technology_sector=4.5)
 
 # ALL:
-# ====
+# # ====
 # old_run = 'Results/20210201-033253_FTB4_All_MCap_pm0.24_evr15.0_BuildDb_nResults8780'
-# new_run = 'Results/20210205-080234_FTB4.5_All_MCap_pm0.24_evr15.0_BuildDb_nResults8780'
+# new_run = 'Results/20210207-073814_FTB4.5_All_MCap_pm0.24_evr15.0_BuildDb_nResults8780'
 # evr_range = [1, 2, 3, 4, 5, 7,10,14,19,24,30,37,45,54]
 # pm_range  = [1,10,18,25,31,36,40,43,45,46,47,48,49,50]
-# research_db(evr_range=evr_range, pm_range=pm_range, ev_millions_range=100, csv_db_path=new_run,  read_united_states_input_symbols=1, tase_mode=0, generate_result_folders=0, appearance_counter_min=1, appearance_counter_max=1000, favor_technology_sector=4.5)
-# sss_diff.run(newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=3, newer_rec_ranges=[100, 1, 55, 5, 65], older_rec_ranges=[100, 1, 55, 5, 55], rec_length=75)
+# # research_db(evr_range=evr_range, pm_range=pm_range, ev_millions_range=100, csv_db_path=new_run,  read_united_states_input_symbols=1, tase_mode=0, generate_result_folders=0, appearance_counter_min=1, appearance_counter_max=800, favor_technology_sector=4.5)
+# sss_diff.run(newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=3, newer_rec_ranges=[100,1,54,1,50], older_rec_ranges=[100, 1, 55, 5, 65], rec_length=80)
 
 # Generate ALL:
-#research_db(evr_range=[12,12], pm_range=[42,42], ev_millions_range=100, csv_db_path=new_run,  read_united_states_input_symbols=1, tase_mode=0, generate_result_folders=1, appearance_counter_min=5, appearance_counter_max=75, favor_technology_sector=4.5)
+# research_db(evr_range=[14,14], pm_range=[36,36], ev_millions_range=100, csv_db_path=new_run,  read_united_states_input_symbols=1, tase_mode=0, generate_result_folders=1, appearance_counter_min=5, appearance_counter_max=75, favor_technology_sector=4.5)
 
 

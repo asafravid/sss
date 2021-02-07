@@ -1,5 +1,5 @@
 #########################################################
-# Version 125 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# Version 126 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #########################################################
 
 # TODO: ASAF: 1. Which sectors have companies who's EVR values are relatively high, apart from technologies? Give them a favor normaization like tech as well

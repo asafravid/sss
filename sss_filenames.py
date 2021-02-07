@@ -1,5 +1,5 @@
 #########################################################
-# Version 125 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# Version 126 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #########################################################
 
 def create_filenames_list(date_and_time):
