@@ -1,5 +1,5 @@
 #########################################################
-# Version 126 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# Version 130 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #########################################################
 
 
@@ -13,7 +13,7 @@ def get_row_index(ticker_index, ticker, rows):
     index = 0
     for row in rows:
         if ticker == row[ticker_index]:
-            return index
+            return index+1 # avoid row index 0
         index += 1
     return -1
 
@@ -73,18 +73,18 @@ def run(newer_path, older_path, db_exists_in_both_folders, diff_only_recommendat
                     newer_rows.append(row)
                     ticker = row[ticker_index]
                     name   = row[name_index]
-                    row_index_in_older_file = get_row_index(ticker_index, ticker, older_rows)
-                    oldr = older_rows[row_index_in_older_file]
-                    if row_index_in_older_file >= 0:
-                        if abs(row_index_in_older_file - row_index) > movement_threshold:
-                            print("{:5} ({:15}):  {:2} positions change from {:3} to {:3}".format(ticker, name, row_index_in_older_file-row_index, row_index_in_older_file, row_index))
+                    row_in_older_file = get_row_index(ticker_index, ticker, older_rows)
+                    oldr = older_rows[row_in_older_file-1]  # -1 converts from row to row_index
+                    if row_in_older_file >= 0:
+                        if abs(row_in_older_file - row_index) > movement_threshold:
+                            print("{:5} ({:15}):  {:2} positions change from {:3} to {:3}".format(ticker, name, row_in_older_file-row_index, row_in_older_file, row_index))
                             if not diff_only_recommendation:
                                 print('                                                                                    From            sss_value: {:15}, ssss_value: {:15}, sssss_value: {:15}, ssse_value: {:15}, sssse_value: {:15}, ssssse_value: {:15}, sssi_value: {:15}, ssssi_value: {:15}, sssssi_value: {:15}, sssei_value: {:15}, ssssei_value: {:15}, sssssei_value: {:15}, enterprise_value_to_revenue: {:15}, evr_effective: {:15}, trailing_price_to_earnings: {:15}, trailing_12months_price_to_sales: {15:}, enterprise_value_to_ebitda: {:15}, profit_margin: {:15}, annualized_profit_margin: {:15}, held_percent_institutions: {:15}, forward_eps: {:15}, trailing_eps: {:15}, price_to_book: {:15}, shares_outstanding: {:15}, net_income_to_common_shareholders: {:15}, nitcsh_to_shares_outstanding: {:15}, num_employees: {:15}, enterprise_value: {:15}, nitcsh_to_num_employees: {:15}, earnings_quarterly_growth: {:15}, price_to_earnings_to_growth_ratio: {:15}, sqrt_peg_ratio: {:15}, annualized_cash_flow_from_operating_activities: {:15}, ev_to_cfo_ratio: {:15}'.format(
                                                                                                                                            oldr[3],          oldr[4],           oldr[5],            oldr[6],           oldr[7],            oldr[8],             oldr[9],           oldr[10],           oldr[11],            oldr[12],           oldr[13],            oldr[14],             oldr[15],                           oldr[16],             oldr[17],                          older[18],                               oldr[19],                          oldr[20],             oldr[21],                        oldr[22],                         oldr[23],           oldr[24],            oldr[25],             oldr[26],                  oldr[27],                                 oldr[28],                            oldr[29],             oldr[30],                oldr[31],                       oldr[32],                         oldr[33],                                 oldr[34],              oldr[35],                                              oldr[36]))
                                 print('                                                                                    To              sss_value: {:15}, ssss_value: {:15}, sssss_value: {:15}, ssse_value: {:15}, sssse_value: {:15}, ssssse_value: {:15}, sssi_value: {:15}, ssssi_value: {:15}, sssssi_value: {:15}, sssei_value: {:15}, ssssei_value: {:15}, sssssei_value: {:15}, enterprise_value_to_revenue: {:15}, evr_effective: {:15}, trailing_price_to_earnings: {:15}, trailing_12months_price_to_sales: {15:}, enterprise_value_to_ebitda: {:15}, profit_margin: {:15}, annualized_profit_margin: {:15}, held_percent_institutions: {:15}, forward_eps: {:15}, trailing_eps: {:15}, price_to_book: {:15}, shares_outstanding: {:15}, net_income_to_common_shareholders: {:15}, nitcsh_to_shares_outstanding: {:15}, num_employees: {:15}, enterprise_value: {:15}, nitcsh_to_num_employees: {:15}, earnings_quarterly_growth: {:15}, price_to_earnings_to_growth_ratio: {:15}, sqrt_peg_ratio: {:15}, annualized_cash_flow_from_operating_activities: {:15}, ev_to_cfo_ratio: {:15}'.format(
                                                                                                                                            row[3],           row[4],            row[5],             row[6],            row[7],             row[8],              row[9],            row[10],            row[11],             row[12],            row[13],             row[14],              row[15],                            row[16],              row[17],                           row[18],                                 row[19],                           row[20],              row[21],                         row[22],                          row[23],            row[24],             row[25],              row[26],                   row[27],                                  row[28],                             row[29],              row[30],                 row[31],                        row[32],                          row[33],                                  row[34],               row[35],                                               row[36] ))
 
-                            output_csv_rows.append([ticker, row_index_in_older_file-row_index, row_index_in_older_file, row_index])
+                            output_csv_rows.append([ticker, row_in_older_file-row_index, row_in_older_file, row_index])
                     else:
                         print("{:5}: appears at position {:2} (new)".format(ticker, row_index))
                         if not diff_only_recommendation:

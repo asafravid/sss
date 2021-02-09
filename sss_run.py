@@ -1,5 +1,5 @@
 #########################################################
-# Version 126 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# Version 130 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #########################################################
 
 
@@ -12,17 +12,10 @@ import sss_diff
 
 EV_MILLIONS_STEP = 100
 
-# TODO: ASAFR: Taking EVR for P/E and replacements of the sorts re not reccomended. Stick to basics
-#              If one element is not available, then a 0 should be taken, and filtering will be "darwinistic".
-#              - A stock without some element in the equation, will cause it to zeroise and not be taken.
-#              - Indeed, some stocks have their price to sales trailing 12months missing, and their corresponding sss value is 0. This is Ok
 #
-# TODO: ASAFR: 1. Add Price/Book --> The lower the better: https://www.investopedia.com/terms/p/price-to-bookratio.asp
-#              2. Look for other parameters for better and better scan
-#
-# TODO: ASAFR: Some stocks don't contain certian paramters and cause SSS to zeroize. But SSSS will not zeroize. I any case:
+# TODO: ASAFR: 0. sss vs ssss/sssss list lengths (appearances) may differ because of the if on the price_to_book which is only for sss -FIX!
 #              1. Compare SSS and SSSS and SSSSS reccommendations, and formalize some mergoing between them
-#              2. Fins stocks with 0 values for trailing Price/Sales (or for instance 0 trailing Price / Earnings) and analyze what can be done
+#              2. Find stocks with 0 values for trailing Price/Sales (or for instance 0 trailing Price / Earnings) which cancel the whole result and analyze what can be done
 
 # Reuse:
 # sss.sss_run(sectors_list=[], build_csv_db_only=0, build_csv_db=0, csv_db_path='None', read_united_states_input_symbols=0, tase_mode=0, num_threads=1,  market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.17, ev_to_cfo_ratio_limit = 100.0, min_enterprise_value_millions_usd=100, best_n_select=50, enterprise_value_to_revenue_limit=15, favor_technology_sector=4.5, generate_result_folders=1)
@@ -128,24 +121,24 @@ def research_db(evr_range, pm_range, ev_millions_range, csv_db_path, read_united
 
 # TASE:
 # =====
-# old_run = 'Results/20210131-161653_Tase_FTB4_MCap_pm0.0567_evr15.0_BuildDb_nResults457'
-# new_run = 'Results/20210204-231709_Tase_FTB4_MCap_pm0.0567_evr15.0_BuildDb_nResults457'
+# old_run = 'Results/20210204-231709_Tase_FTB4_MCap_pm0.0567_evr15.0_BuildDb_nResults457'
+# new_run = 'Results/20210208-220559_Tase_FTB4.5_MCap_pm0.0567_evr15.0_BuildDb_nResults457'
 # evr_range = [1, 2, 3, 4, 5, 7,10,14,19,24,30,37,45,54]
 # pm_range  = [1,10,18,25,31,36,40,43,45,46,47,48,49,50]
-# research_db(evr_range=evr_range pm_range=pm_range, ev_millions_range=5,   csv_db_path=new_run,   read_united_states_input_symbols=0, tase_mode=1, generate_result_folders=0, appearance_counter_min=3, appearance_counter_max=75, favor_technology_sector=4.5)
-# sss_diff.run(newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=2, newer_rec_ranges=[5,1,45,5,45], older_rec_ranges=[10,1,45,5,45], rec_length=80)
+# research_db(evr_range=evr_range, pm_range=pm_range, ev_millions_range=5,   csv_db_path=new_run,   read_united_states_input_symbols=0, tase_mode=1, generate_result_folders=0, appearance_counter_min=1, appearance_counter_max=250, favor_technology_sector=4.5)
+# sss_diff.run(newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=2, newer_rec_ranges=[5,1,54,1,50], older_rec_ranges=[5,1,45,5,45], rec_length=80)
 
 # NASDAQ100+S&P500+RUSSEL1000:
 # ============================
-old_run = 'Results/20210205-002145_FTB4.5_MCap_pm0.17_evr17.5_BuildDb_nResults1126'
-new_run = 'Results/20210207-002556_FTB4.5_MCap_pm0.17_evr17.5_BuildDb_nResults1126'
-# evr_range = [1, 2, 3, 4, 5, 7,10,14,19,24,30,37,45,54]
-# pm_range  = [1,10,18,25,31,36,40,43,45,46,47,48,49,50]
-# research_db(evr_range=evr_range, pm_range=pm_range, ev_millions_range=100,  csv_db_path=new_run,   read_united_states_input_symbols=0, tase_mode=0, generate_result_folders=0, appearance_counter_min=1, appearance_counter_max=1000, favor_technology_sector=4.5)
-sss_diff.run(newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=3, newer_rec_ranges=[100,1,54,1,50], older_rec_ranges=[100,1,50,5,60], rec_length=80)
+old_run = 'Results/20210207-002556_FTB4.5_MCap_pm0.17_evr17.5_BuildDb_nResults1126'
+new_run = 'Results/20210209-000217_FTB4.5_MCap_pm0.17_evr17.5_BuildDb_nResults1126'
+evr_range = [1, 2, 3, 4, 5, 7,10,14,19,24,30,37,45,54]
+pm_range  = [1,10,18,25,31,36,40,43,45,46,47,48,49,50]
+research_db(evr_range=evr_range, pm_range=pm_range, ev_millions_range=100,  csv_db_path=new_run,   read_united_states_input_symbols=0, tase_mode=0, generate_result_folders=0, appearance_counter_min=1, appearance_counter_max=350, favor_technology_sector=4.5)
+# sss_diff.run(newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=3, newer_rec_ranges=[100,1,54,1,50], older_rec_ranges=[100,1,54,1,50], rec_length=80)
 
 # Generate:
-# research_db(evr_range=[19,19],  pm_range=[31,31], ev_millions_range=100, csv_db_path=new_run,   read_united_states_input_symbols=0, tase_mode=0, generate_result_folders=1, appearance_counter_min=15, appearance_counter_max=45, favor_technology_sector=4.5)
+# research_db(evr_range=[24,24],  pm_range=[31,31], ev_millions_range=100, csv_db_path=new_run,   read_united_states_input_symbols=0, tase_mode=0, generate_result_folders=1, appearance_counter_min=15, appearance_counter_max=45, favor_technology_sector=4.5)
 
 # ALL:
 # # ====

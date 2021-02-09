@@ -1,5 +1,5 @@
 #########################################################
-# Version 126 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# Version 130 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #########################################################
 
 # TODO: ASAF: 1. Which sectors have companies who's EVR values are relatively high, apart from technologies? Give them a favor normaization like tech as well
@@ -20,16 +20,17 @@ import math
 from threading import Thread
 from dataclasses import dataclass
 
-NUM_ROUND_DECIMALS            = 4
-NUM_EMPLOYEES_UNKNOWN         = 10000000  # This will make the company very inefficient in terms of number of employees
-PROFIT_MARGIN_UNKNOWN         = 0.025  # This will make the company not profitable terms of profit margins, thus less attractive
-PERCENT_HELD_INSTITUTIONS_LOW = 0.01         # low, to make less relevant
-PEG_UNKNOWN                   = 1  # use a neutral value when PEG is unknown
-SHARES_OUTSTANDING_UNKNOWN    = 100000000  # 100 Million Shares - just a value for calculation of a currently unused vaue
-BAD_SSS                       = 10.0 ** 10.0
-BAD_SSSE                      = 0
-PROFIT_MARGIN_WEIGHTS         = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0, 512.0]  # from oldest to newest
-CASH_FLOW_WEIGHTS             = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0, 512.0]  # from oldest to newest
+NUM_ROUND_DECIMALS                = 4
+NUM_EMPLOYEES_UNKNOWN             = 10000000   # This will make the company very inefficient in terms of number of employees
+PROFIT_MARGIN_UNKNOWN             = 0.0        # This will make the company not profitable terms of profit margins, thus less attractive
+PERCENT_HELD_INSTITUTIONS_LOW     = 0.01       # low, to make less relevant
+PEG_UNKNOWN                       = 1          # use a neutral value when PEG is unknown
+SHARES_OUTSTANDING_UNKNOWN        = 100000000  # 100 Million Shares - just a value for calculation of a currently unused vaue
+BAD_SSS                           = 10.0 ** 15.0
+BAD_SSSE                          = 0
+PROFIT_MARGIN_WEIGHTS             = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0, 512.0]  # from oldest to newest
+CASH_FLOW_WEIGHTS                 = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0, 512.0]  # from oldest to newest
+EARNINGS_QUARTERLY_GROWTH_UNKNOWN = -0.5  # TODO: ASAFR: 1. Set to earnings_quarterly_growth_min/2 and test/check. 2. Scan (like pm and ever) values of earnings_quarterly_growth for big data research better recommendations
 
 
 @dataclass
@@ -38,18 +39,18 @@ class StockData:
     short_name:                                     str   = 'None'
     quote_type:                                     str   = 'None'
     sector:                                         str   = 'None'
-    sss_value:                                      float = 0.0
-    ssss_value:                                     float = 0.0
-    sssss_value:                                    float = 0.0
-    ssse_value:                                     float = 0.0
-    sssse_value:                                    float = 0.0
-    ssssse_value:                                   float = 0.0
-    sssi_value:                                     float = 0.0
-    ssssi_value:                                    float = 0.0
-    sssssi_value:                                   float = 0.0
-    sssei_value:                                    float = 0.0
-    ssssei_value:                                   float = 0.0
-    sssssei_value:                                  float = 0.0
+    sss_value:                                      float = BAD_SSS
+    ssss_value:                                     float = BAD_SSS
+    sssss_value:                                    float = BAD_SSS
+    ssse_value:                                     float = BAD_SSSE
+    sssse_value:                                    float = BAD_SSSE
+    ssssse_value:                                   float = BAD_SSSE
+    sssi_value:                                     float = BAD_SSS
+    ssssi_value:                                    float = BAD_SSS
+    sssssi_value:                                   float = BAD_SSS
+    sssei_value:                                    float = BAD_SSSE
+    ssssei_value:                                   float = BAD_SSSE
+    sssssei_value:                                  float = BAD_SSSE
     enterprise_value_to_revenue:                    float = 0.0
     evr_effective:                                  float = 0.0
     trailing_price_to_earnings:                     float = 0.0
@@ -112,7 +113,7 @@ def text_to_num(text):
         return float(text)
 
 
-def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown, enterprise_value_to_revenue_limit, favor_technology_sector, market_cap_included, research_mode):
+def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, enterprise_value_to_revenue_limit, favor_technology_sector, market_cap_included, research_mode):
     try:
         return_value = True
         info              = {}
@@ -207,25 +208,25 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
             if stock_data.held_percent_institutions is None or stock_data.held_percent_institutions == 0: stock_data.held_percent_institutions = PERCENT_HELD_INSTITUTIONS_LOW
 
             if 'enterpriseToRevenue' in info:                          stock_data.enterprise_value_to_revenue = info['enterpriseToRevenue']  # https://www.investopedia.com/terms/e/ev-revenue-multiple.asp
-            else:                                                      stock_data.enterprise_value_to_revenue = None
-            if isinstance(stock_data.enterprise_value_to_revenue,str): stock_data.enterprise_value_to_revenue = None
+            else:                                                      stock_data.enterprise_value_to_revenue = None # Mark as None, so as to try and calculate manually. TODO: ASAFR: Do the same to the Price and to the Earnings and the Price/Earnings (Also to sales if possible)
+            if isinstance(stock_data.enterprise_value_to_revenue,str): stock_data.enterprise_value_to_revenue = None # Mark as None, so as to try and calculate manually.
 
             if 'enterpriseToEbitda' in info:                           stock_data.enterprise_value_to_ebitda  = info['enterpriseToEbitda']  # The lower the better: https://www.investopedia.com/ask/answers/072715/what-considered-healthy-evebitda.asp
-            else:                                                      stock_data.enterprise_value_to_ebitda  = None
-            if isinstance(stock_data.enterprise_value_to_ebitda,str):  stock_data.enterprise_value_to_ebitda  = None
+            else:                                                      stock_data.enterprise_value_to_ebitda  = 0 # TODO: ASAFR: Mark as None, so as to try and calculate manually.
+            if isinstance(stock_data.enterprise_value_to_ebitda,str):  stock_data.enterprise_value_to_ebitda  = 0 # TODO: ASAFR: Mark as None, so as to try and calculate manually.
 
             if 'trailingPE' in info:
                 stock_data.trailing_price_to_earnings  = info['trailingPE']  # https://www.investopedia.com/terms/t/trailingpe.asp
                 if tase_mode: stock_data.trailing_price_to_earnings /= 100.0  # In TLV stocks, Yahoo multiplies trailingPE by a factor of 100, so compensate
             else:
-                stock_data.trailing_price_to_earnings  = None
-            if isinstance(stock_data.trailing_price_to_earnings,str):  stock_data.trailing_price_to_earnings  = None
+                stock_data.trailing_price_to_earnings  = None # Mark as None, so as to try and calculate manually.
+            if isinstance(stock_data.trailing_price_to_earnings,str):  stock_data.trailing_price_to_earnings  = None # Mark as None, so as to try and calculate manually.
 
             if 'priceToSalesTrailing12Months' in info:
                 stock_data.trailing_12months_price_to_sales = info['priceToSalesTrailing12Months']  # https://www.investopedia.com/articles/fundamental/03/032603.asp#:~:text=The%20price%2Dto%2Dsales%20ratio%20(Price%2FSales%20or,the%20more%20attractive%20the%20investment.
             else:
-                stock_data.trailing_12months_price_to_sales  = None
-            if isinstance(stock_data.trailing_12months_price_to_sales,str):  stock_data.trailing_12months_price_to_sales  = None
+                stock_data.trailing_12months_price_to_sales  = None # Mark as None, so as to try and calculate manually.
+            if isinstance(stock_data.trailing_12months_price_to_sales,str):  stock_data.trailing_12months_price_to_sales  = None # Mark as None, so as to try and calculate manually.
 
         # if stock_data.enterprise_value_to_revenue is None and stock_data.enterprise_value_to_ebitda is None and stock_data.trailing_price_to_earnings is None:
         #     if use_investpy and 'P/E Ratio' in stock_information and stock_information['P/E Ratio'] is not None:
@@ -253,13 +254,13 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
             if isinstance(stock_data.trailing_eps,str):              stock_data.trailing_eps                      = None
 
             if 'priceToBook'                                in info: stock_data.price_to_book                     = info['priceToBook']
-            else:                                                    stock_data.price_to_book                     = None
-            if isinstance(stock_data.price_to_book,str):             stock_data.price_to_book                     = None
+            else:                                                    stock_data.price_to_book                     = None # Mark as None, so as to try and calculate manually.
+            if isinstance(stock_data.price_to_book,str):             stock_data.price_to_book                     = None # Mark as None, so as to try and calculate manually.
 
             # Value is a ratio, such that when multiplied by 100, yields percentage (%) units:
             if 'earningsQuarterlyGrowth'                    in info: stock_data.earnings_quarterly_growth         = info['earningsQuarterlyGrowth']
             else:                                                    stock_data.earnings_quarterly_growth         = None
-            if stock_data.earnings_quarterly_growth         is None: stock_data.earnings_quarterly_growth         = earnings_quarterly_growth_unknown
+            if stock_data.earnings_quarterly_growth         is None: stock_data.earnings_quarterly_growth         = EARNINGS_QUARTERLY_GROWTH_UNKNOWN # TODO: ASAFR: Perhaps a variation is required for TASE (less information on stocks, etc)
 
             if 'pegRatio'                                   in info: stock_data.price_to_earnings_to_growth_ratio = info['pegRatio']
             else:                                                    stock_data.price_to_earnings_to_growth_ratio = PEG_UNKNOWN
@@ -274,7 +275,7 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
                     stock_data.shares_outstanding = SHARES_OUTSTANDING_UNKNOWN
 
             if 'netIncomeToCommon' in info: stock_data.net_income_to_common_shareholders = info['netIncomeToCommon']
-            else:                           stock_data.net_income_to_common_shareholders = None
+            else:                           stock_data.net_income_to_common_shareholders = None # TODO: ASAFR: It may be possible to calculate this manually
 
             if 'enterpriseValue' in info and info['enterpriseValue'] is not None: stock_data.enterprise_value = info['enterpriseValue']
             if market_cap_included:
@@ -300,7 +301,7 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
             if return_value and not research_mode: print('                            Skipping enterprise_value_to_revenue: {}'.format(stock_data.enterprise_value_to_revenue))
             return_value = False
 
-        if stock_data.enterprise_value_to_revenue is not None: stock_data.evr_effective = stock_data.enterprise_value_to_revenue
+        if build_csv_db_only: stock_data.evr_effective = stock_data.enterprise_value_to_revenue
 
         if not build_csv_db_only and (stock_data.enterprise_value_to_ebitda is None or stock_data.enterprise_value_to_ebitda <= 0):
             if return_value and not research_mode: print('                            Skipping enterprise_value_to_ebitda: {}'.format(stock_data.enterprise_value_to_ebitda))
@@ -314,7 +315,11 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
             if return_value and not research_mode: print('                            Skipping trailing_12months_price_to_sales: {}'.format(stock_data.trailing_12months_price_to_sales))
             return_value = False
 
-        if stock_data.trailing_price_to_earnings is not None:
+        if not build_csv_db_only and (stock_data.price_to_book is None or stock_data.price_to_book <= 0):
+            if return_value and not research_mode: print('                            Skipping price_to_book: {}'.format(stock_data.price_to_book))
+            return_value = False
+
+        if build_csv_db_only and stock_data.trailing_price_to_earnings is not None:
             if favor_technology_sector and stock_data.sector == 'Technology':
                 stock_data.tpe_effective = stock_data.trailing_price_to_earnings / float(favor_technology_sector)  # ** 2
             else:
@@ -326,11 +331,9 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
                     if return_value and not research_mode: print('                            Skipping profit_margin: {}'.format(stock_data.profit_margin))
                     return_value = False
 
-        if stock_data.ev_to_cfo_ratio is None  or stock_data.ev_to_cfo_ratio > ev_to_cfo_ratio_limit:
-            if stock_data.ev_to_cfo_ratio is not None or stock_data.ev_to_cfo_ratio <= 0:
-                if not build_csv_db_only and stock_data.ev_to_cfo_ratio > ev_to_cfo_ratio_limit:
-                    if return_value and not research_mode: print('                            Skipping ev_to_cfo_ratio_limit: {}'.format(stock_data.ev_to_cfo_ratio_limit))
-                    return_value = False
+        if stock_data.ev_to_cfo_ratio is None  or stock_data.ev_to_cfo_ratio > ev_to_cfo_ratio_limit or stock_data.ev_to_cfo_ratio <= 0:
+            if return_value and not research_mode: print('                            Skipping ev_to_cfo_ratio_limit: {}'.format(stock_data.ev_to_cfo_ratio_limit))
+            return_value = False
 
         if stock_data.trailing_eps is None:
             if not build_csv_db_only and use_investpy and 'EPS' in stock_information and stock_information['EPS'] is not None:
@@ -353,7 +356,7 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
             if return_value and not research_mode: print('                            Skipping price_to_earnings_to_growth_ratio: {}'.format(stock_data.price_to_earnings_to_growth_ratio))
             if return_value: return_value = False
 
-        if stock_data.price_to_earnings_to_growth_ratio > 0: stock_data.sqrt_peg_ratio = math.sqrt(stock_data.price_to_earnings_to_growth_ratio)
+        if build_csv_db_only and stock_data.price_to_earnings_to_growth_ratio > 0: stock_data.sqrt_peg_ratio = math.sqrt(stock_data.price_to_earnings_to_growth_ratio)
 
         if not build_csv_db_only and (stock_data.net_income_to_common_shareholders is None or stock_data.net_income_to_common_shareholders < 0):
             if return_value and not research_mode: print('                            Skipping net_income_to_common_shareholders: {}'.format(stock_data.net_income_to_common_shareholders))
@@ -367,26 +370,26 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
                 max_profit_margin_effective       = max(stock_data.profit_margin, stock_data.annualized_profit_margin)  # ** 2
                 earnings_qgrowth_factor_effective = (1 + stock_data.earnings_quarterly_growth)  # ** 2
 
-                if max_profit_margin_effective and earnings_qgrowth_factor_effective and stock_data.price_to_earnings_to_growth_ratio > 0:
-                    if stock_data.trailing_price_to_earnings is not None and stock_data.enterprise_value_to_ebitda is not None:
-                        if stock_data.trailing_12months_price_to_sales:
-                            stock_data.sss_value = float(((stock_data.evr_effective * stock_data.tpe_effective * stock_data.enterprise_value_to_ebitda * stock_data.trailing_12months_price_to_sales) / (max_profit_margin_effective)) * ( stock_data.sqrt_peg_ratio                               / earnings_qgrowth_factor_effective))  # The lower  the better
-                        stock_data.ssss_value    = float(((stock_data.evr_effective * stock_data.tpe_effective * stock_data.enterprise_value_to_ebitda                                              ) / (max_profit_margin_effective)) * ((stock_data.sqrt_peg_ratio * stock_data.ev_to_cfo_ratio) / earnings_qgrowth_factor_effective))  # the lower  the better
-                        stock_data.sssss_value   = float(((stock_data.evr_effective * stock_data.tpe_effective * stock_data.enterprise_value_to_ebitda                                              ) / (max_profit_margin_effective)) * ( stock_data.sqrt_peg_ratio                               / earnings_qgrowth_factor_effective))  # the lower  the better
+                if max_profit_margin_effective is not None and max_profit_margin_effective > 0 and earnings_qgrowth_factor_effective is not None and earnings_qgrowth_factor_effective > 0 and stock_data.price_to_earnings_to_growth_ratio is not None and stock_data.price_to_earnings_to_growth_ratio > 0 and stock_data.tpe_effective is not None and stock_data.tpe_effective > 0 and stock_data.enterprise_value_to_ebitda is not None and stock_data.enterprise_value_to_ebitda > 0 and stock_data.ev_to_cfo_ratio is not None and stock_data.ev_to_cfo_ratio > 0 and stock_data.sqrt_peg_ratio is not None and stock_data.sqrt_peg_ratio > 0:
+                    if stock_data.trailing_12months_price_to_sales is not None and stock_data.trailing_12months_price_to_sales and stock_data.trailing_12months_price_to_sales is not None and stock_data.trailing_12months_price_to_sales > 0:
+                        if stock_data.price_to_book is not None and stock_data.price_to_book > 0:
+                            stock_data.sss_value = float(((stock_data.evr_effective * stock_data.tpe_effective * stock_data.enterprise_value_to_ebitda * stock_data.trailing_12months_price_to_sales * stock_data.price_to_book) / (max_profit_margin_effective                                        )) * ((stock_data.sqrt_peg_ratio * stock_data.ev_to_cfo_ratio) / earnings_qgrowth_factor_effective))  # The lower  the better
+                        stock_data.ssss_value    = float(((stock_data.evr_effective * stock_data.tpe_effective * stock_data.enterprise_value_to_ebitda * stock_data.trailing_12months_price_to_sales                           ) / (max_profit_margin_effective                                        )) * ((stock_data.sqrt_peg_ratio * stock_data.ev_to_cfo_ratio) / earnings_qgrowth_factor_effective))  # the lower  the better
+                    stock_data.sssss_value       = float(((stock_data.evr_effective * stock_data.tpe_effective * stock_data.enterprise_value_to_ebitda                                                                         ) / (max_profit_margin_effective                                        )) * ((stock_data.sqrt_peg_ratio * stock_data.ev_to_cfo_ratio) / earnings_qgrowth_factor_effective))  # the lower  the better
 
-                    if (stock_data.sss_value):    stock_data.ssse_value    = float(stock_data.nitcsh_to_num_employees / stock_data.sss_value  )                                                                                                                                                                                          # the higher the better
-                    if (stock_data.ssss_value):   stock_data.sssse_value   = float(stock_data.nitcsh_to_num_employees / stock_data.ssss_value )                                                                                                                                                                                          # the higher the better
-                    if (stock_data.sssss_value):  stock_data.ssssse_value  = float(stock_data.nitcsh_to_num_employees / stock_data.sssss_value)                                                                                                                                                                                          # the higher the better
+                    if (stock_data.sss_value):    stock_data.ssse_value    = float(stock_data.nitcsh_to_num_employees / stock_data.sss_value  )                                                                                                                                                                                                                                                              # the higher the better
+                    if (stock_data.ssss_value):   stock_data.sssse_value   = float(stock_data.nitcsh_to_num_employees / stock_data.ssss_value )                                                                                                                                                                                                                                                              # the higher the better
+                    if (stock_data.sssss_value):  stock_data.ssssse_value  = float(stock_data.nitcsh_to_num_employees / stock_data.sssss_value)                                                                                                                                                                                                                                                              # the higher the better
 
-                    if stock_data.trailing_price_to_earnings is not None and stock_data.enterprise_value_to_ebitda is not None:
-                        if stock_data.trailing_12months_price_to_sales:
-                            stock_data.sssi_value = float(((stock_data.evr_effective * stock_data.tpe_effective * stock_data.enterprise_value_to_ebitda * stock_data.trailing_12months_price_to_sales) / (max_profit_margin_effective * stock_data.held_percent_institutions)) * ( stock_data.sqrt_peg_ratio                               / earnings_qgrowth_factor_effective))  # The lower  the better
-                        stock_data.ssssi_value    = float(((stock_data.evr_effective * stock_data.tpe_effective * stock_data.enterprise_value_to_ebitda                                              ) / (max_profit_margin_effective * stock_data.held_percent_institutions)) * ((stock_data.sqrt_peg_ratio * stock_data.ev_to_cfo_ratio) / earnings_qgrowth_factor_effective))  # the lower  the better
-                        stock_data.sssssi_value   = float(((stock_data.evr_effective * stock_data.tpe_effective * stock_data.enterprise_value_to_ebitda                                              ) / (max_profit_margin_effective * stock_data.held_percent_institutions)) * ( stock_data.sqrt_peg_ratio                               / earnings_qgrowth_factor_effective))  # the lower  the better
+                    if stock_data.trailing_12months_price_to_sales is not None and stock_data.trailing_12months_price_to_sales and stock_data.trailing_12months_price_to_sales is not None and stock_data.trailing_12months_price_to_sales > 0:
+                        if stock_data.price_to_book is not None and stock_data.price_to_book > 0:
+                            stock_data.sssi_value = float(((stock_data.evr_effective * stock_data.tpe_effective * stock_data.enterprise_value_to_ebitda * stock_data.trailing_12months_price_to_sales * stock_data.price_to_book) / (max_profit_margin_effective * stock_data.held_percent_institutions)) * ((stock_data.sqrt_peg_ratio * stock_data.ev_to_cfo_ratio) / earnings_qgrowth_factor_effective))  # The lower  the better
+                        stock_data.ssssi_value    = float(((stock_data.evr_effective * stock_data.tpe_effective * stock_data.enterprise_value_to_ebitda * stock_data.trailing_12months_price_to_sales                           ) / (max_profit_margin_effective * stock_data.held_percent_institutions)) * ((stock_data.sqrt_peg_ratio * stock_data.ev_to_cfo_ratio) / earnings_qgrowth_factor_effective))  # the lower  the better
+                    stock_data.sssssi_value       = float(((stock_data.evr_effective * stock_data.tpe_effective * stock_data.enterprise_value_to_ebitda                                                                         ) / (max_profit_margin_effective * stock_data.held_percent_institutions)) * ((stock_data.sqrt_peg_ratio * stock_data.ev_to_cfo_ratio) / earnings_qgrowth_factor_effective))  # the lower  the better
 
-                    if (stock_data.sssi_value):   stock_data.sssei_value   = float(stock_data.nitcsh_to_num_employees / stock_data.sssi_value  )                                                                                                                                                                                         # the higher the better
-                    if (stock_data.ssssi_value):  stock_data.ssssei_value  = float(stock_data.nitcsh_to_num_employees / stock_data.ssssi_value )                                                                                                                                                                                         # the higher the better
-                    if (stock_data.sssssi_value): stock_data.sssssei_value = float(stock_data.nitcsh_to_num_employees / stock_data.sssssi_value)                                                                                                                                                                                         # the higher the better
+                    if (stock_data.sssi_value):   stock_data.sssei_value   = float(stock_data.nitcsh_to_num_employees / stock_data.sssi_value  )                                                                                                                                                                                                                                                             # the higher the better
+                    if (stock_data.ssssi_value):  stock_data.ssssei_value  = float(stock_data.nitcsh_to_num_employees / stock_data.ssssi_value )                                                                                                                                                                                                                                                             # the higher the better
+                    if (stock_data.sssssi_value): stock_data.sssssei_value = float(stock_data.nitcsh_to_num_employees / stock_data.sssssi_value)                                                                                                                                                                                                                                                             # the higher the better
                 else:
                     stock_data.sss_value     = BAD_SSS
                     stock_data.ssss_value    = BAD_SSS
@@ -528,7 +531,7 @@ def check_interval(thread_id, interval_threads, interval_secs_to_avoid_http_erro
         time.sleep(interval_secs_to_avoid_http_errors)
 
 
-def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thread_id, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown, enterprise_value_to_revenue_limit, favor_technology_sector, market_cap_included, research_mode):
+def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thread_id, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, enterprise_value_to_revenue_limit, favor_technology_sector, market_cap_included, research_mode):
     iteration = 0
     if build_csv_db:
         for symb in symbols:
@@ -541,7 +544,7 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
             else:
                 symbol = yf.Ticker(symb.replace('.','-'))
             stock_data = StockData(ticker=symb)
-            if not process_info(symbol=symbol, stock_data=stock_data, build_csv_db_only=build_csv_db_only, use_investpy=use_investpy, tase_mode=tase_mode, sectors_list=sectors_list, build_csv_db=build_csv_db, profit_margin_limit=profit_margin_limit, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd=min_enterprise_value_millions_usd, earnings_quarterly_growth_min=earnings_quarterly_growth_min, earnings_quarterly_growth_unknown=earnings_quarterly_growth_unknown, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_technology_sector=favor_technology_sector, market_cap_included=market_cap_included, research_mode=research_mode):
+            if not process_info(symbol=symbol, stock_data=stock_data, build_csv_db_only=build_csv_db_only, use_investpy=use_investpy, tase_mode=tase_mode, sectors_list=sectors_list, build_csv_db=build_csv_db, profit_margin_limit=profit_margin_limit, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd=min_enterprise_value_millions_usd, earnings_quarterly_growth_min=earnings_quarterly_growth_min, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_technology_sector=favor_technology_sector, market_cap_included=market_cap_included, research_mode=research_mode):
                 if tase_mode and 'TLV:' not in stock_data.ticker: stock_data.ticker = 'TLV:' + stock_data.ticker.replace('.TA', '').replace('.','-')
                 #                              Ticker	          Name	                 Sector	            sss_value	          ssss_value	         sssss_value	         ssse_value	            sssse_value	            ssssse_value	         sssi_value	            ssssi_value	            sssssi_value	         sssei_value	         ssssei_value	          sssssei_value	            enterprise_value_to_revenue	            evr_effective	          trailing_price_to_earnings  trailing_12months_price_to_sales                        tpe_effective	            enterprise_value_to_ebitda	           profit_margin	         annualized_profit_margin	          held_percent_institutions	            forward_eps	            trailing_eps	         price_to_book	           shares_outstanding	          net_income_to_common_shareholders	            nitcsh_to_shares_outstanding	         num_employees	           enterprise_value	            nitcsh_to_num_employees	            earnings_quarterly_growth	          price_to_earnings_to_growth_ratio             sqrt_peg_ratio	           annualized_cash_flow_from_operating_activities             ev_to_cfo_ratio             last_dividend_0	             last_dividend_1	            last_dividend_2	               last_dividend_3
                 csv_db_data.append([stock_data.ticker, stock_data.short_name, stock_data.sector, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.sssssei_value, stock_data.enterprise_value_to_revenue, stock_data.evr_effective, stock_data.trailing_price_to_earnings, stock_data.trailing_12months_price_to_sales, stock_data.tpe_effective, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.annualized_profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.enterprise_value, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.sqrt_peg_ratio, stock_data.annualized_cash_flow_from_operating_activities, stock_data.ev_to_cfo_ratio, stock_data.last_4_dividends_0, stock_data.last_4_dividends_1, stock_data.last_4_dividends_2, stock_data.last_4_dividends_3])
@@ -566,7 +569,7 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
                     else:
                         row[fix_row_index] = 0
             stock_data = StockData(ticker=symbol, short_name=row[1], sector=row[2], sss_value=float(row[3]), ssss_value=float(row[4]), sssss_value=float(row[5]), ssse_value=float(row[6]), sssse_value=float(row[7]), ssssse_value=float(row[8]), sssi_value=float(row[9]), ssssi_value=float(row[10]), sssssi_value=float(row[11]), sssei_value=float(row[12]), ssssei_value=float(row[13]), sssssei_value=float(row[14]), enterprise_value_to_revenue=float(row[15]), evr_effective=float(row[16]), trailing_price_to_earnings=float(row[17]), trailing_12months_price_to_sales=float(row[18]), tpe_effective=float(row[19]), enterprise_value_to_ebitda=float(row[20]), profit_margin=float(row[21]), annualized_profit_margin=float(row[22]), held_percent_institutions=float(row[23]), forward_eps=float(row[24]), trailing_eps=float(row[25]), price_to_book=float(row[26]), shares_outstanding=float(row[27]), net_income_to_common_shareholders=float(row[28]), nitcsh_to_shares_outstanding=float(row[29]), num_employees=int(row[30]), enterprise_value=int(float(row[31])), nitcsh_to_num_employees=float(row[32]), earnings_quarterly_growth=float(row[33]), price_to_earnings_to_growth_ratio=float(row[34]), sqrt_peg_ratio=float(row[35]), annualized_cash_flow_from_operating_activities=float(row[36]), ev_to_cfo_ratio=float(row[37]), last_4_dividends_0=float(row[38]), last_4_dividends_1=float(row[39]), last_4_dividends_2=float(row[40]), last_4_dividends_3=float(row[41]))
-            if not process_info(symbol=symbol, stock_data=stock_data, build_csv_db_only=build_csv_db_only, use_investpy=use_investpy, tase_mode=tase_mode, sectors_list=sectors_list, build_csv_db=build_csv_db, profit_margin_limit=profit_margin_limit, min_enterprise_value_millions_usd=min_enterprise_value_millions_usd, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, earnings_quarterly_growth_min=earnings_quarterly_growth_min, earnings_quarterly_growth_unknown=earnings_quarterly_growth_unknown, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_technology_sector=favor_technology_sector, market_cap_included=market_cap_included, research_mode=research_mode):
+            if not process_info(symbol=symbol, stock_data=stock_data, build_csv_db_only=build_csv_db_only, use_investpy=use_investpy, tase_mode=tase_mode, sectors_list=sectors_list, build_csv_db=build_csv_db, profit_margin_limit=profit_margin_limit, min_enterprise_value_millions_usd=min_enterprise_value_millions_usd, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, earnings_quarterly_growth_min=earnings_quarterly_growth_min, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_technology_sector=favor_technology_sector, market_cap_included=market_cap_included, research_mode=research_mode):
                 continue
 
             if tase_mode and 'TLV:' not in stock_data.ticker: stock_data.ticker = 'TLV:' + stock_data.ticker.replace('.TA', '').replace('.','-')
@@ -597,8 +600,7 @@ def sss_run(sectors_list, build_csv_db_only, build_csv_db, csv_db_path, read_uni
     # Working Parameters:
     if not research_mode: profit_margin_limit               = round((0.17 + 0.07 * read_united_states_input_symbols) / (1 + 2 * tase_mode), NUM_ROUND_DECIMALS)
     # ev_to_cfo_ratio_limit                                   = 100  # TODO: ASAFR: Multi-dimentional checks requried here as well
-    earnings_quarterly_growth_min                           = 0.01-0.125*tase_mode       # The earnings can decrease by 1/4, but there is still a requirement that price_to_earnings_to_growth_ratio > 0
-    earnings_quarterly_growth_unknown                       = earnings_quarterly_growth_min  # TODO: ASAFR: 1. Set to earnings_quarterly_growth_min/2 and test/check. 2. Scan (like pm and ever) values of earnings_quarterly_growth for big data research better recommendations
+    earnings_quarterly_growth_min                           = 0.01-0.125*tase_mode       # The earnings can decrease by 1/4, but there is still a requirement that price_to_earnings_to_growth_ratio > 0. TODO: ASAFR: Add to multi-dimention
     if not research_mode: enterprise_value_to_revenue_limit = 17.5 - 2.5 * read_united_states_input_symbols - 2.5 * tase_mode                    # Higher than that is too expensive
 
     if len(sectors_list):
@@ -732,9 +734,9 @@ def sss_run(sectors_list, build_csv_db_only, build_csv_db, csv_db_path, read_uni
 
     # Temporary to test and debug: DEBUG MODE
     # =======================================
-    # symbols     = ['TLV:ABIL']
+    # symbols     = ['VRSN']
     # num_threads = 1
-
+     
     if not research_mode: print('\n{} SSS Symbols to Scan using {} threads: {}\n'.format(len(symbols), num_threads, symbols))
 
 
@@ -879,83 +881,83 @@ def sss_run(sectors_list, build_csv_db_only, build_csv_db, csv_db_path, read_uni
 
     if num_threads >=  1:
         check_interval(0, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread0  = Thread(target=process_symbols, args=(symbols0,  csv_db_data0,  rows0,  rows0_no_div,  rows0_only_div,   0,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown, enterprise_value_to_revenue_limit, favor_technology_sector, market_cap_included, research_mode)) # process_symbols(symbols=symbols0, rows=rows0, rows_no_div=rows0_no_div, rows_only_div=rows0_only_div)
-        thread0.start()                               # symbols,   csv_db_data,   rows,   rows_no_div,   rows_only_div,    thread_id, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown, enterprise_value_to_revenue_limit, favor_technology_sector, market_cap_included
+        thread0  = Thread(target=process_symbols, args=(symbols0,  csv_db_data0,  rows0,  rows0_no_div,  rows0_only_div,   0,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min,  enterprise_value_to_revenue_limit, favor_technology_sector, market_cap_included, research_mode)) # process_symbols(symbols=symbols0, rows=rows0, rows_no_div=rows0_no_div, rows_only_div=rows0_only_div)
+        thread0.start()                               # symbols,   csv_db_data,   rows,   rows_no_div,   rows_only_div,    thread_id, build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min,  enterprise_value_to_revenue_limit, favor_technology_sector, market_cap_included
     if num_threads >=  2:
         check_interval(1, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread1  = Thread(target=process_symbols, args=(symbols1,  csv_db_data1,  rows1,  rows1_no_div,  rows1_only_div,   1,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  favor_technology_sector, market_cap_included, research_mode)) # process_symbols(symbols=symbols1, rows=rows1, rows_no_div=rows1_no_div, rows_only_div=rows1_only_div)
+        thread1  = Thread(target=process_symbols, args=(symbols1,  csv_db_data1,  rows1,  rows1_no_div,  rows1_only_div,   1,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, enterprise_value_to_revenue_limit,  favor_technology_sector, market_cap_included, research_mode)) # process_symbols(symbols=symbols1, rows=rows1, rows_no_div=rows1_no_div, rows_only_div=rows1_only_div)
         thread1.start()
     if num_threads >=  3:
         check_interval(2, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread2  = Thread(target=process_symbols, args=(symbols2,  csv_db_data2,  rows2,  rows2_no_div,  rows2_only_div,   2,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  favor_technology_sector, market_cap_included, research_mode))
+        thread2  = Thread(target=process_symbols, args=(symbols2,  csv_db_data2,  rows2,  rows2_no_div,  rows2_only_div,   2,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, enterprise_value_to_revenue_limit,  favor_technology_sector, market_cap_included, research_mode))
         thread2.start()
     if num_threads >=  4:
         check_interval(3, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread3  = Thread(target=process_symbols, args=(symbols3,  csv_db_data3,  rows3,  rows3_no_div,  rows3_only_div,   3,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  favor_technology_sector, market_cap_included, research_mode))
+        thread3  = Thread(target=process_symbols, args=(symbols3,  csv_db_data3,  rows3,  rows3_no_div,  rows3_only_div,   3,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, enterprise_value_to_revenue_limit,  favor_technology_sector, market_cap_included, research_mode))
         thread3.start()
     if num_threads >=  5:
         check_interval(4, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread4  = Thread(target=process_symbols, args=(symbols4,  csv_db_data4,  rows4,  rows4_no_div,  rows4_only_div,   4,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  favor_technology_sector, market_cap_included, research_mode))
+        thread4  = Thread(target=process_symbols, args=(symbols4,  csv_db_data4,  rows4,  rows4_no_div,  rows4_only_div,   4,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, enterprise_value_to_revenue_limit,  favor_technology_sector, market_cap_included, research_mode))
         thread4.start()
     if num_threads >=  6:
         check_interval(5, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread5  = Thread(target=process_symbols, args=(symbols5,  csv_db_data5,  rows5,  rows5_no_div,  rows5_only_div,   5,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  favor_technology_sector, market_cap_included, research_mode))
+        thread5  = Thread(target=process_symbols, args=(symbols5,  csv_db_data5,  rows5,  rows5_no_div,  rows5_only_div,   5,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, enterprise_value_to_revenue_limit,  favor_technology_sector, market_cap_included, research_mode))
         thread5.start()
     if num_threads >=  7:
         check_interval(6, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread6  = Thread(target=process_symbols, args=(symbols6,  csv_db_data6,  rows6,  rows6_no_div,  rows6_only_div,   6,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  favor_technology_sector, market_cap_included, research_mode))
+        thread6  = Thread(target=process_symbols, args=(symbols6,  csv_db_data6,  rows6,  rows6_no_div,  rows6_only_div,   6,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, enterprise_value_to_revenue_limit,  favor_technology_sector, market_cap_included, research_mode))
         thread6.start()
     if num_threads >=  8:
         check_interval(7, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread7  = Thread(target=process_symbols, args=(symbols7,  csv_db_data7,  rows7,  rows7_no_div,  rows7_only_div,   7,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  favor_technology_sector, market_cap_included, research_mode))
+        thread7  = Thread(target=process_symbols, args=(symbols7,  csv_db_data7,  rows7,  rows7_no_div,  rows7_only_div,   7,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, enterprise_value_to_revenue_limit,  favor_technology_sector, market_cap_included, research_mode))
         thread7.start()
     if num_threads >=  9:
         check_interval(8, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread8  = Thread(target=process_symbols, args=(symbols8,  csv_db_data8,  rows8,  rows8_no_div,  rows8_only_div,   8,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  favor_technology_sector, market_cap_included, research_mode))
+        thread8  = Thread(target=process_symbols, args=(symbols8,  csv_db_data8,  rows8,  rows8_no_div,  rows8_only_div,   8,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, enterprise_value_to_revenue_limit,  favor_technology_sector, market_cap_included, research_mode))
         thread8.start()
     if num_threads >= 10:
         check_interval(9, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread9  = Thread(target=process_symbols, args=(symbols9,  csv_db_data9,  rows9,  rows9_no_div,  rows9_only_div,   9,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  favor_technology_sector, market_cap_included, research_mode))
+        thread9  = Thread(target=process_symbols, args=(symbols9,  csv_db_data9,  rows9,  rows9_no_div,  rows9_only_div,   9,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, enterprise_value_to_revenue_limit,  favor_technology_sector, market_cap_included, research_mode))
         thread9.start()
     if num_threads >= 11:
         check_interval(10, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread10 = Thread(target=process_symbols, args=(symbols10, csv_db_data10, rows10, rows10_no_div, rows10_only_div, 10,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  favor_technology_sector, market_cap_included, research_mode))
+        thread10 = Thread(target=process_symbols, args=(symbols10, csv_db_data10, rows10, rows10_no_div, rows10_only_div, 10,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, enterprise_value_to_revenue_limit,  favor_technology_sector, market_cap_included, research_mode))
         thread10.start()
     if num_threads >= 12:
         check_interval(11, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread11 = Thread(target=process_symbols, args=(symbols11, csv_db_data11, rows11, rows11_no_div, rows11_only_div, 11,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  favor_technology_sector, market_cap_included, research_mode))
+        thread11 = Thread(target=process_symbols, args=(symbols11, csv_db_data11, rows11, rows11_no_div, rows11_only_div, 11,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, enterprise_value_to_revenue_limit,  favor_technology_sector, market_cap_included, research_mode))
         thread11.start()
     if num_threads >= 13:
         check_interval(12, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread12 = Thread(target=process_symbols, args=(symbols12, csv_db_data12, rows12, rows12_no_div, rows12_only_div, 12,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  favor_technology_sector, market_cap_included, research_mode))
+        thread12 = Thread(target=process_symbols, args=(symbols12, csv_db_data12, rows12, rows12_no_div, rows12_only_div, 12,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, enterprise_value_to_revenue_limit,  favor_technology_sector, market_cap_included, research_mode))
         thread12.start()
     if num_threads >= 14:
         check_interval(13, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread13 = Thread(target=process_symbols, args=(symbols13, csv_db_data13, rows13, rows13_no_div, rows13_only_div, 13,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  favor_technology_sector, market_cap_included, research_mode))
+        thread13 = Thread(target=process_symbols, args=(symbols13, csv_db_data13, rows13, rows13_no_div, rows13_only_div, 13,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, enterprise_value_to_revenue_limit,  favor_technology_sector, market_cap_included, research_mode))
         thread13.start()
     if num_threads >= 15:
         check_interval(14, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread14 = Thread(target=process_symbols, args=(symbols14, csv_db_data14, rows14, rows14_no_div, rows14_only_div, 14,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  favor_technology_sector, market_cap_included, research_mode))
+        thread14 = Thread(target=process_symbols, args=(symbols14, csv_db_data14, rows14, rows14_no_div, rows14_only_div, 14,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, enterprise_value_to_revenue_limit,  favor_technology_sector, market_cap_included, research_mode))
         thread14.start()
     if num_threads >= 16:
         check_interval(15, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread15 = Thread(target=process_symbols, args=(symbols15, csv_db_data15, rows15, rows15_no_div, rows15_only_div, 15,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  favor_technology_sector, market_cap_included, research_mode))
+        thread15 = Thread(target=process_symbols, args=(symbols15, csv_db_data15, rows15, rows15_no_div, rows15_only_div, 15,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, enterprise_value_to_revenue_limit,  favor_technology_sector, market_cap_included, research_mode))
         thread15.start()
     if num_threads >= 17:
         check_interval(16, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread16 = Thread(target=process_symbols, args=(symbols16, csv_db_data16, rows16, rows16_no_div, rows16_only_div, 16,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  favor_technology_sector, market_cap_included, research_mode))
+        thread16 = Thread(target=process_symbols, args=(symbols16, csv_db_data16, rows16, rows16_no_div, rows16_only_div, 16,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, enterprise_value_to_revenue_limit,  favor_technology_sector, market_cap_included, research_mode))
         thread16.start()
     if num_threads >= 18:
         check_interval(17, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread17 = Thread(target=process_symbols, args=(symbols17, csv_db_data17, rows17, rows17_no_div, rows17_only_div, 17,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  favor_technology_sector, market_cap_included, research_mode))
+        thread17 = Thread(target=process_symbols, args=(symbols17, csv_db_data17, rows17, rows17_no_div, rows17_only_div, 17,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, enterprise_value_to_revenue_limit,  favor_technology_sector, market_cap_included, research_mode))
         thread17.start()
     if num_threads >= 19:
         check_interval(18, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread18 = Thread(target=process_symbols, args=(symbols18, csv_db_data18, rows18, rows18_no_div, rows18_only_div, 18,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  favor_technology_sector, market_cap_included, research_mode))
+        thread18 = Thread(target=process_symbols, args=(symbols18, csv_db_data18, rows18, rows18_no_div, rows18_only_div, 18,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, enterprise_value_to_revenue_limit,  favor_technology_sector, market_cap_included, research_mode))
         thread18.start()
     if num_threads >= 20:
         check_interval(19, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread19 = Thread(target=process_symbols, args=(symbols19, csv_db_data19, rows19, rows19_no_div, rows19_only_div, 19,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, earnings_quarterly_growth_unknown,enterprise_value_to_revenue_limit,  favor_technology_sector, market_cap_included, research_mode))
+        thread19 = Thread(target=process_symbols, args=(symbols19, csv_db_data19, rows19, rows19_no_div, rows19_only_div, 19,         build_csv_db_only, use_investpy, tase_mode, sectors_list, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, enterprise_value_to_revenue_limit,  favor_technology_sector, market_cap_included, research_mode))
         thread19.start()
 
     if num_threads >=  1: thread0.join()
