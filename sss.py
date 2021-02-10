@@ -1,5 +1,5 @@
 #########################################################
-# Version 130 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# Version 132 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #########################################################
 
 # TODO: ASAF: 1. Which sectors have companies who's EVR values are relatively high, apart from technologies? Give them a favor normaization like tech as well
@@ -332,7 +332,7 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
                     return_value = False
 
         if stock_data.ev_to_cfo_ratio is None  or stock_data.ev_to_cfo_ratio > ev_to_cfo_ratio_limit or stock_data.ev_to_cfo_ratio <= 0:
-            if return_value and not research_mode: print('                            Skipping ev_to_cfo_ratio_limit: {}'.format(stock_data.ev_to_cfo_ratio_limit))
+            if return_value and not research_mode: print('                            Skipping ev_to_cfo_ratio: {}'.format(stock_data.ev_to_cfo_ratio))
             return_value = False
 
         if stock_data.trailing_eps is None:
@@ -734,7 +734,7 @@ def sss_run(sectors_list, build_csv_db_only, build_csv_db, csv_db_path, read_uni
 
     # Temporary to test and debug: DEBUG MODE
     # =======================================
-    # symbols     = ['VRSN']
+    # symbols     = ['EFII']
     # num_threads = 1
      
     if not research_mode: print('\n{} SSS Symbols to Scan using {} threads: {}\n'.format(len(symbols), num_threads, symbols))
