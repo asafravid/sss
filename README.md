@@ -2,6 +2,7 @@
  Stock Scanner & Screener: A `yfinance`+`investpy` combined-based Stock Scanner & Screener for the Israeli and US Stock Markets (Extendable to other stock markets as well)
  - https://pypi.org/project/yfinance/
  - https://pypi.org/project/investpy/
+ - https://pypi.org/project/fpdf/
 
 # SSS Core Equation
 http://bit.ly/SssCoreEquation
