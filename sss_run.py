@@ -1,5 +1,5 @@
 #########################################################
-# Version 132 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# Version 135 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #########################################################
 
 
@@ -7,7 +7,7 @@ import sss
 import numpy as np
 import csv
 import os
-import sss_diff
+import pdf_generator
 
 
 EV_MILLIONS_STEP = 100
@@ -119,13 +119,17 @@ def research_db(evr_range, pm_range, ev_millions_range, csv_db_path, read_united
         for key in result_sorted_appearance_counter_dict_sssss.keys():
             f.write("%s,%s,%s,%s,%s\n"%(key[0],str(key[1]).replace(',',' '),key[2],key[3],round(result_sorted_appearance_counter_dict_sssss[key],4)))
 
+    pdf_generator.csv_to_pdf(csv_filename=recommendation_list_filename_sss,   title=recommendation_list_filename_sss.replace( '/',  '-'), limit_num_rows=28)
+    pdf_generator.csv_to_pdf(csv_filename=recommendation_list_filename_ssss,  title=recommendation_list_filename_ssss.replace( '/', '-'), limit_num_rows=28)
+    pdf_generator.csv_to_pdf(csv_filename=recommendation_list_filename_sssss, title=recommendation_list_filename_sssss.replace('/', '-'), limit_num_rows=28)
+
 # TASE:
 # =====
 # old_run = 'Results/20210204-231709_Tase_FTB4_MCap_pm0.0567_evr15.0_BuildDb_nResults457'
-new_run = 'Results/20210210-104049_Tase_FTB4.5_MCap_pm0.0567_evr15.0_BuildDb_nResults241'
-evr_range = [1, 2, 3, 4, 5, 7,10,14,19,24,30,37,45,54]
-pm_range  = [1,10,18,25,31,36,40,43,45,46,47,48,49,50]
-research_db(evr_range=evr_range, pm_range=pm_range, ev_millions_range=5,   csv_db_path=new_run,   read_united_states_input_symbols=0, tase_mode=1, generate_result_folders=0, appearance_counter_min=1, appearance_counter_max=250, favor_technology_sector=4.5)
+# new_run = 'Results/20210210-104049_Tase_FTB4.5_MCap_pm0.0567_evr15.0_BuildDb_nResults241'
+# evr_range = [1, 2, 3, 4, 5, 7,10,14,19,24,30,37,45,54]
+# pm_range  = [1,10,18,25,31,36,40,43,45,46,47,48,49,50]
+# research_db(evr_range=evr_range, pm_range=pm_range, ev_millions_range=5,   csv_db_path=new_run,   read_united_states_input_symbols=0, tase_mode=1, generate_result_folders=0, appearance_counter_min=1, appearance_counter_max=250, favor_technology_sector=4.5)
 # sss_diff.run(newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=2, newer_rec_ranges=[5,1,54,1,50], older_rec_ranges=[5,1,45,5,45], rec_length=80)
 
 # NASDAQ100+S&P500+RUSSEL1000:
@@ -143,10 +147,10 @@ research_db(evr_range=evr_range, pm_range=pm_range, ev_millions_range=5,   csv_d
 # ALL:
 # # ====
 # old_run = 'Results/20210201-033253_FTB4_All_MCap_pm0.24_evr15.0_BuildDb_nResults8780'
-# new_run = 'Results/20210210-093602_FTB4.5_All_MCap_pm0.24_evr15.0_BuildDb_nResults3993'
-# evr_range = [1, 2, 3, 4, 5, 7,10,14,19,24,30,37,45,54]
-# pm_range  = [1,10,18,25,31,36,40,43,45,46,47,48,49,50]
-# research_db(evr_range=evr_range, pm_range=pm_range, ev_millions_range=100, csv_db_path=new_run,  read_united_states_input_symbols=1, tase_mode=0, generate_result_folders=0, appearance_counter_min=1, appearance_counter_max=800, favor_technology_sector=4.5)
+new_run = 'Results/20210210-093602_FTB4.5_All_MCap_pm0.24_evr15.0_BuildDb_nResults3993'
+evr_range = [1, 2, 3, 4, 5, 7,10,14,19,24,30,37,45,54]
+pm_range  = [1,10,18,25,31,36,40,43,45,46,47,48,49,50]
+research_db(evr_range=evr_range, pm_range=pm_range, ev_millions_range=100, csv_db_path=new_run,  read_united_states_input_symbols=1, tase_mode=0, generate_result_folders=0, appearance_counter_min=1, appearance_counter_max=800, favor_technology_sector=4.5)
 # sss_diff.run(newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=3, newer_rec_ranges=[100,1,54,1,50], older_rec_ranges=[100, 1, 55, 5, 65], rec_length=80)
 
 # Generate ALL:
