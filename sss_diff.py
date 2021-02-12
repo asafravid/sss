@@ -1,5 +1,5 @@
 #########################################################
-# Version 135 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# Version 140 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #########################################################
 
 
@@ -7,6 +7,7 @@
 import sss_filenames
 import csv
 import os
+import pdf_generator
 
 
 def get_row_index(ticker_index, ticker, rows):
@@ -112,3 +113,4 @@ def run(newer_path, older_path, db_exists_in_both_folders, diff_only_recommendat
             with open(diff_filenames_list[index], mode='w', newline='') as engine:
                 writer = csv.writer(engine)
                 writer.writerows(output_csv_rows)
+            pdf_generator.csv_to_pdf(csv_filename=diff_filenames_list[index],   title='Diff: '+diff_filenames_list[index].replace( '/',  '-'), limit_num_rows=28)
