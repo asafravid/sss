@@ -36,11 +36,11 @@ http://bit.ly/SssResultsInvestmentTracking
 
 # Indices Maintenance (Once per month)
 - Download `TASE` latest components via https://info.tase.co.il/eng/MarketData/Stocks/MarketData/Pages/MarketData.aspx into `Indices/Data_TASE.csv`
-- Download `NASDAQ100` latest components via https://www.barchart.com/stocks/quotes/$IUXX/components?viewName=main or https://www.nasdaq.com/market-activity/quotes/nasdaq-ndx-index into `Indices/nasdaq100-components.csv`
-- Download `Russel1000` latest components via https://www.barchart.com/stocks/indices/russell/russell1000 or https://en.wikipedia.org/wiki/Russell_1000_Index into `russell-1000-index.csv`
-- Download `S&P500` latest components via https://www.barchart.com/stocks/quotes/$SPX/components into `Indices/snp500-components.csv`
-- Download `NASDAQ` latest components via `ftp://ftp.nasdaqtrader.com/symboldirectory/` into `Indices/nasdaqlisted.csv`
-- Download `NASDAQ` Other Listed components via `ftp://ftp.nasdaqtrader.com/symboldirectory/` into `Indices/otherlisted.csv`
+- Download `NASDAQ100` latest components via https://www.barchart.com/stocks/quotes/$IUXX/components?viewName=main  (Remove last line indicating creation date) or https://www.nasdaq.com/market-activity/quotes/nasdaq-ndx-index into `Indices/nasdaq100-components.csv`
+- Download `Russel1000` latest components via https://www.barchart.com/stocks/indices/russell/russell1000 (Remove last line indicating creation date) or https://en.wikipedia.org/wiki/Russell_1000_Index into `russell-1000-index.csv` 
+- Download `S&P500` latest components via https://www.barchart.com/stocks/quotes/$SPX/components into `Indices/snp500-components.csv`  (Remove last line indicating creation date)
+- Download `NASDAQ` latest components via `ftp://ftp.nasdaqtrader.com/symboldirectory/` into `Indices/nasdaqlisted.csv` (Convert `.txt` to `.csv` and remove last line indicating creation date)
+- Download `NASDAQ` Other Listed components via `ftp://ftp.nasdaqtrader.com/symboldirectory/` into `Indices/otherlisted.csv` (Convert `.txt` to `.csv` and remove last line indicating creation date)
 - You can also create your own indice/group of stocks by either overriding the above files' contents or simply adding your own indice to the code support.
 
 # Disclaimer
