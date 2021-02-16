@@ -1,5 +1,5 @@
 #########################################################
-# Version 170 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# Version 171 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #########################################################
 
 #!/usr/bin/env python
@@ -27,8 +27,9 @@ def csv_to_pdf(csv_filename, csv_db_path, title, limit_num_rows, diff_list, tase
 
     pdf = MyFPDF(format='letter')
     pdf.add_page()
-
-    pdf.add_font('DejaVu', '', 'C:/Users/Asaf/AppData/Local/Microsoft/Windows/Fonts/DejaVuSansCondensed.ttf', uni=True)
+    # Access DejaVuSansCondensed.ttf on the machine. This font supports practically all languages.
+    # Install it via https://fonts2u.com/dejavu-sans-condensed.font
+    pdf.add_font('DejaVu', '', 'DejaVuSansCondensed.ttf', uni=True)
     pdf.set_font('DejaVu', '', 8)
 
     # pdf.set_font("Arial", size=8, style='B')
