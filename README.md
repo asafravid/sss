@@ -1,5 +1,5 @@
 # SSS Overview
- Stock Scanner & Screener: A `yfinance`+`investpy` combined-based Stock Scanner & Screener for the Israeli and US Stock Markets (Extendable to other stock markets as well). Within the code, the followin libraries and fonts are used:
+ Stock Scanner & Screener: A `yfinance`+`investpy` combined-based Stock Scanner & Screener for the Israeli and US Stock Markets (Extendable to other stock markets as well). Within the code, the following libraries and fonts are used:
  - https://pypi.org/project/yfinance/
  - https://pypi.org/project/investpy/
  - https://pypi.org/project/fpdf/
