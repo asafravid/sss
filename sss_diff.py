@@ -1,5 +1,5 @@
 #########################################################
-# Version 170 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# Version 173 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #########################################################
 
 
@@ -19,7 +19,7 @@ def get_row_index(ticker_index, ticker, rows):
     return -1
 
 
-def run(newer_path, older_path, db_exists_in_both_folders, diff_only_recommendation, ticker_index, name_index, movement_threshold, newer_rec_ranges, older_rec_ranges, rec_length):
+def run(newer_path, older_path, db_exists_in_both_folders, diff_only_recommendation, ticker_index, name_index, movement_threshold, newer_rec_ranges, older_rec_ranges, rec_length, consider_as_new_from):
     newer_filenames_list = sss_filenames.create_filenames_list(newer_path)
     older_filenames_list = sss_filenames.create_filenames_list(older_path)
     diff_path = 'Results/diff'+'_new'+newer_path.replace('Results/','_')+'_old'+older_path.replace('Results/','_')
@@ -90,14 +90,17 @@ def run(newer_path, older_path, db_exists_in_both_folders, diff_only_recommendat
                                                                                                                                            row[3],           row[4],            row[5],             row[6],            row[7],             row[8],              row[9],            row[10],            row[11],             row[12],            row[13],             row[14],              row[15],                            row[16],              row[17],                           row[18],                                 row[19],              row[20],                           row[21],              row[22],                         row[23],                          row[24],            row[25],             row[26],               row[27],                        row[28],              row[29],                   row[30],                                  row[31],                             row[32],              row[33],                 row[34],                        row[35],                          row[36],                                  row[37],               row[38],                                               row[39] ))
 
                             output_csv_rows.append([ticker, row_in_older_file-row_index, row_in_older_file, row_index])
-                        diff_lists[index].append(row_in_older_file-row_index)  # old row - this row = row change (up or down)
+                        if row_in_older_file > consider_as_new_from >= row_index:
+                            diff_lists[index].append('new')
+                        else:
+                            diff_lists[index].append(row_in_older_file-row_index)  # old row - this row = row change (up or down)
                     else:
                         print("{:5}: appears at position {:2} (new)".format(ticker, row_index))
                         if not diff_only_recommendation:
                             print('                                                                                                        sss_value: {:15}, ssss_value: {:15}, sssss_value: {:15}, ssse_value: {:15}, sssse_value: {:15}, ssssse_value: {:15}, sssi_value: {:15}, ssssi_value: {:15}, sssssi_value: {:15}, sssei_value: {:15}, ssssei_value: {:15}, sssssei_value: {:15}, enterprise_value_to_revenue: {:15}, evr_effective: {:15}, trailing_price_to_earnings: {:15}, trailing_12months_price_to_sales: {15:}, tpe_effective: {:15}, enterprise_value_to_ebitda: {:15}, profit_margin: {:15}, annualized_profit_margin: {:15}, held_percent_institutions: {:15}, forward_eps: {:15}, trailing_eps: {:15}, previous_close: {:15}, trailing_eps_percentage: {:15}, price_to_book: {:15}, shares_outstanding: {:15}, net_income_to_common_shareholders: {:15}, nitcsh_to_shares_outstanding: {:15}, num_employees: {:15}, enterprise_value: {:15}, nitcsh_to_num_employees: {:15}, earnings_quarterly_growth: {:15}, price_to_earnings_to_growth_ratio: {:15}, sqrt_peg_ratio: {:15}, annualized_cash_flow_from_operating_activities: {:15}, ev_to_cfo_ratio: {:15}'.format(
                                                                                                                                            row[3],           row[4],            row[5],             row[6],            row[7],             row[8],              row[9],            row[10],            row[11],             row[12],            row[13],             row[14],              row[15],                            row[16],              row[17],                           row[18],                                 row[19],              row[20],                           row[21],              row[22],                         row[23],                          row[24],            row[25],             row[26],               row[27],                        row[28],              row[29],                   row[30],                                  row[31],                             row[32],              row[33],                 row[34],                        row[35],                          row[36],                                  row[37],               row[38],                                               row[39]  ))
                         output_csv_rows.append([ticker, 'new', 'new', row_index])
-                        diff_lists[index].append('new')  # old row - this row = row change (up or down)
+                        diff_lists[index].append('new')
 
                     if row_index >= rec_length: break
                     row_index += 1

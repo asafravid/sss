@@ -1,5 +1,5 @@
 #########################################################
-# Version 172 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# Version 173 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #########################################################
 
 
@@ -11,7 +11,8 @@ import pdf_generator
 import sss_diff
 
 
-EV_MILLIONS_STEP = 100
+EV_MILLIONS_STEP          = 100
+PDF_NUM_ENTRIES_IN_REPORT = 28
 
 SCAN_MODE_TASE = 0  # Tel Aviv Stock Exchange
 SCAN_MODE_NSR  = 1  # Nasdaq100 + S&P500 + Russel1000
@@ -114,8 +115,8 @@ def research_db(evr_range, pm_range, ev_millions_range, csv_db_path, read_united
     sorted_appearance_counter_dict_sssss        = {k: v for k, v in sorted(appearance_counter_dict_sssss.items(), key=lambda item: item[1], reverse=True)}
     result_sorted_appearance_counter_dict_sssss = {k: v for k, v in sorted_appearance_counter_dict_sssss.items()  if v > 0.0}
 
-    recommendation_list_filename_sss   = csv_db_path+'/recommendation_sss_'+results_filename.replace('results_','')
-    recommendation_list_filename_ssss  = csv_db_path+'/recommendation_ssss_'+results_filename.replace('results_','')
+    recommendation_list_filename_sss   = csv_db_path+'/recommendation_sss_'  +results_filename.replace('results_','')
+    recommendation_list_filename_ssss  = csv_db_path+'/recommendation_ssss_' +results_filename.replace('results_','')
     recommendation_list_filename_sssss = csv_db_path+'/recommendation_sssss_'+results_filename.replace('results_','')
 
 
@@ -135,19 +136,19 @@ def research_db(evr_range, pm_range, ev_millions_range, csv_db_path, read_united
             f.write("%s,%s,%s,%s,%s\n"%(key[0],str(key[1]).replace(',',' '),key[2],key[3],round(result_sorted_appearance_counter_dict_sssss[key],4)))
 
     if older_path is not None:
-        diff_lists = sss_diff.run(newer_path=newer_path, older_path=older_path, db_exists_in_both_folders=db_exists_in_both_folders, diff_only_recommendation=diff_only_recommendation, ticker_index=ticker_index, name_index=name_index, movement_threshold=movement_threshold, newer_rec_ranges=newer_rec_ranges, older_rec_ranges=older_rec_ranges, rec_length=rec_length)
+        diff_lists = sss_diff.run(newer_path=newer_path, older_path=older_path, db_exists_in_both_folders=db_exists_in_both_folders, diff_only_recommendation=diff_only_recommendation, ticker_index=ticker_index, name_index=name_index, movement_threshold=movement_threshold, newer_rec_ranges=newer_rec_ranges, older_rec_ranges=older_rec_ranges, rec_length=rec_length, consider_as_new_from=PDF_NUM_ENTRIES_IN_REPORT)
 
         #                                                                                               0:15 is date and time
-        pdf_generator.csv_to_pdf(csv_filename=recommendation_list_filename_sss,   csv_db_path=csv_db_path, data_time_str=recommendation_list_filename_sss.replace('Results/','')[  0:15], title=TITLES[scan_mode].replace('_',' '),         limit_num_rows=28, diff_list=diff_lists[0], tase_mode=tase_mode)
-        pdf_generator.csv_to_pdf(csv_filename=recommendation_list_filename_ssss,  csv_db_path=None,        data_time_str=recommendation_list_filename_ssss.replace('Results/','')[ 0:15], title=TITLES[scan_mode].replace('_',' ')+'ssss' , limit_num_rows=28, diff_list=diff_lists[0], tase_mode=tase_mode)
-        pdf_generator.csv_to_pdf(csv_filename=recommendation_list_filename_sssss, csv_db_path=None,        data_time_str=recommendation_list_filename_sssss.replace('Results/','')[0:15], title=TITLES[scan_mode].replace('_',' ')+'sssss', limit_num_rows=28, diff_list=diff_lists[0], tase_mode=tase_mode)
+        pdf_generator.csv_to_pdf(csv_filename=recommendation_list_filename_sss,   csv_db_path=csv_db_path, data_time_str=recommendation_list_filename_sss.replace('Results/','')[  0:15], title=TITLES[scan_mode].replace('_',' '),         limit_num_rows=PDF_NUM_ENTRIES_IN_REPORT, diff_list=diff_lists[0], tase_mode=tase_mode)
+        pdf_generator.csv_to_pdf(csv_filename=recommendation_list_filename_ssss,  csv_db_path=None,        data_time_str=recommendation_list_filename_ssss.replace('Results/','')[ 0:15], title=TITLES[scan_mode].replace('_',' ')+'ssss' , limit_num_rows=PDF_NUM_ENTRIES_IN_REPORT, diff_list=diff_lists[0], tase_mode=tase_mode)
+        pdf_generator.csv_to_pdf(csv_filename=recommendation_list_filename_sssss, csv_db_path=None,        data_time_str=recommendation_list_filename_sssss.replace('Results/','')[0:15], title=TITLES[scan_mode].replace('_',' ')+'sssss', limit_num_rows=PDF_NUM_ENTRIES_IN_REPORT, diff_list=diff_lists[0], tase_mode=tase_mode)
 
 # TASE:
 # =====
 old_run = 'Results/20210214-010721_Tase_FTB4.5_MCap_pm0.0567_evr15.0_BuildDb_nResults239'
 new_run = 'Results/20210217-145504_Tase_FTB4.5_MCap_pm0.0567_evr15.0_BuildDb_nResults260'
-evr_range_tase = [1, 2, 3, 4, 5, 7,10,14,19,24,30,37,45,54]
-pm_range_tase  = [1,10,18,25,31,36,40,43,45,46,47,48,49,50]
+evr_range_tase = [1, 3, 7,10,14,19,24,30,37,45,54]
+pm_range_tase  = [1,10,18,25,31,36,40,43,45,47,50]
 research_db(evr_range=evr_range_tase, pm_range=pm_range_tase, ev_millions_range=5,   csv_db_path=new_run,   read_united_states_input_symbols=0, scan_mode=SCAN_MODE_TASE, generate_result_folders=0, appearance_counter_min=1, appearance_counter_max=250, favor_technology_sector=4.5,
             newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=0, newer_rec_ranges=[5,1,54,1,50], older_rec_ranges=[5,1,54,1,50], rec_length=80)
 #sss_diff.run(newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=0, newer_rec_ranges=[5,1,54,1,50], older_rec_ranges=[5,1,45,5,45], rec_length=80)
