@@ -1,5 +1,5 @@
 #########################################################
-# Version 170 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# Version 174 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #########################################################
 
 # TODO: ASAF: 1. Which sectors have companies who's EVR values are relatively high, apart from technologies? Give them a favor normaization like tech as well
@@ -302,7 +302,7 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
             else:
                 stock_data.ev_to_cfo_ratio = ev_to_cfo_ratio_limit*10  # Set a very high value to make stock unatractive
 
-        if not build_csv_db_only and not tase_mode and (stock_data.enterprise_value is None or stock_data.enterprise_value < min_enterprise_value_millions_usd*1000000):
+        if not build_csv_db_only and (stock_data.enterprise_value is None or stock_data.enterprise_value < min_enterprise_value_millions_usd*1000000):
             if return_value and not research_mode: print('                            Skipping enterprise_value: {}'.format(stock_data.enterprise_value))
             return_value = False
 
@@ -1101,7 +1101,7 @@ def sss_run(sectors_list, build_csv_db_only, build_csv_db, csv_db_path, read_uni
     header_row = ["Ticker", "Name", "Sector", "sss_value", "ssss_value", "sssss_value", "ssse_value", "sssse_value", "ssssse_value", "sssi_value", "ssssi_value", "sssssi_value", "sssei_value", "ssssei_value", "sssssei_value", "enterprise_value_to_revenue", "evr_effective", "trailing_price_to_earnings", "trailing_12months_price_to_sales", "tpe_effective", "enterprise_value_to_ebitda", "profit_margin", "annualized_profit_margin", "held_percent_institutions", "forward_eps", "trailing_eps", "previous_close", "trailing_eps_percentage","price_to_book", "shares_outstanding", "net_income_to_common_shareholders", "nitcsh_to_shares_outstanding", "employees", "enterprise_value", "nitcsh_to_num_employees", "earnings_quarterly_growth", "price_to_earnings_to_growth_ratio", "sqrt_peg_ratio", "annualized_cash_flow_from_operating_activities", "ev_to_cfo_ratio", "last_dividend_0", "last_dividend_1", "last_dividend_2", "last_dividend_3" ]
 
     if research_mode: # Update the appearance counter using ssss and sssss
-        list_len_ssss = len(sorted_list_ssss)
+        list_len_ssss = len(sorted_list_sss)
         list_len_sss  = list_len_ssss
         if appearance_counter_min <= list_len_sss   and list_len_sss   <= appearance_counter_max:
             for index, row in enumerate(sorted_list_sss):

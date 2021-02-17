@@ -1,5 +1,5 @@
 #########################################################
-# Version 173 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# Version 174 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #########################################################
 
 
@@ -91,7 +91,7 @@ def run(newer_path, older_path, db_exists_in_both_folders, diff_only_recommendat
 
                             output_csv_rows.append([ticker, row_in_older_file-row_index, row_in_older_file, row_index])
                         if row_in_older_file > consider_as_new_from >= row_index:
-                            diff_lists[index].append('new')
+                            diff_lists[index].append('new+{}'.format(row_in_older_file-row_index))
                         else:
                             diff_lists[index].append(row_in_older_file-row_index)  # old row - this row = row change (up or down)
                     else:
