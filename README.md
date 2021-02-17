@@ -8,7 +8,7 @@
 # SSS Core Equation
 http://bit.ly/SssCoreEquation
 
-# SSS Big Data Analysis Ranking Equation
+# SSS Big Data (Muti-Dimentional) Analysis and Advanced Ranking Equation
 http://bit.ly/SssBigDataAnalysis
 
 # Setup
