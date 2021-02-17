@@ -1,5 +1,5 @@
 #########################################################
-# Version 171 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# Version 172 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #########################################################
 
 #!/usr/bin/env python
@@ -12,8 +12,8 @@ import matplotlib.pyplot as plt; plt.rcdefaults()
 import numpy as np
 
 
-def csv_to_pdf(csv_filename, csv_db_path, title, limit_num_rows, diff_list, tase_mode):
-    title_for_figures = title[::-1] if tase_mode else title
+def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, diff_list, tase_mode):
+    title_for_figures = data_time_str + ' ' + (title[::-1] if tase_mode else title)
 
     # Read CSV file:
     csv_rows = []
@@ -122,7 +122,7 @@ def csv_to_pdf(csv_filename, csv_db_path, title, limit_num_rows, diff_list, tase
         pdf.write_html(text=html)
 
     if csv_db_path is not None:
-        output_filename = csv_db_path+'/'+title+'.pdf'
+        output_filename = csv_db_path+'/'+data_time_str+title+'.pdf'
     else:
         output_filename = csv_filename+'.pdf'
     pdf.output(output_filename, 'F')
