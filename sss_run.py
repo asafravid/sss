@@ -1,5 +1,5 @@
 #########################################################
-# Version 174 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# Version 175 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #########################################################
 
 
@@ -74,7 +74,7 @@ def prepare_appearance_counters_dictionaries(csv_db_path, appearance_counter_dic
 #  [e, f, g, h]],                    100, e, f, g, h                     500, i, j, k, l
 #                                                                        500, m, n, o, p
 # [[i, j, k, l],                     500, i, j, k, l
-#  [m, n, o, p]],                    500, m, n, o, p
+#  [m, n, o, p]]                     500, m, n, o, p
 #
 def combine_multi_dim_to_table(multi_dim, dim3, rows,cols):
     len_new_rows = len(dim3)*len(rows)

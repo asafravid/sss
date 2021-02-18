@@ -1,5 +1,5 @@
 #########################################################
-# Version 174 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# Version 175 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #########################################################
 
 
@@ -90,10 +90,15 @@ def run(newer_path, older_path, db_exists_in_both_folders, diff_only_recommendat
                                                                                                                                            row[3],           row[4],            row[5],             row[6],            row[7],             row[8],              row[9],            row[10],            row[11],             row[12],            row[13],             row[14],              row[15],                            row[16],              row[17],                           row[18],                                 row[19],              row[20],                           row[21],              row[22],                         row[23],                          row[24],            row[25],             row[26],               row[27],                        row[28],              row[29],                   row[30],                                  row[31],                             row[32],              row[33],                 row[34],                        row[35],                          row[36],                                  row[37],               row[38],                                               row[39] ))
 
                             output_csv_rows.append([ticker, row_in_older_file-row_index, row_in_older_file, row_index])
+
                         if row_in_older_file > consider_as_new_from >= row_index:
                             diff_lists[index].append('new+{}'.format(row_in_older_file-row_index))
+                        elif row_in_older_file == row_index:
+                            diff_lists[index].append('0')
+                        elif row_in_older_file > row_index:
+                            diff_lists[index].append('+{}'.format(row_in_older_file-row_index))  # old row - this row = row change (up+ or down-)
                         else:
-                            diff_lists[index].append(row_in_older_file-row_index)  # old row - this row = row change (up or down)
+                            diff_lists[index].append('{}'.format( row_in_older_file-row_index))  # old row - this row = row change (+up or -down)
                     else:
                         print("{:5}: appears at position {:2} (new)".format(ticker, row_index))
                         if not diff_only_recommendation:
