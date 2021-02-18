@@ -1,5 +1,5 @@
 #########################################################
-# Version 180 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# Version 185 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #########################################################
 
 #!/usr/bin/env python
@@ -41,18 +41,19 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
         if row_index >= limit_num_rows: break
         if row_index > 0:  # row 0 is title
             names.append(row[1])
-            appearances.append(float(row[4]))
+            appearances.append(float(row[5]))
         if row_index == 0 and tase_mode: # overrwrite to hebrew
-            row = ['סימבול'[::-1],'שם החברה'[::-1],'ענף'[::-1],'ערך'[::-1],'ציון'[::-1]]
+            row = ['סימבול'[::-1],'שם החברה'[::-1],'ענף'[::-1],'ערך'[::-1],'סגירה'[::-1],'ציון'[::-1]]
         for col_index, col in enumerate(row):
             w_diff                =0
             if   col_index == 0: w=18 # Ticker
             elif col_index == 1: w=50 # Name
             elif col_index == 2: w=33 # Sector
             elif col_index == 3: w=25 # S value
-            elif col_index == 4:
-                w                = 22 # appearance[_counter]
-                w_diff           = 8  # Diff
+            elif col_index == 4: w=25 # Close
+            elif col_index == 5:
+                w                = 18 # appearance[_counter]
+                w_diff           = 5  # Diff
 
             if col_index < len(row)-1:
                 pdf.cell(w=w, h=5, txt=col, border=1, ln=0, align="C" if row_index == 0 else "L")
@@ -61,19 +62,11 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
                 pdf.cell(w=w, h=5, txt=col.replace('_counter',''), border=1, ln=0, align="C" if row_index == 0 else "L")
                 if w_diff:
                     if diff_list is not None and row_index < len(diff_list):
-                        pdf.cell(w=w, h=5, txt='שינוי'[::-1] if tase_mode and row_index == 0 else str(diff_list[row_index]), border=1, ln=1, align="C" if row_index == 0 else "L")
+                        pdf.cell(w=w, h=5, txt='ציון'[::-1] if tase_mode and row_index == 0 else str(diff_list[row_index]), border=1, ln=1, align="C" if row_index == 0 else "L")
 
     pdf.cell(200, 5, txt='', ln=1, align="L")
     fig, ax = plt.subplots(figsize=(15, 5))
     y_pos = np.arange(len(names))
-
-    # plt.plot(names, appearances)
-    # plt.xlabel('Names')
-    # plt.ylabel('Appearances')
-    # plt.title(csv_filename[csv_filename.find('recommendation'):])
-    # plt.invert_yaxis()
-    # plt.bar(y_pos, appearances, align='center', alpha=0.5)
-    # plt.xticks(y_pos, names)
 
     ax.barh(y_pos, appearances, align='center')
     ax.set_yticks(y_pos)
@@ -85,18 +78,18 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
     # plt.show()
     plt.savefig(csv_filename+"_fig.png")
 
-    if tase_mode:  # TODO: ASAFR: Resolve Hebrew PDF issues
+    if tase_mode:
         telegram_channel_description          = 'ערוץ ערך מוסף'[::-1]
         telegram_discussion_group_description = 'עדכונים, תמיכה טכנית ודיונים'[::-1]
         open_source_description               = 'קוד פתוח'[::-1]
         the_engine_begind_description         = 'מנוע הסריקה'[::-1]
         lecture_description                   = 'הרצאה על הסורק'[::-1]
 
-        pdf.cell(30, 5, txt=telegram_channel_description,          ln=0, align="R", border=1)
-        pdf.cell(39, 5, txt=telegram_discussion_group_description, ln=0, align="R", border=1)
-        pdf.cell(55, 5, txt=open_source_description,               ln=0, align="R", border=1)
-        pdf.cell(40, 5, txt=the_engine_begind_description,         ln=0, align="R", border=1)
-        pdf.cell(30, 5, txt=lecture_description,                   ln=1, align="R", border=1)
+        pdf.cell(30, 5, txt=telegram_channel_description,          ln=0, align="C", border=1)
+        pdf.cell(39, 5, txt=telegram_discussion_group_description, ln=0, align="C", border=1)
+        pdf.cell(55, 5, txt=open_source_description,               ln=0, align="C", border=1)
+        pdf.cell(40, 5, txt=the_engine_begind_description,         ln=0, align="C", border=1)
+        pdf.cell(32, 5, txt=lecture_description,                   ln=1, align="C", border=1)
 
 
         html_telegram_channel_description          = "<A HREF=""https://t.me/investorsIL"">t.me/investorsIL</A><"
@@ -111,7 +104,7 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
         html_the_engine_begind_description         = " <A HREF=""http://bit.ly/SssCoreEquation"">bit.ly/SssCoreEquation</A>"
         pdf.write_html(text=html_the_engine_begind_description)
 
-        html_lecture_description                   = " <A HREF=""http://bit.ly/SssLecture"">bit.ly/SssLecture</A>"
+        html_lecture_description                   = "  <A HREF=""http://bit.ly/SssLecture"">bit.ly/SssLecture</A>"
         pdf.write_html(text=html_lecture_description)
 
         pdf.cell(200, 5, txt='', ln=1, align="R")

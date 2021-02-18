@@ -1,8 +1,8 @@
 #########################################################
-# Version 180 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# Version 185 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #########################################################
 
-# TODO: ASAF: 1. Which sectors have companies who's EVR values are relatively high, apart from technologies? Give them a favor normaization like tech as well
+# TODO: ASAF: 1. Which sectors have companies who's EVR values are relatively high, apart from technologies? Give them a favor normalization like tech as well
 #             2. Finnacials, for instance. Also Favoring EVR is not enough, apply the favor over the PEtrailing (P/E) as well - research the DB prior to that.
 #                - Add column: pe_effective...
 #             3. What about that ev_to_cfo_ratio of 1000 - check that all is well in db.csv and in the results csvs... maybe increase it?
@@ -1097,22 +1097,22 @@ def sss_run(sectors_list, build_csv_db_only, build_csv_db, csv_db_path, read_uni
     list_sss_best_only_div.extend(sorted_list_sssssei_only_div[:best_nrows])
     sorted_list_sssss_best_only_div_with_duplicates = sorted(list_sss_best_only_div, key=lambda row: row[5], reverse=False)  # Sort by sssss_value   -> The lower  - the more attractive
     sorted_list_sssss_best_only_div = list(k for k, _ in itertools.groupby(sorted_list_sssss_best_only_div_with_duplicates))
-
+    #             0         1       2         3            4             5              6             7              8               9             10             11              12             13              14               15                             16               17                            18                                  19               20                            21               22                          23                           24             25              26
     header_row = ["Ticker", "Name", "Sector", "sss_value", "ssss_value", "sssss_value", "ssse_value", "sssse_value", "ssssse_value", "sssi_value", "ssssi_value", "sssssi_value", "sssei_value", "ssssei_value", "sssssei_value", "enterprise_value_to_revenue", "evr_effective", "trailing_price_to_earnings", "trailing_12months_price_to_sales", "tpe_effective", "enterprise_value_to_ebitda", "profit_margin", "annualized_profit_margin", "held_percent_institutions", "forward_eps", "trailing_eps", "previous_close", "trailing_eps_percentage","price_to_book", "shares_outstanding", "net_income_to_common_shareholders", "nitcsh_to_shares_outstanding", "employees", "enterprise_value", "nitcsh_to_num_employees", "earnings_quarterly_growth", "price_to_earnings_to_growth_ratio", "sqrt_peg_ratio", "annualized_cash_flow_from_operating_activities", "ev_to_cfo_ratio", "last_dividend_0", "last_dividend_1", "last_dividend_2", "last_dividend_3" ]
 
     if research_mode: # Update the appearance counter using ssss and sssss
         list_len_ssss = len(sorted_list_sss)
         list_len_sss  = list_len_ssss
-        if appearance_counter_min <= list_len_sss   and list_len_sss   <= appearance_counter_max:
+        if appearance_counter_min <= list_len_sss   <= appearance_counter_max:
             for index, row in enumerate(sorted_list_sss):
-                appearance_counter_dict_sss[  (row[0],row[1],row[2],row[3])] = appearance_counter_dict_sss[  (row[0],row[1],row[2],row[3])]+math.sqrt(float(list_len_sss  -index))/float(list_len_sss)
-        if appearance_counter_min <= list_len_ssss  and list_len_ssss  <= appearance_counter_max:
+                appearance_counter_dict_sss[  (row[0],row[1],row[2],row[3],row[26])] = appearance_counter_dict_sss[  (row[0],row[1],row[2],row[3],row[26])]+math.sqrt(float(list_len_sss  -index))/float(list_len_sss  )
+        if appearance_counter_min <= list_len_ssss  <= appearance_counter_max:
             for index, row in enumerate(sorted_list_ssss):
-                appearance_counter_dict_ssss[ (row[0],row[1],row[2],row[4])] = appearance_counter_dict_ssss[ (row[0],row[1],row[2],row[4])]+math.sqrt(float(list_len_ssss -index))/float(list_len_ssss)
+                appearance_counter_dict_ssss[ (row[0],row[1],row[2],row[4],row[26])] = appearance_counter_dict_ssss[ (row[0],row[1],row[2],row[4],row[26])]+math.sqrt(float(list_len_ssss -index))/float(list_len_ssss )
         list_len_sssss = len(sorted_list_sssss)
-        if appearance_counter_min <= list_len_sssss and list_len_sssss <= appearance_counter_max:
+        if appearance_counter_min <= list_len_sssss <= appearance_counter_max:
             for index, row in enumerate(sorted_list_sssss):
-                appearance_counter_dict_sssss[(row[0],row[1],row[2],row[5])] = appearance_counter_dict_sssss[(row[0],row[1],row[2],row[5])]+math.sqrt(float(list_len_sssss-index))/float(list_len_sssss)
+                appearance_counter_dict_sssss[(row[0],row[1],row[2],row[5],row[26])] = appearance_counter_dict_sssss[(row[0],row[1],row[2],row[5],row[26])]+math.sqrt(float(list_len_sssss-index))/float(list_len_sssss)
 
     sorted_lists_list = [
         sorted_list_db,
