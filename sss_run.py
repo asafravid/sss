@@ -1,5 +1,5 @@
 #########################################################
-# Version 175 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# Version 180 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #########################################################
 
 
@@ -30,11 +30,11 @@ TITLES = ["_תוצאות_סריקה_עבור_בורסת_תל_אביב", "_Scan_R
 
 # Run Build DB Only: TASE
 # =============================
-# sss.sss_run(sectors_list=[], build_csv_db_only=1, build_csv_db=1, csv_db_path='None', read_united_states_input_symbols=0, tase_mode=1, num_threads=20, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.01, ev_to_cfo_ratio_limit = 200.0, min_enterprise_value_millions_usd=5, best_n_select=3, enterprise_value_to_revenue_limit=100, favor_technology_sector=4.5, generate_result_folders=1)
+sss.sss_run(sectors_list=[], build_csv_db_only=1, build_csv_db=1, csv_db_path='None', read_united_states_input_symbols=0, tase_mode=1, num_threads=20, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.01, ev_to_cfo_ratio_limit = 200.0, min_enterprise_value_millions_usd=5, best_n_select=3, enterprise_value_to_revenue_limit=100, favor_technology_sector=4.5, generate_result_folders=1)
 
 # Run Build DB Only: Nasdaq100+S&P500+Russel1000
 # ==============================================
-# sss.sss_run(sectors_list=[], build_csv_db_only=1, build_csv_db=1, csv_db_path='None', read_united_states_input_symbols=0, tase_mode=0, num_threads=20, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.12, ev_to_cfo_ratio_limit = 100.0, min_enterprise_value_millions_usd=100, best_n_select=3, enterprise_value_to_revenue_limit=20, favor_technology_sector=4.5, generate_result_folders=1)
+# sss.sss_run(sectors_list=[], build_csv_db_only=1, build_csv_db=1, csv_db_path='None', read_united_states_input_symbols=0, tase_mode=0, num_threads=20, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.01, ev_to_cfo_ratio_limit=200.0, min_enterprise_value_millions_usd=100, best_n_select=3, enterprise_value_to_revenue_limit=40, favor_technology_sector=4.5, generate_result_folders=1)
 
 # Run Build DB Only: All/Others
 # =============================
@@ -183,13 +183,13 @@ def research_db(evr_range, pm_range, ev_millions_range, csv_db_path, read_united
 
 # TASE:
 # =====
-old_run = 'Results/20210214-010721_Tase_FTB4.5_MCap_pm0.0567_evr15.0_BuildDb_nResults239'
-new_run = 'Results/20210217-145504_Tase_FTB4.5_MCap_pm0.0567_evr15.0_BuildDb_nResults260'
-evr_range_tase         = [1, 3, 7,10,14,19,24,30,37,45,54]
-pm_range_tase          = [1,10,18,25,31,36,40,43,45,47,50]
-ev_millions_range_tase = [5,50,500,5000]
-research_db(evr_range=evr_range_tase, pm_range=pm_range_tase, ev_millions_range=ev_millions_range_tase,   csv_db_path=new_run,   read_united_states_input_symbols=0, scan_mode=SCAN_MODE_TASE, generate_result_folders=0, appearance_counter_min=1, appearance_counter_max=250, favor_technology_sector=4.5,
-            newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=0, newer_rec_ranges=[5,1,54,1,50], older_rec_ranges=[5,1,54,1,50], rec_length=80)
+# old_run = 'Results/20210214-010721_Tase_FTB4.5_MCap_pm0.0567_evr15.0_BuildDb_nResults239'
+# new_run = 'Results/20210217-145504_Tase_FTB4.5_MCap_pm0.0567_evr15.0_BuildDb_nResults260'
+# evr_range_tase         = [1, 3, 7,10,14,19,24,30,37,45,54]
+# pm_range_tase          = [1,10,18,25,31,36,40,43,45,47,50]
+# ev_millions_range_tase = [5,50,500,5000]
+# research_db(evr_range=evr_range_tase, pm_range=pm_range_tase, ev_millions_range=ev_millions_range_tase,   csv_db_path=new_run,   read_united_states_input_symbols=0, scan_mode=SCAN_MODE_TASE, generate_result_folders=0, appearance_counter_min=1, appearance_counter_max=250, favor_technology_sector=4.5,
+#             newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=0, newer_rec_ranges=[ev_millions_range_tase[0],ev_millions_range_tase[-1],evr_range_tase[0],evr_range_tase[-1],pm_range_tase[0],pm_range_tase[-1]], older_rec_ranges=[5,5,1,54,1,50], rec_length=80)
 #sss_diff.run(newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=0, newer_rec_ranges=[5,1,54,1,50], older_rec_ranges=[5,1,45,5,45], rec_length=80)
 
 # Generate TASE:
@@ -200,12 +200,13 @@ research_db(evr_range=evr_range_tase, pm_range=pm_range_tase, ev_millions_range=
 
 # NASDAQ100+S&P500+RUSSEL1000:
 # ============================
-# old_run = 'Results/20210207-002556_FTB4.5_MCap_pm0.17_evr17.5_BuildDb_nResults1126'
-# new_run = 'Results/20210213-011620_FTB4.5_MCap_pm0.17_evr17.5_BuildDb_nResults944'
-# evr_range_n = [1, 2, 3, 4, 5, 7,10,14,19,24,30,37,45,54]
-# pm_range_n  = [1,10,18,25,31,36,40,43,45,46,47,48,49,50]
-# research_db(evr_range=evr_range_n, pm_range=pm_range_n, ev_millions_range=100,  csv_db_path=new_run,   read_united_states_input_symbols=0, scan_mode=SCAN_MODE_NSR, generate_result_folders=0, appearance_counter_min=1, appearance_counter_max=350, favor_technology_sector=4.5,
-#             newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=0, newer_rec_ranges=[100,1,54,1,50], older_rec_ranges=[100,1,54,1,50], rec_length=80)
+# old_run = 'Results/20210213-011620_FTB4.5_MCap_pm0.17_evr17.5_BuildDb_nResults944'
+# new_run = 'Results/20210218-111720_FTB4.5_MCap_pm0.17_evr17.5_BuildDb_nResults962'
+# evr_range_n   = [1, 3, 6, 10,15,20,26,34,42,51]
+# pm_range_n    = [1,11,20, 28,35,41,45,49,52,54]
+# ev_millions_n = [100,250,2500,25000,250000]
+# research_db(evr_range=evr_range_n, pm_range=pm_range_n, ev_millions_range=ev_millions_n,  csv_db_path=new_run,   read_united_states_input_symbols=0, scan_mode=SCAN_MODE_NSR, generate_result_folders=0, appearance_counter_min=1, appearance_counter_max=450, favor_technology_sector=4.5,
+#             newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=0, newer_rec_ranges=[ev_millions_n[0],ev_millions_n[-1],evr_range_n[0],evr_range_n[-1],pm_range_n[0],pm_range_n[-1]], older_rec_ranges=[100,100,1,54,1,50], rec_length=80)
 # sss_diff.run(newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=3, newer_rec_ranges=[100,1,54,1,50], older_rec_ranges=[100,1,54,1,50], rec_length=80)
 
 # Generate:

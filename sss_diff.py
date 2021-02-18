@@ -1,5 +1,5 @@
 #########################################################
-# Version 175 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# Version 180 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #########################################################
 
 
@@ -25,13 +25,13 @@ def run(newer_path, older_path, db_exists_in_both_folders, diff_only_recommendat
     diff_path = 'Results/diff'+'_new'+newer_path.replace('Results/','_')+'_old'+older_path.replace('Results/','_')
     compact_diff_path = diff_path.replace('FavorTechBy3','FTB3').replace('MCap_','').replace('BuildDb_','').replace('nResults','')
     diff_filenames_list  = sss_filenames.create_filenames_list(compact_diff_path)
-    # The order is important: sss, then ssss, then sssss                                                 evm                  evr_min,             evr_max,             pm_min,              pm_max
-    newer_filenames_list.insert(0, newer_path +'/recommendation_sssss_evm{}_evr{}-{}_pm{}-{}.csv'.format(newer_rec_ranges[0], newer_rec_ranges[1], newer_rec_ranges[2], newer_rec_ranges[3], newer_rec_ranges[4]))
-    newer_filenames_list.insert(0, newer_path +'/recommendation_ssss_evm{}_evr{}-{}_pm{}-{}.csv'.format( newer_rec_ranges[0], newer_rec_ranges[1], newer_rec_ranges[2], newer_rec_ranges[3], newer_rec_ranges[4]))
-    newer_filenames_list.insert(0, newer_path +'/recommendation_sss_evm{}_evr{}-{}_pm{}-{}.csv'.format(  newer_rec_ranges[0], newer_rec_ranges[1], newer_rec_ranges[2], newer_rec_ranges[3], newer_rec_ranges[4]))
-    older_filenames_list.insert(0, older_path +'/recommendation_sssss_evm{}_evr{}-{}_pm{}-{}.csv'.format(older_rec_ranges[0], older_rec_ranges[1], older_rec_ranges[2], older_rec_ranges[3], older_rec_ranges[4]))
-    older_filenames_list.insert(0, older_path +'/recommendation_ssss_evm{}_evr{}-{}_pm{}-{}.csv'.format( older_rec_ranges[0], older_rec_ranges[1], older_rec_ranges[2], older_rec_ranges[3], older_rec_ranges[4]))
-    older_filenames_list.insert(0, older_path +'/recommendation_sss_evm{}_evr{}-{}_pm{}-{}.csv'.format(  older_rec_ranges[0], older_rec_ranges[1], older_rec_ranges[2], older_rec_ranges[3], older_rec_ranges[4]))
+    # The order is important: sss, then ssss, then sssss                                                    evm_min              evm_max              evr_min,             evr_max,             pm_min,              pm_max
+    newer_filenames_list.insert(0, newer_path +'/recommendation_sssss_evm{}-{}_evr{}-{}_pm{}-{}.csv'.format(newer_rec_ranges[0], newer_rec_ranges[1], newer_rec_ranges[2], newer_rec_ranges[3], newer_rec_ranges[4], newer_rec_ranges[5]))
+    newer_filenames_list.insert(0, newer_path +'/recommendation_ssss_evm{}-{}_evr{}-{}_pm{}-{}.csv'.format( newer_rec_ranges[0], newer_rec_ranges[1], newer_rec_ranges[2], newer_rec_ranges[3], newer_rec_ranges[4], newer_rec_ranges[5]))
+    newer_filenames_list.insert(0, newer_path +'/recommendation_sss_evm{}-{}_evr{}-{}_pm{}-{}.csv'.format(  newer_rec_ranges[0], newer_rec_ranges[1], newer_rec_ranges[2], newer_rec_ranges[3], newer_rec_ranges[4], newer_rec_ranges[5]))
+    older_filenames_list.insert(0, older_path +'/recommendation_sssss_evm{}-{}_evr{}-{}_pm{}-{}.csv'.format(older_rec_ranges[0], older_rec_ranges[1], older_rec_ranges[2], older_rec_ranges[3], older_rec_ranges[4], older_rec_ranges[5]))
+    older_filenames_list.insert(0, older_path +'/recommendation_ssss_evm{}-{}_evr{}-{}_pm{}-{}.csv'.format( older_rec_ranges[0], older_rec_ranges[1], older_rec_ranges[2], older_rec_ranges[3], older_rec_ranges[4], older_rec_ranges[5]))
+    older_filenames_list.insert(0, older_path +'/recommendation_sss_evm{}-{}_evr{}-{}_pm{}-{}.csv'.format(  older_rec_ranges[0], older_rec_ranges[1], older_rec_ranges[2], older_rec_ranges[3], older_rec_ranges[4], older_rec_ranges[5]))
 
     diff_filenames_list.insert(0,'{}/recommendation_sssss.csv'.format(compact_diff_path))
     diff_filenames_list.insert(0,'{}/recommendation_ssss.csv'.format(compact_diff_path))

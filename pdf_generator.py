@@ -1,5 +1,5 @@
 #########################################################
-# Version 174 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# Version 180 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #########################################################
 
 #!/usr/bin/env python
@@ -86,27 +86,32 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
     plt.savefig(csv_filename+"_fig.png")
 
     if tase_mode:  # TODO: ASAFR: Resolve Hebrew PDF issues
-        telegram_channel_description          = 'ערוץ ערך מוסף בטלגרם'[::-1]
-        telegram_discussion_group_description = 'עדכונים )כולל תמיכה ושאלות על הסורק( ודיונים בטלגרם'[::-1]
+        telegram_channel_description          = 'ערוץ ערך מוסף'[::-1]
+        telegram_discussion_group_description = 'עדכונים, תמיכה טכנית ודיונים'[::-1]
         open_source_description               = 'קוד פתוח'[::-1]
-        lecture_description                   = 'הרצאה )בעברית( על הסורק'[::-1]
+        the_engine_begind_description         = 'מנוע הסריקה'[::-1]
+        lecture_description                   = 'הרצאה על הסורק'[::-1]
 
         pdf.cell(30, 5, txt=telegram_channel_description,          ln=0, align="R", border=1)
-        pdf.cell(70, 5, txt=telegram_discussion_group_description, ln=0, align="R", border=1)
-        pdf.cell(60, 5, txt=open_source_description,               ln=0, align="R", border=1)
-        pdf.cell(35, 5, txt=lecture_description,                   ln=1, align="R", border=1)
+        pdf.cell(39, 5, txt=telegram_discussion_group_description, ln=0, align="R", border=1)
+        pdf.cell(55, 5, txt=open_source_description,               ln=0, align="R", border=1)
+        pdf.cell(40, 5, txt=the_engine_begind_description,         ln=0, align="R", border=1)
+        pdf.cell(30, 5, txt=lecture_description,                   ln=1, align="R", border=1)
 
 
         html_telegram_channel_description          = "<A HREF=""https://t.me/investorsIL"">t.me/investorsIL</A><"
         pdf.write_html(text=html_telegram_channel_description)
 
-        html_telegram_discussion_group_description = "                                <A HREF=""http://t.me/StockScannerIL"">t.me/StockScannerIL</A>"
+        html_telegram_discussion_group_description = "   <A HREF=""http://t.me/StockScannerIL"">t.me/StockScannerIL</A>"
         pdf.write_html(text=html_telegram_discussion_group_description)
 
-        html_open_source_description               = "                  <A HREF=""https://github.com/asafravid/sss"">github.com/asafravid/sss</A>"
+        html_open_source_description               = " <A HREF=""http://bit.ly/OpenSourceStockScanner"">bit.ly/OpenSourceStockScanner</A>"
         pdf.write_html(text=html_open_source_description)
 
-        html_lecture_description                   = "     <A HREF=""http://bit.ly/SssLecture"">bit.ly/SssLecture</A>"
+        html_the_engine_begind_description         = " <A HREF=""http://bit.ly/SssCoreEquation"">bit.ly/SssCoreEquation</A>"
+        pdf.write_html(text=html_the_engine_begind_description)
+
+        html_lecture_description                   = " <A HREF=""http://bit.ly/SssLecture"">bit.ly/SssLecture</A>"
         pdf.write_html(text=html_lecture_description)
 
         pdf.cell(200, 5, txt='', ln=1, align="R")
@@ -117,7 +122,7 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
         html="<p>Deeper Value Channel Telegram: <A HREF=""https://t.me/investorsIL"">https://t.me/investorsIL</A></p>" \
              "<p>Updates, Discussions and Technical Support on Telegram: <A HREF=""https://t.me/StockScannerIL"">https://t.me/StockScannerIL</A></p>" \
              "<p>This Scanner is Open Source. fork() here: <A HREF=""https://github.com/asafravid/sss"">https://github.com/asafravid/sss</A></p>" \
-             "<p>Lecture (in Hebrew): <A HREF=""http://bit.ly/SssLecture"">http://bit.ly/SssLecture</A></p>" \
+             "<p>Lecture (in Hebrew): <A HREF=""http://bit.ly/SssLecture"">http://bit.ly/SssLecture</A>, One Pager: <A HREF=""http://bit.ly/SssCoreEquation"">http://bit.ly/SssCoreEquation</A></p>" \
              "<p><img src=""{}"" width=""600"" height=""250""></p>".format(csv_filename+"_fig.png")
         pdf.write_html(text=html)
 
