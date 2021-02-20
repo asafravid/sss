@@ -1,5 +1,5 @@
 #########################################################
-# Version 196 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# Version 200 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #########################################################
 
 
@@ -34,11 +34,11 @@ TITLES = ["_תוצאות_סריקה_עבור_בורסת_תל_אביב", "_Scan_R
 
 # Run Build DB Only: Nasdaq100+S&P500+Russel1000
 # ==============================================
-sss.sss_run(sectors_list=[], sectors_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', read_united_states_input_symbols=0, tase_mode=0, num_threads=20, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.01, ev_to_cfo_ratio_limit=200.0, min_enterprise_value_millions_usd=100, best_n_select=3, enterprise_value_to_revenue_limit=50, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[4.5, 0.5], generate_result_folders=1)
+# sss.sss_run(sectors_list=[], sectors_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', read_united_states_input_symbols=0, tase_mode=0, num_threads=20, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.01, ev_to_cfo_ratio_limit=200.0, min_enterprise_value_millions_usd=100, best_n_select=3, enterprise_value_to_revenue_limit=80, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[4.5, 1], generate_result_folders=1)
 
 # Run Build DB Only: All/Others
 # =============================
-# sss.sss_run(sectors_list=[], build_csv_db_only=1, build_csv_db=1, csv_db_path='None', read_united_states_input_symbols=1, tase_mode=0, num_threads=20, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.01, ev_to_cfo_ratio_limit = 200.0, min_enterprise_value_millions_usd=100, best_n_select=3, enterprise_value_to_revenue_limit=50, favor_technology_sector=4.5, generate_result_folders=1)
+# sss.sss_run(sectors_list=[], sectors_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', read_united_states_input_symbols=1, tase_mode=0, num_threads=20, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.01, ev_to_cfo_ratio_limit = 200.0, min_enterprise_value_millions_usd=100, best_n_select=3, enterprise_value_to_revenue_limit=75, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[4.5, 0.5], generate_result_folders=1)
 
 # Research Mode:
 # ==============
@@ -202,11 +202,11 @@ def research_db(sectors_list, sectors_filter_out, evr_range, pm_range, ev_millio
 # NASDAQ100+S&P500+RUSSEL1000:
 # ============================
 # old_run = 'Results/20210213-011620_FTB4.5_MCap_pm0.17_evr17.5_BuildDb_nResults944'
-# new_run = 'Results/20210219-012710_FTB4.5_MCap_pm0.17_evr17.5_BuildDb_nResults962'
-# evr_range_n   = [1, 3, 6, 10,15,20,26,34,42,51]
+# new_run = 'Results/20210220-003426_Technology4.5_FinancialServices0.5_MCap_pm0.17_evr17.5_BuildDb_nResults963'
+# evr_range_n   = [1, 3, 6, 10,15,20,26,51]
 # pm_range_n    = [1,11,20, 28,35,41,45,49,52,54]
 # ev_millions_n = [100,250,2500,25000,250000]
-# research_db(evr_range=evr_range_n, pm_range=pm_range_n, ev_millions_range=ev_millions_n,  csv_db_path=new_run,   read_united_states_input_symbols=0, scan_mode=SCAN_MODE_NSR, generate_result_folders=0, appearance_counter_min=1, appearance_counter_max=450, favor_technology_sector=4.5,
+# research_db(sectors_list=[], sectors_filter_out=0, evr_range=evr_range_n, pm_range=pm_range_n, ev_millions_range=ev_millions_n,  csv_db_path=new_run,   read_united_states_input_symbols=0, scan_mode=SCAN_MODE_NSR, generate_result_folders=0, appearance_counter_min=1, appearance_counter_max=450, favor_sectors=['Technology'], favor_sectors_by=[4.5],
 #             newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=0, newer_rec_ranges=[ev_millions_n[0],ev_millions_n[-1],evr_range_n[0],evr_range_n[-1],pm_range_n[0],pm_range_n[-1]], older_rec_ranges=[100,100,1,54,1,50], rec_length=80)
 # sss_diff.run(newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=3, newer_rec_ranges=[100,1,54,1,50], older_rec_ranges=[100,1,54,1,50], rec_length=80)
 
@@ -216,11 +216,11 @@ def research_db(sectors_list, sectors_filter_out, evr_range, pm_range, ev_millio
 # ALL:
 # ====
 # old_run = 'Results/20210213-140333_FTB4.5_All_MCap_pm0.24_evr15.0_BuildDb_nResults4012'
-# new_run = 'Results/20210219-094542_FTB4.5_All_MCap_pm0.24_evr15.0_BuildDb_nResults4129'
+# new_run = 'Results/20210220-161246_Technology4.5_FinancialServices0.5_All_MCap_pm0.24_evr15.0_BuildDb_nResults4132'
 # evr_range_all   = [1,  3,  6, 10, 15, 21, 45]
 # pm_range_all    = [1, 10, 20, 29, 37, 44, 50]
 # ev_millions_all = [75,750,7500,75000,250000]
-# research_db(evr_range=evr_range_all, pm_range=pm_range_all, ev_millions_range=ev_millions_all, csv_db_path=new_run, read_united_states_input_symbols=1, scan_mode=SCAN_MODE_ALL, generate_result_folders=0, appearance_counter_min=1, appearance_counter_max=1000, favor_technology_sector=4.5,
+# research_db(sectors_list=[], sectors_filter_out=0, evr_range=evr_range_all, pm_range=pm_range_all, ev_millions_range=ev_millions_all, csv_db_path=new_run, read_united_states_input_symbols=1, scan_mode=SCAN_MODE_ALL, generate_result_folders=0, appearance_counter_min=1, appearance_counter_max=1000, favor_sectors=['Technology'], favor_sectors_by=[4.5],
 #             newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=0, newer_rec_ranges=[ev_millions_all[0],ev_millions_all[-1],evr_range_all[0],evr_range_all[-1],pm_range_all[0],pm_range_all[-1]], older_rec_ranges=[100, 100, 1, 54, 1, 50], rec_length=80)
 #sss_diff.run(newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=3, newer_rec_ranges=[100,1,54,1,50], older_rec_ranges=[100, 1, 54, 1, 50], rec_length=80)
 

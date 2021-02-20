@@ -1,11 +1,12 @@
 #########################################################
-# Version 196 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# Version 200 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #########################################################
 
 # TODO: ASAF: 1. Which sectors have companies who's EVR values are relatively high, apart from technologies? Give them a favor normalization like tech as well
 #             2. Finnacials, for instance. Also Favoring EVR is not enough, apply the favor over the PEtrailing (P/E) as well - research the DB prior to that.
 #                - Add column: pe_effective...
 #             3. What about that ev_to_cfo_ratio of 1000 - check that all is well in db.csv and in the results csvs... maybe increase it?
+#             4. Check and multi dim and investigate earnings_quarterly_growth_min
 
 import time
 import random
@@ -626,10 +627,9 @@ def sss_run(sectors_list, sectors_filter_out, build_csv_db_only, build_csv_db, c
     interval_secs_to_avoid_http_errors = 60*(7 - 1*tase_mode + 30*read_united_states_input_symbols)         # Every interval_threads, a INTERVALS_TO_AVOID_HTTP_ERRORS sec sleep will take place
 
     # Working Parameters:
-    if not research_mode: profit_margin_limit               = round((0.17 + 0.07 * read_united_states_input_symbols) / (1 + 2 * tase_mode), NUM_ROUND_DECIMALS)
-    # ev_to_cfo_ratio_limit                                   = 100  # TODO: ASAFR: Multi-dimentional checks requried here as well
+    if not research_mode: profit_margin_limit               = profit_margin_limit
     earnings_quarterly_growth_min                           = 0.01-0.25*tase_mode       # The earnings can decrease by 1/4, but there is still a requirement that price_to_earnings_to_growth_ratio > 0. TODO: ASAFR: Add to multi-dimention
-    if not research_mode: enterprise_value_to_revenue_limit = 17.5 - 2.5 * read_united_states_input_symbols - 2.5 * tase_mode                    # Higher than that is too expensive
+    if not research_mode: enterprise_value_to_revenue_limit = enterprise_value_to_revenue_limit
 
     symbols                 = []
     symbols_tase            = []

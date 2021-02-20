@@ -1,5 +1,5 @@
 #########################################################
-# Version 196 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# Version 200 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #########################################################
 
 #!/usr/bin/env python
@@ -40,10 +40,13 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
     for row_index, row in enumerate(csv_rows):
         if row_index >= limit_num_rows: break
         if row_index > 0:  # row 0 is title
-            names.append(row[1])
+            names.append(row[1][0:24])
             appearances.append(float(row[5]))
-        if row_index == 0 and tase_mode: # overrwrite to hebrew
-            row = ['סימבול'[::-1],'שם החברה'[::-1],'ענף'[::-1],'ערך'[::-1],'סגירה'[::-1],'ציון'[::-1]]
+        if row_index == 0:
+            if tase_mode: # overrwrite to hebrew
+                row = ['סימבול'[::-1],'שם החברה'[::-1],'ענף'[::-1],'ערך'[::-1],'סגירה'[::-1],'ציון'[::-1]]
+            else:
+                row = ['Ticker', 'Name', 'Sector', 'Value', 'Close', 'Rank']
         for col_index, col in enumerate(row):
             w_diff                =0
             if   col_index == 0: w=18 # Ticker
@@ -59,10 +62,13 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
                 pdf.cell(w=w, h=5, txt=col, border=1, ln=0, align="C" if row_index == 0 else "L")
             else:
                 # last col is added with the diff col:
-                pdf.cell(w=w, h=5, txt=col.replace('_counter',''), border=1, ln=0, align="C" if row_index == 0 else "L")
+                pdf.cell(w=w, h=5, txt=col.replace('appearance_counter','rank'), border=1, ln=0, align="C" if row_index == 0 else "L")
                 if w_diff:
                     if diff_list is not None and row_index < len(diff_list):
-                        pdf.cell(w=w, h=5, txt='ציון'[::-1] if tase_mode and row_index == 0 else str(diff_list[row_index]), border=1, ln=1, align="C" if row_index == 0 else "L")
+                        if row_index == 0:
+                            pdf.cell(w=w, h=5, txt='שינוי'[::-1] if tase_mode else 'Change', border=1, ln=1, align="C")
+                        else:
+                            pdf.cell(w=w, h=5, txt=str(diff_list[row_index]), border=1, ln=1, align="L")
 
     pdf.cell(200, 5, txt='', ln=1, align="L")
     fig, ax = plt.subplots(figsize=(15, 5))
@@ -72,7 +78,7 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
     ax.set_yticks(y_pos)
     ax.set_yticklabels(names)
     ax.invert_yaxis()  # labels read top-to-bottom
-    ax.set_xlabel('שינוי'[::-1] if tase_mode else 'Appearances')
+    ax.set_xlabel('ציון'[::-1] if tase_mode else 'Rank')
     ax.set_title(title_for_figures)
 
     # plt.show()
