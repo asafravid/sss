@@ -1,5 +1,5 @@
 #########################################################
-# Version 200 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# Version 201 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #########################################################
 
 
@@ -30,7 +30,7 @@ TITLES = ["_תוצאות_סריקה_עבור_בורסת_תל_אביב", "_Scan_R
 
 # Run Build DB Only: TASE
 # =============================
-#sss.sss_run(sectors_list=[], build_csv_db_only=1, build_csv_db=1, csv_db_path='None', read_united_states_input_symbols=0, tase_mode=1, num_threads=20, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.01, ev_to_cfo_ratio_limit = 200.0, min_enterprise_value_millions_usd=5, best_n_select=3, enterprise_value_to_revenue_limit=100, favor_sectors=['Technology', 'Real Estate'], favor_sectors_by=[4.5, 1.0/3.0], generate_result_folders=1)
+# sss.sss_run(sectors_list=[], sectors_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', read_united_states_input_symbols=0, tase_mode=1, num_threads=20, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.01, ev_to_cfo_ratio_limit = 200.0, min_enterprise_value_millions_usd=5, best_n_select=3, enterprise_value_to_revenue_limit=100, favor_sectors=['Technology', 'Real Estate'], favor_sectors_by=[4.5, 1.0], generate_result_folders=1)
 
 # Run Build DB Only: Nasdaq100+S&P500+Russel1000
 # ==============================================
@@ -53,9 +53,9 @@ def prepare_appearance_counters_dictionaries(csv_db_path, appearance_counter_dic
                 row_index += 1
                 continue
             else:
-                appearance_counter_dict_sss[  (row[0],row[1],row[2],float(row[3]),float(row[26]))] = 0.0  # Symbol, Short Name, Sector, SSS   Value, previousClose
-                appearance_counter_dict_ssss[ (row[0],row[1],row[2],float(row[4]),float(row[26]))] = 0.0  # Symbol, Short Name, Sector, SSSS  Value, previousClose
-                appearance_counter_dict_sssss[(row[0],row[1],row[2],float(row[5]),float(row[26]))] = 0.0  # Symbol, Short Name, Sector, SSSSS Value, previousClose
+                appearance_counter_dict_sss[  (row[0],row[1],row[2],float(row[3]),float(row[27]))] = 0.0  # Symbol, Short Name, Sector, SSS   Value, previousClose
+                appearance_counter_dict_ssss[ (row[0],row[1],row[2],float(row[4]),float(row[27]))] = 0.0  # Symbol, Short Name, Sector, SSSS  Value, previousClose
+                appearance_counter_dict_sssss[(row[0],row[1],row[2],float(row[5]),float(row[27]))] = 0.0  # Symbol, Short Name, Sector, SSSSS Value, previousClose
 
 # |dim3 [ev 1,10,50,100,500]| = 5, |rows [evr 5,50]| = 2, |cols [pm 3,10,25,45]| = 4
 #
@@ -184,13 +184,13 @@ def research_db(sectors_list, sectors_filter_out, evr_range, pm_range, ev_millio
 
 # TASE:
 # =====
-# old_run = 'Results/20210218-212513_Tase_FTB4.5_MCap_pm0.0567_evr15.0_BuildDb_nResults260'
-# new_run = 'Results/20210219-171143_Tase_Technology4.5_RealEstate0.3333_MCap_pm0.0567_evr15.0_BuildDb_nResults259'
-# evr_range_tase         = [1, 3, 7,12,22,54]
-# pm_range_tase          = [1,11,20,28,35,41,46,50]
-# ev_millions_range_tase = [5,50,500,5000]
-# research_db(sectors_list=['Real Estate'], sectors_filter_out=1, evr_range=evr_range_tase, pm_range=pm_range_tase, ev_millions_range=ev_millions_range_tase,   csv_db_path=new_run,   read_united_states_input_symbols=0, scan_mode=SCAN_MODE_TASE, generate_result_folders=0, appearance_counter_min=1, appearance_counter_max=250, favor_sectors=['Technology'], favor_sectors_by=[4.5],
-#             newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=0, newer_rec_ranges=[ev_millions_range_tase[0],ev_millions_range_tase[-1],evr_range_tase[0],evr_range_tase[-1],pm_range_tase[0],pm_range_tase[-1]], older_rec_ranges=[ev_millions_range_tase[0],ev_millions_range_tase[-1],evr_range_tase[0],evr_range_tase[-1],pm_range_tase[0],pm_range_tase[-1]], rec_length=80)
+old_run = 'Results/20210219-171143_Tase_Technology4.5_RealEstate0.3333_MCap_pm0.0567_evr15.0_BuildDb_nResults259_Backup'
+new_run = 'Results/20210221-025052_Tase_Technology4.5_RealEstate1.0_MCap_pm0.01_evr100_BuildDb_nResults270'
+evr_range_tase         = [1, 3, 7,12,22,54]
+pm_range_tase          = [1,11,20,28,35,41,46,50]
+ev_millions_range_tase = [5,50,500,5000]
+research_db(sectors_list=[], sectors_filter_out=0, evr_range=evr_range_tase, pm_range=pm_range_tase, ev_millions_range=ev_millions_range_tase,   csv_db_path=new_run,   read_united_states_input_symbols=0, scan_mode=SCAN_MODE_TASE, generate_result_folders=0, appearance_counter_min=1, appearance_counter_max=250, favor_sectors=['Technology'], favor_sectors_by=[4.5],
+            newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=0, newer_rec_ranges=[ev_millions_range_tase[0],ev_millions_range_tase[-1],evr_range_tase[0],evr_range_tase[-1],pm_range_tase[0],pm_range_tase[-1]], older_rec_ranges=[ev_millions_range_tase[0],ev_millions_range_tase[-1],evr_range_tase[0],evr_range_tase[-1],pm_range_tase[0],pm_range_tase[-1]], rec_length=80)
 #sss_diff.run(newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=0, newer_rec_ranges=[5,1,54,1,50], older_rec_ranges=[5,1,45,5,45], rec_length=80)
 
 # Generate TASE:
