@@ -1,5 +1,5 @@
 #########################################################
-# Version 203 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# Version 204 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #########################################################
 
 # TODO: ASAF: 1. Finnacials, for instance. Also Favoring EVR is not enough, apply the favor over the PEtrailing (P/E) as well - research the DB prior to that.
@@ -264,15 +264,6 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
         #         return_value = False
 
         if build_csv_db:
-            # if   stock_data.enterprise_value_to_revenue is None and stock_data.enterprise_value_to_ebitda  is not None: stock_data.enterprise_value_to_revenue = stock_data.enterprise_value_to_ebitda
-            # elif stock_data.enterprise_value_to_revenue is None and stock_data.trailing_price_to_earnings  is not None: stock_data.enterprise_value_to_revenue = stock_data.trailing_price_to_earnings
-            #
-            # if   stock_data.enterprise_value_to_ebitda  is None and stock_data.enterprise_value_to_revenue is not None: stock_data.enterprise_value_to_ebitda  = stock_data.enterprise_value_to_revenue
-            # elif stock_data.enterprise_value_to_ebitda  is None and stock_data.trailing_price_to_earnings  is not None: stock_data.enterprise_value_to_ebitda  = stock_data.trailing_price_to_earnings
-            #
-            # if   stock_data.trailing_price_to_earnings  is None and stock_data.enterprise_value_to_revenue is not None: stock_data.trailing_price_to_earnings  = stock_data.enterprise_value_to_revenue
-            # elif stock_data.trailing_price_to_earnings  is None and stock_data.enterprise_value_to_ebitda  is not None: stock_data.trailing_price_to_earnings  = stock_data.enterprise_value_to_ebitda
-
             if 'forwardEps'                                 in info: stock_data.forward_eps                       = info['forwardEps']
             else:                                                    stock_data.forward_eps                       = None
             if isinstance(stock_data.forward_eps,str):               stock_data.forward_eps                       = None
@@ -321,7 +312,7 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
                         stock_data.enterprise_value = int(text_to_num(stock_information['MarketCap']))
 
             # if no enterprise_value_to_ebitda, use earnings
-            if stock_data.enterprise_value_to_ebitda is None and stock_data.annualized_earnings > 0:
+            if (stock_data.enterprise_value_to_ebitda is None or stock_data.enterprise_value_to_ebitda < 0) and stock_data.annualized_earnings > 0:
                 stock_data.enterprise_value_to_ebitda = float(stock_data.enterprise_value) / stock_data.annualized_earnings
 
             if stock_data.annualized_cash_flow_from_operating_activities > 0:
@@ -794,7 +785,7 @@ def sss_run(sectors_list, sectors_filter_out, build_csv_db_only, build_csv_db, c
 
     # Temporary to test and debug: DEBUG MODE
     # =======================================
-    # symbols     = ['LUMI.TA']
+    # symbols     = ['HARL.TA']
     # num_threads = 1
      
     if not research_mode: print('\n{} SSS Symbols to Scan using {} threads: {}\n'.format(len(symbols), num_threads, symbols))
