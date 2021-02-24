@@ -1,5 +1,5 @@
 #########################################################
-# Version 202 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# Version 203 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #########################################################
 
 # TODO: ASAF: 1. Finnacials, for instance. Also Favoring EVR is not enough, apply the favor over the PEtrailing (P/E) as well - research the DB prior to that.
@@ -1175,7 +1175,7 @@ def sss_run(sectors_list, sectors_filter_out, build_csv_db_only, build_csv_db, c
     marketcap_str         = ""
     pmargin_str           = "_pm{}".format(profit_margin_limit)
     evr_str               = "_evr{}".format(enterprise_value_to_revenue_limit)
-    num_results_str       = "_nResults{}".format(len(rows))
+    num_results_str       = "_nRes{}".format(len(rows))
     build_csv_db_only_str = ""
     if tase_mode:                        tase_str              = "_Tase"
 
@@ -1187,11 +1187,11 @@ def sss_run(sectors_list, sectors_filter_out, build_csv_db_only, build_csv_db, c
         for index, sector in enumerate(favor_sectors):
             sectors_str += '_{}{}'.format(sector.replace(' ',''),round(favor_sectors_by[index],NUM_ROUND_DECIMALS))
 
-    if read_united_states_input_symbols: all_str               = '_All'
+    if read_united_states_input_symbols: all_str               = '_A'
     if build_csv_db == 0:                csv_db_str            = '_DBR'
     if use_investpy:                     investpy_str          = '_Investpy'
     if market_cap_included:              marketcap_str         = '_MCap'
-    if build_csv_db_only:                build_csv_db_only_str = '_BuildDb'
+    if build_csv_db_only:                build_csv_db_only_str = '_Bdb'
     date_and_time = time.strftime("Results/%Y%m%d-%H%M%S{}{}{}{}{}{}{}{}{}{}".format(tase_str, sectors_str, all_str, csv_db_str, marketcap_str, investpy_str, pmargin_str, evr_str, build_csv_db_only_str, num_results_str))
 
     filenames_list = sss_filenames.create_filenames_list(date_and_time)
