@@ -1,5 +1,5 @@
 #########################################################
-# Version 204 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# Version 205 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #########################################################
 
 # TODO: ASAF: 1. Finnacials, for instance. Also Favoring EVR is not enough, apply the favor over the PEtrailing (P/E) as well - research the DB prior to that.
