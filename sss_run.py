@@ -1,5 +1,5 @@
 #########################################################
-# Version 205 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# Version 220 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #########################################################
 
 
@@ -32,7 +32,7 @@ TITLES = ["_תוצאות_סריקה_עבור_בורסת_תל_אביב", "_Scan_R
 
 # Run Build DB Only: TASE
 # =============================
-sss.sss_run(sectors_list=[], sectors_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', read_united_states_input_symbols=0, tase_mode=1, num_threads=20, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.01, ev_to_cfo_ratio_limit = 200.0, min_enterprise_value_millions_usd=5, best_n_select=3, enterprise_value_to_revenue_limit=100, favor_sectors=['Technology', 'Real Estate'], favor_sectors_by=[4.5, 0.5], generate_result_folders=1)
+#sss.sss_run(sectors_list=[], sectors_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', read_united_states_input_symbols=0, tase_mode=1, num_threads=20, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.01, ev_to_cfo_ratio_limit = 200.0, min_enterprise_value_millions_usd=5, best_n_select=3, enterprise_value_to_revenue_limit=100, favor_sectors=['Technology', 'Real Estate'], favor_sectors_by=[4.5, 0.5], generate_result_folders=1)
 
 # Run Build DB Only: Nasdaq100+S&P500+Russel1000
 # ==============================================
@@ -51,9 +51,9 @@ sss.sss_run(sectors_list=[], sectors_filter_out=0, build_csv_db_only=1, build_cs
 # PM:  the lower  the PM,  the more stocks in the result
 #
 # Percentiles:
-# index   0        1         2        3  ...  n-1
+# index   x        1         2        3  ...  n-1
 # +----------------------------------------------------+
-# |       |        |         |        |        |       |
+# |       x        |         |        |        |       |
 # +----------------------------------------------------+
 #
 # In order to give a chance to all stocks fairly, always take the 1st element in the sorted list
@@ -82,24 +82,28 @@ def get_range(csv_db_path, column_name, num_sections, reverse):
     while percentile < 100:
         percentile_range.append(round(np.percentile(sorted_elements_list, percentile), sss.NUM_ROUND_DECIMALS))
         percentile += percentile_step
-    return sorted(percentile_range, reverse=reverse)
+    percentile_range_sorted = sorted(percentile_range, reverse=reverse)
+    percentile_range_sorted.pop(1) # Since the 1st percentile and the 1st element usually give the same result, remove the 1st percentile step
+    return percentile_range_sorted
 
 
 def prepare_appearance_counters_dictionaries(csv_db_path, appearance_counter_dict_sss, appearance_counter_dict_ssss, appearance_counter_dict_sssss):
     csv_db_filename = csv_db_path + '/db.csv'
-    with open(csv_db_filename, mode='r', newline='') as engine:
-        reader = csv.reader(engine, delimiter=',')
-        row_index = 0
-        for row in reader:
-            if row_index <= 1:  # first row is just a title of evr and pm, then a title of columns
-                row_index += 1
-                continue
-            else:
-                appearance_counter_dict_sss[  (row[0],row[1],row[2],float(row[3]),float(row[28]))] = 0.0  # Symbol, Short Name, Sector, SSS   Value, previousClose
-                appearance_counter_dict_ssss[ (row[0],row[1],row[2],float(row[4]),float(row[28]))] = 0.0  # Symbol, Short Name, Sector, SSSS  Value, previousClose
-                appearance_counter_dict_sssss[(row[0],row[1],row[2],float(row[5]),float(row[28]))] = 0.0  # Symbol, Short Name, Sector, SSSSS Value, previousClose
-
-
+    try:
+        with open(csv_db_filename, mode='r', newline='') as engine:
+            reader = csv.reader(engine, delimiter=',')
+            row_index = 0
+            for row in reader:
+                if row_index <= 1:  # first row is just a title of evr and pm, then a title of columns
+                    row_index += 1
+                    continue
+                else:
+                    appearance_counter_dict_sss[  (row[0],row[1],row[2],float(row[3]),float(0 if row[28] == '' else row[28]))] = 0.0  # Symbol, Short Name, Sector, SSS   Value, previousClose
+                    appearance_counter_dict_ssss[ (row[0],row[1],row[2],float(row[4]),float(0 if row[28] == '' else row[28]))] = 0.0  # Symbol, Short Name, Sector, SSSS  Value, previousClose
+                    appearance_counter_dict_sssss[(row[0],row[1],row[2],float(row[5]),float(0 if row[28] == '' else row[28]))] = 0.0  # Symbol, Short Name, Sector, SSSSS Value, previousClose
+    except Exception as e:
+        if print("              Exception in {}: {}".format(row, e)):
+            pass
 # |dim3 [ev 1,10,50,100,500]| = 5, |rows [evr 5,50]| = 2, |cols [pm 3,10,25,45]| = 4
 #
 # Contents are the number of results, per ev,evr,pm:
@@ -228,15 +232,15 @@ def research_db(sectors_list, sectors_filter_out, evr_range, pm_range, ev_millio
 
 # TASE:
 # =====
-# old_run = 'Results/20210219-171143_Tase_Technology4.5_RealEstate0.3333_MCap_pm0.0567_evr15.0_BuildDb_nResults259_Backup'
-# new_run = 'Results/20210224-234320_Tase_Technology4.5_RealEstate0.5_MCap_pm0.01_evr100_Bdb_nRes270'
-# evr_range_tase         = get_range(csv_db_path=new_run, column_name='evr_effective',            num_sections=10, reverse=1)
-# pm_ratios_range_tase   = get_range(csv_db_path=new_run, column_name='annualized_profit_margin', num_sections=10, reverse=0)
-# ev_range_tase          = get_range(csv_db_path=new_run, column_name='enterprise_value',         num_sections=4,  reverse=0)
-# pm_range_tase          = [round(pm*100,    sss.NUM_ROUND_DECIMALS) for pm in pm_ratios_range_tase]
-# ev_millions_range_tase = [int(  ev/1000000                       ) for ev in ev_range_tase       ]
-# research_db(sectors_list=[], sectors_filter_out=0, evr_range=evr_range_tase, pm_range=pm_range_tase, ev_millions_range=ev_millions_range_tase,   csv_db_path=new_run,   read_united_states_input_symbols=0, scan_mode=SCAN_MODE_TASE, generate_result_folders=0, appearance_counter_min=1, appearance_counter_max=400, favor_sectors=['Technology', 'Real Estate'], favor_sectors_by=[4.5, 0.5],
-#             newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=0, newer_rec_ranges=[ev_millions_range_tase[0],ev_millions_range_tase[-1],evr_range_tase[0],evr_range_tase[-1],pm_range_tase[0],pm_range_tase[-1]], older_rec_ranges=[5,5000,1,54,1,50], rec_length=80)
+old_run = 'Results/20210219-171143_Tase_Technology4.5_RealEstate0.3333_MCap_pm0.0567_evr15.0_BuildDb_nResults259_Backup'
+new_run = 'Results/20210226-100125_Tase_Technology4.5_RealEstate0.5_MCap_pm0.01_evr100_Bdb_nRes273'
+evr_range_tase         = get_range(csv_db_path=new_run, column_name='evr_effective',            num_sections=10, reverse=1)
+pm_ratios_range_tase   = get_range(csv_db_path=new_run, column_name='annualized_profit_margin', num_sections=10, reverse=0)
+ev_range_tase          = get_range(csv_db_path=new_run, column_name='enterprise_value',         num_sections=4,  reverse=0)
+pm_range_tase          = [round(pm*100,    sss.NUM_ROUND_DECIMALS) for pm in pm_ratios_range_tase]
+ev_millions_range_tase = [int(  ev/1000000                       ) for ev in ev_range_tase       ]
+research_db(sectors_list=[], sectors_filter_out=0, evr_range=evr_range_tase, pm_range=pm_range_tase, ev_millions_range=ev_millions_range_tase,   csv_db_path=new_run,   read_united_states_input_symbols=0, scan_mode=SCAN_MODE_TASE, generate_result_folders=0, appearance_counter_min=1, appearance_counter_max=400, favor_sectors=['Technology', 'Real Estate'], favor_sectors_by=[4.5, 0.5],
+            newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=0, newer_rec_ranges=[ev_millions_range_tase[0],ev_millions_range_tase[-1],evr_range_tase[0],evr_range_tase[-1],pm_range_tase[0],pm_range_tase[-1]], older_rec_ranges=[5,5000,1,54,1,50], rec_length=80)
 #sss_diff.run(newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, ticker_index=0, name_index=1, movement_threshold=0, newer_rec_ranges=[5,1,54,1,50], older_rec_ranges=[5,1,45,5,45], rec_length=80)
 
 # Generate TASE:
