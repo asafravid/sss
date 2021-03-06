@@ -1,13 +1,11 @@
 #########################################################
-# Version 242 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# Version 246 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #########################################################
 
-# TODO: ASAF: 1. Finnacials, for instance. Also Favoring EVR is not enough, apply the favor over the PEtrailing (P/E) as well - research the DB prior to that.
-#                - Add column: pe_effective...
-#             2. Check and multi dim and investigate earnings_quarterly_growth_min and revenue_quarterly_growth_min
-#             3. Check why Yahoo Finance always gives QRG values of 0? Unusable if that is always so
-#             4. Add Total Debt/Equity (mrq)
-#             5. For Different Countries - different Currencies are used for the Financial (earnings) properties - so conversion to USD must be made for proper manual EV/Revenue (for instance) calculations
+# TODO: ASAF: 1. Check and multi dim and investigate earnings_quarterly_growth_min and revenue_quarterly_growth_min
+#             2. Check why Yahoo Finance always gives QRG values of 0? Unusable if that is always so
+#             3. Add Total Debt/Equity (mrq) - calculate manualy and verify agains this value in Yahoo Finance website
+#             4. For Different Countries - different Currencies are used for the Financial (earnings) properties - so conversion to USD must be made for proper manual EV/Revenue (for instance) calculations
 
 import time
 import random
@@ -145,7 +143,18 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
             try:
                 info                  = symbol.get_info()
                 cash_flows            = symbol.get_cashflow(as_dict=True)
-                # balance_sheet         = symbol.get_balance_sheet(as_dict=True)
+                # TODO: ASAFR: Add Total Debt to Equity:
+                #              הנה Study Case מעניין על AAPL. כל הערכים ב$
+                #              https://www.investopedia.com/terms/d/debtequityratio.asp#:~:text=The%20debt%2Dto%2Dequity%20(,of%20a%20company's%20financial%20statements.
+                #              
+                #              The debt-to-equity (D/E) ratio is calculated by dividing a company’s total liabilities by its shareholder equity. These numbers are available on the balance sheet of a company’s financial statements.
+                #
+                #              הווה אומר שיחס החוב להון של AAPL הוא 258549000000 לחלק ל 65339000000 וזה יוצא 3.9
+                #
+                #              'Total Liab' = {} 258549000000.0
+                #              'Total Stockholder Equity' = {} 65339000000.0
+                #
+                balance_sheet         = symbol.get_balance_sheet(as_dict=True)
                 # balancesheet          = symbol.get_balancesheet(as_dict=True)
                 earnings              = symbol.get_earnings(as_dict=True)  # TODO: ASAFR: There is supposed to be a quarterly_earnings() or earnings_quarterly() which will open up a whole new level of scanning: inner-year scanning
                 # financials            = symbol.get_financials(as_dict=True)
@@ -617,7 +626,7 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
                 if len(symbol.dividends) > 3: stock_data.last_4_dividends_3 = symbol.dividends[3]
 
             except Exception as e:
-                if not research_mode: print("Exception in symbol.dividends: {}".format(e))
+                #if not research_mode: print("Exception in symbol.dividends: {}".format(e))
                 pass
         #                                                                     Ticker	Name	Sector	           Country            sss_value	            ssss_value	           sssss_value	           ssse_value	          sssse_value	          ssssse_value	           sssi_value	          ssssi_value	          sssssi_value	           sssei_value	           ssssei_value	            sssssei_value	          annualized_revenue	         annualized_earnings	         enterprise_value_to_revenue	         evr_effective	           trailing_price_to_earnings	          trailing_12months_price_to_sales	           tpe_effective	         enterprise_value_to_ebitda	            profit_margin	          annualized_profit_margin	           held_percent_institutions	         forward_eps	         trailing_eps	          previous_close	         trailing_eps_percentage	         price_to_book	           shares_outstanding	          net_income_to_common_shareholders	            nitcsh_to_shares_outstanding	         num_employees	           enterprise_value	            market_cap             nitcsh_to_num_employees	           earnings_quarterly_growth             revenue_quarterly_growth	          price_to_earnings_to_growth_ratio	           sqrt_peg_ratio	           annualized_cash_flow_from_operating_activities	          ev_to_cfo_ratio	last_dividend_0	last_dividend_1	last_dividend_2	last_dividend_3
         #                                                                     0         1       2                  3                  4                     5                      6                       7                      8                       9                        10                     11                      12                       13                      14                       15                        16                             17                              18                                      19                        20                                     21                                           22                        23                                     24                        25                                   26                                    27                      28                       29
@@ -649,7 +658,7 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
             if tase_mode:
                 symbol = yf.Ticker(symb)
             else:
-                symbol = yf.Ticker(symb.replace('.','-'))
+                symbol = yf.Ticker(symb.replace('.','-'))  # TODO: ASFAR: Sometimes the '.' Is needed, especially for non-US companies. See for instance 5205.kl. In this case the parameter is also case-sensitive! -> https://github.com/pydata/pandas-datareader/issues/810#issuecomment-789684354
             stock_data = StockData(ticker=symb)
             if not process_info(symbol=symbol, stock_data=stock_data, build_csv_db_only=build_csv_db_only, use_investpy=use_investpy, tase_mode=tase_mode, sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, build_csv_db=build_csv_db, profit_margin_limit=profit_margin_limit, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd=min_enterprise_value_millions_usd, earnings_quarterly_growth_min=earnings_quarterly_growth_min, revenue_quarterly_growth_min=revenue_quarterly_growth_min, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, market_cap_included=market_cap_included, research_mode=research_mode):
                 if tase_mode and 'TLV:' not in stock_data.ticker: stock_data.ticker = 'TLV:' + stock_data.ticker.replace('.TA', '').replace('.','-')
@@ -702,7 +711,7 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
 #     BUILD_CSV_DB                      = 1
 #     BUILD_CSV_DB_ONLY                 = 1
 #     SECTORS_LIST                      = [] # ['Technology', 'Consumer Cyclical', 'Consumer Defensive', 'Industrials', 'Consumer Goods']  # Allows filtering by sector(s)
-def sss_run(sectors_list, sectors_filter_out, countries_list, countries_filter_out,build_csv_db_only, build_csv_db, csv_db_path, read_united_states_input_symbols, tase_mode, num_threads, market_cap_included, use_investpy, research_mode, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, best_n_select, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, generate_result_folders=1, appearance_counter_dict_sss={}, appearance_counter_dict_ssss={}, appearance_counter_dict_sssss={}, appearance_counter_min=25, appearance_counter_max=35):
+def sss_run(sectors_list, sectors_filter_out, countries_list, countries_filter_out,build_csv_db_only, build_csv_db, csv_db_path, read_united_states_input_symbols, tase_mode, num_threads, market_cap_included, use_investpy, research_mode, profit_margin_limit, ev_to_cfo_ratio_limit, min_enterprise_value_millions_usd, best_n_select, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, generate_result_folders=1, appearance_counter_dict_sss={}, appearance_counter_dict_ssss={}, appearance_counter_dict_sssss={}, appearance_counter_min=25, appearance_counter_max=35, custom_portfolio=[]):
     c = CurrencyConverter()
     one_usd_to_ils = round(c.convert(1, 'USD', 'ILS'), NUM_ROUND_DECIMALS) # TODO: ASAFR: This is the simple form of currency conversion - later on - adapt to other countries and currencies - and don't filter out non-US companies in Nasdaq scan
 
@@ -843,9 +852,9 @@ def sss_run(sectors_list, sectors_filter_out, countries_list, countries_filter_o
 
     # Temporary to test and debug: DEBUG MODE
     # =======================================
-    # symbols     = ['GLOB']
-    # num_threads = 1
-     
+    if len(custom_portfolio):
+        symbols = custom_portfolio
+
     if not research_mode: print('\n{} SSS Symbols to Scan using {} threads: {}\n'.format(len(symbols), num_threads, symbols))
 
 
@@ -1242,9 +1251,10 @@ def sss_run(sectors_list, sectors_filter_out, countries_list, countries_filter_o
     all_str               = ""
     csv_db_str            = ""
     investpy_str          = ""
+    custom_portfolio_str  = ""
     num_results_str       = "_nRes{}".format(len(rows))
     build_csv_db_only_str = ""
-    if tase_mode:                        tase_str              = "_Tase"
+    if tase_mode:         tase_str       = "_Tase"
 
     if len(sectors_list):
         if sectors_filter_out:
@@ -1263,7 +1273,8 @@ def sss_run(sectors_list, sectors_filter_out, countries_list, countries_filter_o
     if build_csv_db == 0:                csv_db_str            = '_DBR'
     if use_investpy:                     investpy_str          = '_Investpy'
     if build_csv_db_only:                build_csv_db_only_str = '_Bdb'
-    date_and_time = time.strftime("Results/%Y%m%d-%H%M%S{}{}{}{}{}{}{}{}".format(tase_str, sectors_str, countries_str, all_str, csv_db_str, investpy_str, build_csv_db_only_str, num_results_str))
+    if len(custom_portfolio):            custom_portfolio_str  = '_Custom'
+    date_and_time = time.strftime("Results/%Y%m%d-%H%M%S{}{}{}{}{}{}{}{}{}".format(tase_str, sectors_str, countries_str, all_str, csv_db_str, investpy_str, build_csv_db_only_str, num_results_str, custom_portfolio_str))
 
     filenames_list = sss_filenames.create_filenames_list(date_and_time)
 
