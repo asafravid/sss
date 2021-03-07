@@ -1,5 +1,5 @@
 #########################################################
-# Version 265 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
+# Version 266 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
 #########################################################
 
 # TODO: ASAF: 1. Check and multi dim and investigate earnings_quarterly_growth_min and revenue_quarterly_growth_min
@@ -408,6 +408,10 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
                     stock_data.ev_to_cfo_ratio = float(stock_data.enterprise_value)/stock_data.annualized_cash_flow_from_operating_activities
             else:  # stock_data.annualized_cash_flow_from_operating_activities < 0
                 stock_data.ev_to_cfo_ratio = (1+float(stock_data.enterprise_value)/stock_data.annualized_cash_flow_from_operating_activities)**2
+
+        if stock_data.previous_close is None or stock_data.previous_close < 1.0: # Avoid Penny Stocks
+            if return_value and not research_mode: print('                            Skipping previous_close: {}'.format(stock_data.previous_close))
+            return_value = False
 
         if not build_csv_db_only and (stock_data.enterprise_value is None or stock_data.enterprise_value < min_enterprise_value_millions_usd*1000000):
             if return_value and not research_mode: print('                            Skipping enterprise_value: {}'.format(stock_data.enterprise_value))
