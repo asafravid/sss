@@ -21,6 +21,7 @@ http://bit.ly/SssBigDataAnalysis
   - `pip3 install pandas`
   - `pip3 install yfinance`
   - `pip3 install investpy`
+  - `pip3 install fpdf`
 - Note that for `yfinance` - I'm providing updated sources since they take time to update by the developers, 
   and my forks are, well - mine, and I prefer one to `pip3` install `yfinance` from the origin, and then update 
   (using comparison SW) the necessary changes I made (not too many) to run the `SSS` most efficiently and informatively.
