@@ -1,7 +1,24 @@
-#########################################################
-# Version 275 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
-#########################################################
-
+#############################################################################
+#
+# Version 300 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+#
+#    Stock Screener and Scanner - based on yfinance and investpy
+#    Copyright (C) 2021  Asaf Ravid
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+#############################################################################
 
 import sss
 import numpy as np
@@ -11,8 +28,6 @@ import pdf_generator
 import sss_diff
 
 
-
-EV_MILLIONS_STEP          = 100
 PDF_NUM_ENTRIES_IN_REPORT = 28
 
 SCAN_MODE_TASE = 0  # Tel Aviv Stock Exchange
@@ -22,11 +37,9 @@ SCAN_MODE_ALL  = 2  # All Nasdaq Stocks
 TITLES = ["_תוצאות_סריקה_עבור_בורסת_תל_אביב", "_Scan_Results_for_Nasdaq100_SNP500_Russel1000", "_Scan_Results_for_All_Nasdaq_Stocks"]
 
 #
-# TODO: ASAFR: 0. sss vs ssss/sssss list lengths (appearances) may differ because of the if on the price_to_book which is only for sss -FIX!
-#              1. Compare SSS and SSSS and SSSSS recommendations, and formalize some merging between them
+# TODO: ASAFR: 1. sss vs ssss/sssss list lengths (appearances) may differ - FIX!
 #              2. Find stocks with 0 values for trailing Price/Sales (or for instance 0 trailing Price / Earnings) which cancel the whole result and analyze what can be done (manual calculation for instance, etc)
-#              3. Further narrow the auto-percentile scanning to not add to percentile_list those tickers whose sss values are illegal (exclusde them)
-#              5. Export Results to the SSS excel automatically
+#              3. Export Results to the SSS Google Sheet automatically
 
 # Reuse:
 # sss.sss_run(sectors_list=[], build_csv_db_only=0, build_csv_db=0, csv_db_path='None', read_united_states_input_symbols=0, tase_mode=0, num_threads=1,  market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.17, ev_to_cfo_ratio_limit = 100.0, debt_to_equity_limit = 1000.0, min_enterprise_value_millions_usd=100, best_n_select=50, enterprise_value_to_revenue_limit=15, favor_technology_sector=4.5, generate_result_folders=1)

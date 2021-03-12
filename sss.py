@@ -1,10 +1,28 @@
-#########################################################
-# Version 275 - Author: Asaf Ravid <asaf.rvd@gmail.com> #
-#########################################################
+#############################################################################
+#
+# Version 300 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+#
+#    Stock Screener and Scanner - based on yfinance and investpy
+#    Copyright (C) 2021  Asaf Ravid
+#
+#    This program is free software: you can redistribute it and/or modify
+#    it under the terms of the GNU General Public License as published by
+#    the Free Software Foundation, either version 3 of the License, or
+#    (at your option) any later version.
+#
+#    This program is distributed in the hope that it will be useful,
+#    but WITHOUT ANY WARRANTY; without even the implied warranty of
+#    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+#    GNU General Public License for more details.
+#
+#    You should have received a copy of the GNU General Public License
+#    along with this program.  If not, see <https://www.gnu.org/licenses/>.
+#
+#############################################################################
 
-# TODO: ASAF: 1. Check and multi dim and investigate earnings_quarterly_growth_min and revenue_quarterly_growth_min
-#             2. Check why Yahoo Finance always gives QRG values of 0? Unusable if that is always so
-#             3. Square Root of PEG Ratio may be too harsh, try something else perhaps.
+
+# TODO: ASAF: 1. Check and multi dim and investigate earnings_quarterly_growth_min and revenue_quarterly_growth_min: Check why Yahoo Finance always gives QRG values of 0? Unusable if that is always so
+#             3. Square Root of PEG Ratio may be too harsh, try something else perhaps, but only after understanding why Yahoo Finance PEG ratio is someties vastly different from zachs and other websites - for instance EXC
 #             4. Take latest yfinance base.py (and other - compare the whole folder) and updates - maybe not required - but just stay up to date
 
 import time
@@ -47,10 +65,6 @@ PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE    = 2.0    # Provide a "bonu
 PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE = 2.0    # Provide a "bonus" for companies whose profit margins have increased continuously quarterly
 NEGATIVE_CFO_FACTOR                                   = 100.0  #
 
-# According to https://finance.yahoo.com/quote/<SYMBOL>/financials
-# TODO: ASAFR: For Belgium, BUD has values in USD, while CYAD has values in EUR - this means it is required to investigate furthermore
-COUNTRY_LIST                                       = ['Argentina', 'Australia', 'Austria', 'Bahamas']
-COUNTRY_CURRENCY_LIST                              = ['ARS'      , 'USD',       'EUR',     'USD']
 
 @dataclass
 class StockData:
@@ -165,7 +179,6 @@ def text_to_num(text):
 #                   "financialCurrency": "EUR"
 #
 # data is a dictionary, which, if containing this path, means that a conversion from USD to that currency shall require to take place
-# TODO: ASAFR: compare this path in CYAD (Country is Belgium) to BUD (Country is Belgium) in which teh Currency is not in EUR (and seems to be USD)
 #
 # new_data is a direct dictionary of "QuoteSummaryStore": {
 # - new path to "financialCurrency": "EUR" is:
@@ -200,19 +213,8 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
         stock_information = {}
         if build_csv_db:
             try:
-                info                  = symbol.get_info()
-                cash_flows            = symbol.get_cashflow(as_dict=True)
-                # TODO: ASAFR: Add Total Debt to Equity:
-                #              הנה Study Case מעניין על AAPL. כל הערכים ב$
-                #              https://www.investopedia.com/terms/d/debtequityratio.asp#:~:text=The%20debt%2Dto%2Dequity%20(,of%20a%20company's%20financial%20statements.
-                #              
-                #              The debt-to-equity (D/E) ratio is calculated by dividing a company’s total liabilities by its shareholder equity. These numbers are available on the balance sheet of a company’s financial statements.
-                #
-                #              הווה אומר שיחס החוב להון של AAPL הוא 258549000000 לחלק ל 65339000000 וזה יוצא 3.9
-                #
-                #              'Total Liab' = {} 258549000000.0
-                #              'Total Stockholder Equity' = {} 65339000000.0
-                #
+                info                                   = symbol.get_info()
+                cash_flows                             = symbol.get_cashflow(as_dict=True)
                 balance_sheets                         = symbol.get_balance_sheet(as_dict=True)
                 # balancesheet                         = symbol.get_balancesheet(as_dict=True)
                 earnings_yearly                        = symbol.get_earnings(as_dict=True, freq="yearly")
@@ -988,13 +990,15 @@ def sss_run(sectors_list, sectors_filter_out, countries_list, countries_filter_o
             for index, stock in enumerate(stocks_list_tase): stocks_list_tase[index] += '.TA'
 
     # All nasdaq and others: ftp://ftp.nasdaqtrader.com/symboldirectory/
+    # Legend: http://www.nasdaqtrader.com/trader.aspx?id=symboldirdefs
     # ftp.nasdaqtrader.com/SymbolDirectory/nasdaqlisted.txt
     # ftp.nasdaqtrader.com/SymbolDirectory/otherlisted.txt
+    # ftp.nasdaqtrader.com/SymbolDirectory/nasdaqtraded.txt
     if not research_mode:
         symbols_united_states     = []
         stocks_list_united_states = []
         if read_united_states_input_symbols:
-            nasdaq_filenames_list = ['Indices/nasdaqlisted.csv', 'Indices/otherlisted.csv', 'Indices/nasdaqtraded.csv']
+            nasdaq_filenames_list = ['Indices/nasdaqlisted.csv', 'Indices/otherlisted.csv', 'Indices/nasdaqtraded.csv']  # TODO: ASAFR: nasdaqtraded.csv - 1st column is Y/N (traded or not) - so take row[1] instead!!!
 
             for filename in nasdaq_filenames_list:
                 with open(filename, mode='r', newline='') as engine:
