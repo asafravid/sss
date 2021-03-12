@@ -67,7 +67,7 @@ http://bit.ly/SssResultsInvestmentTracking
   - For any questions / issues / suggestions: You can reach me here: asaf.rvd@gmail.com
 
 # License
-               Copyright (C) 2021  Asaf Ravid <asaf.rvd@gmail.com>
+          Copyright (C) 2021  Asaf Ravid <asaf.rvd@gmail.com>
 
     This program is free software: you can redistribute it and/or modify
     it under the terms of the GNU General Public License as published by
