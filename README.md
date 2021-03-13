@@ -43,7 +43,8 @@ http://bit.ly/SssResultsInvestmentTracking
 - Download `S&P500` latest components via https://www.barchart.com/stocks/quotes/$SPX/components into `Indices/snp500-components.csv`  (Remove last line indicating creation date)
 - Download `NASDAQ` latest components via `ftp://ftp.nasdaqtrader.com/symboldirectory/` into `Indices/nasdaqlisted.csv` (Convert `.txt` to `.csv` and remove last line indicating creation date)
 - Download `NASDAQ` Other Listed components via `ftp://ftp.nasdaqtrader.com/symboldirectory/` into `Indices/otherlisted.csv` (Convert `.txt` to `.csv` and remove last line indicating creation date)
-- You can also create your own indice/group of stocks by either overriding the above files' contents or simply adding your own indice to the code support.
+- You can also create your own indice/group of stocks by either overriding the above files' contents or simply adding your own indice to the code support. Use Custom Mode, and example in `sss_run.py`
+- Checkout http://www.nasdaqtrader.com/trader.aspx?id=symboldirdefs for all symbol definitions (for instance - `$` in stock names, 5-letter stocks ending with `Y`)
 
 # Disclaimer
 - Make your analysis before buying the reccommended stocks
