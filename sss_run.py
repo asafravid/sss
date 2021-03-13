@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 300 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 302 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021  Asaf Ravid
@@ -54,12 +54,12 @@ TITLES = ["_תוצאות_סריקה_עבור_בורסת_תל_אביב", "_Scan_R
 
 # Run Build DB Only: All/Others
 # =============================
-# sss.sss_run(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', read_united_states_input_symbols=1, tase_mode=0, num_threads=20, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.001, ev_to_cfo_ratio_limit = 20000.0, debt_to_equity_limit = 1000.0, min_enterprise_value_millions_usd=5, best_n_select=2, enterprise_value_to_revenue_limit=1000, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[4.0, 0.5], generate_result_folders=1)
+sss.sss_run(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', read_united_states_input_symbols=1, tase_mode=0, num_threads=20, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.001, ev_to_cfo_ratio_limit = 20000.0, debt_to_equity_limit = 1000.0, min_enterprise_value_millions_usd=5, best_n_select=2, enterprise_value_to_revenue_limit=1000, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[4.0, 0.5], generate_result_folders=1)
 
 
 # Run Build DB Only: Custom Portfolio
 # ==============================================
-# sss.sss_run(sectors_list=[], sectors_filter_out=0, countries_list=['Belgium'], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', read_united_states_input_symbols=0, tase_mode=0, num_threads=1, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.01, ev_to_cfo_ratio_limit=20000.0, debt_to_equity_limit = 1000.0, min_enterprise_value_millions_usd=5, best_n_select=2, enterprise_value_to_revenue_limit=200, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[4.0, 0.75], generate_result_folders=1, custom_portfolio=['QLVE'])
+# sss.sss_run(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', read_united_states_input_symbols=0, tase_mode=0, num_threads=1, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.01, ev_to_cfo_ratio_limit=20000.0, debt_to_equity_limit = 1000.0, min_enterprise_value_millions_usd=5, best_n_select=2, enterprise_value_to_revenue_limit=200, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[4.0, 0.75], generate_result_folders=1, custom_portfolio=['HLM$', 'GRCYW', 'BELFB', 'CCV.W', 'CTEST.O', 'FUSE.W', 'CONXU', 'MARPS', 'ATCO$I'])
 
 
 # Research Mode:
@@ -279,24 +279,24 @@ def research_db(sectors_list, sectors_filter_out, countries_list, countries_filt
 
 # NASDAQ100+S&P500+RUSSEL1000:
 # ============================
-old_run = 'Results/20210306-194949_Technology4.5_FinancialServices0.3333_UnitedStates_Bdb_nRes1021'
-new_run = 'Results/20210312-182101_Technology4.0_FinancialServices0.33333_Bdb_nRes1084'
-evr_range_n         = get_range(csv_db_path=new_run, column_name='evr_effective',            num_sections=8, reverse=1)
-pm_ratios_range_n   = get_range(csv_db_path=new_run, column_name='annualized_profit_margin', num_sections=8, reverse=0)
-ev_range_n          = get_range(csv_db_path=new_run, column_name='enterprise_value',         num_sections=4, reverse=0)
-pm_range_n          = [round(pm*100,    sss.NUM_ROUND_DECIMALS) for pm in pm_ratios_range_n]
-ev_millions_range_n = [int(  ev/1000000                       ) for ev in ev_range_n       ]
-research_db(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, evr_range=evr_range_n, pm_range=pm_range_n, ev_millions_range=ev_millions_range_n,  csv_db_path=new_run,   read_united_states_input_symbols=0, scan_mode=SCAN_MODE_NSR, generate_result_folders=0, appearance_counter_min=PDF_NUM_ENTRIES_IN_REPORT/4, appearance_counter_max=850, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[4.0, 0.33333],
-            newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, movement_threshold=0, newer_rec_ranges=[ev_millions_range_n[0],ev_millions_range_n[-1],evr_range_n[0],evr_range_n[-1],pm_range_n[0],pm_range_n[-1]], older_rec_ranges=[609,41513,649.803,1.2344,0.26,41.64], rec_length=80)
+# old_run = 'Results/20210306-194949_Technology4.5_FinancialServices0.3333_UnitedStates_Bdb_nRes1021'
+# new_run = 'Results/20210313-091805_Technology4.0_FinancialServices0.33333_Bdb_nRes1085'
+# evr_range_n         = get_range(csv_db_path=new_run, column_name='evr_effective',            num_sections=8, reverse=1)
+# pm_ratios_range_n   = get_range(csv_db_path=new_run, column_name='annualized_profit_margin', num_sections=8, reverse=0)
+# ev_range_n          = get_range(csv_db_path=new_run, column_name='enterprise_value',         num_sections=4, reverse=0)
+# pm_range_n          = [round(pm*100,    sss.NUM_ROUND_DECIMALS) for pm in pm_ratios_range_n]
+# ev_millions_range_n = [int(  ev/1000000                       ) for ev in ev_range_n       ]
+# research_db(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, evr_range=evr_range_n, pm_range=pm_range_n, ev_millions_range=ev_millions_range_n,  csv_db_path=new_run,   read_united_states_input_symbols=0, scan_mode=SCAN_MODE_NSR, generate_result_folders=0, appearance_counter_min=PDF_NUM_ENTRIES_IN_REPORT/4, appearance_counter_max=850, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[4.0, 0.33333],
+#             newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, movement_threshold=0, newer_rec_ranges=[ev_millions_range_n[0],ev_millions_range_n[-1],evr_range_n[0],evr_range_n[-1],pm_range_n[0],pm_range_n[-1]], older_rec_ranges=[609,41513,649.803,1.2344,0.26,41.64], rec_length=80)
 # sss_diff.run(newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, movement_threshold=3, newer_rec_ranges=[100,1,54,1,50], older_rec_ranges=[100,1,54,1,50], rec_length=80)
 
 # Generate:
 # research_db(evr_range=[24,24],  pm_range=[31,31], ev_millions_range=[100,100], csv_db_path=new_run,   read_united_states_input_symbols=0, tase_mode=0, generate_result_folders=1, appearance_counter_min=15, appearance_counter_max=45, favor_technology_sector=4.5)
 
 # ALL:
-# ====
+# # ====
 # old_run = 'Results/20210306-163202_Technology4.0_FinancialServices0.5_UnitedStates_A_Bdb_nRes5113'
-# new_run = 'Results/20210312-171132_Technology4.0_FinancialServices0.5_A_Bdb_nRes7014'
+# new_run = 'Results/20210313-055646_Technology4.0_FinancialServices0.5_A_Bdb_nRes7199'
 # evr_range_all         = get_range(csv_db_path=new_run, column_name='evr_effective',            num_sections=9, reverse=1)
 # pm_ratios_range_all   = get_range(csv_db_path=new_run, column_name='annualized_profit_margin', num_sections=9, reverse=0)
 # ev_range_all          = get_range(csv_db_path=new_run, column_name='enterprise_value',         num_sections=5, reverse=0)

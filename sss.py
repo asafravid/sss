@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 300 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 302 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021  Asaf Ravid
@@ -22,8 +22,10 @@
 
 
 # TODO: ASAF: 1. Check and multi dim and investigate earnings_quarterly_growth_min and revenue_quarterly_growth_min: Check why Yahoo Finance always gives QRG values of 0? Unusable if that is always so
-#             3. Square Root of PEG Ratio may be too harsh, try something else perhaps, but only after understanding why Yahoo Finance PEG ratio is someties vastly different from zachs and other websites - for instance EXC
-#             4. Take latest yfinance base.py (and other - compare the whole folder) and updates - maybe not required - but just stay up to date
+#             2. Square Root of PEG Ratio may be too harsh, try something else perhaps, but only after understanding why Yahoo Finance PEG ratio is someties vastly different from zachs and other websites - for instance EXC
+#             3. Take latest yfinance base.py (and other - compare the whole folder) and updates - maybe not required - but just stay up to date
+#             4. Remove initially, stocks with 'W' at their 5th letter.
+#             5. What are stocks with '-' and '.' in them? Probably can be pre-filtered as well. Like HIGA-W, for instance
 
 import time
 import random
@@ -41,7 +43,7 @@ from dataclasses import dataclass
 from currency_converter import CurrencyConverter
 
 
-SKIP_5LETTER_Y_STOCK_LISTINGS                           = True       # Skip ADRs - American Depositary receipts (5 Letter Stocks)
+SKIP_5LETTER_Y_STOCK_LISTINGS                         = True       # Skip ADRs - American Depositary receipts (5 Letter Stocks)
 NUM_ROUND_DECIMALS                                    = 5
 NUM_EMPLOYEES_UNKNOWN                                 = 10000000   # This will make the company very inefficient in terms of number of employees
 PROFIT_MARGIN_UNKNOWN                                 = 0.001      # This will make the company almost not profitable terms of profit margins, thus less attractive
@@ -519,7 +521,7 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
             if return_value and not research_mode: print('                            Skipping enterprise_value: {}'.format(stock_data.enterprise_value))
             return_value = False
 
-        #
+        # Checkout http://www.nasdaqtrader.com/trader.aspx?id=symboldirdefs for all symbol definitions (for instance - `$` in stock names, 5-letter stocks ending with `Y`)
         if SKIP_5LETTER_Y_STOCK_LISTINGS and stock_data.ticker[-1] == 'Y' and len(stock_data.ticker) == 5 and not tase_mode and '.' not in stock_data.ticker and '-' not in stock_data.ticker and '$' not in stock_data.ticker:
             return_value = False
 
@@ -998,9 +1000,9 @@ def sss_run(sectors_list, sectors_filter_out, countries_list, countries_filter_o
         symbols_united_states     = []
         stocks_list_united_states = []
         if read_united_states_input_symbols:
-            nasdaq_filenames_list = ['Indices/nasdaqlisted.csv', 'Indices/otherlisted.csv', 'Indices/nasdaqtraded.csv']  # TODO: ASAFR: nasdaqtraded.csv - 1st column is Y/N (traded or not) - so take row[1] instead!!!
-
-            for filename in nasdaq_filenames_list:
+            nasdaq_filenames_list = ['Indices/nasdaqlisted.csv', 'Indices/otherlisted.csv', 'Indices/nasdaqtraded.csv']  # Checkout http://www.nasdaqtrader.com/trader.aspx?id=symboldirdefs for all symbol definitions (for instance - `$` in stock names, 5-letter stocks ending with `Y`)
+            ticker_clumn_list     = [0,                          0,                         1                         ]  # nasdaqtraded.csv - 1st column is Y/N (traded or not) - so take row[1] instead!!!
+            for index, filename in enumerate(nasdaq_filenames_list):
                 with open(filename, mode='r', newline='') as engine:
                     reader = csv.reader(engine, delimiter='|')
                     row_index = 0
@@ -1009,8 +1011,17 @@ def sss_run(sectors_list, sectors_filter_out, countries_list, countries_filter_o
                             row_index += 1
                             continue
                         else:
-                            symbols_united_states.append(row[0])
                             row_index += 1
+                            if '$' in row[ticker_clumn_list[index]]: # AAIC$B -> <stock_symbol>$<letter> --> keep just the stock_Symbol
+                                stock_symbol = row[ticker_clumn_list[index]].split('$')[0]
+                            else:
+                                stock_symbol = row[ticker_clumn_list[index]]
+                            if len(stock_symbol) == 5: # https://www.investopedia.com/ask/answers/06/nasdaqfifthletter.asp
+                                if stock_symbol[4] in ['Q', 'W', 'C']: # Q: Bankruptcy, W: Warrant, C: Nextshares (Example: https://funds.eatonvance.com/includes/loadDocument.php?fn=20939.pdf&dt=fundPDFs)
+                                    continue
+                                if stock_symbol[4] in ['Y'] and SKIP_5LETTER_Y_STOCK_LISTINGS: # Configurable - harder to buy (from Israel, at least), but not impossible of coure
+                                    continue
+                            symbols_united_states.append(stock_symbol)
 
             stocks_list_united_states = investpy.get_stocks_list(country='united states')
 
@@ -1027,7 +1038,7 @@ def sss_run(sectors_list, sectors_filter_out, countries_list, countries_filter_o
     if len(custom_portfolio):
         symbols = custom_portfolio
 
-    if not research_mode: print('\n{} SSS Symbols to Scan using {} threads: {}\n'.format(len(symbols), num_threads, symbols))
+    if not research_mode: print('\n{} Symbols for SSS to Scan (Using {} threads): {}\n'.format(len(symbols), num_threads, symbols))
 
 
     csv_db_data    = []
