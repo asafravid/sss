@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 302 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 305 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021  Asaf Ravid
@@ -423,15 +423,15 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
             else:                                                      stock_data.enterprise_value_to_ebitda  = None
             if isinstance(stock_data.enterprise_value_to_ebitda,str):  stock_data.enterprise_value_to_ebitda  = None
 
+            if 'marketCap' in info and info['marketCap'] is not None:
+                stock_data.market_cap = info['marketCap'] # For Nasdaq - these values are already in USD, no conversion required
+
             if 'trailingPE' in info:
                 stock_data.trailing_price_to_earnings  = info['trailingPE']  # https://www.investopedia.com/terms/t/trailingpe.asp
                 if tase_mode: stock_data.trailing_price_to_earnings /= 100.0  # In TLV stocks, Yahoo multiplies trailingPE by a factor of 100, so compensate
-            else:
-                stock_data.trailing_price_to_earnings  = None # Mark as None, so as to try and calculate manually.
+            elif stock_data.annualized_earnings > 0:
+                stock_data.trailing_price_to_earnings  = stock_data.market_cap / stock_data.annualized_earnings # Calculate manually.
             if isinstance(stock_data.trailing_price_to_earnings,str):  stock_data.trailing_price_to_earnings  = None # Mark as None, so as to try and calculate manually.
-
-            if 'marketCap' in info and info['marketCap'] is not None:
-                stock_data.market_cap = info['marketCap'] # For Nasdaq - these values are already in USD, no conversion required
 
             if 'priceToSalesTrailing12Months' in info and info['priceToSalesTrailing12Months'] is not None:
                 stock_data.trailing_12months_price_to_sales = info['priceToSalesTrailing12Months']  # https://www.investopedia.com/articles/fundamental/03/032603.asp#:~:text=The%20price%2Dto%2Dsales%20ratio%20(Price%2FSales%20or,the%20more%20attractive%20the%20investment.
