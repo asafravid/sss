@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 305 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 306 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021  Asaf Ravid
@@ -26,6 +26,7 @@
 #             3. Take latest yfinance base.py (and other - compare the whole folder) and updates - maybe not required - but just stay up to date
 #             4. Remove initially, stocks with 'W' at their 5th letter.
 #             5. What are stocks with '-' and '.' in them? Probably can be pre-filtered as well. Like HIGA-W, for instance
+#             6. Investigate and add: https://www.investopedia.com/terms/o/operatingmargin.asp - operating margin
 
 import time
 import random
@@ -43,29 +44,35 @@ from dataclasses import dataclass
 from currency_converter import CurrencyConverter
 
 
-SKIP_5LETTER_Y_STOCK_LISTINGS                         = True       # Skip ADRs - American Depositary receipts (5 Letter Stocks)
-NUM_ROUND_DECIMALS                                    = 5
-NUM_EMPLOYEES_UNKNOWN                                 = 10000000   # This will make the company very inefficient in terms of number of employees
-PROFIT_MARGIN_UNKNOWN                                 = 0.001      # This will make the company almost not profitable terms of profit margins, thus less attractive
-PERCENT_HELD_INSTITUTIONS_LOW                         = 0.01       # low, to make less relevant
-PEG_UNKNOWN                                           = 1          # use a neutral value when PEG is unknown
-SHARES_OUTSTANDING_UNKNOWN                            = 100000000  # 100 Million Shares - just a value for calculation of a currently unused vaue
-BAD_SSS                                               = 10.0 ** 25.0
-BAD_SSSE                                              = 0
-PROFIT_MARGIN_WEIGHTS                                 = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0, 512.0]  # from oldest to newest
-CASH_FLOW_WEIGHTS                                     = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0, 512.0]  # from oldest to newest
-REVENUES_WEIGHTS                                      = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0, 512.0]  # from oldest to newest
-EARNINGS_WEIGHTS                                      = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0, 512.0]  # from oldest to newest
-BALANCE_SHEETS_WEIGHTS                                = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0, 512.0]  # from oldest to newest
-EARNINGS_QUARTERLY_GROWTH_UNKNOWN                     = -0.75  # -75% TODO: ASAFR: 1. Scan (like pm and ever) values of earnings_quarterly_growth for big data research better recommendations
-EARNINGS_QUARTERLY_GROWTH_POSITIVE_FACTOR             = 15.0   # When positive, it will have a 10x factor on the 1 + function
-REVENUE_QUARTERLY_GROWTH_UNKNOWN                      = -0.75  # -75% TODO: ASAFR: 1. Scan (like pm and ever) values of revenue_quarterly_growth  for big data research better recommendations
-REVENUE_QUARTERLY_GROWTH_POSITIVE_FACTOR              = 10.0   # When positive, it will have a 10x factor on the 1 + function
-TRAILING_EPS_PERCENTAGE_DAMP_FACTOR                   = 0.01   # When the trailing_eps_percentage is very low (units are ratio here), this damper shall limit the affect to x100 not more)
-PROFIT_MARGIN_DAMPER                                  = 0.001  # When the profit_margin           is very low (units are ratio here), this damper shall limit the affect to x1000 not more)
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE    = 2.0    # Provide a "bonus" for companies whose profit margins have increased continuously annually
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE = 2.0    # Provide a "bonus" for companies whose profit margins have increased continuously quarterly
-NEGATIVE_CFO_FACTOR                                   = 100.0  #
+SKIP_5LETTER_Y_STOCK_LISTINGS                                     = True       # Skip ADRs - American Depositary receipts (5 Letter Stocks)
+NUM_ROUND_DECIMALS                                                = 5
+NUM_EMPLOYEES_UNKNOWN                                             = 10000000   # This will make the company very inefficient in terms of number of employees
+PROFIT_MARGIN_UNKNOWN                                             = 0.001      # This will make the company almost not profitable terms of profit margins, thus less attractive
+PERCENT_HELD_INSTITUTIONS_LOW                                     = 0.01       # low, to make less relevant
+PEG_UNKNOWN                                                       = 1          # use a neutral value when PEG is unknown
+SHARES_OUTSTANDING_UNKNOWN                                        = 100000000  # 100 Million Shares - just a value for calculation of a currently unused vaue
+BAD_SSS                                                           = 10.0 ** 50.0
+BAD_SSSE                                                          = 0
+PROFIT_MARGIN_WEIGHTS                                             = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0, 512.0]  # from oldest to newest
+CASH_FLOW_WEIGHTS                                                 = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0, 512.0]  # from oldest to newest
+REVENUES_WEIGHTS                                                  = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0, 512.0]  # from oldest to newest
+EARNINGS_WEIGHTS                                                  = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0, 512.0]  # from oldest to newest
+BALANCE_SHEETS_WEIGHTS                                            = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0, 512.0]  # from oldest to newest
+EARNINGS_QUARTERLY_GROWTH_UNKNOWN                                 = -0.75  # -75% TODO: ASAFR: 1. Scan (like pm and ever) values of earnings_quarterly_growth for big data research better recommendations
+EARNINGS_QUARTERLY_GROWTH_POSITIVE_FACTOR                         = 15.0   # When positive, it will have a 10x factor on the 1 + function
+REVENUE_QUARTERLY_GROWTH_UNKNOWN                                  = -0.75  # -75% TODO: ASAFR: 1. Scan (like pm and ever) values of revenue_quarterly_growth  for big data research better recommendations
+REVENUE_QUARTERLY_GROWTH_POSITIVE_FACTOR                          = 10.0   # When positive, it will have a 10x factor on the 1 + function
+TRAILING_EPS_PERCENTAGE_DAMP_FACTOR                               = 0.01   # When the trailing_eps_percentage is very low (units are ratio here), this damper shall limit the affect to x100 not more)
+PROFIT_MARGIN_DAMPER                                              = 0.001  # When the profit_margin           is very low (units are ratio here), this damper shall limit the affect to x1000 not more)
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE                = 1.25   # Provide a "bonus" for companies whose profit margins have increased continuously annually
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE             = 1.25   # Provide a "bonus" for companies whose profit margins have increased continuously quarterly
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_POSITIVE                = 2.0    # Provide a "bonus" for companies whose profit margins have been continuously positive annually
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_POSITIVE             = 2.0    # Provide a "bonus" for companies whose profit margins have been continuously positive quarterly
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_EARNINGS    = 1.75   # Provide a "bonus" for companies whose earnings       have been continuously increasing annually
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_REVENUE     = 1.5    # Provide a "bonus" for companies whose revenue        has  been continuously increasing annually
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_EARNINGS = 1.75   # Provide a "bonus" for companies whose earnings       have been continuously increasing quarterly
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_REVENUE  = 1.5    # Provide a "bonus" for companies whose revenue        has  been continuously increasing quarterly
+NEGATIVE_CFO_FACTOR                                               = 100.0  #
 
 
 @dataclass
@@ -210,9 +217,11 @@ def text_to_num(text):
 def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode, sectors_list, sectors_filter_out, countries_list, countries_filter_out, build_csv_db, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, revenue_quarterly_growth_min, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool):
     try:
         return_value = True
-        info              = {}
-        earnings          = {}
-        stock_information = {}
+        info               = {}
+        earnings           = {}
+        earnings_quarterly = {}
+        earnings_yearly    = {}
+        stock_information  = {}
         if build_csv_db:
             try:
                 info                                   = symbol.get_info()
@@ -317,7 +326,10 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
                     used_weights              = 0
                     earnings_to_revenues_list = []
                     weights_sum               = 0
-                    boost                     = True # Will be set to True if there is an annual continuous increase in the profit margin
+                    boost_cont_inc_ratio    = True # Will be set to True if there is a continuous increase in the profit margin
+                    boost_cont_inc_pos      = True # Will be set to True if there is a continuous positive in the profit margin
+                    boost_cont_inc_earnings = True # Will be set to True if there is a continuous increase in the earnings
+                    boost_cont_inc_revenue  = True # Will be set to True if there is a continuous increase in the revenue
                     try:
                         for key in earnings['Revenue']:
                             if float(earnings['Revenue'][key]) > 0:
@@ -326,12 +338,22 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
                                 used_weights += 1
                                 current_ratio = float(earnings['Earnings'][key])/float(earnings['Revenue'][key])
                                 if used_weights > 1:
-                                    boost = True if boost and current_ratio > last_ratio else False
+                                    boost_cont_inc_ratio    = True if boost_cont_inc_ratio    and current_ratio                    > last_ratio                    else False
+                                    boost_cont_inc_pos      = True if boost_cont_inc_pos      and current_ratio                    > 0          and last_ratio > 0 else False
+                                    boost_cont_inc_earnings = True if boost_cont_inc_earnings and float(earnings['Earnings'][key]) > last_earnings                 else False
+                                    boost_cont_inc_revenue  = True if boost_cont_inc_revenue  and float(earnings['Revenue' ][key]) > last_revenue                  else False
                                 last_ratio    = current_ratio
+                                last_earnings = float(earnings['Earnings'][key])
+                                last_revenue  = float(earnings['Revenue' ][key])
                             weight_index += 1
                         if weights_sum > 0:
-                            stock_data.annualized_profit_margin_boost = 1.0 if not boost or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE
-                            stock_data.annualized_profit_margin       = sum(earnings_to_revenues_list)/weights_sum * stock_data.annualized_profit_margin_boost
+                            stock_data.annualized_profit_margin        = sum(earnings_to_revenues_list)/weights_sum
+                            if stock_data.annualized_profit_margin > 0:
+                                stock_data.annualized_profit_margin_boost  = 1.0 if not boost_cont_inc_ratio    or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE
+                                stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_inc_pos      or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_POSITIVE
+                                stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_inc_earnings or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_EARNINGS
+                                stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_inc_revenue  or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_REVENUE
+                                stock_data.annualized_profit_margin       *= stock_data.annualized_profit_margin_boost
                     except Exception as e:
                         print("Exception in annualized_profit_margin: {}".format(e))
                         pass
@@ -344,7 +366,10 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
                     used_weights              = 0
                     earnings_to_revenues_list = []
                     weights_sum               = 0
-                    boost                     = True # Will be set to True if there is an annual continuous increase in the profit margin
+                    boost_cont_inc_ratio    = True # Will be set to True if there is a continuous increase in the profit   margin  TODO: ASAFR: Do the same boosting for cash flows ev_to_cfo
+                    boost_cont_inc_pos      = True # Will be set to True if there is a continuous positive in the profit   margin
+                    boost_cont_inc_earnings = True # Will be set to True if there is a continuous increase in the earnings
+                    boost_cont_inc_revenue  = True # Will be set to True if there is a continuous increase in the revenue
                     try:
                         for key in earnings_quarterly['Revenue']:
                             if float(earnings_quarterly['Revenue'][key]) > 0:
@@ -353,12 +378,22 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
                                 used_weights += 1
                                 current_ratio = float(earnings_quarterly['Earnings'][key])/float(earnings_quarterly['Revenue'][key])
                                 if used_weights > 1:
-                                    boost = True if boost and current_ratio > last_ratio else False
+                                    boost_cont_inc_ratio    = True if boost_cont_inc_ratio    and current_ratio                              > last_ratio                    else False
+                                    boost_cont_inc_pos      = True if boost_cont_inc_pos      and current_ratio                              > 0          and last_ratio > 0 else False
+                                    boost_cont_inc_earnings = True if boost_cont_inc_earnings and float(earnings_quarterly['Earnings'][key]) > last_earnings                 else False
+                                    boost_cont_inc_revenue  = True if boost_cont_inc_revenue  and float(earnings_quarterly['Revenue' ][key]) > last_revenue                  else False
                                 last_ratio    = current_ratio
+                                last_earnings = float(earnings_quarterly['Earnings'][key])
+                                last_revenue  = float(earnings_quarterly['Revenue' ][key])
                             weight_index += 1
                         if weights_sum > 0:
-                            stock_data.quarterized_profit_margin_boost = 1.0 if not boost or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE
-                            stock_data.quarterized_profit_margin       = sum(earnings_to_revenues_list)/weights_sum * stock_data.quarterized_profit_margin_boost
+                            stock_data.quarterized_profit_margin            = sum(earnings_to_revenues_list)/weights_sum
+                            if stock_data.quarterized_profit_margin > 0:
+                                stock_data.quarterized_profit_margin_boost  = 1.0 if not boost_cont_inc_ratio    or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE
+                                stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_inc_pos      or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_POSITIVE
+                                stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_inc_earnings or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_EARNINGS
+                                stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_inc_revenue  or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_REVENUE
+                                stock_data.quarterized_profit_margin       *= stock_data.quarterized_profit_margin_boost
                     except Exception as e:
                         print("Exception in quarterized_profit_margin: {}".format(e))
                         pass
@@ -623,7 +658,9 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
                 if stock_data.num_employees      and stock_data.net_income_to_common_shareholders is not None: stock_data.nitcsh_to_num_employees      = float(stock_data.net_income_to_common_shareholders) / float(stock_data.num_employees)
 
                 # TODO: ASAFR: Add here the quarterly profit margin as well!
-                max_profit_margin_effective       = PROFIT_MARGIN_DAMPER + max(stock_data.profit_margin, stock_data.annualized_profit_margin)
+                max_profit_margin_effective       = PROFIT_MARGIN_DAMPER + max(stock_data.profit_margin, stock_data.annualized_profit_margin)  # annual    includes boos (if exists)
+                quarterly_profit_margin_effective = PROFIT_MARGIN_DAMPER + stock_data.quarterized_profit_margin                                # quarterly includes boos (if exists)
+
                 if stock_data.earnings_quarterly_growth > 0:
                     earnings_qgrowth_factor_effective = (1    + EARNINGS_QUARTERLY_GROWTH_POSITIVE_FACTOR*stock_data.earnings_quarterly_growth)
                 else:
