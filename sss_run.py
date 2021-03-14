@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 306 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 307 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021  Asaf Ravid
@@ -50,7 +50,7 @@ TITLES = ["_תוצאות_סריקה_עבור_בורסת_תל_אביב", "_Scan_R
 
 # Run Build DB Only: Nasdaq100+S&P500+Russel1000
 # ==============================================
-# sss.sss_run(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', read_united_states_input_symbols=0, tase_mode=0, num_threads=20, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.001, ev_to_cfo_ratio_limit=2000.0, debt_to_equity_limit = 1000.0, min_enterprise_value_millions_usd=75, best_n_select=2, enterprise_value_to_revenue_limit=250, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[4.0, 0.33333], generate_result_folders=1)
+sss.sss_run(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', read_united_states_input_symbols=0, tase_mode=0, num_threads=20, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.001, ev_to_cfo_ratio_limit=2000.0, debt_to_equity_limit = 1000.0, min_enterprise_value_millions_usd=75, best_n_select=2, enterprise_value_to_revenue_limit=250, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[4.0, 0.33333], generate_result_folders=1)
 
 # Run Build DB Only: All/Others
 # =============================
@@ -62,7 +62,7 @@ TITLES = ["_תוצאות_סריקה_עבור_בורסת_תל_אביב", "_Scan_R
 # TASE:
 # sss.sss_run(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', read_united_states_input_symbols=0, tase_mode=1, num_threads=1, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.01, ev_to_cfo_ratio_limit=20000.0, debt_to_equity_limit = 1000.0, min_enterprise_value_millions_usd=5, best_n_select=2, enterprise_value_to_revenue_limit=200, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[4.0, 0.75], generate_result_folders=1, custom_portfolio=['MDVI.TA'])
 # Nasdaq:
-# sss.sss_run(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', read_united_states_input_symbols=0, tase_mode=0, num_threads=4, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.01, ev_to_cfo_ratio_limit=20000.0, debt_to_equity_limit = 1000.0, min_enterprise_value_millions_usd=5, best_n_select=2, enterprise_value_to_revenue_limit=200, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[4.0, 0.5], generate_result_folders=1, custom_portfolio=['ACGL']) #['AAPL','ABBV','ACGL','ACN','ADBE','AFL','AGO','AL','ALGN','ALL','ALLY','ALXN','AMAT','AMGN','APT','ARE','ATVI','AVB','AVGO','AZPN','BAC','BDN','BIO','BLK','BMRN','BOKF','BPOP','BRK.B','BTG','BTI','BWXT','BXP','CACC','CB','CDNS','CE','CGNX','CHKP','CMCSA','COF','COOP','CPB','CPRX','CSCO','CUZ','DAC','DFS','DGX','DHI','DLB','DOX','DRE','EBAY','ES','ESGR','EXEL','EXR','FAST','FB','FCNCA','FCPT','FDUS','FF','FHN','FRC','FRO','FTV','GFI','GILD','GIS','GLPI','GNTX','GOOG','GOOGL','GPP','GRMN','GS','GTLS','HIW','HMLP','HOLX','HTH','HUN','HZNP','ICE','INTC','INVA','IRCP','JAZZ','JPM','KGC','KIM','KLAC','KNOP','LAKE','LEN','LMT','LNG','LOPE','LRCX','MAS','MCO','MDLZ','MGM','MMM','MRK','MRVL','MS','MSFT','MU','MX','NBIX','NEM','NVEC','NVR','OHI','OLP','OMF','OPRA','ORAN','ORCL','OZK','PB','PBCT','PBFX','PEG','PG','PM','PNFP','QCOM','QDEL','QRVO','REGN','RGLD','RIO','SBNY','SCHW','SCI','SLM','SMFG','SRE','STT','STZ','SUPN','SWKS','TER','TLK','TMO','TRNO','TROW','TROX','TRQ','TXN','UI','USB','UTHR','VICI','VMW','VRSN','VRTX','VST','VZ','WAL','WMT','WPC','WPM','WTFC','YY'])
+# sss.sss_run(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', read_united_states_input_symbols=0, tase_mode=0, num_threads=4, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.01, ev_to_cfo_ratio_limit=20000.0, debt_to_equity_limit = 1000.0, min_enterprise_value_millions_usd=5, best_n_select=2, enterprise_value_to_revenue_limit=200, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[4.0, 0.5], generate_result_folders=1, custom_portfolio=['SPCE']) #['AAPL','ABBV','ACGL','ACN','ADBE','AFL','AGO','AL','ALGN','ALL','ALLY','ALXN','AMAT','AMGN','APT','ARE','ATVI','AVB','AVGO','AZPN','BAC','BDN','BIO','BLK','BMRN','BOKF','BPOP','BRK.B','BTG','BTI','BWXT','BXP','CACC','CB','CDNS','CE','CGNX','CHKP','CMCSA','COF','COOP','CPB','CPRX','CSCO','CUZ','DAC','DFS','DGX','DHI','DLB','DOX','DRE','EBAY','ES','ESGR','EXEL','EXR','FAST','FB','FCNCA','FCPT','FDUS','FF','FHN','FRC','FRO','FTV','GFI','GILD','GIS','GLPI','GNTX','GOOG','GOOGL','GPP','GRMN','GS','GTLS','HIW','HMLP','HOLX','HTH','HUN','HZNP','ICE','INTC','INVA','IRCP','JAZZ','JPM','KGC','KIM','KLAC','KNOP','LAKE','LEN','LMT','LNG','LOPE','LRCX','MAS','MCO','MDLZ','MGM','MMM','MRK','MRVL','MS','MSFT','MU','MX','NBIX','NEM','NVEC','NVR','OHI','OLP','OMF','OPRA','ORAN','ORCL','OZK','PB','PBCT','PBFX','PEG','PG','PM','PNFP','QCOM','QDEL','QRVO','REGN','RGLD','RIO','SBNY','SCHW','SCI','SLM','SMFG','SRE','STT','STZ','SUPN','SWKS','TER','TLK','TMO','TRNO','TROW','TROX','TRQ','TXN','UI','USB','UTHR','VICI','VMW','VRSN','VRTX','VST','VZ','WAL','WMT','WPC','WPM','WTFC','YY'])
 
 
 # Research Mode:
@@ -282,15 +282,15 @@ def research_db(sectors_list, sectors_filter_out, countries_list, countries_filt
 
 # NASDAQ100+S&P500+RUSSEL1000:
 # ============================
-old_run = 'Results/20210313-091805_Technology4.0_FinancialServices0.33333_Bdb_nRes1085'
-new_run = 'Results/20210314-200605_Technology4.0_FinancialServices0.33333_Bdb_nRes1085'
-evr_range_n         = get_range(csv_db_path=new_run, column_name='evr_effective',            num_sections=8, reverse=1)
-pm_ratios_range_n   = get_range(csv_db_path=new_run, column_name='annualized_profit_margin', num_sections=8, reverse=0)
-ev_range_n          = get_range(csv_db_path=new_run, column_name='enterprise_value',         num_sections=4, reverse=0)
-pm_range_n          = [round(pm*100,    sss.NUM_ROUND_DECIMALS) for pm in pm_ratios_range_n]
-ev_millions_range_n = [int(  ev/1000000                       ) for ev in ev_range_n       ]
-research_db(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, evr_range=evr_range_n, pm_range=pm_range_n, ev_millions_range=ev_millions_range_n,  csv_db_path=new_run,   read_united_states_input_symbols=0, scan_mode=SCAN_MODE_NSR, generate_result_folders=0, appearance_counter_min=PDF_NUM_ENTRIES_IN_REPORT/4, appearance_counter_max=850, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[4.0, 0.33333],
-            newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, movement_threshold=0, newer_rec_ranges=[ev_millions_range_n[0],ev_millions_range_n[-1],evr_range_n[0],evr_range_n[-1],pm_range_n[0],pm_range_n[-1]], older_rec_ranges=[605,43683,661.513,1.29752,0.26,44.714], rec_length=80)
+# old_run = 'Results/20210313-091805_Technology4.0_FinancialServices0.33333_Bdb_nRes1085'
+# new_run = 'Results/20210314-200605_Technology4.0_FinancialServices0.33333_Bdb_nRes1085'
+# evr_range_n         = get_range(csv_db_path=new_run, column_name='evr_effective',            num_sections=8, reverse=1)
+# pm_ratios_range_n   = get_range(csv_db_path=new_run, column_name='annualized_profit_margin', num_sections=8, reverse=0)
+# ev_range_n          = get_range(csv_db_path=new_run, column_name='enterprise_value',         num_sections=4, reverse=0)
+# pm_range_n          = [round(pm*100,    sss.NUM_ROUND_DECIMALS) for pm in pm_ratios_range_n]
+# ev_millions_range_n = [int(  ev/1000000                       ) for ev in ev_range_n       ]
+# research_db(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, evr_range=evr_range_n, pm_range=pm_range_n, ev_millions_range=ev_millions_range_n,  csv_db_path=new_run,   read_united_states_input_symbols=0, scan_mode=SCAN_MODE_NSR, generate_result_folders=0, appearance_counter_min=PDF_NUM_ENTRIES_IN_REPORT/4, appearance_counter_max=850, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[4.0, 0.33333],
+#             newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, movement_threshold=0, newer_rec_ranges=[ev_millions_range_n[0],ev_millions_range_n[-1],evr_range_n[0],evr_range_n[-1],pm_range_n[0],pm_range_n[-1]], older_rec_ranges=[605,43683,661.513,1.29752,0.26,44.714], rec_length=80)
 # sss_diff.run(newer_path=new_run, older_path=old_run, db_exists_in_both_folders=1, diff_only_recommendation=1, movement_threshold=3, newer_rec_ranges=[100,1,54,1,50], older_rec_ranges=[100,1,54,1,50], rec_length=80)
 
 # Generate:
