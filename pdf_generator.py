@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 300 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 315 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021  Asaf Ravid
@@ -138,8 +138,8 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
     else:
         html="<p>Deeper Value Channel Telegram: <A HREF=""https://t.me/investorsIL"">https://t.me/investorsIL</A></p>" \
              "<p>Updates, Discussions and Technical Support on Telegram: <A HREF=""https://t.me/StockScannerIL"">https://t.me/StockScannerIL</A></p>" \
-             "<p>This Scanner is Open Source. fork() here: <A HREF=""https://github.com/asafravid/sss"">https://github.com/asafravid/sss</A></p>" \
-             "<p>Lecture (in Hebrew): <A HREF=""http://bit.ly/SssLecture"">http://bit.ly/SssLecture</A>, One Pager: <A HREF=""http://bit.ly/SssCoreEquation"">http://bit.ly/SssCoreEquation</A></p>" \
+             "<p>This Scanner is Open Source. fork() here: <A HREF=""http://bit.ly/OpenSourceStockScanner"">http://bit.ly/OpenSourceStockScanner</A></p>" \
+             "<p>Lecture: <A HREF=""http://bit.ly/SssLecture"">http://bit.ly/SssLecture</A>, One Pagers: <A HREF=""http://bit.ly/SssCoreEquation"">http://bit.ly/SssCoreEquation</A>, <A HREF=""https://bit.ly/SssBigDataAnalysis"">https://bit.ly/SssBigDataAnalysis</A></p>" \
              "<p><img src=""{}"" width=""600"" height=""250""></p>".format(csv_filename+"_fig.png")
         pdf.write_html(text=html)
 
