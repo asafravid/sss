@@ -10,7 +10,7 @@ The stocks scan and sorting is done according to the below documentation (Core E
 # SSS Core Equation
 http://bit.ly/SssCoreEquation
 
-# SSS Muti-Dimentional Analysis and Ranking Equation
+# SSS Muti-Dimentional Scan and Ranking Equation
 http://bit.ly/SssBigDataAnalysis
 
 # Setup
