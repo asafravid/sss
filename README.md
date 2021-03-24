@@ -5,10 +5,12 @@
  - https://pypi.org/project/fpdf/
  - https://fonts2u.com/dejavu-sans-condensed.font
 
+The stocks scan and sorting is done according to the below documentation (Core Equation and Multi-Dimensional scan) written using Google Documents (https://www.google.com/docs/about/):
+
 # SSS Core Equation
 http://bit.ly/SssCoreEquation
 
-# SSS Big Data (Muti-Dimentional) Analysis and Advanced Ranking Equation
+# SSS Muti-Dimentional Analysis and Ranking Equation
 http://bit.ly/SssBigDataAnalysis
 
 # Setup
@@ -29,9 +31,7 @@ http://bit.ly/SssBigDataAnalysis
 # Run Step-By-Step Instructions
 - 1: Run the scanning mode by uncommenting the `Run Build DB Only` lines in `sss_run.py`
 - 2: A result folder shall be created under `Results` Folder
-- 3: Run research mode, selecting profit margin (`pm`) Enterprise value to Revenue Ratio (`evr`) scanning parameters (just use the defaults - they are fine)
-- 4: Reccomendation list shall appear in the result folder fed to the Research Mode
-- 5: Optional (and recommended) - Run `diff` module (`sss_diff.run()`) to observe differnces (new/removed/moved up/down stocks) from last run
+- 3: Results list shall appear in the result folder fed to the Research Mode
 
 # Track Your Investments - Reference Sheet
 http://bit.ly/SssResultsInvestmentTracking
@@ -47,10 +47,9 @@ http://bit.ly/SssResultsInvestmentTracking
 - Checkout http://www.nasdaqtrader.com/trader.aspx?id=symboldirdefs for all symbol definitions (for instance - `$` in stock names, 5-letter stocks ending with `Y`)
 
 # Disclaimer
-- Make your analysis before buying the reccommended stocks
-- This Stock Screener/Scanner shall only provide reccomendations
-- Buying the reccommended stocks is at your own risk
-- Study the companies reccommended - read their financial reports, and only then decide if and how much to buy
+- Make your analysis before buying any of the Results stocks
+- Buying the Results stocks is at your own risk
+- Study the Results companies - read their financial reports, and only then decide if and how much to buy
 
 # yfinance.7z Usage
 - `yfinance` is a known library which this scanner uses
