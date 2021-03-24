@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 335 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.0.335 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021  Asaf Ravid
@@ -22,7 +22,7 @@
 
 
 # TODO: ASAF: 1. Check and multi dim and investigate earnings_quarterly_growth_min and revenue_quarterly_growth_min: Check why Yahoo Finance always gives QRG values of 0? Unusable if that is always so
-#             2. Square Root of PEG Ratio may be too harsh, try something else perhaps, but only after understanding why Yahoo Finance PEG ratio is someties vastly different from zachs and other websites - for instance EXC
+#             2. Square Root of PEG Ratio may be too harsh, try something else perhaps, but only after understanding why Yahoo Finance PEG ratio is sometimes vastly different from zachs and other websites - for instance EXC
 #             3. Take latest yfinance base.py (and other - compare the whole folder) and updates - maybe not required - but just stay up to date
 #             5. What are stocks with '-' and '.' in them? Probably can be pre-filtered as well. Like HIGA-W, for instance
 #             6. Investigate and add: https://www.investopedia.com/terms/o/operatingmargin.asp - operating margin
@@ -35,6 +35,7 @@
 #             9. Calculate Book Value manually: https://www.wallstreetmojo.com/book-value-formula/, https://www.investopedia.com/articles/investing/110613/market-value-versus-book-value.asp#:~:text=How%20do%20you%20calculate%20book,in%20annual%20and%20quarterly%20reports.
 #             10. Which are the most effective parameters? Correlate the sorting of sss_value to the results and each of the sorted-by-parameter list.
 #             11. Important: https://www.aaii.com/stocks/screens/67
+#             12. Calculate share_price/52weekLow 0.1
 
 import time
 import random                                                                                                          
