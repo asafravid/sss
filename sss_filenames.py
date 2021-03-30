@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.0.345 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.0.350 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021  Asaf Ravid
@@ -58,11 +58,6 @@ def create_filenames_list(date_and_time):
     filename_sssei_engine_only_div      = "{}/sssei_engine_only_div.csv".format(date_and_time)
     filename_ssssei_engine_only_div     = "{}/ssssei_engine_only_div.csv".format(date_and_time)
     filename_sssssei_engine_only_div    = "{}/sssssei_engine_only_div.csv".format(date_and_time)
-
-    filename_sssss_best_engine          = "{}/sssss_best_engine.csv".format(date_and_time)
-    filename_sssss_best_no_div_engine   = "{}/sssss_best_no_div_engine.csv".format(date_and_time)
-    filename_sssss_best_only_div_engine = "{}/sssss_best_only_div_engine.csv".format(date_and_time)
-
     filenames_list = [
         filename_csv_db,
         filename_sss_engine                ,    filename_ssss_engine               ,    filename_sssss_engine              ,    filename_ssse_engine               ,
@@ -74,6 +69,5 @@ def create_filenames_list(date_and_time):
         filename_sssi_engine_no_div        ,    filename_ssssi_engine_no_div       ,    filename_sssssi_engine_no_div      ,    filename_sssei_engine_no_div       ,
         filename_ssssei_engine_no_div      ,    filename_sssssei_engine_no_div     ,    filename_sssi_engine_only_div      ,    filename_ssssi_engine_only_div     ,
         filename_sssssi_engine_only_div    ,    filename_sssei_engine_only_div     ,    filename_ssssei_engine_only_div    ,    filename_sssssei_engine_only_div   ,
-        filename_sssss_best_engine         ,    filename_sssss_best_no_div_engine  ,    filename_sssss_best_only_div_engine
     ]
     return filenames_list

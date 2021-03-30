@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.0.345 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.0.350 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021  Asaf Ravid
@@ -625,9 +625,9 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
             if build_csv_db and stock_data.two_hundred_day_average is None: stock_data.two_hundred_day_average = stock_data.previous_close
 
             if build_csv_db:
-                stock_data.previous_close_percentage_from_200d_ma  = 100.0 * ((stock_data.previous_close - stock_data.two_hundred_day_average) / stock_data.two_hundred_day_average)
-                stock_data.previous_close_percentage_from_52w_low  = 100.0 * ((stock_data.previous_close - stock_data.fifty_two_week_low     ) / stock_data.fifty_two_week_low     )
-                stock_data.previous_close_percentage_from_52w_high = 100.0 * ((stock_data.previous_close - stock_data.fifty_two_week_high    ) / stock_data.fifty_two_week_high    )
+                if stock_data.two_hundred_day_average > 0.0: stock_data.previous_close_percentage_from_200d_ma  = 100.0 * ((stock_data.previous_close - stock_data.two_hundred_day_average) / stock_data.two_hundred_day_average)
+                if stock_data.fifty_two_week_low      > 0.0: stock_data.previous_close_percentage_from_52w_low  = 100.0 * ((stock_data.previous_close - stock_data.fifty_two_week_low     ) / stock_data.fifty_two_week_low     )
+                if stock_data.fifty_two_week_high     > 0.0: stock_data.previous_close_percentage_from_52w_high = 100.0 * ((stock_data.previous_close - stock_data.fifty_two_week_high    ) / stock_data.fifty_two_week_high    )
 
             if stock_data.trailing_eps is not None and stock_data.previous_close is not None and stock_data.previous_close > 0:
                 stock_data.trailing_eps_percentage = stock_data.trailing_eps / stock_data.previous_close
@@ -1104,7 +1104,6 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
             else:             rows_no_div.append(  [stock_data.ticker, stock_data.short_name, stock_data.sector, stock_data.country, stock_data.sss_value, stock_data.ssss_value, stock_data.sssss_value, stock_data.ssse_value, stock_data.sssse_value, stock_data.ssssse_value, stock_data.sssi_value, stock_data.ssssi_value, stock_data.sssssi_value, stock_data.sssei_value, stock_data.ssssei_value, stock_data.sssssei_value, stock_data.annualized_revenue, stock_data.annualized_earnings, stock_data.quarterized_revenue, stock_data.quarterized_earnings, stock_data.effective_earnings, stock_data.effective_revenue, stock_data.enterprise_value_to_revenue, stock_data.evr_effective, stock_data.trailing_price_to_earnings, stock_data.forward_price_to_earnings, stock_data.effective_price_to_earnings, stock_data.trailing_12months_price_to_sales, stock_data.pe_effective, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.annualized_profit_margin, stock_data.annualized_profit_margin_boost, stock_data.quarterized_profit_margin, stock_data.quarterized_profit_margin_boost, stock_data.effective_profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.previous_close, stock_data.trailing_eps_percentage, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.num_employees, stock_data.enterprise_value, stock_data.market_cap, stock_data.nitcsh_to_num_employees, stock_data.earnings_quarterly_growth, stock_data.revenue_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.effective_peg_ratio, stock_data.annualized_cash_flow_from_operating_activities, stock_data.quarterized_cash_flow_from_operating_activities, stock_data.annualized_ev_to_cfo_ratio, stock_data.quarterized_ev_to_cfo_ratio, stock_data.ev_to_cfo_ratio_effective, stock_data.annualized_total_liab, stock_data.annualized_total_stockholder_equity, stock_data.annualized_debt_to_equity, stock_data.quarterized_total_liab, stock_data.quarterized_total_stockholder_equity, stock_data.quarterized_debt_to_equity, stock_data.debt_to_equity_effective, stock_data.financial_currency, stock_data.conversion_rate_mult_to_usd, stock_data.last_4_dividends_0, stock_data.last_4_dividends_1, stock_data.last_4_dividends_2, stock_data.last_4_dividends_3, stock_data.fifty_two_week_change, stock_data.fifty_two_week_low, stock_data.fifty_two_week_high, stock_data.two_hundred_day_average, stock_data.previous_close_percentage_from_200d_ma, stock_data.previous_close_percentage_from_52w_low, stock_data.previous_close_percentage_from_52w_high])
 
 
-#     BEST_N_SELECT                     = 50                     # Select best N from each of the resulting sorted tables
 #     USE_INVESTPY                      = 0
 #     MARKET_CAP_INCLUDED               = 1
 #     FORWARD_EPS_INCLUDED              = 0*(not tase_mode)
@@ -1114,7 +1113,7 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
 #     BUILD_CSV_DB                      = 1
 #     BUILD_CSV_DB_ONLY                 = 1
 #     SECTORS_LIST                      = [] # ['Technology', 'Consumer Cyclical', 'Consumer Defensive', 'Industrials', 'Consumer Goods']  # Allows filtering by sector(s)
-def sss_run(sectors_list, sectors_filter_out, countries_list, countries_filter_out,build_csv_db_only, build_csv_db, csv_db_path, read_united_states_input_symbols, tase_mode, num_threads, market_cap_included, use_investpy, research_mode, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, min_enterprise_value_millions_usd, best_n_select, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, generate_result_folders=1, appearance_counter_dict_sss={}, appearance_counter_dict_ssss={}, appearance_counter_dict_sssss={}, appearance_counter_min=25, appearance_counter_max=35, custom_portfolio=[]):
+def sss_run(sectors_list, sectors_filter_out, countries_list, countries_filter_out,build_csv_db_only, build_csv_db, csv_db_path, read_united_states_input_symbols, tase_mode, num_threads, market_cap_included, use_investpy, research_mode, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, min_enterprise_value_millions_usd, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, generate_result_folders=1, appearance_counter_dict_sss={}, appearance_counter_dict_ssss={}, appearance_counter_dict_sssss={}, appearance_counter_min=25, appearance_counter_max=35, custom_portfolio=[]):
     currency_conversion_tool = CurrencyConverter() if build_csv_db else None
 
     # Working Mode:
@@ -1535,93 +1534,56 @@ def sss_run(sectors_list, sectors_filter_out, countries_list, countries_filter_o
     sssssei_index        = header_row.index("sssssei_value")
     previous_close_index = header_row.index("previous_close")
 
-    # Now, Sort the rows using the sss_value and ssse_value formulas: [1:] skips the 1st title row
-    sorted_list_db               = sorted(csv_db_data,   key=lambda row:          row[ticker_index],reverse=False)  # Sort by ticker symbol
-    sorted_list_sss              = sorted(rows,          key=lambda row:          row[sss_index   ],           reverse=False)  # Sort by sss_value     -> The lower  - the more attractive
-    sorted_list_ssss             = sorted(rows,          key=lambda row:          row[ssss_index  ],           reverse=False)  # Sort by ssss_value    -> The lower  - the more attractive
-    sorted_list_sssss            = sorted(rows,          key=lambda row:          row[sssss_index ],           reverse=False)  # Sort by sssss_value   -> The lower  - the more attractive
-    sorted_list_ssse             = sorted(rows,          key=lambda row:          row[ssse_index  ],           reverse=True )  # Sort by ssse_value    -> The higher - the more attractive
-    sorted_list_sssse            = sorted(rows,          key=lambda row:          row[sssse_index ],           reverse=True )  # Sort by sssse_value   -> The higher - the more attractive
-    sorted_list_ssssse           = sorted(rows,          key=lambda row:          row[ssssse_index],           reverse=True )  # Sort by ssssse_value  -> The higher - the more attractive
-    sorted_list_sss_no_div       = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[sss_index   ],    reverse=False)  # Sort by sss_value     -> The lower  - the more attractive
-    sorted_list_ssss_no_div      = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[ssss_index  ],    reverse=False)  # Sort by ssss_value    -> The lower  - the more attractive
-    sorted_list_sssss_no_div     = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[sssss_index ],    reverse=False)  # Sort by sssss_value   -> The lower  - the more attractive
-    sorted_list_ssse_no_div      = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[ssse_index  ],    reverse=True )  # Sort by ssse_value    -> The higher - the more attractive
-    sorted_list_sssse_no_div     = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[sssse_index ],    reverse=True )  # Sort by sssse_value   -> The higher - the more attractive
-    sorted_list_ssssse_no_div    = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[ssssse_index],    reverse=True )  # Sort by ssssse_value  -> The higher - the more attractive
-    sorted_list_sss_only_div     = sorted(rows_only_div, key=lambda row_only_div: row_only_div[sss_index   ],  reverse=False)  # Sort by sss_value     -> The lower  - the more attractive
-    sorted_list_ssss_only_div    = sorted(rows_only_div, key=lambda row_only_div: row_only_div[ssss_index  ],  reverse=False)  # Sort by ssss_value    -> The lower  - the more attractive
-    sorted_list_sssss_only_div   = sorted(rows_only_div, key=lambda row_only_div: row_only_div[sssss_index ],  reverse=False)  # Sort by sssss_value   -> The lower  - the more attractive
-    sorted_list_ssse_only_div    = sorted(rows_only_div, key=lambda row_only_div: row_only_div[ssse_index  ],  reverse=True )  # Sort by ssse_value    -> The higher - the more attractive
-    sorted_list_sssse_only_div   = sorted(rows_only_div, key=lambda row_only_div: row_only_div[sssse_index ],  reverse=True )  # Sort by sssse_value   -> The higher - the more attractive
-    sorted_list_ssssse_only_div  = sorted(rows_only_div, key=lambda row_only_div: row_only_div[ssssse_index],  reverse=True )  # Sort by ssssse_value  -> The higher - the more attractive
-    sorted_list_sssi             = sorted(rows,          key=lambda row:          row[sssi_index   ],          reverse=False)  # Sort by sssi_value    -> The lower  - the more attractive
-    sorted_list_ssssi            = sorted(rows,          key=lambda row:          row[ssssi_index  ],          reverse=False)  # Sort by ssssi_value   -> The lower  - the more attractive
-    sorted_list_sssssi           = sorted(rows,          key=lambda row:          row[sssssi_index ],          reverse=False)  # Sort by sssssi_value  -> The lower  - the more attractive
-    sorted_list_sssei            = sorted(rows,          key=lambda row:          row[sssei_index  ],          reverse=True )  # Sort by sssei_value   -> The higher - the more attractive
-    sorted_list_ssssei           = sorted(rows,          key=lambda row:          row[ssssei_index ],          reverse=True )  # Sort by ssssei_value  -> The higher - the more attractive
-    sorted_list_sssssei          = sorted(rows,          key=lambda row:          row[sssssei_index],          reverse=True )  # Sort by sssssei_value -> The higher - the more attractive
-    sorted_list_sssi_no_div      = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[sssi_index   ],   reverse=False)  # Sort by sssi_value    -> The lower  - the more attractive
-    sorted_list_ssssi_no_div     = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[ssssi_index  ],   reverse=False)  # Sort by ssssi_value   -> The lower  - the more attractive
-    sorted_list_sssssi_no_div    = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[sssssi_index ],   reverse=False)  # Sort by sssssi_value  -> The lower  - the more attractive
-    sorted_list_sssei_no_div     = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[sssei_index  ],   reverse=True )  # Sort by sssei_value   -> The higher - the more attractive
-    sorted_list_ssssei_no_div    = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[ssssei_index ],   reverse=True )  # Sort by ssssei_value  -> The higher - the more attractive
-    sorted_list_sssssei_no_div   = sorted(rows_no_div,   key=lambda row_no_div:   row_no_div[sssssei_index],   reverse=True )  # Sort by sssssei_value -> The higher - the more attractive
-    sorted_list_sssi_only_div    = sorted(rows_only_div, key=lambda row_only_div: row_only_div[sssi_index   ], reverse=False)  # Sort by sssi_value    -> The lower  - the more attractive
-    sorted_list_ssssi_only_div   = sorted(rows_only_div, key=lambda row_only_div: row_only_div[ssssi_index  ], reverse=False)  # Sort by ssssi_value   -> The lower  - the more attractive
-    sorted_list_sssssi_only_div  = sorted(rows_only_div, key=lambda row_only_div: row_only_div[sssssi_index ], reverse=False)  # Sort by sssssi_value  -> The lower  - the more attractive
-    sorted_list_sssei_only_div   = sorted(rows_only_div, key=lambda row_only_div: row_only_div[sssei_index  ], reverse=True )  # Sort by sssei_value   -> The higher - the more attractive
-    sorted_list_ssssei_only_div  = sorted(rows_only_div, key=lambda row_only_div: row_only_div[ssssei_index ], reverse=True )  # Sort by ssssei_value  -> The higher - the more attractive
-    sorted_list_sssssei_only_div = sorted(rows_only_div, key=lambda row_only_div: row_only_div[sssssei_index], reverse=True )  # Sort by sssssei_value -> The higher - the more attractive
+    # remove (from rows, not from db) rows whose sss[s[s]]_value is a bad one - irrelevant:
+    compact_rows          = []
+    compact_rows_no_div   = []
+    compact_rows_only_div = []
+    for row in rows:
+        if row[sss_index] != BAD_SSS: compact_rows.append(row)
+    for row_no_div in rows_no_div:
+        if row_no_div[sss_index] != BAD_SSS: compact_rows_no_div.append(row_no_div)
+    for row_only_div in rows_only_div:
+        if row_only_div[sss_index] != BAD_SSS: compact_rows_only_div.append(row_only_div)
 
-    best_nrows = int(len(rows)/best_n_select)
-    list_sss_best = []
-    list_sss_best.extend(sorted_list_sss             [:best_nrows])
-    list_sss_best.extend(sorted_list_ssss            [:best_nrows])
-    list_sss_best.extend(sorted_list_sssss           [:best_nrows])
-    list_sss_best.extend(sorted_list_ssse            [:best_nrows])
-    list_sss_best.extend(sorted_list_sssse           [:best_nrows])
-    list_sss_best.extend(sorted_list_ssssse          [:best_nrows])
-    list_sss_best.extend(sorted_list_sssi            [:best_nrows])
-    list_sss_best.extend(sorted_list_ssssi           [:best_nrows])
-    list_sss_best.extend(sorted_list_sssssi          [:best_nrows])
-    list_sss_best.extend(sorted_list_sssei           [:best_nrows])
-    list_sss_best.extend(sorted_list_ssssei          [:best_nrows])
-    list_sss_best.extend(sorted_list_sssssei         [:best_nrows])
-    sorted_list_sssss_best_with_duplicates = sorted(list_sss_best, key=lambda row: row[sss_index], reverse=False)  # Sort by sss_value   -> The lower  - the more attractive
-    sorted_list_sssss_best = list(k for k, _ in itertools.groupby(sorted_list_sssss_best_with_duplicates))
+    # Now, Sort the compact_rows using the sss_value and ssse_value formulas: [1:] skips the 1st title row
+    sorted_list_db               = sorted(csv_db_data,           key=lambda row:          row[ticker_index],           reverse=False)  # Sort by ticker symbol
+    sorted_list_sss              = sorted(compact_rows,          key=lambda row:          row[sss_index   ],           reverse=False)  # Sort by sss_value     -> The lower  - the more attractive
+    sorted_list_ssss             = sorted(compact_rows,          key=lambda row:          row[ssss_index  ],           reverse=False)  # Sort by ssss_value    -> The lower  - the more attractive
+    sorted_list_sssss            = sorted(compact_rows,          key=lambda row:          row[sssss_index ],           reverse=False)  # Sort by sssss_value   -> The lower  - the more attractive
+    sorted_list_ssse             = sorted(compact_rows,          key=lambda row:          row[ssse_index  ],           reverse=True )  # Sort by ssse_value    -> The higher - the more attractive
+    sorted_list_sssse            = sorted(compact_rows,          key=lambda row:          row[sssse_index ],           reverse=True )  # Sort by sssse_value   -> The higher - the more attractive
+    sorted_list_ssssse           = sorted(compact_rows,          key=lambda row:          row[ssssse_index],           reverse=True )  # Sort by ssssse_value  -> The higher - the more attractive
+    sorted_list_sss_no_div       = sorted(compact_rows_no_div,   key=lambda row_no_div:   row_no_div[sss_index   ],    reverse=False)  # Sort by sss_value     -> The lower  - the more attractive
+    sorted_list_ssss_no_div      = sorted(compact_rows_no_div,   key=lambda row_no_div:   row_no_div[ssss_index  ],    reverse=False)  # Sort by ssss_value    -> The lower  - the more attractive
+    sorted_list_sssss_no_div     = sorted(compact_rows_no_div,   key=lambda row_no_div:   row_no_div[sssss_index ],    reverse=False)  # Sort by sssss_value   -> The lower  - the more attractive
+    sorted_list_ssse_no_div      = sorted(compact_rows_no_div,   key=lambda row_no_div:   row_no_div[ssse_index  ],    reverse=True )  # Sort by ssse_value    -> The higher - the more attractive
+    sorted_list_sssse_no_div     = sorted(compact_rows_no_div,   key=lambda row_no_div:   row_no_div[sssse_index ],    reverse=True )  # Sort by sssse_value   -> The higher - the more attractive
+    sorted_list_ssssse_no_div    = sorted(compact_rows_no_div,   key=lambda row_no_div:   row_no_div[ssssse_index],    reverse=True )  # Sort by ssssse_value  -> The higher - the more attractive
+    sorted_list_sss_only_div     = sorted(compact_rows_only_div, key=lambda row_only_div: row_only_div[sss_index   ],  reverse=False)  # Sort by sss_value     -> The lower  - the more attractive
+    sorted_list_ssss_only_div    = sorted(compact_rows_only_div, key=lambda row_only_div: row_only_div[ssss_index  ],  reverse=False)  # Sort by ssss_value    -> The lower  - the more attractive
+    sorted_list_sssss_only_div   = sorted(compact_rows_only_div, key=lambda row_only_div: row_only_div[sssss_index ],  reverse=False)  # Sort by sssss_value   -> The lower  - the more attractive
+    sorted_list_ssse_only_div    = sorted(compact_rows_only_div, key=lambda row_only_div: row_only_div[ssse_index  ],  reverse=True )  # Sort by ssse_value    -> The higher - the more attractive
+    sorted_list_sssse_only_div   = sorted(compact_rows_only_div, key=lambda row_only_div: row_only_div[sssse_index ],  reverse=True )  # Sort by sssse_value   -> The higher - the more attractive
+    sorted_list_ssssse_only_div  = sorted(compact_rows_only_div, key=lambda row_only_div: row_only_div[ssssse_index],  reverse=True )  # Sort by ssssse_value  -> The higher - the more attractive
+    sorted_list_sssi             = sorted(compact_rows,          key=lambda row:          row[sssi_index   ],          reverse=False)  # Sort by sssi_value    -> The lower  - the more attractive
+    sorted_list_ssssi            = sorted(compact_rows,          key=lambda row:          row[ssssi_index  ],          reverse=False)  # Sort by ssssi_value   -> The lower  - the more attractive
+    sorted_list_sssssi           = sorted(compact_rows,          key=lambda row:          row[sssssi_index ],          reverse=False)  # Sort by sssssi_value  -> The lower  - the more attractive
+    sorted_list_sssei            = sorted(compact_rows,          key=lambda row:          row[sssei_index  ],          reverse=True )  # Sort by sssei_value   -> The higher - the more attractive
+    sorted_list_ssssei           = sorted(compact_rows,          key=lambda row:          row[ssssei_index ],          reverse=True )  # Sort by ssssei_value  -> The higher - the more attractive
+    sorted_list_sssssei          = sorted(compact_rows,          key=lambda row:          row[sssssei_index],          reverse=True )  # Sort by sssssei_value -> The higher - the more attractive
+    sorted_list_sssi_no_div      = sorted(compact_rows_no_div,   key=lambda row_no_div:   row_no_div[sssi_index   ],   reverse=False)  # Sort by sssi_value    -> The lower  - the more attractive
+    sorted_list_ssssi_no_div     = sorted(compact_rows_no_div,   key=lambda row_no_div:   row_no_div[ssssi_index  ],   reverse=False)  # Sort by ssssi_value   -> The lower  - the more attractive
+    sorted_list_sssssi_no_div    = sorted(compact_rows_no_div,   key=lambda row_no_div:   row_no_div[sssssi_index ],   reverse=False)  # Sort by sssssi_value  -> The lower  - the more attractive
+    sorted_list_sssei_no_div     = sorted(compact_rows_no_div,   key=lambda row_no_div:   row_no_div[sssei_index  ],   reverse=True )  # Sort by sssei_value   -> The higher - the more attractive
+    sorted_list_ssssei_no_div    = sorted(compact_rows_no_div,   key=lambda row_no_div:   row_no_div[ssssei_index ],   reverse=True )  # Sort by ssssei_value  -> The higher - the more attractive
+    sorted_list_sssssei_no_div   = sorted(compact_rows_no_div,   key=lambda row_no_div:   row_no_div[sssssei_index],   reverse=True )  # Sort by sssssei_value -> The higher - the more attractive
+    sorted_list_sssi_only_div    = sorted(compact_rows_only_div, key=lambda row_only_div: row_only_div[sssi_index   ], reverse=False)  # Sort by sssi_value    -> The lower  - the more attractive
+    sorted_list_ssssi_only_div   = sorted(compact_rows_only_div, key=lambda row_only_div: row_only_div[ssssi_index  ], reverse=False)  # Sort by ssssi_value   -> The lower  - the more attractive
+    sorted_list_sssssi_only_div  = sorted(compact_rows_only_div, key=lambda row_only_div: row_only_div[sssssi_index ], reverse=False)  # Sort by sssssi_value  -> The lower  - the more attractive
+    sorted_list_sssei_only_div   = sorted(compact_rows_only_div, key=lambda row_only_div: row_only_div[sssei_index  ], reverse=True )  # Sort by sssei_value   -> The higher - the more attractive
+    sorted_list_ssssei_only_div  = sorted(compact_rows_only_div, key=lambda row_only_div: row_only_div[ssssei_index ], reverse=True )  # Sort by ssssei_value  -> The higher - the more attractive
+    sorted_list_sssssei_only_div = sorted(compact_rows_only_div, key=lambda row_only_div: row_only_div[sssssei_index], reverse=True )  # Sort by sssssei_value -> The higher - the more attractive
 
-    list_sss_best_no_div = []
-    list_sss_best_no_div.extend(sorted_list_sss_no_div    [:best_nrows])
-    list_sss_best_no_div.extend(sorted_list_ssss_no_div   [:best_nrows])
-    list_sss_best_no_div.extend(sorted_list_sssss_no_div  [:best_nrows])
-    list_sss_best_no_div.extend(sorted_list_ssse_no_div   [:best_nrows])
-    list_sss_best_no_div.extend(sorted_list_sssse_no_div  [:best_nrows])
-    list_sss_best_no_div.extend(sorted_list_ssssse_no_div [:best_nrows])
-    list_sss_best_no_div.extend(sorted_list_sssi_no_div   [:best_nrows])
-    list_sss_best_no_div.extend(sorted_list_ssssi_no_div  [:best_nrows])
-    list_sss_best_no_div.extend(sorted_list_sssssi_no_div [:best_nrows])
-    list_sss_best_no_div.extend(sorted_list_sssei_no_div  [:best_nrows])
-    list_sss_best_no_div.extend(sorted_list_ssssei_no_div [:best_nrows])
-    list_sss_best_no_div.extend(sorted_list_sssssei_no_div[:best_nrows])
-    sorted_list_sssss_best_no_div_with_duplicates = sorted(list_sss_best_no_div, key=lambda row: row[sss_index], reverse=False)  # Sort by sss_value   -> The lower  - the more attractive
-    sorted_list_sssss_best_no_div = list(k for k, _ in itertools.groupby(sorted_list_sssss_best_no_div_with_duplicates))
-
-    list_sss_best_only_div = []
-    list_sss_best_only_div.extend(sorted_list_sss_only_div    [:best_nrows])
-    list_sss_best_only_div.extend(sorted_list_ssss_only_div   [:best_nrows])
-    list_sss_best_only_div.extend(sorted_list_sssss_only_div  [:best_nrows])
-    list_sss_best_only_div.extend(sorted_list_ssse_only_div   [:best_nrows])
-    list_sss_best_only_div.extend(sorted_list_sssse_only_div  [:best_nrows])
-    list_sss_best_only_div.extend(sorted_list_ssssse_only_div [:best_nrows])
-    list_sss_best_only_div.extend(sorted_list_sssi_only_div   [:best_nrows])
-    list_sss_best_only_div.extend(sorted_list_ssssi_only_div  [:best_nrows])
-    list_sss_best_only_div.extend(sorted_list_sssssi_only_div [:best_nrows])
-    list_sss_best_only_div.extend(sorted_list_sssei_only_div  [:best_nrows])
-    list_sss_best_only_div.extend(sorted_list_ssssei_only_div [:best_nrows])
-    list_sss_best_only_div.extend(sorted_list_sssssei_only_div[:best_nrows])
-    sorted_list_sssss_best_only_div_with_duplicates = sorted(list_sss_best_only_div, key=lambda row: row[sss_index], reverse=False)  # Sort by sssss_value   -> The lower  - the more attractive
-    sorted_list_sssss_best_only_div = list(k for k, _ in itertools.groupby(sorted_list_sssss_best_only_div_with_duplicates))
     if research_mode: # Update the appearance counter using ssss and sssss
         list_len_ssss = len(sorted_list_sss)
         list_len_sss  = list_len_ssss
@@ -1651,7 +1613,6 @@ def sss_run(sectors_list, sectors_filter_out, countries_list, countries_filter_o
         sorted_list_sssi_no_div,                sorted_list_ssssi_no_div,               sorted_list_sssssi_no_div,              sorted_list_sssei_no_div,
         sorted_list_ssssei_no_div,              sorted_list_sssssei_no_div,             sorted_list_sssi_only_div,              sorted_list_ssssi_only_div,
         sorted_list_sssssi_only_div,            sorted_list_sssei_only_div,             sorted_list_ssssei_only_div,            sorted_list_sssssei_only_div,
-        sorted_list_sssss_best,                 sorted_list_sssss_best_no_div,          sorted_list_sssss_best_only_div
     ]
 
     for sorted_list in sorted_lists_list:
@@ -1664,7 +1625,7 @@ def sss_run(sectors_list, sectors_filter_out, countries_list, countries_filter_o
     csv_db_str            = ""
     investpy_str          = ""
     custom_portfolio_str  = ""
-    num_results_str       = "_nRes{}".format(len(rows))
+    num_results_str       = "_nRes{}".format(len(compact_rows))
     build_csv_db_only_str = ""
     if tase_mode:         tase_str       = "_Tase"
 
@@ -1704,4 +1665,4 @@ def sss_run(sectors_list, sectors_filter_out, countries_list, countries_filter_o
                 sorted_lists_list[index].insert(0, evr_pm_col_title_row)
                 writer.writerows(sorted_lists_list[index])
 
-    return len(rows)
+    return len(compact_rows)
