@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.0.335 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.0.345 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021  Asaf Ravid
@@ -34,23 +34,23 @@ def get_row_index(ticker_index, ticker, rows):
     return -1
 
 
-def run(newer_path, older_path, db_exists_in_both_folders, diff_only_recommendation, movement_threshold, newer_rec_ranges, older_rec_ranges, rec_length, consider_as_new_from):
+def run(newer_path, older_path, db_exists_in_both_folders, diff_only_recommendation, movement_threshold, newer_res_ranges, older_res_ranges, res_length, consider_as_new_from):
     newer_filenames_list = sss_filenames.create_filenames_list(newer_path)
     older_filenames_list = sss_filenames.create_filenames_list(older_path)
-    diff_path = 'Results/diff'+'_new'+newer_path.replace('Results/','_')+'_old'+older_path.replace('Results/','_')
+    diff_path = 'Results/Diff/'+'new'+newer_path.replace('Results','_').replace('/','').replace('nRes','')+'_old'+older_path.replace('Results','_').replace('/','').replace('Tase','').replace('Nsr','').replace('All','').replace('nRes','').replace('a','').replace('e','').replace('i','').replace('o','').replace('u','')
     compact_diff_path = diff_path.replace('FavorTechBy3','FTB3').replace('MCap_','').replace('BuildDb_','').replace('nResults','')
     diff_filenames_list  = sss_filenames.create_filenames_list(compact_diff_path)
     # The order is important: sss, then ssss, then sssss                                                    evm_min              evm_max              pe_min,             pe_max,             evr_min,             evr_max,             pm_min,              pm_max
-    newer_filenames_list.insert(0, newer_path +'/rec_sssss_evm{}-{}_pe{}-{}_evr{}-{}_pm{}-{}.csv'.format(newer_rec_ranges[0], newer_rec_ranges[1], newer_rec_ranges[2], newer_rec_ranges[3], newer_rec_ranges[4], newer_rec_ranges[5], newer_rec_ranges[6], newer_rec_ranges[7]))
-    newer_filenames_list.insert(0, newer_path +'/rec_ssss_evm{}-{}_pe{}-{}_evr{}-{}_pm{}-{}.csv'.format( newer_rec_ranges[0], newer_rec_ranges[1], newer_rec_ranges[2], newer_rec_ranges[3], newer_rec_ranges[4], newer_rec_ranges[5], newer_rec_ranges[6], newer_rec_ranges[7]))
-    newer_filenames_list.insert(0, newer_path +'/rec_sss_evm{}-{}_pe{}-{}_evr{}-{}_pm{}-{}.csv'.format(  newer_rec_ranges[0], newer_rec_ranges[1], newer_rec_ranges[2], newer_rec_ranges[3], newer_rec_ranges[4], newer_rec_ranges[5], newer_rec_ranges[6], newer_rec_ranges[7]))
-    older_filenames_list.insert(0, older_path +'/rec_sssss_evm{}-{}_pe{}-{}_evr{}-{}_pm{}-{}.csv'.format(older_rec_ranges[0], older_rec_ranges[1], older_rec_ranges[2], older_rec_ranges[3], older_rec_ranges[4], older_rec_ranges[5], older_rec_ranges[6], older_rec_ranges[7]))
-    older_filenames_list.insert(0, older_path +'/rec_ssss_evm{}-{}_pe{}-{}_evr{}-{}_pm{}-{}.csv'.format( older_rec_ranges[0], older_rec_ranges[1], older_rec_ranges[2], older_rec_ranges[3], older_rec_ranges[4], older_rec_ranges[5], older_rec_ranges[6], older_rec_ranges[7]))
-    older_filenames_list.insert(0, older_path +'/rec_sss_evm{}-{}_pe{}-{}_evr{}-{}_pm{}-{}.csv'.format(  older_rec_ranges[0], older_rec_ranges[1], older_rec_ranges[2], older_rec_ranges[3], older_rec_ranges[4], older_rec_ranges[5], older_rec_ranges[6], older_rec_ranges[7]))
+    newer_filenames_list.insert(0, newer_path +'/res_sssss_evm{}-{}_pe{}-{}_evr{}-{}_pm{}-{}.csv'.format(newer_res_ranges[0], newer_res_ranges[1], newer_res_ranges[2], newer_res_ranges[3], newer_res_ranges[4], newer_res_ranges[5], newer_res_ranges[6], newer_res_ranges[7]))
+    newer_filenames_list.insert(0, newer_path +'/res_ssss_evm{}-{}_pe{}-{}_evr{}-{}_pm{}-{}.csv'.format( newer_res_ranges[0], newer_res_ranges[1], newer_res_ranges[2], newer_res_ranges[3], newer_res_ranges[4], newer_res_ranges[5], newer_res_ranges[6], newer_res_ranges[7]))
+    newer_filenames_list.insert(0, newer_path +'/res_sss_evm{}-{}_pe{}-{}_evr{}-{}_pm{}-{}.csv'.format(  newer_res_ranges[0], newer_res_ranges[1], newer_res_ranges[2], newer_res_ranges[3], newer_res_ranges[4], newer_res_ranges[5], newer_res_ranges[6], newer_res_ranges[7]))
+    older_filenames_list.insert(0, older_path +'/res_sssss_evm{}-{}_pe{}-{}_evr{}-{}_pm{}-{}.csv'.format(older_res_ranges[0], older_res_ranges[1], older_res_ranges[2], older_res_ranges[3], older_res_ranges[4], older_res_ranges[5], older_res_ranges[6], older_res_ranges[7]))
+    older_filenames_list.insert(0, older_path +'/res_ssss_evm{}-{}_pe{}-{}_evr{}-{}_pm{}-{}.csv'.format( older_res_ranges[0], older_res_ranges[1], older_res_ranges[2], older_res_ranges[3], older_res_ranges[4], older_res_ranges[5], older_res_ranges[6], older_res_ranges[7]))
+    older_filenames_list.insert(0, older_path +'/res_sss_evm{}-{}_pe{}-{}_evr{}-{}_pm{}-{}.csv'.format(  older_res_ranges[0], older_res_ranges[1], older_res_ranges[2], older_res_ranges[3], older_res_ranges[4], older_res_ranges[5], older_res_ranges[6], older_res_ranges[7]))
 
-    diff_filenames_list.insert(0,'{}/rec_sssss.csv'.format(compact_diff_path))
-    diff_filenames_list.insert(0,'{}/rec_ssss.csv'.format( compact_diff_path))
-    diff_filenames_list.insert(0,'{}/rec_sss.csv'.format( compact_diff_path))
+    diff_filenames_list.insert(0,'{}/res_sssss.csv'.format(compact_diff_path))
+    diff_filenames_list.insert(0,'{}/res_ssss.csv'.format( compact_diff_path))
+    diff_filenames_list.insert(0,'{}/res_sss.csv'.format( compact_diff_path))
 
     if len(older_filenames_list) != len(newer_filenames_list):
         raise Exception("Different Lengths of lists - Unacceptable")
@@ -75,7 +75,7 @@ def run(newer_path, older_path, db_exists_in_both_folders, diff_only_recommendat
                     continue
                 else:
                     older_rows.append(row)
-                    if row_index >= rec_length: break
+                    if row_index >= res_length: break
                     row_index += 1
 
         # 2nd, read the Newer File and check if (and where) each line appears in the Older file (if at all)
@@ -118,7 +118,7 @@ def run(newer_path, older_path, db_exists_in_both_folders, diff_only_recommendat
                         output_csv_rows.append([ticker, 'new', 'new', row_index])
                         diff_lists[index].append('new')
 
-                    if row_index >= rec_length: break
+                    if row_index >= res_length: break
                     row_index += 1
 
         # 3rd, scan for Older File rows which do not appear in the Newer files anymore:
