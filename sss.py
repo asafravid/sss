@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.0.357 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.0.360 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021  Asaf Ravid
@@ -103,6 +103,7 @@ PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_REVENUE  = 1.5    # Pro
 PROFIT_MARGIN_DUPLICATION_FACTOR                                  = 8.0    # When copying profit margin (if either quarterized/annualized/profit_margin is missing) - devide by this factor
 NEGATIVE_CFO_FACTOR                                               = 10.0   #
 NEGATIVE_PEG_RATIO_FACTOR                                         = 10.0   # -0.5 -> 5, and -0.001 -> 0.01
+NEGATIVE_DEBT_TO_EQUITY_FACTOR                                    = 10.0   # -0.5 -> 5, and -0.001 -> 0.01
 
 TRAILING_PRICE_TO_EARNINGS_WEIGHT = 0.75
 FORWARD_PRICE_TO_EARNINGS_WEIGHT  = 0.25
@@ -149,7 +150,7 @@ class StockData:
     shares_outstanding:                             float = 0.0
     net_income_to_common_shareholders:              float = 0.0
     nitcsh_to_shares_outstanding:                   float = 0.0
-    employees:                                  int   = 0
+    employees:                                      int   = 0
     enterprise_value:                               int   = 0
     market_cap:                                     int   = 0
     nitcsh_to_num_employees:                        float = 0.0
@@ -293,6 +294,9 @@ def text_to_num(text):
         return float(text)
 
 
+def weighted_average(values_list, weights):
+    return sum([values_list[i]*weights[i] for i in range(len(values_list))])/sum(weights)
+
 def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode, sectors_list, sectors_filter_out, countries_list, countries_filter_out, build_csv_db, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, revenue_quarterly_growth_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool):
     try:
         return_value = True
@@ -378,6 +382,8 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
                 pass
 
             stock_data.debt_to_equity_effective = (stock_data.annualized_debt_to_equity+stock_data.quarterized_debt_to_equity)/2.0
+            if stock_data.debt_to_equity_effective < 0:
+                stock_data.debt_to_equity_effective = (1.0-stock_data.debt_to_equity_effective * NEGATIVE_DEBT_TO_EQUITY_FACTOR)
 
             weight_index    = 0
             cash_flows_list = []
@@ -779,8 +785,10 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
             elif stock_data.annualized_profit_margin  is None: stock_data.annualized_profit_margin  = stock_data.profit_margin/PROFIT_MARGIN_DUPLICATION_FACTOR
             elif stock_data.quarterized_profit_margin is None: stock_data.quarterized_profit_margin = max(stock_data.profit_margin, stock_data.annualized_profit_margin)/PROFIT_MARGIN_DUPLICATION_FACTOR
 
-            stock_data.effective_profit_margin = PROFIT_MARGIN_DAMPER + (stock_data.profit_margin+stock_data.annualized_profit_margin+stock_data.quarterized_profit_margin)/3.0 # Regular Average is the better (higher) choice after taking the max
-
+            sorted_pms = sorted([stock_data.profit_margin, stock_data.annualized_profit_margin, stock_data.quarterized_profit_margin])
+            weighted_average_pm = weighted_average(sorted_pms, PROFIT_MARGIN_WEIGHTS[:len(sorted_pms)]) # Do provide higher weight to the higher profit margin when averaging out
+            stock_data.effective_profit_margin = PROFIT_MARGIN_DAMPER + weighted_average_pm
+            
         if not build_csv_db_only and stock_data.effective_profit_margin < profit_margin_limit:
             if return_value and (not research_mode or VERBOSE_LOGS): print('                            Skipping {} effective_profit_margin: {}'.format(stock_data.symbol, stock_data.effective_profit_margin))
             return_value = False
