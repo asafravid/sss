@@ -11,7 +11,7 @@ The stocks scan and sorting is done according to the below documentation (Core E
 http://bit.ly/SssCoreEquation
 
 # SSS Muti-Dimentional Scan and Ranking Equation
-http://bit.ly/SssBigDataAnalysis
+https://bit.ly/MultiDimentionalScan
 
 # Setup
 - Install `Python 3.7` or higher from https://www.python.org/downloads/
