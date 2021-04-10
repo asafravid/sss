@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.0.370 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.0.372 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021  Asaf Ravid
@@ -120,7 +120,7 @@ DIST_FROM_LOW_FACTOR_HIGHER_THAN_ONE_POWER = 6
 #
 # TODO: ASAFR: Mati Alon (https://www.gurufocus.com/letter.php)
 #              1. Add Free Cash Flow
-#              2. Lower Market Cap - Give more weight (in multi-dimentional scan)
+#              2. Lower Market Cap - Give more weight (in multi-dimensional scan)
 
 @dataclass
 class StockData:
@@ -1216,8 +1216,8 @@ def sss_run(sectors_list, sectors_filter_out, countries_list, countries_filter_o
     interval_secs_to_avoid_http_errors = 60*(7 - 1*tase_mode + 30*read_united_states_input_symbols) if build_csv_db else 0  # Every interval_threads, a INTERVALS_TO_AVOID_HTTP_ERRORS sec sleep will take place
 
     # Working Parameters:
-    earnings_quarterly_growth_min = -0.25      # The earnings can decrease by 1/4, but there is still a requirement that price_to_earnings_to_growth_ratio > 0. TODO: ASAFR: Add to multi-dimention
-    revenue_quarterly_growth_min  = -0.25      # The earnings can decrease by 1/4, but there is still a requirement that price_to_earnings_to_growth_ratio > 0. TODO: ASAFR: Add to multi-dimention
+    earnings_quarterly_growth_min = -0.25      # The earnings can decrease by 1/4, but there is still a requirement that price_to_earnings_to_growth_ratio > 0. TODO: ASAFR: Add to multi-dimension
+    revenue_quarterly_growth_min  = -0.25      # The earnings can decrease by 1/4, but there is still a requirement that price_to_earnings_to_growth_ratio > 0. TODO: ASAFR: Add to multi-dimension
 
     symbols                 = []
     symbols_tase            = []

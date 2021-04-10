@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.0.370 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.0.372 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021  Asaf Ravid
@@ -268,7 +268,7 @@ def research_db(sectors_list, sectors_filter_out, countries_list, countries_filt
 
 run_custom_tase = False   # Custom Portfolio
 run_custom      = False
-run_tase        = True   # Tel Aviv Stock Exchange
+run_tase        = False   # Tel Aviv Stock Exchange
 run_nsr         = True   # NASDAQ100+S&P500+RUSSEL1000
 run_all         = True   # All Nasdaq Stocks
 research_mode   = True   # Research Mode
@@ -282,7 +282,7 @@ if not research_mode: # Run Build DB Only:
 else: # Research Mode:
     if run_tase:
         old_run = 'Results/Tase/20210401-230522_Tase_Technology4.0_RealEstate0.75_Bdb_nRes255'
-        new_run = 'Results/Tase/20210408-093922_Tase_Technology4.0_RealEstate0.75_Bdb_nRes257'
+        new_run = 'Results/Tase/20210408-232454_Tase_Technology4.0_RealEstate0.75_Bdb_nRes257'
         ev_range_tase          = get_range(csv_db_path=new_run, column_name='enterprise_value',        num_sections=4, reverse=0, pop_1st_percentile_range=True)
         pe_range_tase          = get_range(csv_db_path=new_run, column_name='pe_effective',            num_sections=7, reverse=1, pop_1st_percentile_range=True)
         evr_range_tase         = get_range(csv_db_path=new_run, column_name='evr_effective',           num_sections=7, reverse=1, pop_1st_percentile_range=True)
@@ -299,7 +299,7 @@ else: # Research Mode:
         #             newer_path=new_run, older_path=None, db_exists_in_both_folders=1, diff_only_result=1, movement_threshold=0, newer_res_ranges=[5,1,54,1,50], older_res_ranges=[5,1,54,1,50], res_length=80)
     if run_nsr:
         old_run = 'Results/Nsr/20210402-222743_Technology3.5_FinancialServices0.5_Bdb_nRes822'
-        new_run = 'Results/Nsr/20210408-101723_Technology3.5_FinancialServices0.5_Bdb_nRes826'
+        new_run = 'Results/Nsr/20210410-003024_Technology3.5_FinancialServices0.5_Bdb_nRes825'
         ev_range_nsr          = get_range(csv_db_path=new_run, column_name='enterprise_value',        num_sections=4, reverse=0)
         pe_range_nsr          = get_range(csv_db_path=new_run, column_name='pe_effective',            num_sections=8, reverse=1)
         evr_range_nsr         = get_range(csv_db_path=new_run, column_name='evr_effective',           num_sections=8, reverse=1)
@@ -315,7 +315,7 @@ else: # Research Mode:
         # research_db(evr_range=[24,24],  pm_range=[31,31], ev_millions_range=[100,100], csv_db_path=new_run,   read_united_states_input_symbols=0, tase_mode=0, generate_result_folders=1, appearance_counter_min=15, appearance_counter_max=45, favor_technology_sector=4.5)
     if run_all:
         old_run = 'Results/All/20210403-052905_Technology3.5_FinancialServices0.5_A_Bdb_nRes2851'
-        new_run = 'Results/All/20210408-172942_Technology3.5_FinancialServices0.5_A_Bdb_nRes2861'
+        new_run = 'Results/All/20210410-073432_Technology3.5_FinancialServices0.5_A_Bdb_nRes2864'
         ev_range_all          = get_range(csv_db_path=new_run, column_name='enterprise_value',         num_sections=5, reverse=0)
         pe_range_all          = get_range(csv_db_path=new_run, column_name='pe_effective',             num_sections=9, reverse=1)
         evr_range_all         = get_range(csv_db_path=new_run, column_name='evr_effective',            num_sections=9, reverse=1)

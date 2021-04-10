@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.0.345 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.0.372 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021  Asaf Ravid
@@ -64,10 +64,10 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
             if tase_mode: # overrwrite to hebrew
                 row = ['סימבול'[::-1],'שם החברה'[::-1],'ענף'[::-1],'ערך'[::-1],'סגירה'[::-1],'ציון'[::-1]]
             else:
-                row = ['Ticker', 'Name', 'Sector', 'Value', 'Close', 'Rank']
+                row = ['Symbol', 'Name', 'Sector', 'Value', 'Close', 'Rank']
         for col_index, col in enumerate(row):
             w_diff                =0
-            if   col_index == 0: w=18 # Ticker
+            if   col_index == 0: w=18 # Symbol
             elif col_index == 1: w=50 # Name
             elif col_index == 2: w=33 # Sector
             elif col_index == 3: w=25 # S value
@@ -139,7 +139,7 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
         html="<p>Deeper Value Channel Telegram: <A HREF=""https://t.me/investorsIL"">https://t.me/investorsIL</A></p>" \
              "<p>Updates, Discussions and Technical Support on Telegram: <A HREF=""https://t.me/StockScannerIL"">https://t.me/StockScannerIL</A></p>" \
              "<p>This Scanner is Open Source. fork() here: <A HREF=""http://bit.ly/OpenSourceStockScanner"">http://bit.ly/OpenSourceStockScanner</A></p>" \
-             "<p>Lecture: <A HREF=""http://bit.ly/SssLecture"">http://bit.ly/SssLecture</A>, One Pagers: <A HREF=""http://bit.ly/SssCoreEquation"">http://bit.ly/SssCoreEquation</A>, <A HREF=""http://bit.ly/MultiDimentionalScan"">http://bit.ly/MultiDimentionalScan</A></p>" \
+             "<p>Lecture: <A HREF=""http://bit.ly/SssLecture"">http://bit.ly/SssLecture</A>, One Pagers: <A HREF=""http://bit.ly/SssCoreEquation"">http://bit.ly/SssCoreEquation</A>, <A HREF=""http://bit.ly/MultiDimensionalScan"">http://bit.ly/MultiDimensionalScan</A></p>" \
              "<p><img src=""{}"" width=""600"" height=""250""></p>".format(csv_filename+"_fig.png")
         pdf.write_html(text=html)
 
