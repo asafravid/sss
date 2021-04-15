@@ -1,9 +1,9 @@
 REM #############################################################################
 REM #
-REM # Version 300 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+REM # Version 391 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 REM #
 REM #    Stock Screener and Scanner - based on yfinance and investpy
-REM #    Copyright (C) 2021  Asaf Ravid
+REM #    Copyright (C) 2021 Asaf Ravid
 REM #
 REM #    This program is free software: you can redistribute it and/or modify
 REM #    it under the terms of the GNU General Public License as published by
