@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.0.391 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.0.392 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021 Asaf Ravid
@@ -97,7 +97,7 @@ REVENUE_QUARTERLY_GROWTH_POSITIVE_FACTOR                          = 10.0   # Whe
 TRAILING_EPS_PERCENTAGE_DAMP_FACTOR                               = 0.01   # When the trailing_eps_percentage is very low (units are ratio here), this damper shall limit the affect to x100 not more)
 PROFIT_MARGIN_DAMPER                                              = 0.01   # When the profit_margin                   is very low (units are ratio here), this damper shall limit the affect to x100 not more)
 RATIO_DAMPER                                                      = 0.01   # When the total/current_other_other ratio is very low (units are ratio here), this damper shall limit the affect to x100 not more)
-REFERENCE_DB_MAX_VALUE_DIFF_FACTOR_THRESHOLD                      = 0.75   # if there is a parameter difference fro reference db, in which the difference of values is higher than 0.75*abs(max_value) then something went wrong with the fetch of values from yfinance. Compensate smartly from reference database
+REFERENCE_DB_MAX_VALUE_DIFF_FACTOR_THRESHOLD                      = 0.9   # if there is a parameter difference from reference db, in which the difference of values is higher than 0.75*abs(max_value) then something went wrong with the fetch of values from yfinance. Compensate smartly from reference database
 
 # TODO: ASAFR: All below boosters should be calibrated by:
 #              1. The rarety (statistically comapred to all the stocks in scan) - proportionaly to it (the rarest the case - the more boost)
@@ -339,6 +339,24 @@ def text_to_num(text):
 
 def weighted_average(values_list, weights):
     return sum([values_list[i]*weights[i] for i in range(len(values_list))])/sum(weights)
+
+
+def sss_core_equation_value_set(stock_data):
+    if stock_data.shares_outstanding and stock_data.net_income_to_common_shareholders is not None: stock_data.nitcsh_to_shares_outstanding = float(stock_data.net_income_to_common_shareholders) / float(stock_data.shares_outstanding)
+    if stock_data.employees          and stock_data.net_income_to_common_shareholders is not None: stock_data.nitcsh_to_num_employees = float(stock_data.net_income_to_common_shareholders) / float(stock_data.employees)
+
+    if stock_data.earnings_quarterly_growth > 0:
+        earnings_qgrowth_factor_effective = (1 + EARNINGS_QUARTERLY_GROWTH_POSITIVE_FACTOR * stock_data.earnings_quarterly_growth)
+    else:
+        earnings_qgrowth_factor_effective = (1 + stock_data.earnings_quarterly_growth)
+
+    if stock_data.trailing_12months_price_to_sales is not None and stock_data.trailing_12months_price_to_sales > 0 and stock_data.effective_profit_margin is not None and stock_data.effective_profit_margin > 0 and earnings_qgrowth_factor_effective is not None and stock_data.pe_effective is not None and stock_data.pe_effective > 0 and stock_data.enterprise_value_to_ebitda is not None and stock_data.enterprise_value_to_ebitda > 0 and stock_data.ev_to_cfo_ratio_effective is not None and stock_data.ev_to_cfo_ratio_effective > 0 and stock_data.effective_peg_ratio is not None and stock_data.effective_peg_ratio > 0 and stock_data.price_to_book                is not None and stock_data.price_to_book > 0 and stock_data.debt_to_equity_effective > 0 and stock_data.total_ratio_effective > 0 and stock_data.total_current_ratio_effective > 0:
+        effective_debt_to_equity_effective = math.sqrt(stock_data.debt_to_equity_effective)
+        effective_current_ratio            = (stock_data.total_ratio_effective + stock_data.total_current_ratio_effective) / 2.0  # TODO: ASAFR: In the next stage - add the other and current other ratios - more information -> more completeness
+        stock_data.sss_value               = float(stock_data.eff_dist_from_low_factor * ((stock_data.evr_effective * stock_data.pe_effective * stock_data.enterprise_value_to_ebitda * stock_data.trailing_12months_price_to_sales * stock_data.price_to_book) / (stock_data.effective_profit_margin * effective_current_ratio)) * ((stock_data.effective_peg_ratio * stock_data.ev_to_cfo_ratio_effective * effective_debt_to_equity_effective) / earnings_qgrowth_factor_effective))  # The lower  the better
+    else:
+        stock_data.sss_value = BAD_SSS
+        
 
 def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode, sectors_list, sectors_filter_out, countries_list, countries_filter_out, build_csv_db, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, min_enterprise_value_millions_usd, earnings_quarterly_growth_min, revenue_quarterly_growth_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, reference_db):
     try:
@@ -978,22 +996,7 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
 
         if build_csv_db:
             if return_value:
-                if stock_data.shares_outstanding and stock_data.net_income_to_common_shareholders is not None: stock_data.nitcsh_to_shares_outstanding = float(stock_data.net_income_to_common_shareholders) / float(stock_data.shares_outstanding)
-                if stock_data.employees      and stock_data.net_income_to_common_shareholders is not None: stock_data.nitcsh_to_num_employees      = float(stock_data.net_income_to_common_shareholders) / float(stock_data.employees)
-
-                if stock_data.earnings_quarterly_growth > 0:
-                    earnings_qgrowth_factor_effective = (1    + EARNINGS_QUARTERLY_GROWTH_POSITIVE_FACTOR*stock_data.earnings_quarterly_growth)
-                else:
-                    earnings_qgrowth_factor_effective = (1    + stock_data.earnings_quarterly_growth)
-
-                if stock_data.trailing_12months_price_to_sales is not None and stock_data.trailing_12months_price_to_sales > 0 and stock_data.effective_profit_margin is not None and stock_data.effective_profit_margin > 0 and earnings_qgrowth_factor_effective is not None and stock_data.pe_effective is not None and stock_data.pe_effective > 0 and stock_data.enterprise_value_to_ebitda is not None and stock_data.enterprise_value_to_ebitda > 0 and stock_data.ev_to_cfo_ratio_effective is not None and stock_data.ev_to_cfo_ratio_effective > 0 and stock_data.effective_peg_ratio is not None and stock_data.effective_peg_ratio > 0:
-                    if stock_data.price_to_book is not None and stock_data.price_to_book > 0:
-                        if stock_data.debt_to_equity_effective > 0 and stock_data.total_ratio_effective > 0 and stock_data.total_current_ratio_effective > 0:
-                            effective_debt_to_equity_effective = math.sqrt(stock_data.debt_to_equity_effective)
-                            effective_current_ratio            = (stock_data.total_ratio_effective + stock_data.total_current_ratio_effective)/2.0   # TODO: ASAFR: In the next stage - add the other and current other ratios - more information -> more completeness
-                            stock_data.sss_value = float(stock_data.eff_dist_from_low_factor*((stock_data.evr_effective * stock_data.pe_effective * stock_data.enterprise_value_to_ebitda * stock_data.trailing_12months_price_to_sales * stock_data.price_to_book) / (stock_data.effective_profit_margin * effective_current_ratio)) * ((stock_data.effective_peg_ratio * stock_data.ev_to_cfo_ratio_effective * effective_debt_to_equity_effective) / earnings_qgrowth_factor_effective))  # The lower  the better
-                else:
-                    stock_data.sss_value = BAD_SSS
+                sss_core_equation_value_set(stock_data)
             else:
                 stock_data.sss_value = BAD_SSS
             # Rounding to non-None values + set None values to 0 for simplicity:
@@ -1213,21 +1216,34 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
             if len(reference_db):
                 symbol_index_in_reference_db = find_symbol_in_reference_db(stock_data.symbol, reference_db)
                 if symbol_index_in_reference_db >= 0:
+                    found_differences = False
                     for index in range(len(g_header_row)):
                         if type(row_to_append[index]) == int or type(row_to_append[index]) == float:
                             min_val = min(float(row_to_append[index]), float(reference_db[symbol_index_in_reference_db][index]))
                             max_val = max(float(row_to_append[index]), float(reference_db[symbol_index_in_reference_db][index]))
                             diff    = abs(max_val-min_val)
                             # TODO: ASAFR: 52-week change is not really working and not really needed - fix or eliminate
-                            indices_list_to_ignore_changes_in = [g_fifty_two_week_change_index, g_sss_value_index, g_two_hundred_day_average_index, g_previous_close_percentage_from_200d_ma_index]
+                            indices_list_to_ignore_changes_in = [g_sss_value_index] # [g_fifty_two_week_change_index, g_sss_value_index, g_two_hundred_day_average_index, g_previous_close_percentage_from_200d_ma_index]
                             if diff > abs(max_val)*REFERENCE_DB_MAX_VALUE_DIFF_FACTOR_THRESHOLD and index not in indices_list_to_ignore_changes_in:
-                                print('                            {:5} - Suspicious Difference detected (taking lower sss_value row as correct row): reference_db[{:25}]={:6}, db[{:25}]={:6}'.format(row_to_append[g_symbol_index], g_header_row[index], reference_db[symbol_index_in_reference_db][index], g_header_row[index], row_to_append[index]))
-                                diff_rows.append(reference_db[symbol_index_in_reference_db])
                                 if float(reference_db[symbol_index_in_reference_db][g_sss_value_index]) < float(row_to_append[g_sss_value_index]):
-                                    stock_data = get_stock_data_from_db_row(reference_db[symbol_index_in_reference_db])
-                                    # Re-process with correct information:
-                                    process_info_result = process_info(symbol=symbol, stock_data=stock_data, build_csv_db_only=build_csv_db_only, use_investpy=use_investpy, tase_mode=tase_mode, sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, build_csv_db=build_csv_db, profit_margin_limit=profit_margin_limit, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, debt_to_equity_limit=debt_to_equity_limit, min_enterprise_value_millions_usd=min_enterprise_value_millions_usd, earnings_quarterly_growth_min=earnings_quarterly_growth_min, revenue_quarterly_growth_min=revenue_quarterly_growth_min, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, market_cap_included=market_cap_included, research_mode=research_mode, currency_conversion_tool=currency_conversion_tool, reference_db=reference_db)
-                                break
+                                    found_differences = True
+                                    compensated_value = round(REFERENCE_DB_MAX_VALUE_DIFF_FACTOR_THRESHOLD*float(reference_db[symbol_index_in_reference_db][index]) + (1-REFERENCE_DB_MAX_VALUE_DIFF_FACTOR_THRESHOLD)*float(row_to_append[index]), NUM_ROUND_DECIMALS)
+                                    if type(row_to_append[index]) == int:
+                                        compensated_value = int(round(compensated_value))
+                                    print('                            {:5} - Suspicious Difference detected (taking lower sss_value row as correct row): reference_db[{:25}]={:6}, db[{:25}]={:6} -> compensated_value = {:6}'.format(row_to_append[g_symbol_index], g_header_row[index], reference_db[symbol_index_in_reference_db][index], g_header_row[index], row_to_append[index], compensated_value))
+                                    row_to_append[index] = compensated_value  # Overwrite specific index value with compensated value from reference db
+
+                    if found_differences:
+                        get_stock_data_from_db_row(row_to_append)
+                        if stock_data.sector             in ['None', '', 'Unknown']: stock_data.sector             = reference_db[symbol_index_in_reference_db][g_sector_index]
+                        if stock_data.country            in ['None', '', 'Unknown']: stock_data.country            = reference_db[symbol_index_in_reference_db][g_country_index]
+                        if stock_data.short_name         in ['None', '', 'Unknown']: stock_data.short_name         = reference_db[symbol_index_in_reference_db][g_name_index]
+                        if stock_data.financial_currency in ['None', '', 'Unknown']: stock_data.financial_currency = reference_db[symbol_index_in_reference_db][g_financial_currency_index]
+
+                        # stock_data = get_stock_data_from_db_row(reference_db[symbol_index_in_reference_db])
+                        # Re-process with more correct information:
+                        sss_core_equation_value_set(stock_data)
+                        diff_rows.append(reference_db[symbol_index_in_reference_db])
 
             dividends_sum = stock_data.last_dividend_0+stock_data.last_dividend_1+stock_data.last_dividend_2+stock_data.last_dividend_3
 
@@ -1422,7 +1438,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
     if not research_mode and tase_mode and build_csv_db:
         symbols = symbols_tase + stocks_list_tase
 
-    if not research_mode and build_csv_db: symbols = list(set(symbols))
+    if not research_mode and build_csv_db: symbols = sorted(list(set(symbols)))
 
 
     # Temporary to test and debug: DEBUG MODE

@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.0.391 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.0.392 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021 Asaf Ravid
@@ -268,9 +268,9 @@ def research_db(sectors_list, sectors_filter_out, countries_list, countries_filt
 
 run_custom_tase = False   # Custom Portfolio
 run_custom      = False
-run_tase        = True    # Tel Aviv Stock Exchange
+run_tase        = False    # Tel Aviv Stock Exchange
 run_nsr         = True   # NASDAQ100+S&P500+RUSSEL1000
-run_all         = True   # All Nasdaq Stocks
+run_all         = False   # All Nasdaq Stocks
 research_mode   = False   # Research Mode
 
 reference_run_tase = 'Results/Tase/20210415-124430_Tase_Technology4.0_RealEstate0.75_Bdb_nRes248'
