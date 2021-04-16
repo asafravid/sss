@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.0.392 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.0.393 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021 Asaf Ravid
@@ -1282,7 +1282,7 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
 #                 It is sometimes observed that stocks information is wrongly fetched. Is such cases, the last run's reference point shall be used, with a forgetting factor
 def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, countries_filter_out,build_csv_db_only, build_csv_db, csv_db_path, read_united_states_input_symbols, tase_mode, num_threads, market_cap_included, use_investpy, research_mode, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, min_enterprise_value_millions_usd, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, generate_result_folders=1, appearance_counter_dict_sss={}, appearance_counter_min=25, appearance_counter_max=35, custom_portfolio=[]):
     reference_db = []
-    if not research_mode and reference_run is not None:  # in non-research mode, compare to reference run
+    if not research_mode and reference_run is not None and len(reference_run):  # in non-research mode, compare to reference run
         reference_csv_db_filename = reference_run+'/db.csv'
         with open(reference_csv_db_filename, mode='r', newline='') as engine:
             reader = csv.reader(engine, delimiter=',')
