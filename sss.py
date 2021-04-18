@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.0.400 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.0.401 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021 Asaf Ravid
@@ -1150,10 +1150,18 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
 
             try:  # It is important to note that: 1. latest value is in index 0. 2. For the actual value in USD, need to translate the date of the dividend to the value of share at that time, because the dividends[] are pare share
                 dividends = symbol.get_dividends()
-                if len(dividends) > 0: stock_data.last_dividend_0 = dividends[0]
-                if len(dividends) > 1: stock_data.last_dividend_1 = dividends[1]
-                if len(dividends) > 2: stock_data.last_dividend_2 = dividends[2]
-                if len(dividends) > 3: stock_data.last_dividend_3 = dividends[3]
+                if len(dividends) > 0:
+                    last_4_dividends = dividends[-1:]
+                    stock_data.last_dividend_0 = last_4_dividends[-1] # Latest
+                if len(dividends) > 1:
+                    last_4_dividends = dividends[-2:]
+                    stock_data.last_dividend_1 = last_4_dividends[-2] # One before latest
+                if len(dividends) > 2:
+                    last_4_dividends = dividends[-3:]
+                    stock_data.last_dividend_2 = last_4_dividends[-3] # 2 before latest, etc
+                if len(dividends) > 3:
+                    last_4_dividends = dividends[-4:]
+                    stock_data.last_dividend_3 = last_4_dividends[-4]
 
             except Exception as e:
                 #if not research_mode: print("Exception in symbol.dividends: {}".format(e))
