@@ -33,8 +33,8 @@ https://bit.ly/MultiDimensionalScan
 - 2: A result folder shall be created under `Results` Folder
 - 3: Results list shall appear in the result folder fed to the Research Mode
 
-# Track Your Investments - Reference Sheet
-http://bit.ly/SssResultsInvestmentTracking
+# Track Results - Reference Sheet
+http://bit.ly/SssResultsTracking
 
 # Indices Maintenance (Once per month)
 - Download `TASE` latest components via https://info.tase.co.il/eng/MarketData/Stocks/MarketData/Pages/MarketData.aspx into `Indices/Data_TASE.csv`
