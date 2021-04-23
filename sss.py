@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.0.401 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.0.510 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021 Asaf Ravid
@@ -1238,7 +1238,7 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
                                     compensated_value = round(REFERENCE_DB_MAX_VALUE_DIFF_FACTOR_THRESHOLD*float(reference_db[symbol_index_in_reference_db][index]) + (1-REFERENCE_DB_MAX_VALUE_DIFF_FACTOR_THRESHOLD)*float(row_to_append[index]), NUM_ROUND_DECIMALS)
                                     if type(row_to_append[index]) == int:
                                         compensated_value = int(round(compensated_value))
-                                    print('                            {:5} - Suspicious Difference detected (taking lower sss_value row as correct row): reference_db[{:25}]={:6}, db[{:25}]={:6} -> compensated_value = {:6}'.format(row_to_append[g_symbol_index], g_header_row[index], reference_db[symbol_index_in_reference_db][index], g_header_row[index], row_to_append[index], compensated_value))
+                                    print('                            {:5} - Suspicious Difference detected (taking lower sss_value [{} < {}] row as correct row): reference_db[{:25}]={:6}, db[{:25}]={:6} -> compensated_value = {:6}'.format(row_to_append[g_symbol_index], (reference_db[symbol_index_in_reference_db][g_sss_value_index]), (row_to_append[g_sss_value_index]), g_header_row[index], reference_db[symbol_index_in_reference_db][index], g_header_row[index], row_to_append[index], compensated_value))
                                     row_to_append[index] = compensated_value  # Overwrite specific index value with compensated value from reference db
 
                     if found_differences:
@@ -1311,8 +1311,8 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
     interval_secs_to_avoid_http_errors = 60*(7 - 1*tase_mode + 30*read_united_states_input_symbols) if build_csv_db else 0  # Every interval_threads, a INTERVALS_TO_AVOID_HTTP_ERRORS sec sleep will take place
 
     # Working Parameters:
-    earnings_quarterly_growth_min = -0.25      # The earnings can decrease by 1/4, but there is still a requirement that price_to_earnings_to_growth_ratio > 0. TODO: ASAFR: Add to multi-dimension
-    revenue_quarterly_growth_min  = -0.25      # The earnings can decrease by 1/4, but there is still a requirement that price_to_earnings_to_growth_ratio > 0. TODO: ASAFR: Add to multi-dimension
+    earnings_quarterly_growth_min = -0.5      # The earnings can decrease by 1/2, but there is still a requirement that price_to_earnings_to_growth_ratio > 0. TODO: ASAFR: Add to multi-dimension
+    revenue_quarterly_growth_min  = -0.25     # The earnings can decrease by 1/4, but there is still a requirement that price_to_earnings_to_growth_ratio > 0. TODO: ASAFR: Add to multi-dimension
 
     symbols                 = []
     symbols_tase            = []
@@ -1664,6 +1664,8 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
         list_len_sss = len(sorted_list_sss)
         if appearance_counter_min <= list_len_sss   <= appearance_counter_max:
             for index, row in enumerate(sorted_list_sss):
+                if 'ISRA-L' in row[g_symbol_index]:
+                    print('ISRA-L - index is {}'.format(index))
                 appearance_counter_dict_sss[  (row[g_symbol_index],row[g_name_index],row[g_sector_index],row[g_sss_value_index],  row[g_previous_close_index])] = appearance_counter_dict_sss[  (row[g_symbol_index],row[g_name_index],row[g_sector_index],row[g_sss_value_index],  row[g_previous_close_index])]+math.sqrt(float(list_len_sss  -index))/float(list_len_sss  )
 
     sorted_lists_list = [

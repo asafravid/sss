@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.0.400 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.0.510 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021 Asaf Ravid
@@ -189,6 +189,9 @@ def combine_multi_dim_to_table_4d(multi_dim, dim4, dim3, rows,cols):
     return combined4_rows_cols
 
 
+# TODO: ASAFR: 1. Must add the EQG to the multi-dimentional scan - the TH is now -50% but it must be scanned
+#              2. Like the EQG - see other places where there are filterings out (around that area in sss.py) and handle properly
+#              3. Low EQG (minus) - give a harsher "punishment"
 def research_db(sectors_list, sectors_filter_out, countries_list, countries_filter_out, evr_range, pe_range, pm_range, ev_millions_range, csv_db_path, read_united_states_input_symbols, scan_mode, generate_result_folders, appearance_counter_min, appearance_counter_max, favor_sectors, favor_sectors_by,
                 newer_path, older_path, db_exists_in_both_folders, diff_only_result, movement_threshold, res_length):
     if scan_mode == SCAN_MODE_TASE:
@@ -268,8 +271,8 @@ def research_db(sectors_list, sectors_filter_out, countries_list, countries_filt
 
 run_custom_tase = False   # Custom Portfolio
 run_custom      = False
-run_tase        = False   # Tel Aviv Stock Exchange
-run_nsr         = True   # NASDAQ100+S&P500+RUSSEL1000
+run_tase        = True   # Tel Aviv Stock Exchange
+run_nsr         = False   # NASDAQ100+S&P500+RUSSEL1000
 run_all         = False    # All Nasdaq Stocks
 research_mode   = True   # Research Mode
 
@@ -279,14 +282,14 @@ reference_run_nsr    = 'Results/Nsr/20210410-003024_Technology3.5_FinancialServi
 reference_run_all    = 'Results/All/20210410-073432_Technology3.5_FinancialServices0.5_A_Bdb_nRes2864'
 
 if not research_mode: # Run Build DB Only:
-    if run_custom_tase: sss.sss_run(reference_run=None,                 sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', read_united_states_input_symbols=0, tase_mode=1, num_threads=1,  market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=20000.0,  debt_to_equity_limit=1000.0, min_enterprise_value_millions_usd=5, price_to_earnings_limit=9000, enterprise_value_to_revenue_limit=1500, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[4.0, 0.75], generate_result_folders=1, custom_portfolio=['CLIS.TA'])
+    if run_custom_tase: sss.sss_run(reference_run=None,                 sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', read_united_states_input_symbols=0, tase_mode=1, num_threads=1,  market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=20000.0,  debt_to_equity_limit=1000.0, min_enterprise_value_millions_usd=5, price_to_earnings_limit=9000, enterprise_value_to_revenue_limit=1500, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[4.0, 0.75], generate_result_folders=1, custom_portfolio=['ISRA-L.TA'])
     if run_custom:      sss.sss_run(reference_run=reference_run_custom, sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', read_united_states_input_symbols=0, tase_mode=0, num_threads=4,  market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=20000.0,  debt_to_equity_limit=1000.0, min_enterprise_value_millions_usd=5, price_to_earnings_limit=9000, enterprise_value_to_revenue_limit=2000, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[3.5,  0.5], generate_result_folders=1, custom_portfolio=['DAC', 'SLM', 'AMAT', 'WAL', 'AGO', 'LRCX', 'PNFP', 'MGM', 'DFS', 'MU', 'KLAC', 'BPOP', 'TER', 'FHN', 'TROX', 'OZK', 'KIM', 'AFL', 'PBCT', 'FCNCA', 'OMF', 'UI', 'WTFC', 'AL', 'LNG', 'UTHR', 'DLB', 'HIW', 'SBNY', 'FRC', 'BLK', 'BOKF', 'SCHW', 'PB', 'QRVO', 'MX', 'TROW', 'TRQ', 'HZNP', 'BDN', 'CSCO', 'CGNX', 'FDUS', 'PBFX', 'GNTX', 'MSFT', 'ORCL', 'BXP', 'ABBV', 'CE', 'ESGR', 'ALXN', 'MRVL', 'PM', 'GPP', 'EXR', 'EBAY', 'CPRX', 'OPRA', 'OHI', 'GS', 'ATVI', 'LEN', 'VICI', 'DHI', 'BIO', 'ALL', 'EXEL', 'ICE', 'MMM', 'ACGL', 'COOP', 'FB', 'CACC', 'BWXT', 'OLP', 'GFI', 'SCI', 'ALGN', 'TGT', 'VMW', 'DG', 'AAPL', 'MAS', 'AZPN', 'SRE', 'GRMN', 'FAST', 'HOLX', 'STZ', 'BAC', 'TMO', 'SONY', 'CDNS', 'MCO', 'AMGN', 'DGX', 'CDW', 'GOOG', 'STT', 'ACN', 'GLPI', 'AKAM', 'PHM', 'FRO', 'GOOGL', 'COF', 'LMT', 'GTN', 'DRE', 'INTC', 'NVEC', 'GHC', 'USB', 'ALLY', 'MDLZ', 'PEG', 'ADBE', 'RGLD', 'BTI', 'TXN', 'BRK.B', 'PG', 'NGG', 'KNOP', 'SUPN', 'WPM', 'AVB', 'KGC', 'HPQ', 'WPC', 'DISH', 'PGR', 'LOPE', 'FCPT', 'CUZ', 'ATH', 'CI', 'COO', 'NEM', 'ETR', 'CMCSA', 'TRNO', 'CROX', 'NVR', 'REGN', 'VZ', 'JEF', 'MS', 'BIDU', 'LH', 'ABEV', 'UHS', 'TRP', 'ARE', 'FTV', 'TRV', 'BMRN', 'TKC', 'CPB', 'ORAN', 'JAZZ', 'SWK', 'GTLS', 'HUN', 'WMT', 'AVGO', 'CIG', 'TSN', 'LDOS', 'MHO', 'VIV', 'JPM', 'VST', 'BBY', 'MTH', 'APH', 'TX', 'NUE', 'BTG', 'IRCP', 'SWKS', 'JD', 'INVA', 'MFC', 'TLK', 'SMFG', 'FF', 'DOX', 'VRSN', 'GIS', 'CHKP', 'HMLP', 'ES', 'WSM', 'MRK', 'CB', 'HTH', 'GILD', 'QCOM', 'RIO', 'ACTG', 'ELP', 'NBIX', 'VRTX', 'LAKE', 'YY', 'QDEL', 'APT'])
     if run_tase:        sss.sss_run(reference_run=reference_run_tase,   sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', read_united_states_input_symbols=0, tase_mode=1, num_threads=20, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=100000.0, debt_to_equity_limit=1000.0, min_enterprise_value_millions_usd=1, price_to_earnings_limit=4500, enterprise_value_to_revenue_limit=1500, favor_sectors=['Technology', 'Real Estate'],        favor_sectors_by=[4.0, 0.75], generate_result_folders=1)
     if run_nsr:         sss.sss_run(reference_run=reference_run_nsr ,   sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', read_united_states_input_symbols=0, tase_mode=0, num_threads=20, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=2000.0,   debt_to_equity_limit=1000.0, min_enterprise_value_millions_usd=5, price_to_earnings_limit=6500, enterprise_value_to_revenue_limit=2500, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[3.5,  0.5], generate_result_folders=1)
     if run_all:         sss.sss_run(reference_run=reference_run_all ,   sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', read_united_states_input_symbols=1, tase_mode=0, num_threads=20, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=20000.0,  debt_to_equity_limit=1000.0, min_enterprise_value_millions_usd=5, price_to_earnings_limit=9000, enterprise_value_to_revenue_limit=3000, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[3.5,  0.5], generate_result_folders=1)
 else: # Research Mode:
     if run_tase:
-        new_run = 'Results/Tase/20210416-023617_Tase_Technology4.0_RealEstate0.75_Bdb_nRes258'
+        new_run = 'Results/Tase/20210423-072820_Tase_Technology4.0_RealEstate0.75_Bdb_nRes258'
         ev_range_tase          = get_range(csv_db_path=new_run, column_name='enterprise_value',        num_sections=4, reverse=0, pop_1st_percentile_range=True)
         pe_range_tase          = get_range(csv_db_path=new_run, column_name='pe_effective',            num_sections=7, reverse=1, pop_1st_percentile_range=True)
         evr_range_tase         = get_range(csv_db_path=new_run, column_name='evr_effective',           num_sections=7, reverse=1, pop_1st_percentile_range=True)

@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.0.506 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.0.510 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021 Asaf Ravid
@@ -29,7 +29,7 @@ import math
 
 import sss
 
-END_DATE_STR = '20210419'
+END_DATE_STR = '20210422'
 RESULTS_LEN        = 28
 TASE_MODE          = 0
 RESULTS_INPUT_FOLDER = "Results/Nsr"
@@ -113,4 +113,4 @@ for results_input_path in results_input_paths:
         performance_list.append(performance)
         existence_in_db_ratios_list.append(existence_in_db_ratio)
 
-    print('     Performance % between {} and {} of {} is {}. DB existence ({})'.format(start,end, sss_values_list, performance_list, existence_in_db_ratios_list))
+    print('     Performance % between {} and {} of {} is {}. DB existence ({})'.format(start[:10],end[:10], sss_values_list, performance_list, existence_in_db_ratios_list))
