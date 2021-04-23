@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.0.515 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.0.516 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021 Asaf Ravid
@@ -66,6 +66,22 @@ def read_engine_results(path, max_results, sss_value_name):
     return engine_results_list
 
 
+def find_start_date_value(symbol_to_check, start_date, pd_database_close_data):
+    found_date = False
+    current_date = start_date
+    while not found_date:
+        current_date_str = current_date.strftime('%Y-%m-%d')
+
+        try:
+            start_date_value_check = pd_database_close_data[symbol_to_check].loc[current_date_str]
+        except Exception as e:
+            current_date = current_date - datetime.timedelta(days=1)
+            continue
+        found_date = True
+
+    return start_date_value_check
+
+
 symbol_close_values_db = {}
 sss_values_list        = ['sss', 'ssss', 'sssss']
 pd_database_close      = None
@@ -83,7 +99,16 @@ for results_input_path in results_input_paths:
     results_lists               = []
     gains_lists                 = []
     performance_list            = []
+    performance_indices_list    = []
     existence_in_db_ratios_list = []
+
+    # Comparison Indices:
+    if pd_database_close is None:
+        comparison_indices_list     = ['SPY', 'QQQ', 'VTWO']
+        data_start_end_indices_list = yf.download(comparison_indices_list, start=start, end=end, threads=False)
+        data_start_end_indices_list = data_start_end_indices_list.Close
+        pd_database_close = data_start_end_indices_list
+
     for sss_value_name in sss_values_list:
         results_list = read_engine_results(results_input_path+'/'+sss_value_name+'_engine.csv', RESULTS_LEN, sss_value_name+'_value')
         results_lists.append(results_list)
@@ -117,28 +142,27 @@ for results_input_path in results_input_paths:
                     pd_database_close = data_start_end_new_symbols_list
                 else:
                     pd_database_close = pd.concat([pd_database_close, data_start_end_new_symbols_list], axis=1, join="outer")
+
             for symbol in results_list:
                 if symbol not in symbol_close_values_db:
                     symbol_close_values_db[symbol] = pd_database_close[symbol]
 
-                found_date = False
-                current_date = start
-                while not found_date:
-                    current_date_str = current_date.strftime('%Y-%m-%d')
-
-                    try:
-                        start_date_value = pd_database_close[symbol].loc[current_date_str]
-                    except Exception as e:
-                        current_date = current_date - datetime.timedelta(days=1)
-                        continue
-                    found_date = True
+                start_date_value = find_start_date_value(symbol, start, pd_database_close)
                 end_date_value   = pd_database_close[symbol][-1]
                 if not math.isnan(start_date_value) and not math.isnan(end_date_value):
                     gains_list.append(round(end_date_value/start_date_value-1.0, sss.NUM_ROUND_DECIMALS))
+
+            if not len(performance_indices_list):
+                for comparison_indice in comparison_indices_list:
+                    start_date_value = find_start_date_value(comparison_indice, start, pd_database_close)
+                    end_date_value   = pd_database_close[comparison_indice][-1]
+                    if not math.isnan(start_date_value) and not math.isnan(end_date_value):
+                        performance_indices_list.append(round(100.0*(end_date_value / start_date_value - 1.0), sss.NUM_ROUND_DECIMALS))
+
             performance           = round(100*numpy.mean(gains_list), sss.NUM_ROUND_DECIMALS)
             existence_in_db_ratio = round(float(len(existing_symbols_list))/float(len(results_list)),sss.NUM_ROUND_DECIMALS)
         gains_lists.append(gains_list)
         performance_list.append(performance)
         existence_in_db_ratios_list.append(existence_in_db_ratio)
 
-    print('     Performance % between {} and {} of {} is {}. DB existence ({})'.format(start,end, sss_values_list, performance_list, existence_in_db_ratios_list))
+    print('     Performance % between {} and {} of {} is {}. DB existence ({}). {} Indices Performance Comparison: {}'.format(start,end, sss_values_list, performance_list, existence_in_db_ratios_list, comparison_indices_list, performance_indices_list))
