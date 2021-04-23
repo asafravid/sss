@@ -1,6 +1,6 @@
 REM #############################################################################
 REM #
-REM # Version 391 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+REM # Version 0.0.451 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 REM #
 REM #    Stock Screener and Scanner - based on yfinance and investpy
 REM #    Copyright (C) 2021 Asaf Ravid
@@ -20,11 +20,14 @@ REM #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 REM #
 REM #############################################################################
 
-mkdir Backup\%1
-copy sss.py           Backup\%1\sss.py
-copy sss_run.py       Backup\%1\sss_run.py
-copy sss_diff.py      Backup\%1\sss_diff.py
-copy sss_filenames.py Backup\%1\sss_filenames.py
-copy sss_filenames.py Backup\%1\sss_filenames.py
-copy pdf_generator.py Backup\%1\pdf_generator.py 
-copy version.bat Backup\%1\version.bat 
+mkdir                           Backup\%1
+copy sss.py                     Backup\%1\sss.py
+copy sss_run.py                 Backup\%1\sss_run.py
+copy sss_diff.py                Backup\%1\sss_diff.py
+copy sss_filenames.py           Backup\%1\sss_filenames.py
+copy sss_filenames.py           Backup\%1\sss_filenames.py
+copy pdf_generator.py           Backup\%1\pdf_generator.py
+copy Math.xlsx                  Backup\%1\Math.xlsx
+copy sss_results_performance.py Backup\%1\sss_results_performance.py
+
+copy version.bat                Backup\%1\version.bat

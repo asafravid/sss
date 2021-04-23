@@ -272,14 +272,14 @@ def research_db(sectors_list, sectors_filter_out, countries_list, countries_filt
 run_custom_tase = False   # Custom Portfolio
 run_custom      = False
 run_tase        = True   # Tel Aviv Stock Exchange
-run_nsr         = False   # NASDAQ100+S&P500+RUSSEL1000
-run_all         = False    # All Nasdaq Stocks
-research_mode   = True   # Research Mode
+run_nsr         = True   # NASDAQ100+S&P500+RUSSEL1000
+run_all         = True    # All Nasdaq Stocks
+research_mode   = False   # Research Mode
 
 reference_run_custom = 'Results/Custom/20210412-033351_Technology3.5_FinancialServices0.5_Bdb_nRes185_Custom'
-reference_run_tase   = 'Results/Tase/20210415-124430_Tase_Technology4.0_RealEstate0.75_Bdb_nRes248'
-reference_run_nsr    = 'Results/Nsr/20210410-003024_Technology3.5_FinancialServices0.5_Bdb_nRes825'
-reference_run_all    = 'Results/All/20210410-073432_Technology3.5_FinancialServices0.5_A_Bdb_nRes2864'
+reference_run_tase   = 'Results/Tase/20210423-072820_Tase_Technology4.0_RealEstate0.75_Bdb_nRes258'
+reference_run_nsr    = 'Results/Nsr/20210417-152942_Technology3.5_FinancialServices0.5_Bdb_nRes848'
+reference_run_all    = 'Results/All/20210417-222547_Technology3.5_FinancialServices0.5_A_Bdb_nRes2482'
 
 if not research_mode: # Run Build DB Only:
     if run_custom_tase: sss.sss_run(reference_run=None,                 sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', read_united_states_input_symbols=0, tase_mode=1, num_threads=1,  market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=20000.0,  debt_to_equity_limit=1000.0, min_enterprise_value_millions_usd=5, price_to_earnings_limit=9000, enterprise_value_to_revenue_limit=1500, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[4.0, 0.75], generate_result_folders=1, custom_portfolio=['ISRA-L.TA'])
