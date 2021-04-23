@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.0.510 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.0.515 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021 Asaf Ravid
@@ -26,7 +26,7 @@ import yfinance as yf
 import datetime
 import numpy
 import math
-
+import pandas as pd
 import sss
 
 END_DATE_STR = '20210422'
@@ -67,7 +67,8 @@ def read_engine_results(path, max_results, sss_value_name):
 
 
 symbol_close_values_db = {}
-
+sss_values_list        = ['sss', 'ssss', 'sssss']
+pd_database_close      = None
 
 for results_input_path in results_input_paths:
     results_input_path = results_input_path.replace("\\",'/')[:-1]
@@ -77,7 +78,8 @@ for results_input_path in results_input_paths:
     start = datetime.datetime(int(results_date[0:4]), int(results_date[4:6]), int(results_date[6:8]))
     end   = datetime.datetime(int(END_DATE_STR[0:4]), int(END_DATE_STR[4:6]), int(END_DATE_STR[6:8]))
 
-    sss_values_list             = ['sss', 'ssss', 'sssss']
+    start = start - datetime.timedelta(days=1)
+
     results_lists               = []
     gains_lists                 = []
     performance_list            = []
@@ -99,12 +101,38 @@ for results_input_path in results_input_paths:
                 else:
                     new_symbols_list.append(symbol)
 
-            data_start_end = yf.download(results_list, start=start, end=end, threads=False)
+            if len(new_symbols_list):
+                length_was_1 = False
+                if len(new_symbols_list) == 1:  # take 1 from the existing, to get a proper-clumned dataframe
+                    new_symbols_list.append(existing_symbols_list[0])
+                    length_was_1 = True
+
+                data_start_end_new_symbols_list = yf.download(new_symbols_list, start=start, end=end, threads=False)
+                data_start_end_new_symbols_list = data_start_end_new_symbols_list.Close
+
+                if length_was_1:
+                    del data_start_end_new_symbols_list[existing_symbols_list[0]]
+
+                if pd_database_close is None:
+                    pd_database_close = data_start_end_new_symbols_list
+                else:
+                    pd_database_close = pd.concat([pd_database_close, data_start_end_new_symbols_list], axis=1, join="outer")
             for symbol in results_list:
                 if symbol not in symbol_close_values_db:
-                    symbol_close_values_db[symbol] = data_start_end.Close[symbol]
-                start_date_value = data_start_end.Close[symbol][0]
-                end_date_value   = data_start_end.Close[symbol][-1]
+                    symbol_close_values_db[symbol] = pd_database_close[symbol]
+
+                found_date = False
+                current_date = start
+                while not found_date:
+                    current_date_str = current_date.strftime('%Y-%m-%d')
+
+                    try:
+                        start_date_value = pd_database_close[symbol].loc[current_date_str]
+                    except Exception as e:
+                        current_date = current_date - datetime.timedelta(days=1)
+                        continue
+                    found_date = True
+                end_date_value   = pd_database_close[symbol][-1]
                 if not math.isnan(start_date_value) and not math.isnan(end_date_value):
                     gains_list.append(round(end_date_value/start_date_value-1.0, sss.NUM_ROUND_DECIMALS))
             performance           = round(100*numpy.mean(gains_list), sss.NUM_ROUND_DECIMALS)
@@ -113,4 +141,4 @@ for results_input_path in results_input_paths:
         performance_list.append(performance)
         existence_in_db_ratios_list.append(existence_in_db_ratio)
 
-    print('     Performance % between {} and {} of {} is {}. DB existence ({})'.format(start[:10],end[:10], sss_values_list, performance_list, existence_in_db_ratios_list))
+    print('     Performance % between {} and {} of {} is {}. DB existence ({})'.format(start,end, sss_values_list, performance_list, existence_in_db_ratios_list))
