@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.0.517 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.0.518 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021 Asaf Ravid
@@ -968,7 +968,6 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
         # if not build_csv_db_only and not tase_mode and (stock_data.forward_eps is None or stock_data.forward_eps is not None and stock_data.forward_eps <= 0):
         #     if return_value and (not research_mode or VERBOSE_LOGS): print('                            Skipping {} forward_eps: {}'.format(stock_data.symbol, stock_data.forward_eps))
         #     return_value = False
-        # TODO: ASAFR: Take trailing_eps/forward_eps: the lower the better [but distinguish between both values sign, for instance one is > 0 and the other < 0 - investigate DB!] - but investigate 1st!
 
         if not build_csv_db_only and (stock_data.earnings_quarterly_growth is None or stock_data.earnings_quarterly_growth < earnings_quarterly_growth_min):
             if return_value and (not research_mode or VERBOSE_LOGS): print('                            Skipping {} earnings_quarterly_growth: {}'.format(stock_data.symbol, stock_data.earnings_quarterly_growth))
@@ -987,9 +986,9 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
             elif stock_data.price_to_earnings_to_growth_ratio < 0: stock_data.effective_peg_ratio = -stock_data.price_to_earnings_to_growth_ratio*NEGATIVE_PEG_RATIO_FACTOR
             else                                                 : stock_data.effective_peg_ratio =  1.0  # Something must be wrong, so take a neutral value of 1.0
 
-        if not build_csv_db_only and (stock_data.net_income_to_common_shareholders is None or stock_data.net_income_to_common_shareholders < 0):
-            if return_value and (not research_mode or VERBOSE_LOGS): print('                            Skipping {} net_income_to_common_shareholders: {}'.format(stock_data.symbol, stock_data.net_income_to_common_shareholders))
-            if return_value: return_value = False
+        # if not build_csv_db_only and (stock_data.net_income_to_common_shareholders is None or stock_data.net_income_to_common_shareholders < 0):
+        #     if return_value and (not research_mode or VERBOSE_LOGS): print('                            Skipping {} net_income_to_common_shareholders: {}'.format(stock_data.symbol, stock_data.net_income_to_common_shareholders))
+        #     if return_value: return_value = False
 
         if build_csv_db:
             if return_value:
