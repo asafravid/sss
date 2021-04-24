@@ -3,6 +3,7 @@
  - https://pypi.org/project/yfinance/
  - https://pypi.org/project/investpy/
  - https://pypi.org/project/fpdf/
+ - https://pypi.org/project/pandas/
  - https://fonts2u.com/dejavu-sans-condensed.font
 
 The stocks scan and sorting is done according to the below documentation (Core Equation and Multi-Dimensional scan) written using Google Documents (https://www.google.com/docs/about/):
@@ -29,9 +30,9 @@ https://bit.ly/MultiDimensionalScan
   (using comparison SW) the necessary changes I made (not too many) to run the `SSS` most efficiently and informatively.
   
 # Run Step-By-Step Instructions
-- 1: Run the scanning mode by uncommenting the `Run Build DB Only` lines in `sss_run.py`
-- 2: A result folder shall be created under `Results` Folder
-- 3: Results list shall appear in the result folder fed to the Research Mode
+- 1: Set the required scanning mode (`custom`/`tase`/`nsr`/`all`) in `sss_run.py` and run `sss_run.py`
+- 2: A Results folder shall be created under `Results` Folder
+- 3: Feed the Results path into the `research_mode` (Multi-Dimensional Scan). A `PDF` and `sss_results.csv` files shall be created in the same folder
 
 # Track Results - Reference Sheet
 http://bit.ly/SssResultsTracking
@@ -65,7 +66,7 @@ http://bit.ly/SssResultsTracking
 - Good luck and you are welcome to contribute to this project:
   - Add other contries' stocks
   - Past reccomendations and present results - for proving that the model works
-  - Multi-Dimentional Big Data research mode (scan over `EQG`s, etc)
+  - Multi-Dimensional Scan enhancements (scan over `EQG`s, etc)
   - For any questions / issues / suggestions: You can reach me here: asaf.rvd@gmail.com
 
 # License
