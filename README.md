@@ -34,9 +34,6 @@ https://bit.ly/MultiDimensionalScan
 - 2: A Results folder shall be created under `Results` Folder
 - 3: Feed the Results path into the `research_mode` (Multi-Dimensional Scan). A `PDF` and `sss_results.csv` files shall be created in the same folder
 
-# Track Results - Reference Sheet
-http://bit.ly/SssResultsTracking
-
 # Indices Maintenance (Once per month)
 - Download `TASE` latest components via https://info.tase.co.il/eng/MarketData/Stocks/MarketData/Pages/MarketData.aspx into `Indices/Data_TASE.csv`
 - Download `NASDAQ100` latest components via https://www.nasdaq.com/market-activity/quotes/nasdaq-ndx-index into `Indices/nasdaq100-components.csv`
