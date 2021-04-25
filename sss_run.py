@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.0.518 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.0.555 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021 Asaf Ravid
@@ -29,8 +29,8 @@ import sss_diff
 
 
 # TODO: ASAFR: Increase Report size to 35
-PDF_NUM_ENTRIES_IN_REPORT       = 28
-RESEARCH_MODE_MIN_ENTRIES_LIMIT = 7   # PDF_NUM_ENTRIES_IN_REPORT/4
+PDF_NUM_ENTRIES_IN_REPORT       = 35
+RESEARCH_MODE_MIN_ENTRIES_LIMIT = 7
 
 SCAN_MODE_TASE = 0  # Tel Aviv Stock Exchange
 SCAN_MODE_NSR  = 1  # Nasdaq100 + S&P500 + Russel1000
@@ -272,9 +272,9 @@ def research_db(sectors_list, sectors_filter_out, countries_list, countries_filt
 
 run_custom_tase = False   # Custom Portfolio
 run_custom      = False
-run_tase        = False   # Tel Aviv Stock Exchange
-run_nsr         = True   # NASDAQ100+S&P500+RUSSEL1000
-run_all         = True    # All Nasdaq Stocks
+run_tase        = True   # Tel Aviv Stock Exchange
+run_nsr         = False   # NASDAQ100+S&P500+RUSSEL1000
+run_all         = False    # All Nasdaq Stocks
 research_mode   = True   # Research Mode
 
 reference_run_custom = 'Results/Custom/20210412-033351_Technology3.5_FinancialServices0.5_Bdb_nRes185_Custom'
@@ -290,7 +290,7 @@ if not research_mode: # Run Build DB Only:
     if run_all:         sss.sss_run(reference_run=reference_run_all ,   sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', read_united_states_input_symbols=1, tase_mode=0, num_threads=20, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=20000.0,  debt_to_equity_limit=1000.0, min_enterprise_value_millions_usd=5, price_to_earnings_limit=9000, enterprise_value_to_revenue_limit=3000, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[3.5,  0.5], generate_result_folders=1)
 else: # Research Mode:
     if run_tase:
-        new_run = 'Results/Tase/20210423-072820_Tase_Technology4.0_RealEstate0.75_Bdb_nRes258'
+        new_run = 'Results/Tase/20210424-094844_Tase_Technology4.0_RealEstate0.75_Bdb_nRes258'
         ev_range_tase          = get_range(csv_db_path=new_run, column_name='enterprise_value',        num_sections=4, reverse=0, pop_1st_percentile_range=True)
         pe_range_tase          = get_range(csv_db_path=new_run, column_name='pe_effective',            num_sections=7, reverse=1, pop_1st_percentile_range=True)
         evr_range_tase         = get_range(csv_db_path=new_run, column_name='evr_effective',           num_sections=7, reverse=1, pop_1st_percentile_range=True)

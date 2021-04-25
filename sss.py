@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.0.518 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.0.555 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021 Asaf Ravid
@@ -22,7 +22,7 @@
 
 
 # TODO: ASAF: 0. Remove non-required columns from the indices input CSVs - faster load and down to the point
-#                0.2. Investigate average and ranges of all parameters in the SSS Core Equation - summarise in the document itself (Test Case)
+#                0.1. Investigate average and ranges of all parameters in the SSS Core Equation - summarise in the document itself (Test Case)
 #             1. Check and multi dim and investigate earnings_quarterly_growth_min and revenue_quarterly_growth_min: Check why Yahoo Finance always gives QRG values of 0? Unusable if that is always so
 #             2. Square Root of PEG Ratio may be too harsh, try something else perhaps, but only after understanding why Yahoo Finance PEG ratio is sometimes vastly different from zachs and other websites - for instance EXC
 #             3. Take latest yfinance base.py (and other - compare the whole folder) and updates - maybe not required - but just stay up to date
