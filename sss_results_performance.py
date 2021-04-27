@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.0.555 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.0.580 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021 Asaf Ravid
@@ -19,7 +19,7 @@
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 #############################################################################
-
+import os
 from glob import glob
 import csv
 import yfinance as yf
@@ -29,23 +29,25 @@ import math
 import pandas as pd
 import sss
 
-END_DATE_STR = '20210422'
+END_DATE_STR = '20210427'
 RESULTS_LEN        = 28
 TASE_MODE          = 0
 RESULTS_INPUT_FOLDER = "Results/Nsr"
-RESULTS_INPUT_PATH = "Results/Nsr/20201115-043117_FAVOUR_TECH_BY3_MARKETCAP_FORWARDEPS_PMARGIN0.17_EVR17.5_BUILD_DB_ONLY_NUM_RESULTS_1115"
 
 results_input_paths = glob(RESULTS_INPUT_FOLDER+'/*/')
 
 
 # Read Results Input:
-def read_engine_results(path, max_results, sss_value_name):
+def read_engine_results(path, results_filename, max_results, sss_value_name, optional_rename):
     engine_results_list = []
     effective_row_index = 0
     sss_value_index     = -1
 
     try:
-        with open(path, mode='r', newline='') as engine:
+        if optional_rename is not None:
+            os.rename(path+'/'+results_filename, path+'/'+optional_rename)
+            results_filename = optional_rename
+        with open(path+'/'+results_filename, mode='r', newline='') as engine:
             reader = csv.reader(engine, delimiter=',')
             found_title_row = False
             for row in reader:
@@ -55,7 +57,7 @@ def read_engine_results(path, max_results, sss_value_name):
                         sss_value_index = row.index(sss_value_name)
                     continue
                 else:
-                    if sss_value_index >= 0 and float(row[sss_value_index]) > 0.0:
+                    if (sss_value_index >= 0 and float(row[sss_value_index]) > 0.0) or sss_value_index < 0:
                         engine_results_list.append(row[0])
                         effective_row_index += 1
                         if effective_row_index >= max_results:
@@ -83,7 +85,8 @@ def find_start_date_value(symbol_to_check, start_date, pd_database_close_data):
 
 
 symbol_close_values_db = {}
-sss_values_list        = ['sss', 'ssss', 'sssss']
+results_filenames_list = ['sss_engine.csv', 'results_sss.csv'] # , 'rec_sss.csv',     'rec_sss_1.csv',     'rec_sss_2.csv',     'rec_sss_3.csv',     'rec_sss_4.csv',     'rec_sss_5.csv'    ]
+optional_rename_list   = [None,             None             ] #  'sss_results.csv', 'sss_results_1.csv', 'sss_results_2.csv', 'sss_results_3.csv', 'sss_results_4.csv', 'sss_results_5.csv']
 pd_database_close      = None
 
 for results_input_path in results_input_paths:
@@ -109,8 +112,8 @@ for results_input_path in results_input_paths:
         data_start_end_indices_list = data_start_end_indices_list.Close
         pd_database_close = data_start_end_indices_list
 
-    for sss_value_name in sss_values_list:
-        results_list = read_engine_results(results_input_path+'/'+sss_value_name+'_engine.csv', RESULTS_LEN, sss_value_name+'_value')
+    for index, results_filename in enumerate(results_filenames_list):
+        results_list = read_engine_results(results_input_path, results_filename, RESULTS_LEN, 'sss_value', optional_rename_list[index])
         results_lists.append(results_list)
 
         existing_symbols_list = []
@@ -165,4 +168,4 @@ for results_input_path in results_input_paths:
         performance_list.append(performance)
         existence_in_db_ratios_list.append(existence_in_db_ratio)
 
-    print('     Performance % between {} and {} of {} is {}. DB existence ({}). {} Indices Performance Comparison: {}'.format(start,end, sss_values_list, performance_list, existence_in_db_ratios_list, comparison_indices_list, performance_indices_list))
+    print('     Performance % between {} and {} of {} is {}. DB existence ({}). {} Indices Performance Comparison: {}'.format(start,end, results_filenames_list, performance_list, existence_in_db_ratios_list, comparison_indices_list, performance_indices_list))
