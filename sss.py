@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.0.578 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.0.584 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021 Asaf Ravid
@@ -309,10 +309,13 @@ def check_quote_type(stock_data, research_mode):
 
 def check_sector(stock_data, sectors_list):
     # Fix stocks' Sectors to Correct Sector. yfinance sometimes has those mistaken
-    if   stock_data.symbol == 'BRMG.TA' or stock_data.symbol == 'RLCO.TA': stock_data.sector = 'Consumer Cyclical'
-    elif stock_data.symbol == 'EFNC.TA'                                  : stock_data.sector = 'Financial Services'
-    elif stock_data.symbol == 'DEDR-L.TA'                                : stock_data.sector = 'Energy'
-    elif stock_data.symbol == 'GLRS.TA'                                  : stock_data.sector = 'Consumer Defensive'
+    if   stock_data.symbol in ['BRMG.TA',   'RLCO.TA'                                 ]: stock_data.sector = 'Consumer Cyclical'
+    elif stock_data.symbol in ['EFNC.TA'                                              ]: stock_data.sector = 'Financial Services'
+    elif stock_data.symbol in ['DEDR-L.TA'                                            ]: stock_data.sector = 'Energy'
+    elif stock_data.symbol in ['GLRS.TA',   'WILC.TA'                                 ]: stock_data.sector = 'Consumer Defensive'
+    elif stock_data.symbol in ['POLY.TA',   'WTS.TA', 'YBOX.TA', 'PLAZ-L.TA', 'TIGBUR']: stock_data.sector = 'Real Estate'
+    elif stock_data.symbol in ['XTLB.TA',   'UNVO.TA'                                 ]: stock_data.sector = 'Healthcare'
+    elif stock_data.symbol in ['UNCT-L.TA', 'ROBO.TA', 'SONO.TA', 'SMAG-L', 'STG.TA'  ]: stock_data.sector = 'Technology'
 
     if len(sectors_list) and stock_data.sector not in sectors_list:
         return False
@@ -920,7 +923,7 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
             return_value = False
 
         # Checkout http://www.nasdaqtrader.com/trader.aspx?id=symboldirdefs for all symbol definitions (for instance - `$` in stock names, 5-letter stocks ending with `Y`)
-        if SKIP_5LETTER_Y_STOCK_LISTINGS and stock_data.symbol[-1] == 'Y' and len(stock_data.symbol) == 5 and not tase_mode and '.' not in stock_data.symbol and '-' not in stock_data.symbol and '$' not in stock_data.symbol:
+        if not tase_mode and SKIP_5LETTER_Y_STOCK_LISTINGS and stock_data.symbol[-1] == 'Y' and len(stock_data.symbol) == 5 and not tase_mode and '.' not in stock_data.symbol and '-' not in stock_data.symbol and '$' not in stock_data.symbol:
             return_value = False
 
         if stock_data.enterprise_value_to_revenue is None and stock_data.enterprise_value is not None and use_investpy and 'Revenue' in stock_information and stock_information['Revenue'] is not None  and text_to_num(stock_information['Revenue']) > 0:
@@ -1353,8 +1356,8 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
     interval_secs_to_avoid_http_errors = 60*(7 - 1*tase_mode + 30*read_united_states_input_symbols) if build_csv_db else 0  # Every interval_threads, a INTERVALS_TO_AVOID_HTTP_ERRORS sec sleep will take place
 
     # Working Parameters:
-    eqg_min                      = -0.5      # The earnings can decrease by 1/2, but there is still a requirement that price_to_earnings_to_growth_ratio > 0. TODO: ASAFR: Add to multi-dimension
-    revenue_quarterly_growth_min = -0.25     # The revenue  can decrease by 1/4, but there is still a requirement that price_to_earnings_to_growth_ratio > 0. TODO: ASAFR: Add to multi-dimension
+    eqg_min                      = EQG_UNKNOWN                          # The earnings can decrease but there is still a requirement that price_to_earnings_to_growth_ratio > 0. TODO: ASAFR: Add to multi-dimension
+    revenue_quarterly_growth_min = REVENUE_QUARTERLY_GROWTH_UNKNOWN     # The revenue  can decrease there is still a requirement that price_to_earnings_to_growth_ratio > 0. TODO: ASAFR: Add to multi-dimension
 
     symbols                 = []
     symbols_tase            = []
@@ -1755,7 +1758,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
     if use_investpy:                     investpy_str          = '_Investpy'
     if build_csv_db_only:                build_csv_db_only_str = '_Bdb'
     if len(custom_portfolio):            custom_portfolio_str  = '_Custom'
-    date_and_time = time.strftime("Results/{}/%Y%m%d-%H%M%S{}{}{}{}{}{}{}{}{}".format(mode_str, tase_str, sectors_str, countries_str, all_str, csv_db_str, investpy_str, build_csv_db_only_str, num_results_str, custom_portfolio_str))
+    date_and_time = time.strftime("Results/{}/%Y%m%d-%H%M%S{}{}{}{}{}{}{}{}{}".format(mode_str, tase_str, sectors_str.replace(' ','').replace('a','').replace('e','').replace('i','').replace('o','').replace('u',''), countries_str, all_str, csv_db_str, investpy_str, build_csv_db_only_str, num_results_str, custom_portfolio_str))
 
     filenames_list = sss_filenames.create_filenames_list(date_and_time)
 
