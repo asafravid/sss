@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.0.585 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.0.595 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021 Asaf Ravid
@@ -70,9 +70,9 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
             w_diff                =0
             if   col_index == 0: w=18 # Symbol
             elif col_index == 1: w=50 # Name
-            elif col_index == 2: w=28 # Sector
+            elif col_index == 2: w=33 # Sector
             elif col_index == 3: w=30 # S value
-            elif col_index == 4: w=25 # Close
+            elif col_index == 4: w=20 # Close
             elif col_index == 5:
                 w                = 18 # appearance[_counter]
                 w_diff           = 5  # Diff

@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.0.585 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.0.595 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021 Asaf Ravid
@@ -309,13 +309,23 @@ def check_quote_type(stock_data, research_mode):
 
 def check_sector(stock_data, sectors_list):
     # Fix stocks' Sectors to Correct Sector. yfinance sometimes has those mistaken
-    if   stock_data.symbol in ['BRMG.TA',   'RLCO.TA'                                 ]: stock_data.sector = 'Consumer Cyclical'
-    elif stock_data.symbol in ['EFNC.TA'                                              ]: stock_data.sector = 'Financial Services'
-    elif stock_data.symbol in ['DEDR-L.TA'                                            ]: stock_data.sector = 'Energy'
-    elif stock_data.symbol in ['GLRS.TA',   'WILC.TA'                                 ]: stock_data.sector = 'Consumer Defensive'
-    elif stock_data.symbol in ['POLY.TA',   'WTS.TA', 'YBOX.TA', 'PLAZ-L.TA', 'TIGBUR']: stock_data.sector = 'Real Estate'
-    elif stock_data.symbol in ['XTLB.TA',   'UNVO.TA'                                 ]: stock_data.sector = 'Healthcare'
-    elif stock_data.symbol in ['UNCT-L.TA', 'ROBO.TA', 'SONO.TA', 'SMAG-L', 'STG.TA'  ]: stock_data.sector = 'Technology'
+    if   stock_data.symbol in ['BRMG.TA',   'RLCO.TA',   'DELT.TA'                              ]: stock_data.sector = 'Consumer Cyclical'
+    elif stock_data.symbol in ['EFNC.TA',   'GIBUI.TA',  'KMNK-M.TA'                            ]: stock_data.sector = 'Financial Services'
+    elif stock_data.symbol in ['DEDR-L.TA', 'GLEX-L'                                            ]: stock_data.sector = 'Energy'
+    elif stock_data.symbol in ['GLRS.TA',   'WILC.TA',   'MEDN.TA'                              ]: stock_data.sector = 'Consumer Defensive'
+    elif stock_data.symbol in ['POLY.TA',   'WTS.TA',    'YBOX.TA',  'PLAZ-L.TA', 'TIGBUR.TA',
+                               'ROTS.TA',   'AZRT.TA',   'SKBN.TA',  'DUNI.TA',   'DNYA.TA',
+                               'HGG.TA',    'YAAC.TA',   'LZNR.TA',  'LSCO.TA',   'MGRT.TA',
+                               'ALMA.TA',   'RTSN.TA',   'AVIV.TA',  'KRNV.TA',   'LAHAV.TA',
+                               'NERZ.TA'                                                        ]: stock_data.sector = 'Real Estate'
+    elif stock_data.symbol in ['XTLB.TA',   'UNVO.TA',   'BONS.TA',  'CSURE.TA',  'GODM-M.TA',
+                               'ILX.TA',    'LCTX.TA',   'ORMP.TA'                              ]: stock_data.sector = 'Healthcare'
+    elif stock_data.symbol in ['BIRM.TA'                                                        ]: stock_data.sector = 'Industrials'
+    elif stock_data.symbol in ['IGLD-M.TA'                                                      ]: stock_data.sector = 'Communication Services'
+    elif stock_data.symbol in ['UNCT-L.TA', 'ROBO.TA',   'SONO.TA',  'SMAG-L.TA', 'STG.TA',
+                               'BIGT-L.TA', 'BIMT-L.TA', 'BVC.TA',   'ECPA.TA',   'ELLO.TA',
+                               'FLYS.TA',   'FORTY.TA',  'GFC-L.TA', 'IARG-L.TA', 'IBITEC-F.TA',
+                               'MBMX-M.TA', 'MITC.TA',   'SMAG-L.TA'                            ]: stock_data.sector = 'Technology'
 
     if len(sectors_list) and stock_data.sector not in sectors_list:
         return False
@@ -1272,19 +1282,23 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
                     found_differences = False
                     for index in range(len(g_header_row)):
                         if type(row_to_append[index]) == int or type(row_to_append[index]) == float:
-                            min_val = min(float(row_to_append[index]), float(reference_db[symbol_index_in_reference_db][index]))
-                            max_val = max(float(row_to_append[index]), float(reference_db[symbol_index_in_reference_db][index]))
-                            diff    = abs(max_val-min_val)
-                            # TODO: ASAFR: 52-week change is not really working and not really needed - fix or eliminate
-                            indices_list_to_ignore_changes_in = [g_sss_value_index] # [g_fifty_two_week_change_index, g_sss_value_index, g_two_hundred_day_average_index, g_previous_close_percentage_from_200d_ma_index]
-                            if diff > abs(max_val)*REFERENCE_DB_MAX_VALUE_DIFF_FACTOR_THRESHOLD and index not in indices_list_to_ignore_changes_in:
-                                if float(reference_db[symbol_index_in_reference_db][g_sss_value_index]) < float(row_to_append[g_sss_value_index]):
-                                    found_differences = True
-                                    compensated_value = round(REFERENCE_DB_MAX_VALUE_DIFF_FACTOR_THRESHOLD*float(reference_db[symbol_index_in_reference_db][index]) + (1-REFERENCE_DB_MAX_VALUE_DIFF_FACTOR_THRESHOLD)*float(row_to_append[index]), NUM_ROUND_DECIMALS)
-                                    if type(row_to_append[index]) == int:
-                                        compensated_value = int(round(compensated_value))
-                                    print('                            {:5} - Suspicious Difference detected (taking lower sss_value [{} < {}] row as correct row): reference_db[{:25}]={:6}, db[{:25}]={:6} -> compensated_value = {:6}'.format(row_to_append[g_symbol_index], (reference_db[symbol_index_in_reference_db][g_sss_value_index]), (row_to_append[g_sss_value_index]), g_header_row[index], reference_db[symbol_index_in_reference_db][index], g_header_row[index], row_to_append[index], compensated_value))
-                                    row_to_append[index] = compensated_value  # Overwrite specific index value with compensated value from reference db
+                            try:
+                                min_val = min(float(row_to_append[index]), float(reference_db[symbol_index_in_reference_db][index]))
+                                max_val = max(float(row_to_append[index]), float(reference_db[symbol_index_in_reference_db][index]))
+                                diff    = abs(max_val-min_val)
+                                # TODO: ASAFR: 52-week change is not really working and not really needed - fix or eliminate
+                                indices_list_to_ignore_changes_in = [g_sss_value_index] # [g_fifty_two_week_change_index, g_sss_value_index, g_two_hundred_day_average_index, g_previous_close_percentage_from_200d_ma_index]
+                                if diff > abs(max_val)*REFERENCE_DB_MAX_VALUE_DIFF_FACTOR_THRESHOLD and index not in indices_list_to_ignore_changes_in:
+                                    if float(reference_db[symbol_index_in_reference_db][g_sss_value_index]) < float(row_to_append[g_sss_value_index]):
+                                        found_differences = True
+                                        compensated_value = round(REFERENCE_DB_MAX_VALUE_DIFF_FACTOR_THRESHOLD*float(reference_db[symbol_index_in_reference_db][index]) + (1-REFERENCE_DB_MAX_VALUE_DIFF_FACTOR_THRESHOLD)*float(row_to_append[index]), NUM_ROUND_DECIMALS)
+                                        if type(row_to_append[index]) == int:
+                                            compensated_value = int(round(compensated_value))
+                                        print('                            {:5} - Suspicious Difference detected (taking lower sss_value [{} < {}] row as correct row): reference_db[{:25}]={:6}, db[{:25}]={:6} -> compensated_value = {:6}'.format(row_to_append[g_symbol_index], (reference_db[symbol_index_in_reference_db][g_sss_value_index]), (row_to_append[g_sss_value_index]), g_header_row[index], reference_db[symbol_index_in_reference_db][index], g_header_row[index], row_to_append[index], compensated_value))
+                                        row_to_append[index] = compensated_value  # Overwrite specific index value with compensated value from reference db
+                            except Exception as e:
+                                print("Exception {} in comparison of {}: row_to_append is {} while reference_db is {}".format(e, g_header_row[index], row_to_append[index], reference_db[symbol_index_in_reference_db][index]))
+                                pass
 
                     if found_differences:
                         get_stock_data_from_db_row(row_to_append)
@@ -1333,7 +1347,7 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
 
 # reference_run : Used for identifying anomalies in which some symbol information is completely different from last run. It can be different but only in new quartely reports
 #                 It is sometimes observed that stocks information is wrongly fetched. Is such cases, the last run's reference point shall be used, with a forgetting factor
-def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, countries_filter_out,build_csv_db_only, build_csv_db, csv_db_path, read_united_states_input_symbols, tase_mode, num_threads, market_cap_included, use_investpy, research_mode, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, min_enterprise_value_millions_usd, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, generate_result_folders=1, appearance_counter_dict_sss={}, appearance_counter_min=25, appearance_counter_max=35, custom_portfolio=[]):
+def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, countries_filter_out,build_csv_db_only, build_csv_db, csv_db_path, db_filename, read_united_states_input_symbols, tase_mode, num_threads, market_cap_included, use_investpy, research_mode, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, min_enterprise_value_millions_usd, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, generate_result_folders=1, appearance_counter_dict_sss={}, appearance_counter_min=25, appearance_counter_max=35, custom_portfolio=[]):
     reference_db = []
     if not research_mode and reference_run is not None and len(reference_run):  # in non-research mode, compare to reference run
         reference_csv_db_filename = reference_run+'/db.csv'
@@ -1526,7 +1540,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
 
     if build_csv_db == 0: # if DB is already present, read from it and prepare input to threads
         symbols = []
-        csv_db_filename = csv_db_path+'/db.csv'
+        csv_db_filename = csv_db_path+'/'+db_filename
         with open(csv_db_filename, mode='r', newline='') as engine:
             reader = csv.reader(engine, delimiter=',')
             row_index = 0
