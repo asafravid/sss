@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.0.595 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.1 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021 Asaf Ravid
@@ -308,13 +308,13 @@ def check_sector(stock_data, sectors_list):
     # Fix stocks' Sectors to Correct Sector. yfinance sometimes has those mistaken
     if   stock_data.symbol in ['BRMG.TA',   'RLCO.TA',   'DELT.TA'                              ]: stock_data.sector = 'Consumer Cyclical'
     elif stock_data.symbol in ['EFNC.TA',   'GIBUI.TA',  'KMNK-M.TA'                            ]: stock_data.sector = 'Financial Services'
-    elif stock_data.symbol in ['DEDR-L.TA', 'GLEX-L'                                            ]: stock_data.sector = 'Energy'
+    elif stock_data.symbol in ['DEDR-L.TA', 'GLEX-L',    'RPAC.TA'                              ]: stock_data.sector = 'Energy'
     elif stock_data.symbol in ['GLRS.TA',   'WILC.TA',   'MEDN.TA'                              ]: stock_data.sector = 'Consumer Defensive'
     elif stock_data.symbol in ['POLY.TA',   'WTS.TA',    'YBOX.TA',  'PLAZ-L.TA', 'TIGBUR.TA',
                                'ROTS.TA',   'AZRT.TA',   'SKBN.TA',  'DUNI.TA',   'DNYA.TA',
                                'HGG.TA',    'YAAC.TA',   'LZNR.TA',  'LSCO.TA',   'MGRT.TA',
                                'ALMA.TA',   'RTSN.TA',   'AVIV.TA',  'KRNV.TA',   'LAHAV.TA',
-                               'NERZ.TA'                                                        ]: stock_data.sector = 'Real Estate'
+                               'NERZ.TA',   'SNEL.TA'                                           ]: stock_data.sector = 'Real Estate'
     elif stock_data.symbol in ['XTLB.TA',   'UNVO.TA',   'BONS.TA',  'CSURE.TA',  'GODM-M.TA',
                                'ILX.TA',    'LCTX.TA',   'ORMP.TA'                              ]: stock_data.sector = 'Healthcare'
     elif stock_data.symbol in ['BIRM.TA'                                                        ]: stock_data.sector = 'Industrials'
@@ -322,7 +322,8 @@ def check_sector(stock_data, sectors_list):
     elif stock_data.symbol in ['UNCT-L.TA', 'ROBO.TA',   'SONO.TA',  'SMAG-L.TA', 'STG.TA',
                                'BIGT-L.TA', 'BIMT-L.TA', 'BVC.TA',   'ECPA.TA',   'ELLO.TA',
                                'FLYS.TA',   'FORTY.TA',  'GFC-L.TA', 'IARG-L.TA', 'IBITEC-F.TA',
-                               'MBMX-M.TA', 'MITC.TA',   'SMAG-L.TA'                            ]: stock_data.sector = 'Technology'
+                               'MBMX-M.TA', 'MITC.TA',   'SMAG-L.TA','ORBI.TA',   'ARYT.TA',
+                               'ORTC.TA',   'PERI.TA',   'PAYT.TA',  'TUZA.TA'                  ]: stock_data.sector = 'Technology'
 
     if len(sectors_list) and stock_data.sector not in sectors_list:
         return False
@@ -387,7 +388,7 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
                 earnings_yearly                        = symbol.get_earnings(     as_dict=True, freq="yearly")
                 earnings_quarterly                     = symbol.get_earnings(     as_dict=True, freq="quarterly")
                 stock_data.financial_currency          = earnings_yearly['financialCurrency']
-                stock_data.conversion_rate_mult_to_usd = round(currency_conversion_tool[stock_data.financial_currency], NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply by to get the original value in USD
+                stock_data.conversion_rate_mult_to_usd = round(1.0/currency_conversion_tool[stock_data.financial_currency], NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
                 # financials                           = symbol.get_financials(as_dict=True)
                 # institutional_holders                = symbol.get_institutional_holders(as_dict=True)
                 # sustainability                       = symbol.get_sustainability(as_dict=True)
@@ -557,7 +558,7 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
                         cash_flows_list.append(cash_flows[key]['Total Cash From Operating Activities']*CASH_FLOW_WEIGHTS[weight_index])
                         weights_sum += CASH_FLOW_WEIGHTS[weight_index]
                         weight_index += 1
-                if weights_sum > 0: stock_data.annualized_cash_flow_from_operating_activities = stock_data.conversion_rate_mult_to_usd*sum(cash_flows_list) / weights_sum
+                if weights_sum > 0: stock_data.annualized_cash_flow_from_operating_activities = stock_data.conversion_rate_mult_to_usd*sum(cash_flows_list) / weights_sum  # Multiplying by the factor to get the valu in USD.
             except Exception as e:
                 print("Exception in {} cash_flows: {}".format(stock_data.symbol, e))
                 stock_data.annualized_cash_flow_from_operating_activities = 0
@@ -572,7 +573,7 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
                         cash_flows_list.append(cash_flows_quarterly[key]['Total Cash From Operating Activities']*CASH_FLOW_WEIGHTS[weight_index])
                         weights_sum += CASH_FLOW_WEIGHTS[weight_index]
                         weight_index += 1
-                if weights_sum > 0: stock_data.quarterized_cash_flow_from_operating_activities = stock_data.conversion_rate_mult_to_usd*sum(cash_flows_list) / weights_sum
+                if weights_sum > 0: stock_data.quarterized_cash_flow_from_operating_activities = stock_data.conversion_rate_mult_to_usd*sum(cash_flows_list) / weights_sum  # Multiplying by the factor to get the valu in USD.
             except Exception as e:
                 print("Exception in {} cash_flows_quarterly: {}".format(stock_data.symbol, e))
                 stock_data.quarterzed_cash_flow_from_operating_activities = 0
@@ -693,7 +694,7 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
                     revenues_list.append((float(earnings_yearly['Revenue'][key])) * REVENUES_WEIGHTS[weight_index])
                     weights_sum += REVENUES_WEIGHTS[weight_index]
                     weight_index += 1
-                stock_data.annualized_revenue = stock_data.conversion_rate_mult_to_usd*sum(revenues_list) / weights_sum
+                stock_data.annualized_revenue = stock_data.conversion_rate_mult_to_usd*sum(revenues_list) / weights_sum  # Multiplying by the factor to get the valu in USD.
 
             if earnings_yearly is not None and 'Earnings' in earnings_yearly:
                 weight_index      = 0
@@ -715,7 +716,7 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
                         qeg_weights_sum += EARNINGS_WEIGHTS[weight_index-1]
                     previous_earnings = earnings_yearly['Earnings'][key]
                     weight_index     += 1
-                stock_data.annualized_earnings = stock_data.conversion_rate_mult_to_usd*sum(earnings_list) / weights_sum
+                stock_data.annualized_earnings = stock_data.conversion_rate_mult_to_usd*sum(earnings_list) / weights_sum  # Multiplying by the factor to get the valu in USD.
                 if len(qeg_list):
                     stock_data.eqg_yoy         =                                        sum(qeg_list)      / qeg_weights_sum
                 else:
@@ -731,7 +732,7 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
                     revenues_list.append((float(earnings_quarterly['Revenue'][key])) * REVENUES_WEIGHTS[weight_index])
                     weights_sum += REVENUES_WEIGHTS[weight_index]
                     weight_index += 1
-                stock_data.quarterized_revenue = stock_data.conversion_rate_mult_to_usd*sum(revenues_list) / weights_sum
+                stock_data.quarterized_revenue = stock_data.conversion_rate_mult_to_usd*sum(revenues_list) / weights_sum  # Multiplying by the factor to get the valu in USD.
 
             if earnings_quarterly is not None and 'Earnings' in earnings_quarterly:
                 weight_index  = 0
@@ -741,7 +742,7 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
                     earnings_list.append((float(earnings_quarterly['Earnings'][key])) * EARNINGS_WEIGHTS[weight_index])
                     weights_sum += EARNINGS_WEIGHTS[weight_index]
                     weight_index += 1
-                stock_data.quarterized_earnings = stock_data.conversion_rate_mult_to_usd*sum(earnings_list) / weights_sum
+                stock_data.quarterized_earnings = stock_data.conversion_rate_mult_to_usd*sum(earnings_list) / weights_sum  # Multiplying by the factor to get the valu in USD.
 
             if   stock_data.annualized_earnings  is None and stock_data.quarterized_earnings is     None: stock_data.effective_earnings = None
             elif stock_data.annualized_earnings  is None and stock_data.quarterized_earnings is not None: stock_data.effective_earnings = stock_data.quarterized_earnings
@@ -921,6 +922,7 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
 
             stock_data.ev_to_cfo_ratio_effective = (stock_data.annualized_ev_to_cfo_ratio+stock_data.quarterized_ev_to_cfo_ratio)/2.0
 
+        # TODO: ASAFR: Here: id no previous_close, use market_high, low regular, or anything possible to avoid none!
         if stock_data.previous_close is None or stock_data.previous_close < 1.0: # Avoid Penny Stocks
             if return_value and (not research_mode or VERBOSE_LOGS): print('                            Skipping {} previous_close: {}'.format(stock_data.symbol, stock_data.previous_close))
             return_value = False
@@ -1005,19 +1007,6 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
         if stock_data.trailing_eps is None:
             if not build_csv_db_only and use_investpy and 'EPS' in stock_information and stock_information['EPS'] is not None:
                 stock_data.trailing_eps = float(text_to_num(stock_information['EPS']))
-
-        # if not build_csv_db_only and (stock_data.trailing_eps is None or stock_data.trailing_eps is not None and stock_data.trailing_eps <= 0):
-        #     if return_value and (not research_mode or VERBOSE_LOGS): print('                            Skipping {} trailing_eps: {}'.format(stock_data.symbol, stock_data.trailing_eps))
-        #     return_value = False
-
-        #if not build_csv_db_only and stock_data.previous_close is None:
-        #    if return_value and (not research_mode or VERBOSE_LOGS): print('                            Skipping {} previous_close: {}'.format(stock_data.symbol, stock_data.previous_close))
-        #    return_value = False
-
-        # in TASE, forward EPS is mostly not provided, so allow it to not appear in stock_data:
-        # if not build_csv_db_only and not tase_mode and (stock_data.forward_eps is None or stock_data.forward_eps is not None and stock_data.forward_eps <= 0):
-        #     if return_value and (not research_mode or VERBOSE_LOGS): print('                            Skipping {} forward_eps: {}'.format(stock_data.symbol, stock_data.forward_eps))
-        #     return_value = False
 
         if not build_csv_db_only and (stock_data.eqg_factor_effective is None or stock_data.eqg_factor_effective < eqg_min):
             if return_value and (not research_mode or VERBOSE_LOGS): print('                            Skipping {} eqg_factor_effective: {}'.format(stock_data.symbol, stock_data.eqg_factor_effective))

@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.0.595 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.1 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021 Asaf Ravid
@@ -90,12 +90,12 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
                             pdf.set_text_color(0, 0, 200 if row_index == 0 else 0)  # blue for title and black otherwise
                             pdf.cell(w=w, h=4, txt='שינוי'[::-1] if tase_mode else 'Change', border=1, ln=1, align="C")
                         else:
-                            if '+' in str(diff_list[row_index]):
-                                pdf.set_text_color(0,200,0)   # green
+                            if 'new' in str(diff_list[row_index]):
+                                pdf.set_text_color(0, 0, 200)  # blue
                             elif '-' in str(diff_list[row_index]):
                                 pdf.set_text_color(200,0,0)   # red
-                            elif 'new' in str(diff_list[row_index]):
-                                pdf.set_text_color(0, 0, 200) # blue
+                            elif '+' in str(diff_list[row_index]):
+                                pdf.set_text_color(0,200,0)   # green
                             else:
                                 pdf.set_text_color(0, 0, 0)   # black
                             pdf.cell(w=w, h=4, txt=str(diff_list[row_index]), border=1, ln=1, align="L")
