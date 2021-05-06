@@ -15,19 +15,19 @@ http://bit.ly/SssCoreEquation
 https://bit.ly/MultiDimensionalScan
 
 # Setup
-- Install `Python 3.7` or higher from https://www.python.org/downloads/
+- Install `Python 3.8` or higher from https://www.python.org/downloads/
 - Install `Pycharm Community Edition` from https://www.jetbrains.com/pycharm/download/
 - Download the `SSS` source code as a Zip file from this page (https://github.com/asafravid/sss/archive/master.zip) or clone/fork the repository directly
 - Open Project from folder (to which you unzipped the `sss` source code)
 - No further steps required apart from `pip3` installing relevant libraries:
-  - `cd <[path to]Python 3.7>`
+  - `cd <[path to]Python 3.8>`
   - `pip3 install pandas`
   - `pip3 install yfinance`
   - `pip3 install investpy`
   - `pip3 install fpdf`
-- Note that for `yfinance` - I'm providing updated sources since they take time to update by the developers, 
-  and my forks are, well - mine, and I prefer one to `pip3` install `yfinance` from the origin, and then update 
-  (using comparison SW) the necessary changes I made (not too many) to run the `SSS` most efficiently and informatively.
+  - `pip3 install forex_python`
+  - `pip3 install numpy`
+- Note that for `yfinance` - I may be providing updated sources since they take time to update by the developers, so `pip3 install yfinance` from the origin, and then update (using comparison SW) the necessary changes I made (not too many) to run the `SSS` most efficiently and informatively.
   
 # Run Step-By-Step Instructions
 - 1: Set the required scanning mode (`custom`/`tase`/`nsr`/`all`) in `sss_run.py` and run `sss_run.py`
