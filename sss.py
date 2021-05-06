@@ -64,12 +64,10 @@ import os
 import sss_filenames
 import investpy
 import math
-import numpy
 
 from threading import Thread
 from dataclasses import dataclass
-from currency_converter import CurrencyConverter
-
+from forex_python.converter import CurrencyRates
 
 VERBOSE_LOGS = 0
 
@@ -214,7 +212,6 @@ class StockData:
 
 
 g_header_row = ["Symbol", "Name", "Sector", "Country", "sss_value", "annualized_revenue", "annualized_earnings", "quarterized_revenue", "quarterized_earnings", "effective_earnings", "effective_revenue", "enterprise_value_to_revenue", "evr_effective", "trailing_price_to_earnings", "forward_price_to_earnings", "effective_price_to_earnings", "trailing_12months_price_to_sales", "pe_effective", "enterprise_value_to_ebitda", "profit_margin", "annualized_profit_margin", "annualized_profit_margin_boost", "quarterized_profit_margin", "quarterized_profit_margin_boost", "effective_profit_margin", "held_percent_institutions", "forward_eps", "trailing_eps", "previous_close", "trailing_eps_percentage","price_to_book", "shares_outstanding", "net_income_to_common_shareholders", "nitcsh_to_shares_outstanding", "employees", "enterprise_value", "market_cap", "nitcsh_to_num_employees", "eqg", "eqg_yoy", "eqg_effective", "eqg_factor_effective", "revenue_quarterly_growth", "price_to_earnings_to_growth_ratio", "effective_peg_ratio", "annualized_cash_flow_from_operating_activities", "quarterized_cash_flow_from_operating_activities", "annualized_ev_to_cfo_ratio", "quarterized_ev_to_cfo_ratio", "ev_to_cfo_ratio_effective", "annualized_debt_to_equity", "quarterized_debt_to_equity", "debt_to_equity_effective", "financial_currency", "conversion_rate_mult_to_usd", "last_dividend_0", "last_dividend_1", "last_dividend_2", "last_dividend_3", "fifty_two_week_change", "fifty_two_week_low", "fifty_two_week_high", "two_hundred_day_average", "previous_close_percentage_from_200d_ma", "previous_close_percentage_from_52w_low", "previous_close_percentage_from_52w_high", "dist_from_low_factor", "eff_dist_from_low_factor", "annualized_total_ratio", "quarterized_total_ratio", "annualized_other_current_ratio", "quarterized_other_current_ratio", "annualized_other_ratio", "quarterized_other_ratio", "annualized_total_current_ratio", "quarterized_total_current_ratio", "total_ratio_effective", "other_current_ratio_effective", "other_ratio_effective", "total_current_ratio_effective" ]
-
 g_symbol_index                                          = g_header_row.index("Symbol")
 g_name_index                                            = g_header_row.index("Name")
 g_sector_index                                          = g_header_row.index("Sector")
@@ -390,7 +387,7 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
                 earnings_yearly                        = symbol.get_earnings(     as_dict=True, freq="yearly")
                 earnings_quarterly                     = symbol.get_earnings(     as_dict=True, freq="quarterly")
                 stock_data.financial_currency          = earnings_yearly['financialCurrency']
-                stock_data.conversion_rate_mult_to_usd = round(currency_conversion_tool.convert(1, earnings_yearly['financialCurrency'], 'USD'), NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply by to get the original value in USD
+                stock_data.conversion_rate_mult_to_usd = round(currency_conversion_tool[stock_data.financial_currency], NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply by to get the original value in USD
                 # financials                           = symbol.get_financials(as_dict=True)
                 # institutional_holders                = symbol.get_institutional_holders(as_dict=True)
                 # sustainability                       = symbol.get_sustainability(as_dict=True)
@@ -1348,6 +1345,8 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
 # reference_run : Used for identifying anomalies in which some symbol information is completely different from last run. It can be different but only in new quartely reports
 #                 It is sometimes observed that stocks information is wrongly fetched. Is such cases, the last run's reference point shall be used, with a forgetting factor
 def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, countries_filter_out,build_csv_db_only, build_csv_db, csv_db_path, db_filename, read_united_states_input_symbols, tase_mode, num_threads, market_cap_included, use_investpy, research_mode, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, min_enterprise_value_millions_usd, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, generate_result_folders=1, appearance_counter_dict_sss={}, appearance_counter_min=25, appearance_counter_max=35, custom_portfolio=[]):
+    currency_conversion_tool = CurrencyRates().get_rates('USD') if build_csv_db else None
+
     reference_db = []
     if not research_mode and reference_run is not None and len(reference_run):  # in non-research mode, compare to reference run
         reference_csv_db_filename = reference_run+'/db.csv'
@@ -1361,8 +1360,6 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
                 else:
                     reference_db.append(row)
                     row_index += 1
-
-    currency_conversion_tool = CurrencyConverter() if build_csv_db else None
 
     # Working Mode:
     relaxed_access                     = (num_threads-1)/10.0                                       if build_csv_db else 0  # In seconds
