@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.2 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.4 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021 Asaf Ravid
@@ -96,6 +96,7 @@ TRAILING_EPS_PERCENTAGE_DAMP_FACTOR          = 0.01   # When the trailing_eps_pe
 PROFIT_MARGIN_DAMPER                         = 0.01   # When the profit_margin                   is very low (units are ratio here), this damper shall limit the affect to x100 not more)
 RATIO_DAMPER                                 = 0.01   # When the total/current_other_other ratio is very low (units are ratio here), this damper shall limit the affect to x100 not more)
 REFERENCE_DB_MAX_VALUE_DIFF_FACTOR_THRESHOLD = 0.9   # if there is a parameter difference from reference db, in which the difference of values is higher than 0.75*abs(max_value) then something went wrong with the fetch of values from yfinance. Compensate smartly from reference database
+QUARTERLY_YEARLY_MISSING_FACTOR              = 0.25  # if either yearly or quarterly values are missing - compensate by other with bad factor (less information means less attractive)
 
 # TODO: ASAFR: All below boosters should be calibrated by:
 #              1. The rarety (statistically comapred to all the stocks in scan) - proportionaly to it (the rarest the case - the more boost)
@@ -209,9 +210,10 @@ class StockData:
     other_current_ratio_effective:                  float = 0.0
     other_ratio_effective:                          float = 0.0
     total_current_ratio_effective:                  float = 0.0
+    skip_reason:                                    str   = 'None'
 
 
-g_header_row = ["Symbol", "Name", "Sector", "Country", "sss_value", "annualized_revenue", "annualized_earnings", "quarterized_revenue", "quarterized_earnings", "effective_earnings", "effective_revenue", "enterprise_value_to_revenue", "evr_effective", "trailing_price_to_earnings", "forward_price_to_earnings", "effective_price_to_earnings", "trailing_12months_price_to_sales", "pe_effective", "enterprise_value_to_ebitda", "profit_margin", "annualized_profit_margin", "annualized_profit_margin_boost", "quarterized_profit_margin", "quarterized_profit_margin_boost", "effective_profit_margin", "held_percent_institutions", "forward_eps", "trailing_eps", "previous_close", "trailing_eps_percentage","price_to_book", "shares_outstanding", "net_income_to_common_shareholders", "nitcsh_to_shares_outstanding", "employees", "enterprise_value", "market_cap", "nitcsh_to_num_employees", "eqg", "eqg_yoy", "eqg_effective", "eqg_factor_effective", "revenue_quarterly_growth", "price_to_earnings_to_growth_ratio", "effective_peg_ratio", "annualized_cash_flow_from_operating_activities", "quarterized_cash_flow_from_operating_activities", "annualized_ev_to_cfo_ratio", "quarterized_ev_to_cfo_ratio", "ev_to_cfo_ratio_effective", "annualized_debt_to_equity", "quarterized_debt_to_equity", "debt_to_equity_effective", "financial_currency", "conversion_rate_mult_to_usd", "last_dividend_0", "last_dividend_1", "last_dividend_2", "last_dividend_3", "fifty_two_week_change", "fifty_two_week_low", "fifty_two_week_high", "two_hundred_day_average", "previous_close_percentage_from_200d_ma", "previous_close_percentage_from_52w_low", "previous_close_percentage_from_52w_high", "dist_from_low_factor", "eff_dist_from_low_factor", "annualized_total_ratio", "quarterized_total_ratio", "annualized_other_current_ratio", "quarterized_other_current_ratio", "annualized_other_ratio", "quarterized_other_ratio", "annualized_total_current_ratio", "quarterized_total_current_ratio", "total_ratio_effective", "other_current_ratio_effective", "other_ratio_effective", "total_current_ratio_effective" ]
+g_header_row = ["Symbol", "Name", "Sector", "Country", "sss_value", "annualized_revenue", "annualized_earnings", "quarterized_revenue", "quarterized_earnings", "effective_earnings", "effective_revenue", "enterprise_value_to_revenue", "evr_effective", "trailing_price_to_earnings", "forward_price_to_earnings", "effective_price_to_earnings", "trailing_12months_price_to_sales", "pe_effective", "enterprise_value_to_ebitda", "profit_margin", "annualized_profit_margin", "annualized_profit_margin_boost", "quarterized_profit_margin", "quarterized_profit_margin_boost", "effective_profit_margin", "held_percent_institutions", "forward_eps", "trailing_eps", "previous_close", "trailing_eps_percentage","price_to_book", "shares_outstanding", "net_income_to_common_shareholders", "nitcsh_to_shares_outstanding", "employees", "enterprise_value", "market_cap", "nitcsh_to_num_employees", "eqg", "eqg_yoy", "eqg_effective", "eqg_factor_effective", "revenue_quarterly_growth", "price_to_earnings_to_growth_ratio", "effective_peg_ratio", "annualized_cash_flow_from_operating_activities", "quarterized_cash_flow_from_operating_activities", "annualized_ev_to_cfo_ratio", "quarterized_ev_to_cfo_ratio", "ev_to_cfo_ratio_effective", "annualized_debt_to_equity", "quarterized_debt_to_equity", "debt_to_equity_effective", "financial_currency", "conversion_rate_mult_to_usd", "last_dividend_0", "last_dividend_1", "last_dividend_2", "last_dividend_3", "fifty_two_week_change", "fifty_two_week_low", "fifty_two_week_high", "two_hundred_day_average", "previous_close_percentage_from_200d_ma", "previous_close_percentage_from_52w_low", "previous_close_percentage_from_52w_high", "dist_from_low_factor", "eff_dist_from_low_factor", "annualized_total_ratio", "quarterized_total_ratio", "annualized_other_current_ratio", "quarterized_other_current_ratio", "annualized_other_ratio", "quarterized_other_ratio", "annualized_total_current_ratio", "quarterized_total_current_ratio", "total_ratio_effective", "other_current_ratio_effective", "other_ratio_effective", "total_current_ratio_effective", "skip_reason" ]
 g_symbol_index                                          = g_header_row.index("Symbol")
 g_name_index                                            = g_header_row.index("Name")
 g_sector_index                                          = g_header_row.index("Sector")
@@ -292,6 +294,7 @@ g_total_ratio_effective_index                           = g_header_row.index("to
 g_other_current_ratio_effective_index                   = g_header_row.index("other_current_ratio_effective")
 g_other_ratio_effective_index                           = g_header_row.index("other_ratio_effective")
 g_total_current_ratio_effective_index                   = g_header_row.index("total_current_ratio_effective")
+g_skip_reason_index                                     = g_header_row.index("skip_reason")
 
 
 def check_quote_type(stock_data, research_mode):
@@ -366,10 +369,10 @@ def weighted_average(values_list, weights):
 
 
 def sss_core_equation_value_set(stock_data):
-    if stock_data.shares_outstanding and stock_data.net_income_to_common_shareholders is not None: stock_data.nitcsh_to_shares_outstanding = float(stock_data.net_income_to_common_shareholders) / float(stock_data.shares_outstanding)
-    if stock_data.employees          and stock_data.net_income_to_common_shareholders is not None: stock_data.nitcsh_to_num_employees = float(stock_data.net_income_to_common_shareholders) / float(stock_data.employees)
+    if stock_data.shares_outstanding and stock_data.net_income_to_common_shareholders != None: stock_data.nitcsh_to_shares_outstanding = float(stock_data.net_income_to_common_shareholders) / float(stock_data.shares_outstanding)
+    if stock_data.employees          and stock_data.net_income_to_common_shareholders != None: stock_data.nitcsh_to_num_employees = float(stock_data.net_income_to_common_shareholders) / float(stock_data.employees)
 
-    if stock_data.trailing_12months_price_to_sales is not None and stock_data.trailing_12months_price_to_sales > 0 and stock_data.effective_profit_margin is not None and stock_data.effective_profit_margin > 0 and stock_data.eqg_factor_effective and stock_data.eqg_factor_effective > 0 is not None and stock_data.pe_effective is not None and stock_data.pe_effective > 0 and stock_data.enterprise_value_to_ebitda is not None and stock_data.enterprise_value_to_ebitda > 0 and stock_data.ev_to_cfo_ratio_effective is not None and stock_data.ev_to_cfo_ratio_effective > 0 and stock_data.effective_peg_ratio is not None and stock_data.effective_peg_ratio > 0 and stock_data.price_to_book                is not None and stock_data.price_to_book > 0 and stock_data.debt_to_equity_effective > 0 and stock_data.total_ratio_effective > 0 and stock_data.total_current_ratio_effective > 0:
+    if stock_data.trailing_12months_price_to_sales != None and stock_data.trailing_12months_price_to_sales > 0 and stock_data.effective_profit_margin != None and stock_data.effective_profit_margin > 0 and stock_data.eqg_factor_effective and stock_data.eqg_factor_effective > 0 != None and stock_data.pe_effective != None and stock_data.pe_effective > 0 and stock_data.enterprise_value_to_ebitda != None and stock_data.enterprise_value_to_ebitda > 0 and stock_data.ev_to_cfo_ratio_effective != None and stock_data.ev_to_cfo_ratio_effective > 0 and stock_data.effective_peg_ratio != None and stock_data.effective_peg_ratio > 0 and stock_data.price_to_book                != None and stock_data.price_to_book > 0 and stock_data.debt_to_equity_effective > 0 and stock_data.total_ratio_effective > 0 and stock_data.total_current_ratio_effective > 0:
         effective_debt_to_equity_effective = math.sqrt(stock_data.debt_to_equity_effective)
         effective_current_ratio            = (stock_data.total_ratio_effective + stock_data.total_current_ratio_effective) / 2.0  # TODO: ASAFR: In the next stage - add the other and current other ratios - more information -> more completeness
         stock_data.sss_value               = float(stock_data.eff_dist_from_low_factor * ((stock_data.evr_effective * stock_data.pe_effective * stock_data.enterprise_value_to_ebitda * stock_data.trailing_12months_price_to_sales * stock_data.price_to_book) / (stock_data.effective_profit_margin * effective_current_ratio)) * ((stock_data.effective_peg_ratio * stock_data.ev_to_cfo_ratio_effective * effective_debt_to_equity_effective) / stock_data.eqg_factor_effective))  # The lower  the better
@@ -379,81 +382,81 @@ def sss_core_equation_value_set(stock_data):
 
 # Rounding to non-None values + set None values to 0 for simplicity:
 def round_and_avoid_none_values(stock_data):
-    if stock_data.sss_value                                       is not None: stock_data.sss_value                                       = round(stock_data.sss_value,                                       NUM_ROUND_DECIMALS)
-    if stock_data.annualized_revenue                              is not None: stock_data.annualized_revenue                              = round(stock_data.annualized_revenue,                              NUM_ROUND_DECIMALS)
-    if stock_data.annualized_earnings                             is not None: stock_data.annualized_earnings                             = round(stock_data.annualized_earnings,                             NUM_ROUND_DECIMALS)
-    if stock_data.quarterized_revenue                             is not None: stock_data.quarterized_revenue                             = round(stock_data.quarterized_revenue,                             NUM_ROUND_DECIMALS)
-    if stock_data.quarterized_earnings                            is not None: stock_data.quarterized_earnings                            = round(stock_data.quarterized_earnings,                            NUM_ROUND_DECIMALS)
-    if stock_data.effective_earnings                              is not None: stock_data.effective_earnings                              = round(stock_data.effective_earnings,                              NUM_ROUND_DECIMALS)
-    if stock_data.effective_revenue                               is not None: stock_data.effective_revenue                               = round(stock_data.effective_revenue,                               NUM_ROUND_DECIMALS)
-    if stock_data.enterprise_value_to_revenue                     is not None: stock_data.enterprise_value_to_revenue                     = round(stock_data.enterprise_value_to_revenue,                     NUM_ROUND_DECIMALS)
-    if stock_data.evr_effective                                   is not None: stock_data.evr_effective                                   = round(stock_data.evr_effective,                                   NUM_ROUND_DECIMALS)
-    if stock_data.trailing_price_to_earnings                      is not None: stock_data.trailing_price_to_earnings                      = round(stock_data.trailing_price_to_earnings,                      NUM_ROUND_DECIMALS)
-    if stock_data.forward_price_to_earnings                       is not None: stock_data.forward_price_to_earnings                       = round(stock_data.forward_price_to_earnings,                       NUM_ROUND_DECIMALS)
-    if stock_data.effective_price_to_earnings                     is not None: stock_data.effective_price_to_earnings                     = round(stock_data.effective_price_to_earnings,                     NUM_ROUND_DECIMALS)
-    if stock_data.trailing_12months_price_to_sales                is not None: stock_data.trailing_12months_price_to_sales                = round(stock_data.trailing_12months_price_to_sales,                NUM_ROUND_DECIMALS)
-    if stock_data.pe_effective                                    is not None: stock_data.pe_effective                                    = round(stock_data.pe_effective,                                    NUM_ROUND_DECIMALS)
-    if stock_data.enterprise_value_to_ebitda                      is not None: stock_data.enterprise_value_to_ebitda                      = round(stock_data.enterprise_value_to_ebitda,                      NUM_ROUND_DECIMALS)
-    if stock_data.profit_margin                                   is not None: stock_data.profit_margin                                   = round(stock_data.profit_margin,                                   NUM_ROUND_DECIMALS)
-    if stock_data.annualized_profit_margin                        is not None: stock_data.annualized_profit_margin                        = round(stock_data.annualized_profit_margin,                        NUM_ROUND_DECIMALS)
-    if stock_data.annualized_profit_margin_boost                  is not None: stock_data.annualized_profit_margin_boost                  = round(stock_data.annualized_profit_margin_boost,                  NUM_ROUND_DECIMALS)
-    if stock_data.quarterized_profit_margin                       is not None: stock_data.quarterized_profit_margin                       = round(stock_data.quarterized_profit_margin,                       NUM_ROUND_DECIMALS)
-    if stock_data.quarterized_profit_margin_boost                 is not None: stock_data.quarterized_profit_margin_boost                 = round(stock_data.quarterized_profit_margin_boost,                 NUM_ROUND_DECIMALS)
-    if stock_data.effective_profit_margin                         is not None: stock_data.effective_profit_margin                         = round(stock_data.effective_profit_margin,                         NUM_ROUND_DECIMALS)
-    if stock_data.held_percent_institutions                       is not None: stock_data.held_percent_institutions                       = round(stock_data.held_percent_institutions,                       NUM_ROUND_DECIMALS)
-    if stock_data.forward_eps                                     is not None: stock_data.forward_eps                                     = round(stock_data.forward_eps,                                     NUM_ROUND_DECIMALS)
-    if stock_data.trailing_eps                                    is not None: stock_data.trailing_eps                                    = round(stock_data.trailing_eps,                                    NUM_ROUND_DECIMALS)
-    if stock_data.previous_close                                  is not None: stock_data.previous_close                                  = round(stock_data.previous_close,                                  NUM_ROUND_DECIMALS)
-    if stock_data.trailing_eps_percentage                         is not None: stock_data.trailing_eps_percentage                         = round(stock_data.trailing_eps_percentage,                         NUM_ROUND_DECIMALS)
-    if stock_data.price_to_book                                   is not None: stock_data.price_to_book                                   = round(stock_data.price_to_book,                                   NUM_ROUND_DECIMALS)
-    if stock_data.shares_outstanding                              is not None: stock_data.shares_outstanding                              = round(stock_data.shares_outstanding,                              NUM_ROUND_DECIMALS)
-    if stock_data.net_income_to_common_shareholders               is not None: stock_data.net_income_to_common_shareholders               = round(stock_data.net_income_to_common_shareholders,               NUM_ROUND_DECIMALS)
-    if stock_data.nitcsh_to_shares_outstanding                    is not None: stock_data.nitcsh_to_shares_outstanding                    = round(stock_data.nitcsh_to_shares_outstanding,                    NUM_ROUND_DECIMALS)
-    if stock_data.employees                                       is not None: stock_data.employees                                       = int(  stock_data.employees                                                          )
-    if stock_data.enterprise_value                                is not None: stock_data.enterprise_value                                = int(  stock_data.enterprise_value                                                   )
-    if stock_data.market_cap                                      is not None: stock_data.market_cap                                      = int(  stock_data.market_cap                                                         )
-    if stock_data.nitcsh_to_num_employees                         is not None: stock_data.nitcsh_to_num_employees                         = round(stock_data.nitcsh_to_num_employees,                         NUM_ROUND_DECIMALS)
-    if stock_data.eqg                                             is not None: stock_data.eqg                                             = round(stock_data.eqg,                                             NUM_ROUND_DECIMALS)
-    if stock_data.eqg_yoy                                         is not None: stock_data.eqg_yoy                                         = round(stock_data.eqg_yoy,                                         NUM_ROUND_DECIMALS)
-    if stock_data.eqg_effective                                   is not None: stock_data.eqg_effective                                   = round(stock_data.eqg_effective,                                   NUM_ROUND_DECIMALS)
-    if stock_data.eqg_factor_effective                            is not None: stock_data.eqg_factor_effective                            = round(stock_data.eqg_factor_effective,                            NUM_ROUND_DECIMALS)
-    if stock_data.revenue_quarterly_growth                        is not None: stock_data.revenue_quarterly_growth                        = round(stock_data.revenue_quarterly_growth,                        NUM_ROUND_DECIMALS)
-    if stock_data.price_to_earnings_to_growth_ratio               is not None: stock_data.price_to_earnings_to_growth_ratio               = round(stock_data.price_to_earnings_to_growth_ratio,               NUM_ROUND_DECIMALS)
-    if stock_data.effective_peg_ratio                             is not None: stock_data.effective_peg_ratio                             = round(stock_data.effective_peg_ratio,                             NUM_ROUND_DECIMALS)
-    if stock_data.annualized_cash_flow_from_operating_activities  is not None: stock_data.annualized_cash_flow_from_operating_activities  = round(stock_data.annualized_cash_flow_from_operating_activities,  NUM_ROUND_DECIMALS)
-    if stock_data.quarterized_cash_flow_from_operating_activities is not None: stock_data.quarterized_cash_flow_from_operating_activities = round(stock_data.quarterized_cash_flow_from_operating_activities, NUM_ROUND_DECIMALS)
-    if stock_data.annualized_ev_to_cfo_ratio                      is not None: stock_data.annualized_ev_to_cfo_ratio                      = round(stock_data.annualized_ev_to_cfo_ratio,                      NUM_ROUND_DECIMALS)
-    if stock_data.quarterized_ev_to_cfo_ratio                     is not None: stock_data.quarterized_ev_to_cfo_ratio                     = round(stock_data.quarterized_ev_to_cfo_ratio,                     NUM_ROUND_DECIMALS)
-    if stock_data.ev_to_cfo_ratio_effective                       is not None: stock_data.ev_to_cfo_ratio_effective                       = round(stock_data.ev_to_cfo_ratio_effective,                       NUM_ROUND_DECIMALS)
-    if stock_data.annualized_debt_to_equity                       is not None: stock_data.annualized_debt_to_equity                       = round(stock_data.annualized_debt_to_equity,                       NUM_ROUND_DECIMALS)
-    if stock_data.quarterized_debt_to_equity                      is not None: stock_data.quarterized_debt_to_equity                      = round(stock_data.quarterized_debt_to_equity,                      NUM_ROUND_DECIMALS)
-    if stock_data.debt_to_equity_effective                        is not None: stock_data.debt_to_equity_effective                        = round(stock_data.debt_to_equity_effective,                        NUM_ROUND_DECIMALS)
-    if stock_data.conversion_rate_mult_to_usd                     is not None: stock_data.conversion_rate_mult_to_usd                     = round(stock_data.conversion_rate_mult_to_usd,                     NUM_ROUND_DECIMALS)
-    if stock_data.last_dividend_0                                 is not None: stock_data.last_dividend_0                                 = round(stock_data.last_dividend_0,                                 NUM_ROUND_DECIMALS)
-    if stock_data.last_dividend_1                                 is not None: stock_data.last_dividend_1                                 = round(stock_data.last_dividend_1,                                 NUM_ROUND_DECIMALS)
-    if stock_data.last_dividend_2                                 is not None: stock_data.last_dividend_2                                 = round(stock_data.last_dividend_2,                                 NUM_ROUND_DECIMALS)
-    if stock_data.last_dividend_3                                 is not None: stock_data.last_dividend_3                                 = round(stock_data.last_dividend_3,                                 NUM_ROUND_DECIMALS)
-    if stock_data.fifty_two_week_change                           is not None: stock_data.fifty_two_week_change                           = round(stock_data.fifty_two_week_change,                           NUM_ROUND_DECIMALS)
-    if stock_data.fifty_two_week_low                              is not None: stock_data.fifty_two_week_low                              = round(stock_data.fifty_two_week_low,                              NUM_ROUND_DECIMALS)
-    if stock_data.fifty_two_week_high                             is not None: stock_data.fifty_two_week_high                             = round(stock_data.fifty_two_week_high,                             NUM_ROUND_DECIMALS)
-    if stock_data.two_hundred_day_average                         is not None: stock_data.two_hundred_day_average                         = round(stock_data.two_hundred_day_average,                         NUM_ROUND_DECIMALS)
-    if stock_data.previous_close_percentage_from_200d_ma          is not None: stock_data.previous_close_percentage_from_200d_ma          = round(stock_data.previous_close_percentage_from_200d_ma,          NUM_ROUND_DECIMALS)
-    if stock_data.previous_close_percentage_from_52w_low          is not None: stock_data.previous_close_percentage_from_52w_low          = round(stock_data.previous_close_percentage_from_52w_low,          NUM_ROUND_DECIMALS)
-    if stock_data.previous_close_percentage_from_52w_high         is not None: stock_data.previous_close_percentage_from_52w_high         = round(stock_data.previous_close_percentage_from_52w_high,         NUM_ROUND_DECIMALS)
-    if stock_data.dist_from_low_factor                            is not None: stock_data.dist_from_low_factor                            = round(stock_data.dist_from_low_factor,                            NUM_ROUND_DECIMALS)
-    if stock_data.eff_dist_from_low_factor                        is not None: stock_data.eff_dist_from_low_factor                        = round(stock_data.eff_dist_from_low_factor,                        NUM_ROUND_DECIMALS)
-    if stock_data.annualized_total_ratio                          is not None: stock_data.annualized_total_ratio                          = round(stock_data.annualized_total_ratio,                          NUM_ROUND_DECIMALS)
-    if stock_data.quarterized_total_ratio                         is not None: stock_data.quarterized_total_ratio                         = round(stock_data.quarterized_total_ratio,                         NUM_ROUND_DECIMALS)
-    if stock_data.annualized_other_current_ratio                  is not None: stock_data.annualized_other_current_ratio                  = round(stock_data.annualized_other_current_ratio,                  NUM_ROUND_DECIMALS)
-    if stock_data.quarterized_other_current_ratio                 is not None: stock_data.quarterized_other_current_ratio                 = round(stock_data.quarterized_other_current_ratio,                 NUM_ROUND_DECIMALS)
-    if stock_data.annualized_other_ratio                          is not None: stock_data.annualized_other_ratio                          = round(stock_data.annualized_other_ratio,                          NUM_ROUND_DECIMALS)
-    if stock_data.quarterized_other_ratio                         is not None: stock_data.quarterized_other_ratio                         = round(stock_data.quarterized_other_ratio,                         NUM_ROUND_DECIMALS)
-    if stock_data.annualized_total_current_ratio                  is not None: stock_data.annualized_total_current_ratio                  = round(stock_data.annualized_total_current_ratio,                  NUM_ROUND_DECIMALS)
-    if stock_data.quarterized_total_current_ratio                 is not None: stock_data.quarterized_total_current_ratio                 = round(stock_data.quarterized_total_current_ratio,                 NUM_ROUND_DECIMALS)
-    if stock_data.total_ratio_effective                           is not None: stock_data.total_ratio_effective                           = round(stock_data.total_ratio_effective,                           NUM_ROUND_DECIMALS)
-    if stock_data.other_current_ratio_effective                   is not None: stock_data.other_current_ratio_effective                   = round(stock_data.other_current_ratio_effective,                   NUM_ROUND_DECIMALS)
-    if stock_data.other_ratio_effective                           is not None: stock_data.other_ratio_effective                           = round(stock_data.other_ratio_effective,                           NUM_ROUND_DECIMALS)
-    if stock_data.total_current_ratio_effective                   is not None: stock_data.total_current_ratio_effective                   = round(stock_data.total_current_ratio_effective,                   NUM_ROUND_DECIMALS)
+    if stock_data.sss_value                                       != None: stock_data.sss_value                                       = round(stock_data.sss_value,                                       NUM_ROUND_DECIMALS)
+    if stock_data.annualized_revenue                              != None: stock_data.annualized_revenue                              = round(stock_data.annualized_revenue,                              NUM_ROUND_DECIMALS)
+    if stock_data.annualized_earnings                             != None: stock_data.annualized_earnings                             = round(stock_data.annualized_earnings,                             NUM_ROUND_DECIMALS)
+    if stock_data.quarterized_revenue                             != None: stock_data.quarterized_revenue                             = round(stock_data.quarterized_revenue,                             NUM_ROUND_DECIMALS)
+    if stock_data.quarterized_earnings                            != None: stock_data.quarterized_earnings                            = round(stock_data.quarterized_earnings,                            NUM_ROUND_DECIMALS)
+    if stock_data.effective_earnings                              != None: stock_data.effective_earnings                              = round(stock_data.effective_earnings,                              NUM_ROUND_DECIMALS)
+    if stock_data.effective_revenue                               != None: stock_data.effective_revenue                               = round(stock_data.effective_revenue,                               NUM_ROUND_DECIMALS)
+    if stock_data.enterprise_value_to_revenue                     != None: stock_data.enterprise_value_to_revenue                     = round(stock_data.enterprise_value_to_revenue,                     NUM_ROUND_DECIMALS)
+    if stock_data.evr_effective                                   != None: stock_data.evr_effective                                   = round(stock_data.evr_effective,                                   NUM_ROUND_DECIMALS)
+    if stock_data.trailing_price_to_earnings                      != None: stock_data.trailing_price_to_earnings                      = round(stock_data.trailing_price_to_earnings,                      NUM_ROUND_DECIMALS)
+    if stock_data.forward_price_to_earnings                       != None: stock_data.forward_price_to_earnings                       = round(stock_data.forward_price_to_earnings,                       NUM_ROUND_DECIMALS)
+    if stock_data.effective_price_to_earnings                     != None: stock_data.effective_price_to_earnings                     = round(stock_data.effective_price_to_earnings,                     NUM_ROUND_DECIMALS)
+    if stock_data.trailing_12months_price_to_sales                != None: stock_data.trailing_12months_price_to_sales                = round(stock_data.trailing_12months_price_to_sales,                NUM_ROUND_DECIMALS)
+    if stock_data.pe_effective                                    != None: stock_data.pe_effective                                    = round(stock_data.pe_effective,                                    NUM_ROUND_DECIMALS)
+    if stock_data.enterprise_value_to_ebitda                      != None: stock_data.enterprise_value_to_ebitda                      = round(stock_data.enterprise_value_to_ebitda,                      NUM_ROUND_DECIMALS)
+    if stock_data.profit_margin                                   != None: stock_data.profit_margin                                   = round(stock_data.profit_margin,                                   NUM_ROUND_DECIMALS)
+    if stock_data.annualized_profit_margin                        != None: stock_data.annualized_profit_margin                        = round(stock_data.annualized_profit_margin,                        NUM_ROUND_DECIMALS)
+    if stock_data.annualized_profit_margin_boost                  != None: stock_data.annualized_profit_margin_boost                  = round(stock_data.annualized_profit_margin_boost,                  NUM_ROUND_DECIMALS)
+    if stock_data.quarterized_profit_margin                       != None: stock_data.quarterized_profit_margin                       = round(stock_data.quarterized_profit_margin,                       NUM_ROUND_DECIMALS)
+    if stock_data.quarterized_profit_margin_boost                 != None: stock_data.quarterized_profit_margin_boost                 = round(stock_data.quarterized_profit_margin_boost,                 NUM_ROUND_DECIMALS)
+    if stock_data.effective_profit_margin                         != None: stock_data.effective_profit_margin                         = round(stock_data.effective_profit_margin,                         NUM_ROUND_DECIMALS)
+    if stock_data.held_percent_institutions                       != None: stock_data.held_percent_institutions                       = round(stock_data.held_percent_institutions,                       NUM_ROUND_DECIMALS)
+    if stock_data.forward_eps                                     != None: stock_data.forward_eps                                     = round(stock_data.forward_eps,                                     NUM_ROUND_DECIMALS)
+    if stock_data.trailing_eps                                    != None: stock_data.trailing_eps                                    = round(stock_data.trailing_eps,                                    NUM_ROUND_DECIMALS)
+    if stock_data.previous_close                                  != None: stock_data.previous_close                                  = round(stock_data.previous_close,                                  NUM_ROUND_DECIMALS)
+    if stock_data.trailing_eps_percentage                         != None: stock_data.trailing_eps_percentage                         = round(stock_data.trailing_eps_percentage,                         NUM_ROUND_DECIMALS)
+    if stock_data.price_to_book                                   != None: stock_data.price_to_book                                   = round(stock_data.price_to_book,                                   NUM_ROUND_DECIMALS)
+    if stock_data.shares_outstanding                              != None: stock_data.shares_outstanding                              = round(stock_data.shares_outstanding,                              NUM_ROUND_DECIMALS)
+    if stock_data.net_income_to_common_shareholders               != None: stock_data.net_income_to_common_shareholders               = round(stock_data.net_income_to_common_shareholders,               NUM_ROUND_DECIMALS)
+    if stock_data.nitcsh_to_shares_outstanding                    != None: stock_data.nitcsh_to_shares_outstanding                    = round(stock_data.nitcsh_to_shares_outstanding,                    NUM_ROUND_DECIMALS)
+    if stock_data.employees                                       != None: stock_data.employees                                       = int(  stock_data.employees                                                          )
+    if stock_data.enterprise_value                                != None: stock_data.enterprise_value                                = int(  stock_data.enterprise_value                                                   )
+    if stock_data.market_cap                                      != None: stock_data.market_cap                                      = int(  stock_data.market_cap                                                         )
+    if stock_data.nitcsh_to_num_employees                         != None: stock_data.nitcsh_to_num_employees                         = round(stock_data.nitcsh_to_num_employees,                         NUM_ROUND_DECIMALS)
+    if stock_data.eqg                                             != None: stock_data.eqg                                             = round(stock_data.eqg,                                             NUM_ROUND_DECIMALS)
+    if stock_data.eqg_yoy                                         != None: stock_data.eqg_yoy                                         = round(stock_data.eqg_yoy,                                         NUM_ROUND_DECIMALS)
+    if stock_data.eqg_effective                                   != None: stock_data.eqg_effective                                   = round(stock_data.eqg_effective,                                   NUM_ROUND_DECIMALS)
+    if stock_data.eqg_factor_effective                            != None: stock_data.eqg_factor_effective                            = round(stock_data.eqg_factor_effective,                            NUM_ROUND_DECIMALS)
+    if stock_data.revenue_quarterly_growth                        != None: stock_data.revenue_quarterly_growth                        = round(stock_data.revenue_quarterly_growth,                        NUM_ROUND_DECIMALS)
+    if stock_data.price_to_earnings_to_growth_ratio               != None: stock_data.price_to_earnings_to_growth_ratio               = round(stock_data.price_to_earnings_to_growth_ratio,               NUM_ROUND_DECIMALS)
+    if stock_data.effective_peg_ratio                             != None: stock_data.effective_peg_ratio                             = round(stock_data.effective_peg_ratio,                             NUM_ROUND_DECIMALS)
+    if stock_data.annualized_cash_flow_from_operating_activities  != None: stock_data.annualized_cash_flow_from_operating_activities  = round(stock_data.annualized_cash_flow_from_operating_activities,  NUM_ROUND_DECIMALS)
+    if stock_data.quarterized_cash_flow_from_operating_activities != None: stock_data.quarterized_cash_flow_from_operating_activities = round(stock_data.quarterized_cash_flow_from_operating_activities, NUM_ROUND_DECIMALS)
+    if stock_data.annualized_ev_to_cfo_ratio                      != None: stock_data.annualized_ev_to_cfo_ratio                      = round(stock_data.annualized_ev_to_cfo_ratio,                      NUM_ROUND_DECIMALS)
+    if stock_data.quarterized_ev_to_cfo_ratio                     != None: stock_data.quarterized_ev_to_cfo_ratio                     = round(stock_data.quarterized_ev_to_cfo_ratio,                     NUM_ROUND_DECIMALS)
+    if stock_data.ev_to_cfo_ratio_effective                       != None: stock_data.ev_to_cfo_ratio_effective                       = round(stock_data.ev_to_cfo_ratio_effective,                       NUM_ROUND_DECIMALS)
+    if stock_data.annualized_debt_to_equity                       != None: stock_data.annualized_debt_to_equity                       = round(stock_data.annualized_debt_to_equity,                       NUM_ROUND_DECIMALS)
+    if stock_data.quarterized_debt_to_equity                      != None: stock_data.quarterized_debt_to_equity                      = round(stock_data.quarterized_debt_to_equity,                      NUM_ROUND_DECIMALS)
+    if stock_data.debt_to_equity_effective                        != None: stock_data.debt_to_equity_effective                        = round(stock_data.debt_to_equity_effective,                        NUM_ROUND_DECIMALS)
+    if stock_data.conversion_rate_mult_to_usd                     != None: stock_data.conversion_rate_mult_to_usd                     = round(stock_data.conversion_rate_mult_to_usd,                     NUM_ROUND_DECIMALS)
+    if stock_data.last_dividend_0                                 != None: stock_data.last_dividend_0                                 = round(stock_data.last_dividend_0,                                 NUM_ROUND_DECIMALS)
+    if stock_data.last_dividend_1                                 != None: stock_data.last_dividend_1                                 = round(stock_data.last_dividend_1,                                 NUM_ROUND_DECIMALS)
+    if stock_data.last_dividend_2                                 != None: stock_data.last_dividend_2                                 = round(stock_data.last_dividend_2,                                 NUM_ROUND_DECIMALS)
+    if stock_data.last_dividend_3                                 != None: stock_data.last_dividend_3                                 = round(stock_data.last_dividend_3,                                 NUM_ROUND_DECIMALS)
+    if stock_data.fifty_two_week_change                           != None: stock_data.fifty_two_week_change                           = round(stock_data.fifty_two_week_change,                           NUM_ROUND_DECIMALS)
+    if stock_data.fifty_two_week_low                              != None: stock_data.fifty_two_week_low                              = round(stock_data.fifty_two_week_low,                              NUM_ROUND_DECIMALS)
+    if stock_data.fifty_two_week_high                             != None: stock_data.fifty_two_week_high                             = round(stock_data.fifty_two_week_high,                             NUM_ROUND_DECIMALS)
+    if stock_data.two_hundred_day_average                         != None: stock_data.two_hundred_day_average                         = round(stock_data.two_hundred_day_average,                         NUM_ROUND_DECIMALS)
+    if stock_data.previous_close_percentage_from_200d_ma          != None: stock_data.previous_close_percentage_from_200d_ma          = round(stock_data.previous_close_percentage_from_200d_ma,          NUM_ROUND_DECIMALS)
+    if stock_data.previous_close_percentage_from_52w_low          != None: stock_data.previous_close_percentage_from_52w_low          = round(stock_data.previous_close_percentage_from_52w_low,          NUM_ROUND_DECIMALS)
+    if stock_data.previous_close_percentage_from_52w_high         != None: stock_data.previous_close_percentage_from_52w_high         = round(stock_data.previous_close_percentage_from_52w_high,         NUM_ROUND_DECIMALS)
+    if stock_data.dist_from_low_factor                            != None: stock_data.dist_from_low_factor                            = round(stock_data.dist_from_low_factor,                            NUM_ROUND_DECIMALS)
+    if stock_data.eff_dist_from_low_factor                        != None: stock_data.eff_dist_from_low_factor                        = round(stock_data.eff_dist_from_low_factor,                        NUM_ROUND_DECIMALS)
+    if stock_data.annualized_total_ratio                          != None: stock_data.annualized_total_ratio                          = round(stock_data.annualized_total_ratio,                          NUM_ROUND_DECIMALS)
+    if stock_data.quarterized_total_ratio                         != None: stock_data.quarterized_total_ratio                         = round(stock_data.quarterized_total_ratio,                         NUM_ROUND_DECIMALS)
+    if stock_data.annualized_other_current_ratio                  != None: stock_data.annualized_other_current_ratio                  = round(stock_data.annualized_other_current_ratio,                  NUM_ROUND_DECIMALS)
+    if stock_data.quarterized_other_current_ratio                 != None: stock_data.quarterized_other_current_ratio                 = round(stock_data.quarterized_other_current_ratio,                 NUM_ROUND_DECIMALS)
+    if stock_data.annualized_other_ratio                          != None: stock_data.annualized_other_ratio                          = round(stock_data.annualized_other_ratio,                          NUM_ROUND_DECIMALS)
+    if stock_data.quarterized_other_ratio                         != None: stock_data.quarterized_other_ratio                         = round(stock_data.quarterized_other_ratio,                         NUM_ROUND_DECIMALS)
+    if stock_data.annualized_total_current_ratio                  != None: stock_data.annualized_total_current_ratio                  = round(stock_data.annualized_total_current_ratio,                  NUM_ROUND_DECIMALS)
+    if stock_data.quarterized_total_current_ratio                 != None: stock_data.quarterized_total_current_ratio                 = round(stock_data.quarterized_total_current_ratio,                 NUM_ROUND_DECIMALS)
+    if stock_data.total_ratio_effective                           != None: stock_data.total_ratio_effective                           = round(stock_data.total_ratio_effective,                           NUM_ROUND_DECIMALS)
+    if stock_data.other_current_ratio_effective                   != None: stock_data.other_current_ratio_effective                   = round(stock_data.other_current_ratio_effective,                   NUM_ROUND_DECIMALS)
+    if stock_data.other_ratio_effective                           != None: stock_data.other_ratio_effective                           = round(stock_data.other_ratio_effective,                           NUM_ROUND_DECIMALS)
+    if stock_data.total_current_ratio_effective                   != None: stock_data.total_current_ratio_effective                   = round(stock_data.total_current_ratio_effective,                   NUM_ROUND_DECIMALS)
 
     # TODO: ASAFR: Unify below with above to single line for each parameter
     if stock_data.sss_value                                       is None: stock_data.sss_value                                       = BAD_SSS
@@ -543,7 +546,7 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
         if build_csv_db:
             try:
                 info                                   = symbol.get_info()
-                cash_flows                             = symbol.get_cashflow(     as_dict=True, freq="yearly")
+                cash_flows_yearly                             = symbol.get_cashflow(     as_dict=True, freq="yearly")
                 cash_flows_quarterly                   = symbol.get_cashflow(     as_dict=True, freq="quarterly")
                 balance_sheets_yearly                  = symbol.get_balance_sheet(as_dict=True, freq="yearly")
                 balance_sheets_quarterly               = symbol.get_balance_sheet(as_dict=True, freq="quarterly")
@@ -662,14 +665,14 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
                 pass
             if len(total_current_ratios_list): stock_data.quarterized_total_current_ratio = weighted_average(total_current_ratios_list, BALANCE_SHEETS_WEIGHTS[:len(total_current_ratios_list)])
 
-            if stock_data.annualized_total_ratio          == 0.0: stock_data.annualized_total_ratio          = stock_data.quarterized_total_ratio
-            if stock_data.quarterized_total_ratio         == 0.0: stock_data.quarterized_total_ratio         = stock_data.annualized_total_ratio
-            if stock_data.annualized_other_current_ratio  == 0.0: stock_data.annualized_other_current_ratio  = stock_data.quarterized_other_current_ratio
-            if stock_data.quarterized_other_current_ratio == 0.0: stock_data.quarterized_other_current_ratio = stock_data.annualized_other_current_ratio
-            if stock_data.annualized_other_ratio          == 0.0: stock_data.annualized_other_ratio          = stock_data.quarterized_other_ratio
-            if stock_data.quarterized_other_ratio         == 0.0: stock_data.quarterized_other_ratio         = stock_data.annualized_other_ratio
-            if stock_data.annualized_total_current_ratio  == 0.0: stock_data.annualized_total_current_ratio  = stock_data.quarterized_total_current_ratio
-            if stock_data.quarterized_total_current_ratio == 0.0: stock_data.quarterized_total_current_ratio = stock_data.annualized_total_current_ratio
+            if stock_data.annualized_total_ratio          == 0.0: stock_data.annualized_total_ratio          = stock_data.quarterized_total_ratio        *QUARTERLY_YEARLY_MISSING_FACTOR
+            if stock_data.quarterized_total_ratio         == 0.0: stock_data.quarterized_total_ratio         = stock_data.annualized_total_ratio         *QUARTERLY_YEARLY_MISSING_FACTOR
+            if stock_data.annualized_other_current_ratio  == 0.0: stock_data.annualized_other_current_ratio  = stock_data.quarterized_other_current_ratio*QUARTERLY_YEARLY_MISSING_FACTOR
+            if stock_data.quarterized_other_current_ratio == 0.0: stock_data.quarterized_other_current_ratio = stock_data.annualized_other_current_ratio *QUARTERLY_YEARLY_MISSING_FACTOR
+            if stock_data.annualized_other_ratio          == 0.0: stock_data.annualized_other_ratio          = stock_data.quarterized_other_ratio        *QUARTERLY_YEARLY_MISSING_FACTOR
+            if stock_data.quarterized_other_ratio         == 0.0: stock_data.quarterized_other_ratio         = stock_data.annualized_other_ratio         *QUARTERLY_YEARLY_MISSING_FACTOR
+            if stock_data.annualized_total_current_ratio  == 0.0: stock_data.annualized_total_current_ratio  = stock_data.quarterized_total_current_ratio*QUARTERLY_YEARLY_MISSING_FACTOR
+            if stock_data.quarterized_total_current_ratio == 0.0: stock_data.quarterized_total_current_ratio = stock_data.annualized_total_current_ratio *QUARTERLY_YEARLY_MISSING_FACTOR
 
             # TODO: ASAFR: In the next stage - add the other current and other ratio to a sum of the ratios Investigate prior
             stock_data.total_ratio_effective         = RATIO_DAMPER+(stock_data.annualized_total_ratio         + stock_data.quarterized_total_ratio        )/2.0
@@ -684,9 +687,10 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
                         total_debt_to_equity_list.append(balance_sheets_yearly[key]['Total Liab']/balance_sheets_yearly[key]['Total Stockholder Equity'])
             except Exception as e:
                 print("Exception in {} annualized_debt_to_equity: {}".format(stock_data.symbol, e))
-                stock_data.annualized_debt_to_equity           = 0
+                stock_data.annualized_debt_to_equity           = None
                 pass
             if len(total_debt_to_equity_list): stock_data.annualized_debt_to_equity = weighted_average(total_debt_to_equity_list, BALANCE_SHEETS_WEIGHTS[:len(total_debt_to_equity_list)])
+            else:                              stock_data.annualized_debt_to_equity = None
 
             # TODO: ASAFR: Add Other Current Liab / Other Stockholder Equity
             total_debt_to_equity_list     = []
@@ -696,34 +700,44 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
                         total_debt_to_equity_list.append(balance_sheets_quarterly[key]['Total Liab']/balance_sheets_quarterly[key]['Total Stockholder Equity'])
             except Exception as e:
                 print("Exception in {} quarterized_debt_to_equity: {}".format(stock_data.symbol, e))
-                stock_data.quarterized_debt_to_equity = 0
+                stock_data.quarterized_debt_to_equity = None
                 pass
             if len(total_debt_to_equity_list): stock_data.quarterized_debt_to_equity = weighted_average(total_debt_to_equity_list, BALANCE_SHEETS_WEIGHTS[:len(total_debt_to_equity_list)])
+            else:                              stock_data.quarterized_debt_to_equity = None
 
-            # A mixed sign (one negative, the other positive) quarterized and annualized values cannot simply be averaged, because the may lead to a low D/E value
-            if stock_data.annualized_debt_to_equity > 0.0 and stock_data.quarterized_debt_to_equity > 0.0 or stock_data.annualized_debt_to_equity < 0.0 and stock_data.quarterized_debt_to_equity < 0.0:
-                stock_data.debt_to_equity_effective = (stock_data.annualized_debt_to_equity+stock_data.quarterized_debt_to_equity)/2.0
-            elif stock_data.annualized_debt_to_equity > 0.0 and stock_data.quarterized_debt_to_equity < 0.0:
-                stock_data.debt_to_equity_effective = (                                stock_data.annualized_debt_to_equity - NEGATIVE_DEBT_TO_EQUITY_FACTOR*stock_data.quarterized_debt_to_equity)**2
+            if stock_data.annualized_debt_to_equity is None and stock_data.quarterized_debt_to_equity is None:
+                stock_data.annualized_debt_to_equity = stock_data.quarterized_debt_to_equity = 1000.0*debt_to_equity_limit
             else:
-                stock_data.debt_to_equity_effective = (-NEGATIVE_DEBT_TO_EQUITY_FACTOR*stock_data.annualized_debt_to_equity +                                stock_data.quarterized_debt_to_equity)**2
+                if   stock_data.annualized_debt_to_equity is None and stock_data.quarterized_debt_to_equity != None:
+                    stock_data.annualized_debt_to_equity = stock_data.quarterized_debt_to_equity*QUARTERLY_YEARLY_MISSING_FACTOR
+                elif stock_data.annualized_debt_to_equity != None and stock_data.quarterized_debt_to_equity is None:
+                    stock_data.quarterized_debt_to_equity = stock_data.annualized_debt_to_equity * QUARTERLY_YEARLY_MISSING_FACTOR
 
-            if stock_data.debt_to_equity_effective < 0.0:
-                stock_data.debt_to_equity_effective = (1.0-stock_data.debt_to_equity_effective * NEGATIVE_DEBT_TO_EQUITY_FACTOR)  # (https://www.investopedia.com/terms/d/debtequityratio.asp#:~:text=What%20does%20it%20mean%20for,has%20more%20liabilities%20than%20assets.) What does it mean for debt to equity to be negative? If a company has a negative D/E ratio, this means that the company has negative shareholder equity. In other words, it means that the company has more liabilities than assets
+                # A mixed sign (one negative, the other positive) quarterized and annualized values cannot simply be averaged, because the may lead to a low D/E value
+                if stock_data.annualized_debt_to_equity > 0.0 and stock_data.quarterized_debt_to_equity > 0.0 or stock_data.annualized_debt_to_equity < 0.0 and stock_data.quarterized_debt_to_equity < 0.0:
+                    stock_data.debt_to_equity_effective = (stock_data.annualized_debt_to_equity+stock_data.quarterized_debt_to_equity)/2.0
+                elif stock_data.annualized_debt_to_equity > 0.0 and stock_data.quarterized_debt_to_equity < 0.0:
+                    stock_data.debt_to_equity_effective = (                                stock_data.annualized_debt_to_equity - NEGATIVE_DEBT_TO_EQUITY_FACTOR*stock_data.quarterized_debt_to_equity)**2
+                else:
+                    stock_data.debt_to_equity_effective = (-NEGATIVE_DEBT_TO_EQUITY_FACTOR*stock_data.annualized_debt_to_equity +                                stock_data.quarterized_debt_to_equity)**2
+
+                if stock_data.debt_to_equity_effective < 0.0:
+                    stock_data.debt_to_equity_effective = (1.0-stock_data.debt_to_equity_effective * NEGATIVE_DEBT_TO_EQUITY_FACTOR)  # (https://www.investopedia.com/terms/d/debtequityratio.asp#:~:text=What%20does%20it%20mean%20for,has%20more%20liabilities%20than%20assets.) What does it mean for debt to equity to be negative? If a company has a negative D/E ratio, this means that the company has negative shareholder equity. In other words, it means that the company has more liabilities than assets
 
             weight_index    = 0
             cash_flows_list = []
             weights_sum     = 0
             try:
-                for key in reversed(list(cash_flows)):  # The 1st element will be the oldest, receiving the lowest weight
-                    if 'Total Cash From Operating Activities' in cash_flows[key] and not math.isnan(cash_flows[key]['Total Cash From Operating Activities']):
-                        cash_flows_list.append(cash_flows[key]['Total Cash From Operating Activities']*CASH_FLOW_WEIGHTS[weight_index])
+                for key in reversed(list(cash_flows_yearly)):  # The 1st element will be the oldest, receiving the lowest weight
+                    if 'Total Cash From Operating Activities' in cash_flows_yearly[key] and not math.isnan(cash_flows_yearly[key]['Total Cash From Operating Activities']):
+                        cash_flows_list.append(cash_flows_yearly[key]['Total Cash From Operating Activities']*CASH_FLOW_WEIGHTS[weight_index])
                         weights_sum += CASH_FLOW_WEIGHTS[weight_index]
                         weight_index += 1
                 if weights_sum > 0: stock_data.annualized_cash_flow_from_operating_activities = stock_data.conversion_rate_mult_to_usd*sum(cash_flows_list) / weights_sum  # Multiplying by the factor to get the valu in USD.
+                else:               stock_data.annualized_cash_flow_from_operating_activities = None
             except Exception as e:
-                print("Exception in {} cash_flows: {}".format(stock_data.symbol, e))
-                stock_data.annualized_cash_flow_from_operating_activities = 0
+                print("Exception in {} cash_flows_yearly: {}".format(stock_data.symbol, e))
+                stock_data.annualized_cash_flow_from_operating_activities = None
                 pass
 
             weight_index    = 0
@@ -736,13 +750,14 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
                         weights_sum += CASH_FLOW_WEIGHTS[weight_index]
                         weight_index += 1
                 if weights_sum > 0: stock_data.quarterized_cash_flow_from_operating_activities = stock_data.conversion_rate_mult_to_usd*sum(cash_flows_list) / weights_sum  # Multiplying by the factor to get the valu in USD.
+                else:               stock_data.quarterized_cash_flow_from_operating_activities = None
             except Exception as e:
                 print("Exception in {} cash_flows_quarterly: {}".format(stock_data.symbol, e))
-                stock_data.quarterzed_cash_flow_from_operating_activities = 0
+                stock_data.quarterized_cash_flow_from_operating_activities = None
                 pass
 
         if stock_data.short_name is     None:                       stock_data.short_name = 'None'
-        if stock_data.short_name is not None and not research_mode: print('              {:35}:'.format(stock_data.short_name))
+        if stock_data.short_name != None and not research_mode: print('              {:35}:'.format(stock_data.short_name))
 
         if build_csv_db and 'quoteType' in info: stock_data.quote_type = info['quoteType']
         if not check_quote_type(stock_data, research_mode):     return_value = False
@@ -766,7 +781,7 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
             if stock_data.employees is None: stock_data.employees = NUM_EMPLOYEES_UNKNOWN
 
             # Oldest is the lower index
-            if earnings_yearly is not None and 'Revenue' in earnings_yearly and 'Earnings'in earnings_yearly:
+            if earnings_yearly != None and 'Revenue' in earnings_yearly and 'Earnings'in earnings_yearly:
                 len_revenue_list  = len(earnings_yearly['Revenue'])
                 len_earnings_list = len(earnings_yearly['Earnings'])
                 if len_earnings_list == len_revenue_list:
@@ -807,7 +822,7 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
                         stock_data.annualized_profit_margin = None
                         pass
 
-            if earnings_quarterly is not None and 'Revenue' in earnings_quarterly and 'Earnings'in earnings_quarterly:
+            if earnings_quarterly != None and 'Revenue' in earnings_quarterly and 'Earnings'in earnings_quarterly:
                 len_revenue_list  = len(earnings_quarterly['Revenue'])
                 len_earnings_list = len(earnings_quarterly['Earnings'])
                 if len_earnings_list == len_revenue_list:
@@ -848,7 +863,7 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
                         stock_data.quarterized_profit_margin = None
                         pass
 
-            if earnings_yearly is not None and 'Revenue' in earnings_yearly:
+            if earnings_yearly != None and 'Revenue' in earnings_yearly:
                 weight_index  = 0
                 revenues_list = []
                 weights_sum   = 0
@@ -858,7 +873,7 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
                     weight_index += 1
                 stock_data.annualized_revenue = stock_data.conversion_rate_mult_to_usd*sum(revenues_list) / weights_sum  # Multiplying by the factor to get the valu in USD.
 
-            if earnings_yearly is not None and 'Earnings' in earnings_yearly:
+            if earnings_yearly != None and 'Earnings' in earnings_yearly:
                 weight_index      = 0
                 earnings_list     = []
                 qeg_list          = []
@@ -886,7 +901,7 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
             else:
                 stock_data.eqg_yoy = None
 
-            if earnings_quarterly is not None and 'Revenue' in earnings_quarterly:
+            if earnings_quarterly != None and 'Revenue' in earnings_quarterly:
                 weight_index  = 0
                 revenues_list = []
                 weights_sum   = 0
@@ -896,7 +911,7 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
                     weight_index += 1
                 stock_data.quarterized_revenue = stock_data.conversion_rate_mult_to_usd*sum(revenues_list) / weights_sum  # Multiplying by the factor to get the valu in USD.
 
-            if earnings_quarterly is not None and 'Earnings' in earnings_quarterly:
+            if earnings_quarterly != None and 'Earnings' in earnings_quarterly:
                 weight_index  = 0
                 earnings_list = []
                 weights_sum   = 0
@@ -907,8 +922,8 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
                 stock_data.quarterized_earnings = stock_data.conversion_rate_mult_to_usd*sum(earnings_list) / weights_sum  # Multiplying by the factor to get the valu in USD.
 
             if   stock_data.annualized_earnings  is None and stock_data.quarterized_earnings is     None: stock_data.effective_earnings = None
-            elif stock_data.annualized_earnings  is None and stock_data.quarterized_earnings is not None: stock_data.effective_earnings = stock_data.quarterized_earnings
-            elif stock_data.quarterized_earnings is None and stock_data.annualized_earnings  is not None: stock_data.effective_earnings = stock_data.annualized_earnings
+            elif stock_data.annualized_earnings  is None and stock_data.quarterized_earnings != None: stock_data.effective_earnings = stock_data.quarterized_earnings
+            elif stock_data.quarterized_earnings is None and stock_data.annualized_earnings  != None: stock_data.effective_earnings = stock_data.annualized_earnings
             else                                                                                        : stock_data.effective_earnings = (stock_data.annualized_earnings+stock_data.quarterized_earnings)/2.0
 
             if   stock_data.annualized_revenue   is None and stock_data.quarterized_revenue is      None: stock_data.effective_revenue  = None
@@ -935,37 +950,37 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
             else:                                                      stock_data.enterprise_value_to_ebitda  = None
             if isinstance(stock_data.enterprise_value_to_ebitda,str):  stock_data.enterprise_value_to_ebitda  = None
 
-            if 'marketCap' in info and info['marketCap'] is not None:
+            if 'marketCap' in info and info['marketCap'] != None:
                 stock_data.market_cap = info['marketCap'] # For Nasdaq - these values are already in USD, no conversion required
             else:
                 stock_data.market_cap = None
 
-            if 'enterpriseValue' in info and info['enterpriseValue'] is not None: stock_data.enterprise_value = info['enterpriseValue']  # Value is always in USD, no need to convert
+            if 'enterpriseValue' in info and info['enterpriseValue'] != None: stock_data.enterprise_value = info['enterpriseValue']  # Value is always in USD, no need to convert
             if market_cap_included:
                 if stock_data.enterprise_value is None or stock_data.enterprise_value <= 0:
-                    if   'marketCap' in info and info['marketCap'] is not None:
+                    if   'marketCap' in info and info['marketCap'] != None:
                         stock_data.enterprise_value = int(info['marketCap'])
-                    elif use_investpy and 'MarketCap' in stock_information and stock_information['MarketCap'] is not None:
+                    elif use_investpy and 'MarketCap' in stock_information and stock_information['MarketCap'] != None:
                         stock_data.enterprise_value = int(text_to_num(stock_information['MarketCap']))
                 elif stock_data.market_cap is None or stock_data.market_cap <= 0:
                     stock_data.market_cap = stock_data.enterprise_value
 
             if 'trailingPE' in info:
                 stock_data.trailing_price_to_earnings  = info['trailingPE']  # https://www.investopedia.com/terms/t/trailingpe.asp
-                if tase_mode and stock_data.trailing_price_to_earnings is not None: stock_data.trailing_price_to_earnings /= 100.0  # In TLV stocks, Yahoo multiplies trailingPE by a factor of 100, so compensate
-            elif stock_data.effective_earnings is not None and stock_data.effective_earnings != 0:
+                if tase_mode and stock_data.trailing_price_to_earnings != None: stock_data.trailing_price_to_earnings /= 100.0  # In TLV stocks, Yahoo multiplies trailingPE by a factor of 100, so compensate
+            elif stock_data.effective_earnings != None and stock_data.effective_earnings != 0:
                 stock_data.trailing_price_to_earnings  = stock_data.market_cap / stock_data.effective_earnings # Calculate manually.
             if isinstance(stock_data.trailing_price_to_earnings,str):  stock_data.trailing_price_to_earnings  = None # Mark as None, so as to try and calculate manually.
 
             if 'forwardPE' in info:
                 stock_data.forward_price_to_earnings  = info['forwardPE']  # https://www.investopedia.com/terms/t/trailingpe.asp
-                if tase_mode and stock_data.forward_price_to_earnings is not None:
+                if tase_mode and stock_data.forward_price_to_earnings != None:
                     stock_data.forward_price_to_earnings /= 100.0
             else:  stock_data.forward_price_to_earnings  = None # Mark as None, so as to try and calculate manually. TODO: ASAFR: Calcualte using the forward_eps?
 
             if   stock_data.trailing_price_to_earnings is None and stock_data.forward_price_to_earnings  is     None: stock_data.effective_price_to_earnings = None
-            elif stock_data.forward_price_to_earnings  is None and stock_data.trailing_price_to_earnings is not None: stock_data.effective_price_to_earnings = stock_data.trailing_price_to_earnings
-            elif stock_data.trailing_price_to_earnings is None and stock_data.forward_price_to_earnings  is not None: stock_data.effective_price_to_earnings = stock_data.forward_price_to_earnings
+            elif stock_data.forward_price_to_earnings  is None and stock_data.trailing_price_to_earnings != None: stock_data.effective_price_to_earnings = stock_data.trailing_price_to_earnings
+            elif stock_data.trailing_price_to_earnings is None and stock_data.forward_price_to_earnings  != None: stock_data.effective_price_to_earnings = stock_data.forward_price_to_earnings
             else:  # mixed sign (one negative, one positive) values of forward and trailing, cannot be simply averaged, as they may yield to a totally wrong result. Need special handling in such cases
                 if stock_data.trailing_price_to_earnings > 0.0 and stock_data.forward_price_to_earnings > 0.0 or stock_data.trailing_price_to_earnings < 0.0 and stock_data.forward_price_to_earnings < 0.0:
                     stock_data.effective_price_to_earnings = (stock_data.trailing_price_to_earnings*TRAILING_PRICE_TO_EARNINGS_WEIGHT+stock_data.forward_price_to_earnings*FORWARD_PRICE_TO_EARNINGS_WEIGHT)
@@ -995,7 +1010,7 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
             if build_csv_db and stock_data.fifty_two_week_low                                                               is None: stock_data.fifty_two_week_low      = stock_data.previous_close
             if build_csv_db and stock_data.fifty_two_week_high                                                              is None: stock_data.fifty_two_week_high     = stock_data.previous_close
             if build_csv_db and stock_data.two_hundred_day_average                                                          is None: stock_data.two_hundred_day_average = stock_data.previous_close
-            if build_csv_db and stock_data.previous_close is not None and stock_data.previous_close < stock_data.fifty_two_week_low: stock_data.previous_close          = stock_data.fifty_two_week_low
+            if build_csv_db and stock_data.previous_close != None and stock_data.previous_close < stock_data.fifty_two_week_low: stock_data.previous_close          = stock_data.fifty_two_week_low
 
             if build_csv_db:
                 if stock_data.two_hundred_day_average > 0.0: stock_data.previous_close_percentage_from_200d_ma  = 100.0 * ((stock_data.previous_close - stock_data.two_hundred_day_average) / stock_data.two_hundred_day_average)
@@ -1008,7 +1023,7 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
                         stock_data.dist_from_low_factor = (stock_data.previous_close - stock_data.fifty_two_week_low)/(0.5*(stock_data.fifty_two_week_high-stock_data.fifty_two_week_low))
                     stock_data.eff_dist_from_low_factor = (DIST_FROM_LOW_FACTOR_DAMPER + stock_data.dist_from_low_factor) if stock_data.dist_from_low_factor < 1.0 else (stock_data.dist_from_low_factor**DIST_FROM_LOW_FACTOR_HIGHER_THAN_ONE_POWER)
 
-            if stock_data.trailing_eps is not None and stock_data.previous_close is not None and stock_data.previous_close > 0:
+            if stock_data.trailing_eps != None and stock_data.previous_close != None and stock_data.previous_close > 0:
                 stock_data.trailing_eps_percentage = stock_data.trailing_eps / stock_data.previous_close
 
             if 'priceToBook'                                in info: stock_data.price_to_book                     = info['priceToBook']
@@ -1023,8 +1038,8 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
             else:
                 stock_data.eqg         = None
 
-            if   stock_data.eqg is     None and stock_data.eqg_yoy is not None: stock_data.eqg     = stock_data.eqg_yoy
-            elif stock_data.eqg is not None and stock_data.eqg_yoy is     None: stock_data.eqg_yoy = stock_data.eqg
+            if   stock_data.eqg is     None and stock_data.eqg_yoy != None: stock_data.eqg     = stock_data.eqg_yoy
+            elif stock_data.eqg != None and stock_data.eqg_yoy is     None: stock_data.eqg_yoy = stock_data.eqg
             elif stock_data.eqg is     None and stock_data.eqg_yoy is     None: stock_data.eqg_yoy = stock_data.eqg = EQG_UNKNOWN
 
             if stock_data.eqg         is None:
@@ -1049,7 +1064,7 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
             if 'sharesOutstanding'                          in info: stock_data.shares_outstanding                = info['sharesOutstanding']
             else:                                                    stock_data.shares_outstanding                = SHARES_OUTSTANDING_UNKNOWN
             if stock_data.shares_outstanding is None or stock_data.shares_outstanding == 0:
-                if use_investpy and 'Shares Outstanding' in stock_information and stock_information['Shares Outstanding'] is not None:
+                if use_investpy and 'Shares Outstanding' in stock_information and stock_information['Shares Outstanding'] != None:
                     stock_data.shares_outstanding = int(text_to_num(stock_information['Shares Outstanding']))
                 else:
                     stock_data.shares_outstanding = SHARES_OUTSTANDING_UNKNOWN
@@ -1058,80 +1073,96 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
             else:                           stock_data.net_income_to_common_shareholders = None # TODO: ASAFR: It may be possible to calculate this manually
 
             # if no enterprise_value_to_ebitda, use earnings.
-            if (stock_data.enterprise_value_to_ebitda is None or stock_data.enterprise_value_to_ebitda < 0) and stock_data.effective_earnings is not None and stock_data.effective_earnings != 0:
+            if (stock_data.enterprise_value_to_ebitda is None or stock_data.enterprise_value_to_ebitda < 0) and stock_data.effective_earnings != None and stock_data.effective_earnings != 0:
                 stock_data.enterprise_value_to_ebitda = float(stock_data.enterprise_value) / stock_data.effective_earnings  #  effective_earnings is already in USD
 
-            if stock_data.annualized_cash_flow_from_operating_activities >= 0:
-                if stock_data.enterprise_value == 0 or stock_data.annualized_cash_flow_from_operating_activities == 0: # When 0, it means either EV is 0 (strange!) or a very very good cash flow (strange as well)
-                    stock_data.annualized_ev_to_cfo_ratio = ev_to_cfo_ratio_limit * 1000  # Set a very high value to make stock unatractive
-                else:
-                    stock_data.annualized_ev_to_cfo_ratio = float(stock_data.enterprise_value)/stock_data.annualized_cash_flow_from_operating_activities  # annualized_cash_flow_from_operating_activities has been converted to USD earlier
-            else:  # stock_data.annualized_cash_flow_from_operating_activities < 0
-                stock_data.annualized_ev_to_cfo_ratio = (1.0-NEGATIVE_CFO_FACTOR*float(stock_data.enterprise_value)/stock_data.annualized_cash_flow_from_operating_activities)**3
+            if stock_data.annualized_cash_flow_from_operating_activities is None and stock_data.quarterized_cash_flow_from_operating_activities is None:
+                if stock_data.effective_earnings != None:
+                    stock_data.annualized_cash_flow_from_operating_activities = stock_data.quarterized_cash_flow_from_operating_activities = stock_data.effective_earnings
+            elif stock_data.annualized_cash_flow_from_operating_activities is None and stock_data.quarterized_cash_flow_from_operating_activities != None:
+                stock_data.annualized_cash_flow_from_operating_activities = stock_data.quarterized_cash_flow_from_operating_activities*QUARTERLY_YEARLY_MISSING_FACTOR
+            elif stock_data.annualized_cash_flow_from_operating_activities != None and stock_data.quarterized_cash_flow_from_operating_activities is None:
+                stock_data.quarterized_cash_flow_from_operating_activities = stock_data.annualized_cash_flow_from_operating_activities*QUARTERLY_YEARLY_MISSING_FACTOR
 
-            if stock_data.quarterized_cash_flow_from_operating_activities >= 0:
-                if stock_data.enterprise_value == 0 or stock_data.quarterized_cash_flow_from_operating_activities == 0: # When 0, it means either EV is 0 (strange!) or a very very good cash flow (strange as well)
-                    stock_data.quarterized_ev_to_cfo_ratio = ev_to_cfo_ratio_limit * 1000  # Set a very high value to make stock unatractive
-                else:
-                    stock_data.quarterized_ev_to_cfo_ratio = float(stock_data.enterprise_value)/stock_data.quarterized_cash_flow_from_operating_activities  # quarterized_cash_flow_from_operating_activities has been converted to USD earlier
-            else:  # stock_data.quarterized_cash_flow_from_operating_activities < 0
-                stock_data.quarterized_ev_to_cfo_ratio = (1.0-NEGATIVE_CFO_FACTOR*float(stock_data.enterprise_value)/stock_data.quarterized_cash_flow_from_operating_activities)**3
+            if stock_data.annualized_cash_flow_from_operating_activities != None:
+                if stock_data.annualized_cash_flow_from_operating_activities >= 0:
+                    if stock_data.enterprise_value == 0 or stock_data.annualized_cash_flow_from_operating_activities == 0: # When 0, it means either EV is 0 (strange!) or a very very good cash flow (strange as well)
+                        stock_data.annualized_ev_to_cfo_ratio = ev_to_cfo_ratio_limit * 1000  # Set a very high value to make stock unatractive
+                    else:
+                        stock_data.annualized_ev_to_cfo_ratio = float(stock_data.enterprise_value)/stock_data.annualized_cash_flow_from_operating_activities  # annualized_cash_flow_from_operating_activities has been converted to USD earlier
+                else:  # stock_data.annualized_cash_flow_from_operating_activities < 0
+                    stock_data.annualized_ev_to_cfo_ratio = (1.0-NEGATIVE_CFO_FACTOR*float(stock_data.enterprise_value)/stock_data.annualized_cash_flow_from_operating_activities)**3
+            else:
+                stock_data.annualized_ev_to_cfo_ratio = ev_to_cfo_ratio_limit * 1000
+
+            if stock_data.quarterized_cash_flow_from_operating_activities != None:
+                if stock_data.quarterized_cash_flow_from_operating_activities >= 0:
+                    if stock_data.enterprise_value == 0 or stock_data.quarterized_cash_flow_from_operating_activities == 0: # When 0, it means either EV is 0 (strange!) or a very very good cash flow (strange as well)
+                        stock_data.quarterized_ev_to_cfo_ratio = ev_to_cfo_ratio_limit * 1000  # Set a very high value to make stock unatractive
+                    else:
+                        stock_data.quarterized_ev_to_cfo_ratio = float(stock_data.enterprise_value)/stock_data.quarterized_cash_flow_from_operating_activities  # quarterized_cash_flow_from_operating_activities has been converted to USD earlier
+                else:  # stock_data.quarterized_cash_flow_from_operating_activities < 0
+                    stock_data.quarterized_ev_to_cfo_ratio = (1.0-NEGATIVE_CFO_FACTOR*float(stock_data.enterprise_value)/stock_data.quarterized_cash_flow_from_operating_activities)**3
+            else:
+                stock_data.quarterized_cash_flow_from_operating_activities = ev_to_cfo_ratio_limit * 1000
 
             stock_data.ev_to_cfo_ratio_effective = (stock_data.annualized_ev_to_cfo_ratio+stock_data.quarterized_ev_to_cfo_ratio)/2.0
 
-            if 'priceToSalesTrailing12Months' in info and info['priceToSalesTrailing12Months'] is not None:
+            if 'priceToSalesTrailing12Months' in info and info['priceToSalesTrailing12Months'] != None:
                 stock_data.trailing_12months_price_to_sales = info['priceToSalesTrailing12Months']  # https://www.investopedia.com/articles/fundamental/03/032603.asp#:~:text=The%20price%2Dto%2Dsales%20ratio%20(Price%2FSales%20or,the%20more%20attractive%20the%20investment.
             else:
-                if stock_data.effective_revenue is not None and stock_data.effective_revenue > 0:
+                if stock_data.effective_revenue != None and stock_data.effective_revenue > 0:
                     stock_data.trailing_12months_price_to_sales  = stock_data.market_cap / stock_data.effective_revenue  # effective_revenue is already in USD (converted earlier)
-                elif stock_data.ev_to_cfo_ratio_effective is not None:
+                elif stock_data.ev_to_cfo_ratio_effective != None:
                     stock_data.trailing_12months_price_to_sales  = stock_data.ev_to_cfo_ratio_effective
                 else:
                     stock_data.trailing_12months_price_to_sales  = None # Mark as None, so as to try and calculate manually.
             if isinstance(stock_data.trailing_12months_price_to_sales,str):  stock_data.trailing_12months_price_to_sales  = None # Mark as None, so as to try and calculate manually.
         # TODO: ASAFR: Here: id no previous_close, use market_high, low regular, or anything possible to avoid none!
-        if not build_csv_db_only and stock_data.previous_close is None or stock_data.previous_close < 1.0: # Avoid Penny Stocks
-            if return_value and (not research_mode or VERBOSE_LOGS): print('                            Skipping {} previous_close: {}'.format(stock_data.symbol, stock_data.previous_close))
+        if not build_csv_db_only and (stock_data.previous_close is None or stock_data.previous_close < 1.0): # Avoid Penny Stocks
+            if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} previous_close: {}'.format(stock_data.symbol, stock_data.previous_close)
             return_value = False
 
         if not build_csv_db_only and (stock_data.enterprise_value is None or stock_data.enterprise_value < min_enterprise_value_millions_usd*1000000):
-            if return_value and (not research_mode or VERBOSE_LOGS): print('                            Skipping {} enterprise_value: {}'.format(stock_data.symbol, stock_data.enterprise_value))
+            if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} enterprise_value: {}'.format(stock_data.symbol, stock_data.enterprise_value)
             return_value = False
 
         # Checkout http://www.nasdaqtrader.com/trader.aspx?id=symboldirdefs for all symbol definitions (for instance - `$` in stock names, 5-letter stocks ending with `Y`)
         if not tase_mode and SKIP_5LETTER_Y_STOCK_LISTINGS and stock_data.symbol[-1] == 'Y' and len(stock_data.symbol) == 5 and '.' not in stock_data.symbol and '-' not in stock_data.symbol and '$' not in stock_data.symbol:
+            if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} 5 letter stock listing'.format(stock_data.symbol)
             return_value = False
 
-        if build_csv_db_only and stock_data.enterprise_value_to_revenue is None and stock_data.enterprise_value is not None and use_investpy and 'Revenue' in stock_information and stock_information['Revenue'] is not None  and text_to_num(stock_information['Revenue']) > 0:
+        if build_csv_db_only and stock_data.enterprise_value_to_revenue is None and use_investpy and 'Revenue' in stock_information and stock_information['Revenue'] != None  and text_to_num(stock_information['Revenue']) > 0:
             stock_data.enterprise_value_to_revenue = float(stock_data.enterprise_value)/float(text_to_num(stock_information['Revenue']))
 
         if not build_csv_db_only and (stock_data.evr_effective is None or stock_data.evr_effective <= 0 or stock_data.evr_effective > enterprise_value_to_revenue_limit):
-            if return_value and (not research_mode or VERBOSE_LOGS): print('                            Skipping {} enterprise_value_to_revenue: {}'.format(stock_data.symbol, stock_data.evr_effective))
+            if return_value and (not research_mode or VERBOSE_LOGS):
+                stock_data.skip_reason = 'Skipping {} enterprise_value_to_revenue: {}'.format(stock_data.symbol, stock_data.evr_effective)
             return_value = False
 
         if build_csv_db_only:
-            if (stock_data.enterprise_value_to_revenue is not None and stock_data.enterprise_value_to_revenue <= 0 or stock_data.enterprise_value_to_revenue is None) and stock_data.effective_revenue > 0:
+            if (stock_data.enterprise_value_to_revenue != None and stock_data.enterprise_value_to_revenue <= 0 or stock_data.enterprise_value_to_revenue is None) and stock_data.effective_revenue > 0:
                 stock_data.evr_effective = stock_data.enterprise_value/stock_data.effective_revenue
             else:
                 stock_data.evr_effective = stock_data.enterprise_value_to_revenue
 
         if not build_csv_db_only and (stock_data.enterprise_value_to_ebitda is None or stock_data.enterprise_value_to_ebitda <= 0):
-            if return_value and (not research_mode or VERBOSE_LOGS): print('                            Skipping {} enterprise_value_to_ebitda: {}'.format(stock_data.symbol, stock_data.enterprise_value_to_ebitda))
+            if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} enterprise_value_to_ebitda: {}'.format(stock_data.symbol, stock_data.enterprise_value_to_ebitda)
             return_value = False
 
         if not build_csv_db_only and (stock_data.effective_price_to_earnings is None or stock_data.effective_price_to_earnings <= 0):
-            if return_value and (not research_mode or VERBOSE_LOGS): print('                            Skipping {} effective_price_to_earnings: {}'.format(stock_data.symbol, stock_data.effective_price_to_earnings))
+            if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} effective_price_to_earnings: {}'.format(stock_data.symbol, stock_data.effective_price_to_earnings)
             return_value = False
 
         if not build_csv_db_only and (stock_data.trailing_12months_price_to_sales is None or stock_data.trailing_12months_price_to_sales <= 0):
-            if return_value and (not research_mode or VERBOSE_LOGS): print('                            Skipping {} trailing_12months_price_to_sales: {}'.format(stock_data.symbol, stock_data.trailing_12months_price_to_sales))
+            if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} trailing_12months_price_to_sales: {}'.format(stock_data.symbol, stock_data.trailing_12months_price_to_sales)
             return_value = False
 
         if not build_csv_db_only and (stock_data.price_to_book is None or stock_data.price_to_book <= 0):
-            if return_value and (not research_mode or VERBOSE_LOGS): print('                            Skipping {} price_to_book: {}'.format(stock_data.symbol, stock_data.price_to_book))
+            if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} price_to_book: {}'.format(stock_data.symbol, stock_data.price_to_book)
             return_value = False
 
-        if build_csv_db_only and stock_data.effective_price_to_earnings is not None:
+        if build_csv_db_only and stock_data.effective_price_to_earnings != None:
             if stock_data.sector in favor_sectors:
                 index = favor_sectors.index(stock_data.sector)
                 stock_data.pe_effective = stock_data.effective_price_to_earnings / float(favor_sectors_by[index])  # ** 2
@@ -1139,18 +1170,18 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
                 stock_data.pe_effective = stock_data.effective_price_to_earnings
 
         if not build_csv_db_only and (stock_data.pe_effective is None or stock_data.pe_effective <= 0 or stock_data.pe_effective > price_to_earnings_limit):
-            if return_value and (not research_mode or VERBOSE_LOGS): print('                            Skipping {} pe_effective: {}'.format(stock_data.symbol, stock_data.pe_effective))
+            if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} pe_effective: {}'.format(stock_data.symbol, stock_data.pe_effective)
             return_value = False
 
         if build_csv_db_only:
-            if   stock_data.profit_margin is None and stock_data.annualized_profit_margin is None and stock_data.quarterized_profit_margin is None:
-                stock_data.profit_margin = stock_data.annualized_profit_margin = stock_data.quarterized_profit_margin = PROFIT_MARGIN_UNKNOWN
-            elif stock_data.profit_margin is None and stock_data.annualized_profit_margin is None                                                 :
-                 stock_data.profit_margin     =       stock_data.annualized_profit_margin     =       stock_data.quarterized_profit_margin/PROFIT_MARGIN_DUPLICATION_FACTOR
-            elif                                      stock_data.annualized_profit_margin is None and stock_data.quarterized_profit_margin is None:
-                                                      stock_data.annualized_profit_margin     =       stock_data.quarterized_profit_margin     =    stock_data.profit_margin/PROFIT_MARGIN_DUPLICATION_FACTOR
-            elif stock_data.profit_margin is None and                                                 stock_data.quarterized_profit_margin is None:
-                 stock_data.profit_margin     =                                                       stock_data.quarterized_profit_margin     =    stock_data.annualized_profit_margin/PROFIT_MARGIN_DUPLICATION_FACTOR
+            if   stock_data.profit_margin            is None and stock_data.annualized_profit_margin is None and stock_data.quarterized_profit_margin is None:
+                stock_data.profit_margin             = stock_data.annualized_profit_margin  = stock_data.quarterized_profit_margin = PROFIT_MARGIN_UNKNOWN
+            elif stock_data.profit_margin            is None and stock_data.annualized_profit_margin is None                                                 :
+                 stock_data.profit_margin            = stock_data.annualized_profit_margin  = stock_data.quarterized_profit_margin/PROFIT_MARGIN_DUPLICATION_FACTOR
+            elif stock_data.annualized_profit_margin is None and stock_data.quarterized_profit_margin is None:
+                 stock_data.annualized_profit_margin = stock_data.quarterized_profit_margin = stock_data.profit_margin/PROFIT_MARGIN_DUPLICATION_FACTOR
+            elif stock_data.profit_margin            is None and stock_data.quarterized_profit_margin is None:
+                 stock_data.profit_margin            = stock_data.quarterized_profit_margin = stock_data.annualized_profit_margin/PROFIT_MARGIN_DUPLICATION_FACTOR
             elif stock_data.profit_margin             is None: stock_data.profit_margin             = stock_data.annualized_profit_margin/PROFIT_MARGIN_DUPLICATION_FACTOR
             elif stock_data.annualized_profit_margin  is None: stock_data.annualized_profit_margin  = stock_data.profit_margin/PROFIT_MARGIN_DUPLICATION_FACTOR
             elif stock_data.quarterized_profit_margin is None: stock_data.quarterized_profit_margin = max(stock_data.profit_margin, stock_data.annualized_profit_margin)/PROFIT_MARGIN_DUPLICATION_FACTOR
@@ -1160,28 +1191,28 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
             stock_data.effective_profit_margin = PROFIT_MARGIN_DAMPER + weighted_average_pm
             
         if not build_csv_db_only and stock_data.effective_profit_margin < profit_margin_limit:
-            if return_value and (not research_mode or VERBOSE_LOGS): print('                            Skipping {} effective_profit_margin: {}'.format(stock_data.symbol, stock_data.effective_profit_margin))
+            if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} effective_profit_margin: {}'.format(stock_data.symbol, stock_data.effective_profit_margin)
             return_value = False
 
         if not build_csv_db_only and (stock_data.ev_to_cfo_ratio_effective is None  or stock_data.ev_to_cfo_ratio_effective > ev_to_cfo_ratio_limit or stock_data.ev_to_cfo_ratio_effective <= 0):
-            if return_value and (not research_mode or VERBOSE_LOGS): print('                            Skipping {} ev_to_cfo_ratio_effective: {}'.format(stock_data.symbol, stock_data.ev_to_cfo_ratio_effective))
+            if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} ev_to_cfo_ratio_effective: {}'.format(stock_data.symbol, stock_data.ev_to_cfo_ratio_effective)
             return_value = False
 
         if not build_csv_db_only and (stock_data.debt_to_equity_effective is None  or stock_data.debt_to_equity_effective > debt_to_equity_limit or stock_data.debt_to_equity_effective <= 0):
-            if return_value and (not research_mode or VERBOSE_LOGS): print('                            Skipping {} debt_to_equity_effective: {}'.format(stock_data.symbol, stock_data.debt_to_equity_effective))
+            if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} debt_to_equity_effective: {}'.format(stock_data.symbol, stock_data.debt_to_equity_effective)
             return_value = False
 
         if stock_data.trailing_eps is None:
-            if not build_csv_db_only and use_investpy and 'EPS' in stock_information and stock_information['EPS'] is not None:
+            if not build_csv_db_only and use_investpy and 'EPS' in stock_information and stock_information['EPS'] != None:
                 stock_data.trailing_eps = float(text_to_num(stock_information['EPS']))
 
         if not build_csv_db_only and (stock_data.eqg_factor_effective is None or stock_data.eqg_factor_effective < eqg_min):
-            if return_value and (not research_mode or VERBOSE_LOGS): print('                            Skipping {} eqg_factor_effective: {}'.format(stock_data.symbol, stock_data.eqg_factor_effective))
+            if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} eqg_factor_effective: {}'.format(stock_data.symbol, stock_data.eqg_factor_effective)
             return_value = False
 
         if not build_csv_db_only and stock_data.price_to_earnings_to_growth_ratio is None:
-            if return_value and (not research_mode or VERBOSE_LOGS): print('                            Skipping {} price_to_earnings_to_growth_ratio: {}'.format(stock_data.symbol, stock_data.price_to_earnings_to_growth_ratio))
-            if return_value: return_value = False
+            if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} price_to_earnings_to_growth_ratio: {}'.format(stock_data.symbol, stock_data.price_to_earnings_to_growth_ratio)
+            return_value = False
 
         if build_csv_db_only:
             if   stock_data.price_to_earnings_to_growth_ratio > 0: stock_data.effective_peg_ratio =  stock_data.price_to_earnings_to_growth_ratio
@@ -1189,24 +1220,16 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
             else                                                 : stock_data.effective_peg_ratio =  1.0  # Something must be wrong, so take a neutral value of 1.0
 
         if build_csv_db:
-            if return_value:
-                sss_core_equation_value_set(stock_data)
-            else:
-                stock_data.sss_value = BAD_SSS
+            if return_value: sss_core_equation_value_set(stock_data)
+            else:            stock_data.sss_value = BAD_SSS
 
-            stock_data.last_dividend_0 = 0
-            stock_data.last_dividend_1 = 0
-            stock_data.last_dividend_2 = 0
-            stock_data.last_dividend_3 = 0
+            stock_data.last_dividend_0 = 0; stock_data.last_dividend_1 = 0
+            stock_data.last_dividend_2 = 0; stock_data.last_dividend_3 = 0
 
             # try: TODO: ASAFR: Complete this backup data to the yfinance dividends information
-            #     if tase_mode:
-            #         stock_dividends = investpy.get_stock_dividends(stock=stock_data.symbol.replace('.TA',''), country='israel')
-            #     else:
-            #         stock_dividends = investpy.get_stock_dividends(stock=stock_data.symbol, country='united states')
-            #     # print("stock_dividends: {}".format(stock_dividends.values.tolist()))
+            #     if tase_mode: stock_dividends = investpy.get_stock_dividends(stock=stock_data.symbol.replace('.TA',''), country='israel')
+            #     else:         stock_dividends = investpy.get_stock_dividends(stock=stock_data.symbol, country='united states')
             # except Exception as e:
-            #     print("Exception in investpy symbol.dividends: {}".format(e))
             #     pass
 
             try:  # It is important to note that: 1. latest value is in index 0. 2. For the actual value in USD, need to translate the date of the dividend to the value of share at that time, because the dividends[] are pare share
@@ -1230,8 +1253,10 @@ def process_info(symbol, stock_data, build_csv_db_only, use_investpy, tase_mode,
 
             round_and_avoid_none_values(stock_data)
 
-        if return_value and not research_mode: print('                                          sector: {:15},     country: {:15},    sss_value: {:15},     annualized_revenue: {:15},     annualized_earnings: {:15},     quarterized_revenue: {:15},     quarterized_earnings: {:15},     effective_earnings: {:15},     effective_revenue: {:15},     enterprise_value_to_revenue: {:15},     evr_effective: {:15},     trailing_price_to_earnings: {:15},     forward_price_to_earnings: {:15},     effective_price_to_earnings: {:15},     trailing_12months_price_to_sales: {:15},     pe_effective: {:15},     enterprise_value_to_ebitda: {:15},     profit_margin: {:15},     annualized_profit_margin: {:15},       annualized_profit_margin_boost: {:15},     quarterized_profit_margin: {:15},     quarterized_profit_margin_boost: {:15},     effective_profit_margin_boost: {:15}, held_percent_institutions: {:15},     forward_eps: {:15},     trailing_eps: {:15},     previous_close: {:15},     trailing_eps_percentage: {:15},     price_to_book: {:15},     shares_outstanding: {:15},     net_income_to_common_shareholders: {:15},     nitcsh_to_shares_outstanding: {:15},     employees: {:15},     enterprise_value: {:15},     market_cap: {:15},     nitcsh_to_num_employees: {:15},     eqg_factor_effective: {:15},     revenue_quarterly_growth: {:15},     price_to_earnings_to_growth_ratio: {:15},     effective_peg_ratio: {:15},     annualized_cash_flow_from_operating_activities: {:15},     quarterized_cash_flow_from_operating_activities: {:15},     annualized_ev_to_cfo_ratio: {:15},     quarterized_ev_to_cfo_ratio: {:15},     ev_to_cfo_ratio_effective: {:15},     annualized_debt_to_equity: {:15},     quarterized_debt_to_equity: {:15},     debt_to_equity_effective: {:15},     financial_currency: {:15},     conversion_rate_mult_to_usd: {:15}'.format(
+        if return_value and not research_mode: print('                                          sector: {:10},     country: {:10},    sss_value: {:10},     annualized_revenue: {:10},     annualized_earnings: {:10},     quarterized_revenue: {:10},     quarterized_earnings: {:10},     effective_earnings: {:10},     effective_revenue: {:10},     enterprise_value_to_revenue: {:10},     evr_effective: {:10},     trailing_price_to_earnings: {:10},     forward_price_to_earnings: {:10},     effective_price_to_earnings: {:10},     trailing_12months_price_to_sales: {:10},     pe_effective: {:10},     enterprise_value_to_ebitda: {:10},     profit_margin: {:10},     annualized_profit_margin: {:10},       annualized_profit_margin_boost: {:10},     quarterized_profit_margin: {:10},     quarterized_profit_margin_boost: {:10},     effective_profit_margin_boost: {:10}, held_percent_institutions: {:10},     forward_eps: {:10},     trailing_eps: {:10},     previous_close: {:10},     trailing_eps_percentage: {:10},     price_to_book: {:10},     shares_outstanding: {:10},     net_income_to_common_shareholders: {:10},     nitcsh_to_shares_outstanding: {:10},     employees: {:10},     enterprise_value: {:10},     market_cap: {:10},     nitcsh_to_num_employees: {:10},     eqg_factor_effective: {:10},     revenue_quarterly_growth: {:10},     price_to_earnings_to_growth_ratio: {:10},     effective_peg_ratio: {:10},     annualized_cash_flow_from_operating_activities: {:10},     quarterized_cash_flow_from_operating_activities: {:10},     annualized_ev_to_cfo_ratio: {:10},     quarterized_ev_to_cfo_ratio: {:10},     ev_to_cfo_ratio_effective: {:10},     annualized_debt_to_equity: {:10},     quarterized_debt_to_equity: {:10},     debt_to_equity_effective: {:10},     financial_currency: {:10},     conversion_rate_mult_to_usd: {:10}'.format(
                                                                                                 stock_data.sector, stock_data.country,stock_data.sss_value, stock_data.annualized_revenue, stock_data.annualized_earnings, stock_data.quarterized_revenue, stock_data.quarterized_earnings, stock_data.effective_earnings, stock_data.effective_revenue, stock_data.enterprise_value_to_revenue, stock_data.evr_effective, stock_data.trailing_price_to_earnings, stock_data.forward_price_to_earnings, stock_data.effective_price_to_earnings, stock_data.trailing_12months_price_to_sales, stock_data.pe_effective, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.annualized_profit_margin,   stock_data.annualized_profit_margin_boost, stock_data.quarterized_profit_margin, stock_data.quarterized_profit_margin_boost, stock_data.effective_profit_margin,   stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.previous_close, stock_data.trailing_eps_percentage, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.employees, stock_data.enterprise_value, stock_data.market_cap, stock_data.nitcsh_to_num_employees, stock_data.eqg_factor_effective, stock_data.revenue_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.effective_peg_ratio, stock_data.annualized_cash_flow_from_operating_activities, stock_data.quarterized_cash_flow_from_operating_activities, stock_data.annualized_ev_to_cfo_ratio, stock_data.quarterized_ev_to_cfo_ratio, stock_data.ev_to_cfo_ratio_effective, stock_data.annualized_debt_to_equity, stock_data.quarterized_debt_to_equity, stock_data.debt_to_equity_effective, stock_data.financial_currency, stock_data.conversion_rate_mult_to_usd))
+        if not return_value and (not research_mode or VERBOSE_LOGS): print('                            ' + stock_data.skip_reason)
+
         return return_value
 
     except Exception as e:  # More information is output when exception is used instead of Exception
@@ -1256,7 +1281,7 @@ def find_symbol_in_reference_db(symbol, reference_db):
 
 
 def get_db_row_from_stock_data(stock_data):
-    return [stock_data.symbol, stock_data.short_name, stock_data.sector, stock_data.country, stock_data.sss_value, stock_data.annualized_revenue, stock_data.annualized_earnings, stock_data.quarterized_revenue, stock_data.quarterized_earnings, stock_data.effective_earnings, stock_data.effective_revenue, stock_data.enterprise_value_to_revenue, stock_data.evr_effective, stock_data.trailing_price_to_earnings, stock_data.forward_price_to_earnings, stock_data.effective_price_to_earnings, stock_data.trailing_12months_price_to_sales, stock_data.pe_effective, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.annualized_profit_margin, stock_data.annualized_profit_margin_boost, stock_data.quarterized_profit_margin, stock_data.quarterized_profit_margin_boost, stock_data.effective_profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.previous_close, stock_data.trailing_eps_percentage, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.employees, stock_data.enterprise_value, stock_data.market_cap, stock_data.nitcsh_to_num_employees, stock_data.eqg, stock_data.eqg_yoy, stock_data.eqg_effective, stock_data.eqg_factor_effective, stock_data.revenue_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.effective_peg_ratio, stock_data.annualized_cash_flow_from_operating_activities, stock_data.quarterized_cash_flow_from_operating_activities, stock_data.annualized_ev_to_cfo_ratio, stock_data.quarterized_ev_to_cfo_ratio, stock_data.ev_to_cfo_ratio_effective, stock_data.annualized_debt_to_equity, stock_data.quarterized_debt_to_equity, stock_data.debt_to_equity_effective, stock_data.financial_currency, stock_data.conversion_rate_mult_to_usd, stock_data.last_dividend_0, stock_data.last_dividend_1, stock_data.last_dividend_2, stock_data.last_dividend_3, stock_data.fifty_two_week_change, stock_data.fifty_two_week_low, stock_data.fifty_two_week_high, stock_data.two_hundred_day_average, stock_data.previous_close_percentage_from_200d_ma, stock_data.previous_close_percentage_from_52w_low, stock_data.previous_close_percentage_from_52w_high, stock_data.dist_from_low_factor, stock_data.eff_dist_from_low_factor, stock_data.annualized_total_ratio, stock_data.quarterized_total_ratio, stock_data.annualized_other_current_ratio, stock_data.quarterized_other_current_ratio, stock_data.annualized_other_ratio, stock_data.quarterized_other_ratio, stock_data.annualized_total_current_ratio, stock_data.quarterized_total_current_ratio, stock_data.total_ratio_effective, stock_data.other_current_ratio_effective, stock_data.other_ratio_effective, stock_data.total_current_ratio_effective]
+    return [stock_data.symbol, stock_data.short_name, stock_data.sector, stock_data.country, stock_data.sss_value, stock_data.annualized_revenue, stock_data.annualized_earnings, stock_data.quarterized_revenue, stock_data.quarterized_earnings, stock_data.effective_earnings, stock_data.effective_revenue, stock_data.enterprise_value_to_revenue, stock_data.evr_effective, stock_data.trailing_price_to_earnings, stock_data.forward_price_to_earnings, stock_data.effective_price_to_earnings, stock_data.trailing_12months_price_to_sales, stock_data.pe_effective, stock_data.enterprise_value_to_ebitda, stock_data.profit_margin, stock_data.annualized_profit_margin, stock_data.annualized_profit_margin_boost, stock_data.quarterized_profit_margin, stock_data.quarterized_profit_margin_boost, stock_data.effective_profit_margin, stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.previous_close, stock_data.trailing_eps_percentage, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.employees, stock_data.enterprise_value, stock_data.market_cap, stock_data.nitcsh_to_num_employees, stock_data.eqg, stock_data.eqg_yoy, stock_data.eqg_effective, stock_data.eqg_factor_effective, stock_data.revenue_quarterly_growth, stock_data.price_to_earnings_to_growth_ratio, stock_data.effective_peg_ratio, stock_data.annualized_cash_flow_from_operating_activities, stock_data.quarterized_cash_flow_from_operating_activities, stock_data.annualized_ev_to_cfo_ratio, stock_data.quarterized_ev_to_cfo_ratio, stock_data.ev_to_cfo_ratio_effective, stock_data.annualized_debt_to_equity, stock_data.quarterized_debt_to_equity, stock_data.debt_to_equity_effective, stock_data.financial_currency, stock_data.conversion_rate_mult_to_usd, stock_data.last_dividend_0, stock_data.last_dividend_1, stock_data.last_dividend_2, stock_data.last_dividend_3, stock_data.fifty_two_week_change, stock_data.fifty_two_week_low, stock_data.fifty_two_week_high, stock_data.two_hundred_day_average, stock_data.previous_close_percentage_from_200d_ma, stock_data.previous_close_percentage_from_52w_low, stock_data.previous_close_percentage_from_52w_high, stock_data.dist_from_low_factor, stock_data.eff_dist_from_low_factor, stock_data.annualized_total_ratio, stock_data.quarterized_total_ratio, stock_data.annualized_other_current_ratio, stock_data.quarterized_other_current_ratio, stock_data.annualized_other_ratio, stock_data.quarterized_other_ratio, stock_data.annualized_total_current_ratio, stock_data.quarterized_total_current_ratio, stock_data.total_ratio_effective, stock_data.other_current_ratio_effective, stock_data.other_ratio_effective, stock_data.total_current_ratio_effective, stock_data.skip_reason]
 
 
 def get_stock_data_from_db_row(row, symbol=None):
@@ -1264,7 +1289,7 @@ def get_stock_data_from_db_row(row, symbol=None):
         stock_symbol = symbol
     else:
         stock_symbol = row[g_symbol_index]
-    return StockData(symbol=stock_symbol, short_name=row[g_name_index], sector=row[g_sector_index], country=row[g_country_index], sss_value=float(row[g_sss_value_index] if row[g_sss_value_index] is not None else 0), annualized_revenue=float(row[g_annualized_revenue_index] if row[g_annualized_revenue_index] is not None else 0), annualized_earnings=float(row[g_annualized_earnings_index] if row[g_annualized_earnings_index] is not None else 0), quarterized_revenue=float(row[g_quarterized_revenue_index] if row[g_quarterized_revenue_index] is not None else 0), quarterized_earnings=float(row[g_quarterized_earnings_index] if row[g_quarterized_earnings_index] is not None else 0), effective_earnings=float(row[g_effective_earnings_index] if row[g_effective_earnings_index] is not None else 0), effective_revenue=float(row[g_effective_revenue_index] if row[g_effective_revenue_index] is not None else 0), enterprise_value_to_revenue=float(row[g_enterprise_value_to_revenue_index] if row[g_enterprise_value_to_revenue_index] is not None else 0), evr_effective=float(row[g_evr_effective_index] if row[g_evr_effective_index] is not None else 0), trailing_price_to_earnings=float(row[g_trailing_price_to_earnings_index] if row[g_trailing_price_to_earnings_index] is not None else 0), forward_price_to_earnings=float(row[g_forward_price_to_earnings_index] if row[g_forward_price_to_earnings_index] is not None else 0), effective_price_to_earnings=float(row[g_effective_price_to_earnings_index] if row[g_effective_price_to_earnings_index] is not None else 0), trailing_12months_price_to_sales=float(row[g_trailing_12months_price_to_sales_index] if row[g_trailing_12months_price_to_sales_index] is not None else 0), pe_effective=float(row[g_pe_effective_index] if row[g_pe_effective_index] is not None else 0), enterprise_value_to_ebitda=float(row[g_enterprise_value_to_ebitda_index] if row[g_enterprise_value_to_ebitda_index] is not None else 0), profit_margin=float(row[g_profit_margin_index] if row[g_profit_margin_index] is not None else 0), annualized_profit_margin=float(row[g_annualized_profit_margin_index] if row[g_annualized_profit_margin_index] is not None else 0), annualized_profit_margin_boost=float(row[g_annualized_profit_margin_boost_index] if row[g_annualized_profit_margin_boost_index] is not None else 0), quarterized_profit_margin=float(row[g_quarterized_profit_margin_index] if row[g_quarterized_profit_margin_index] is not None else 0), quarterized_profit_margin_boost=float(row[g_quarterized_profit_margin_boost_index] if row[g_quarterized_profit_margin_boost_index] is not None else 0), effective_profit_margin=float(row[g_effective_profit_margin_index] if row[g_effective_profit_margin_index] is not None else 0), held_percent_institutions=float(row[g_held_percent_institutions_index] if row[g_held_percent_institutions_index] is not None else 0), forward_eps=float(row[g_forward_eps_index] if row[g_forward_eps_index] is not None else 0), trailing_eps=float(row[g_trailing_eps_index] if row[g_trailing_eps_index] is not None else 0), previous_close=float(row[g_previous_close_index] if row[g_previous_close_index] is not None else 0), trailing_eps_percentage=float(row[g_trailing_eps_percentage_index] if row[g_trailing_eps_percentage_index] is not None else 0), price_to_book=float(row[g_price_to_book_index] if row[g_price_to_book_index] is not None else 0), shares_outstanding=float(row[g_shares_outstanding_index] if row[g_shares_outstanding_index] is not None else 0), net_income_to_common_shareholders=float(row[g_net_income_to_common_shareholders_index] if row[g_net_income_to_common_shareholders_index] is not None else 0), nitcsh_to_shares_outstanding=float(row[g_nitcsh_to_shares_outstanding_index] if row[g_nitcsh_to_shares_outstanding_index] is not None else 0), employees=int(float(row[g_employees_index] if row[g_employees_index] is not None else 0)), enterprise_value=int(float(row[g_enterprise_value_index] if row[g_enterprise_value_index] is not None else 0)), market_cap=int(float(row[g_market_cap_index] if row[g_market_cap_index] is not None else 0)), nitcsh_to_num_employees=float(row[g_nitcsh_to_num_employees_index] if row[g_nitcsh_to_num_employees_index] is not None else 0), eqg=float(row[g_eqg_index] if row[g_eqg_index] is not None else 0), eqg_yoy=float(row[g_eqg_yoy_index] if row[g_eqg_yoy_index] is not None else 0), eqg_effective=float(row[g_eqg_effective_index] if row[g_eqg_effective_index] is not None else 0), eqg_factor_effective=float(row[g_eqg_factor_effective_index] if row[g_eqg_factor_effective_index] is not None else 0), revenue_quarterly_growth=float(row[g_revenue_quarterly_growth_index] if row[g_revenue_quarterly_growth_index] is not None else 0), price_to_earnings_to_growth_ratio=float(row[g_price_to_earnings_to_growth_ratio_index] if row[g_price_to_earnings_to_growth_ratio_index] is not None else 0), effective_peg_ratio=float(row[g_effective_peg_ratio_index] if row[g_effective_peg_ratio_index] is not None else 0), annualized_cash_flow_from_operating_activities=float(row[g_annualized_cash_flow_from_operating_activities_index] if row[g_annualized_cash_flow_from_operating_activities_index] is not None else 0), quarterized_cash_flow_from_operating_activities=float(row[g_quarterized_cash_flow_from_operating_activities_index] if row[g_quarterized_cash_flow_from_operating_activities_index] is not None else 0), annualized_ev_to_cfo_ratio=float(row[g_annualized_ev_to_cfo_ratio_index] if row[g_annualized_ev_to_cfo_ratio_index] is not None else 0), quarterized_ev_to_cfo_ratio=float(row[g_quarterized_ev_to_cfo_ratio_index] if row[g_quarterized_ev_to_cfo_ratio_index] is not None else 0), ev_to_cfo_ratio_effective=float(row[g_ev_to_cfo_ratio_effective_index] if row[g_ev_to_cfo_ratio_effective_index] is not None else 0), annualized_debt_to_equity=float(row[g_annualized_debt_to_equity_index] if row[g_annualized_debt_to_equity_index] is not None else 0), quarterized_debt_to_equity=float(row[g_quarterized_debt_to_equity_index] if row[g_quarterized_debt_to_equity_index] is not None else 0), debt_to_equity_effective=float(row[g_debt_to_equity_effective_index] if row[g_debt_to_equity_effective_index] is not None else 0), financial_currency=row[g_financial_currency_index], conversion_rate_mult_to_usd=float(row[g_conversion_rate_mult_to_usd_index] if row[g_conversion_rate_mult_to_usd_index] is not None else 0), last_dividend_0=float(row[g_last_dividend_0_index] if row[g_last_dividend_0_index] is not None else 0), last_dividend_1=float(row[g_last_dividend_1_index] if row[g_last_dividend_1_index] is not None else 0), last_dividend_2=float(row[g_last_dividend_2_index] if row[g_last_dividend_2_index] is not None else 0), last_dividend_3=float(row[g_last_dividend_3_index] if row[g_last_dividend_3_index] is not None else 0), fifty_two_week_change=float(row[g_fifty_two_week_change_index] if row[g_fifty_two_week_change_index] is not None else 0), fifty_two_week_low=float(row[g_fifty_two_week_low_index] if row[g_fifty_two_week_low_index] is not None else 0), fifty_two_week_high=float(row[g_fifty_two_week_high_index] if row[g_fifty_two_week_high_index] is not None else 0), two_hundred_day_average=float(row[g_two_hundred_day_average_index] if row[g_two_hundred_day_average_index] is not None else 0), previous_close_percentage_from_200d_ma=float(row[g_previous_close_percentage_from_200d_ma_index] if row[g_previous_close_percentage_from_200d_ma_index] is not None else 0), previous_close_percentage_from_52w_low=float(row[g_previous_close_percentage_from_52w_low_index] if row[g_previous_close_percentage_from_52w_low_index] is not None else 0), previous_close_percentage_from_52w_high=float(row[g_previous_close_percentage_from_52w_high_index] if row[g_previous_close_percentage_from_52w_high_index] is not None else 0), dist_from_low_factor=float(row[g_dist_from_low_factor_index] if row[g_dist_from_low_factor_index] is not None else 0), eff_dist_from_low_factor=float(row[g_eff_dist_from_low_factor_index] if row[g_eff_dist_from_low_factor_index] is not None else 0), annualized_total_ratio=float(row[g_annualized_total_ratio_index] if row[g_annualized_total_ratio_index] is not None else 0), quarterized_total_ratio=float(row[g_quarterized_total_ratio_index] if row[g_quarterized_total_ratio_index] is not None else 0), annualized_other_current_ratio=float(row[g_annualized_other_current_ratio_index] if row[g_annualized_other_current_ratio_index] is not None else 0), quarterized_other_current_ratio=float(row[g_quarterized_other_current_ratio_index] if row[g_quarterized_other_current_ratio_index] is not None else 0), annualized_other_ratio=float(row[g_annualized_other_ratio_index] if row[g_annualized_other_ratio_index] is not None else 0), quarterized_other_ratio=float(row[g_quarterized_other_ratio_index] if row[g_quarterized_other_ratio_index] is not None else 0), annualized_total_current_ratio=float(row[g_annualized_total_current_ratio_index] if row[g_annualized_total_current_ratio_index] is not None else 0), quarterized_total_current_ratio=float(row[g_quarterized_total_current_ratio_index] if row[g_quarterized_total_current_ratio_index] is not None else 0), total_ratio_effective=float(row[g_total_ratio_effective_index] if row[g_total_ratio_effective_index] is not None else 0), other_current_ratio_effective=float(row[g_other_current_ratio_effective_index] if row[g_other_current_ratio_effective_index] is not None else 0), other_ratio_effective=float(row[g_other_ratio_effective_index] if row[g_other_ratio_effective_index] is not None else 0), total_current_ratio_effective=float(row[g_total_current_ratio_effective_index] if row[g_total_current_ratio_effective_index] is not None else 0))
+    return StockData(symbol=stock_symbol, short_name=row[g_name_index], sector=row[g_sector_index], country=row[g_country_index], sss_value=float(row[g_sss_value_index] if row[g_sss_value_index] != None else 0), annualized_revenue=float(row[g_annualized_revenue_index] if row[g_annualized_revenue_index] != None else 0), annualized_earnings=float(row[g_annualized_earnings_index] if row[g_annualized_earnings_index] != None else 0), quarterized_revenue=float(row[g_quarterized_revenue_index] if row[g_quarterized_revenue_index] != None else 0), quarterized_earnings=float(row[g_quarterized_earnings_index] if row[g_quarterized_earnings_index] != None else 0), effective_earnings=float(row[g_effective_earnings_index] if row[g_effective_earnings_index] != None else 0), effective_revenue=float(row[g_effective_revenue_index] if row[g_effective_revenue_index] != None else 0), enterprise_value_to_revenue=float(row[g_enterprise_value_to_revenue_index] if row[g_enterprise_value_to_revenue_index] != None else 0), evr_effective=float(row[g_evr_effective_index] if row[g_evr_effective_index] != None else 0), trailing_price_to_earnings=float(row[g_trailing_price_to_earnings_index] if row[g_trailing_price_to_earnings_index] != None else 0), forward_price_to_earnings=float(row[g_forward_price_to_earnings_index] if row[g_forward_price_to_earnings_index] != None else 0), effective_price_to_earnings=float(row[g_effective_price_to_earnings_index] if row[g_effective_price_to_earnings_index] != None else 0), trailing_12months_price_to_sales=float(row[g_trailing_12months_price_to_sales_index] if row[g_trailing_12months_price_to_sales_index] != None else 0), pe_effective=float(row[g_pe_effective_index] if row[g_pe_effective_index] != None else 0), enterprise_value_to_ebitda=float(row[g_enterprise_value_to_ebitda_index] if row[g_enterprise_value_to_ebitda_index] != None else 0), profit_margin=float(row[g_profit_margin_index] if row[g_profit_margin_index] != None else 0), annualized_profit_margin=float(row[g_annualized_profit_margin_index] if row[g_annualized_profit_margin_index] != None else 0), annualized_profit_margin_boost=float(row[g_annualized_profit_margin_boost_index] if row[g_annualized_profit_margin_boost_index] != None else 0), quarterized_profit_margin=float(row[g_quarterized_profit_margin_index] if row[g_quarterized_profit_margin_index] != None else 0), quarterized_profit_margin_boost=float(row[g_quarterized_profit_margin_boost_index] if row[g_quarterized_profit_margin_boost_index] != None else 0), effective_profit_margin=float(row[g_effective_profit_margin_index] if row[g_effective_profit_margin_index] != None else 0), held_percent_institutions=float(row[g_held_percent_institutions_index] if row[g_held_percent_institutions_index] != None else 0), forward_eps=float(row[g_forward_eps_index] if row[g_forward_eps_index] != None else 0), trailing_eps=float(row[g_trailing_eps_index] if row[g_trailing_eps_index] != None else 0), previous_close=float(row[g_previous_close_index] if row[g_previous_close_index] != None else 0), trailing_eps_percentage=float(row[g_trailing_eps_percentage_index] if row[g_trailing_eps_percentage_index] != None else 0), price_to_book=float(row[g_price_to_book_index] if row[g_price_to_book_index] != None else 0), shares_outstanding=float(row[g_shares_outstanding_index] if row[g_shares_outstanding_index] != None else 0), net_income_to_common_shareholders=float(row[g_net_income_to_common_shareholders_index] if row[g_net_income_to_common_shareholders_index] != None else 0), nitcsh_to_shares_outstanding=float(row[g_nitcsh_to_shares_outstanding_index] if row[g_nitcsh_to_shares_outstanding_index] != None else 0), employees=int(float(row[g_employees_index] if row[g_employees_index] != None else 0)), enterprise_value=int(float(row[g_enterprise_value_index] if row[g_enterprise_value_index] != None else 0)), market_cap=int(float(row[g_market_cap_index] if row[g_market_cap_index] != None else 0)), nitcsh_to_num_employees=float(row[g_nitcsh_to_num_employees_index] if row[g_nitcsh_to_num_employees_index] != None else 0), eqg=float(row[g_eqg_index] if row[g_eqg_index] != None else 0), eqg_yoy=float(row[g_eqg_yoy_index] if row[g_eqg_yoy_index] != None else 0), eqg_effective=float(row[g_eqg_effective_index] if row[g_eqg_effective_index] != None else 0), eqg_factor_effective=float(row[g_eqg_factor_effective_index] if row[g_eqg_factor_effective_index] != None else 0), revenue_quarterly_growth=float(row[g_revenue_quarterly_growth_index] if row[g_revenue_quarterly_growth_index] != None else 0), price_to_earnings_to_growth_ratio=float(row[g_price_to_earnings_to_growth_ratio_index] if row[g_price_to_earnings_to_growth_ratio_index] != None else 0), effective_peg_ratio=float(row[g_effective_peg_ratio_index] if row[g_effective_peg_ratio_index] != None else 0), annualized_cash_flow_from_operating_activities=float(row[g_annualized_cash_flow_from_operating_activities_index] if row[g_annualized_cash_flow_from_operating_activities_index] != None else 0), quarterized_cash_flow_from_operating_activities=float(row[g_quarterized_cash_flow_from_operating_activities_index] if row[g_quarterized_cash_flow_from_operating_activities_index] != None else 0), annualized_ev_to_cfo_ratio=float(row[g_annualized_ev_to_cfo_ratio_index] if row[g_annualized_ev_to_cfo_ratio_index] != None else 0), quarterized_ev_to_cfo_ratio=float(row[g_quarterized_ev_to_cfo_ratio_index] if row[g_quarterized_ev_to_cfo_ratio_index] != None else 0), ev_to_cfo_ratio_effective=float(row[g_ev_to_cfo_ratio_effective_index] if row[g_ev_to_cfo_ratio_effective_index] != None else 0), annualized_debt_to_equity=float(row[g_annualized_debt_to_equity_index] if row[g_annualized_debt_to_equity_index] != None else 0), quarterized_debt_to_equity=float(row[g_quarterized_debt_to_equity_index] if row[g_quarterized_debt_to_equity_index] != None else 0), debt_to_equity_effective=float(row[g_debt_to_equity_effective_index] if row[g_debt_to_equity_effective_index] != None else 0), financial_currency=row[g_financial_currency_index], conversion_rate_mult_to_usd=float(row[g_conversion_rate_mult_to_usd_index] if row[g_conversion_rate_mult_to_usd_index] != None else 0), last_dividend_0=float(row[g_last_dividend_0_index] if row[g_last_dividend_0_index] != None else 0), last_dividend_1=float(row[g_last_dividend_1_index] if row[g_last_dividend_1_index] != None else 0), last_dividend_2=float(row[g_last_dividend_2_index] if row[g_last_dividend_2_index] != None else 0), last_dividend_3=float(row[g_last_dividend_3_index] if row[g_last_dividend_3_index] != None else 0), fifty_two_week_change=float(row[g_fifty_two_week_change_index] if row[g_fifty_two_week_change_index] != None else 0), fifty_two_week_low=float(row[g_fifty_two_week_low_index] if row[g_fifty_two_week_low_index] != None else 0), fifty_two_week_high=float(row[g_fifty_two_week_high_index] if row[g_fifty_two_week_high_index] != None else 0), two_hundred_day_average=float(row[g_two_hundred_day_average_index] if row[g_two_hundred_day_average_index] != None else 0), previous_close_percentage_from_200d_ma=float(row[g_previous_close_percentage_from_200d_ma_index] if row[g_previous_close_percentage_from_200d_ma_index] != None else 0), previous_close_percentage_from_52w_low=float(row[g_previous_close_percentage_from_52w_low_index] if row[g_previous_close_percentage_from_52w_low_index] != None else 0), previous_close_percentage_from_52w_high=float(row[g_previous_close_percentage_from_52w_high_index] if row[g_previous_close_percentage_from_52w_high_index] != None else 0), dist_from_low_factor=float(row[g_dist_from_low_factor_index] if row[g_dist_from_low_factor_index] != None else 0), eff_dist_from_low_factor=float(row[g_eff_dist_from_low_factor_index] if row[g_eff_dist_from_low_factor_index] != None else 0), annualized_total_ratio=float(row[g_annualized_total_ratio_index] if row[g_annualized_total_ratio_index] != None else 0), quarterized_total_ratio=float(row[g_quarterized_total_ratio_index] if row[g_quarterized_total_ratio_index] != None else 0), annualized_other_current_ratio=float(row[g_annualized_other_current_ratio_index] if row[g_annualized_other_current_ratio_index] != None else 0), quarterized_other_current_ratio=float(row[g_quarterized_other_current_ratio_index] if row[g_quarterized_other_current_ratio_index] != None else 0), annualized_other_ratio=float(row[g_annualized_other_ratio_index] if row[g_annualized_other_ratio_index] != None else 0), quarterized_other_ratio=float(row[g_quarterized_other_ratio_index] if row[g_quarterized_other_ratio_index] != None else 0), annualized_total_current_ratio=float(row[g_annualized_total_current_ratio_index] if row[g_annualized_total_current_ratio_index] != None else 0), quarterized_total_current_ratio=float(row[g_quarterized_total_current_ratio_index] if row[g_quarterized_total_current_ratio_index] != None else 0), total_ratio_effective=float(row[g_total_ratio_effective_index] if row[g_total_ratio_effective_index] != None else 0), other_current_ratio_effective=float(row[g_other_current_ratio_effective_index] if row[g_other_current_ratio_effective_index] != None else 0), other_ratio_effective=float(row[g_other_ratio_effective_index] if row[g_other_ratio_effective_index] != None else 0), total_current_ratio_effective=float(row[g_total_current_ratio_effective_index] if row[g_total_current_ratio_effective_index] != None else 0), skip_reason=row[g_skip_reason_index])
 
 def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thread_id, build_csv_db_only, use_investpy, tase_mode, sectors_list, sectors_filter_out, countries_list, countries_filter_out, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, min_enterprise_value_millions_usd, eqg_min, revenue_quarterly_growth_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, reference_db, diff_rows):
     iteration = 0
@@ -1289,21 +1314,23 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
                 if symbol_index_in_reference_db >= 0:
                     found_differences = False
                     for index in range(len(g_header_row)):
+                        if (VERBOSE_LOGS): print('      comparing column {}'.format(g_header_row[index]))
                         if type(row_to_append[index]) == int or type(row_to_append[index]) == float:
                             try:
-                                min_val = min(float(row_to_append[index]), float(reference_db[symbol_index_in_reference_db][index]))
-                                max_val = max(float(row_to_append[index]), float(reference_db[symbol_index_in_reference_db][index]))
-                                diff    = abs(max_val-min_val)
-                                # TODO: ASAFR: 52-week change is not really working and not really needed - fix or eliminate
-                                indices_list_to_ignore_changes_in = [g_sss_value_index] # [g_fifty_two_week_change_index, g_sss_value_index, g_two_hundred_day_average_index, g_previous_close_percentage_from_200d_ma_index]
-                                if diff > abs(max_val)*REFERENCE_DB_MAX_VALUE_DIFF_FACTOR_THRESHOLD and index not in indices_list_to_ignore_changes_in:
-                                    if float(reference_db[symbol_index_in_reference_db][g_sss_value_index]) < float(row_to_append[g_sss_value_index]):
-                                        found_differences = True
-                                        compensated_value = round(REFERENCE_DB_MAX_VALUE_DIFF_FACTOR_THRESHOLD*float(reference_db[symbol_index_in_reference_db][index]) + (1-REFERENCE_DB_MAX_VALUE_DIFF_FACTOR_THRESHOLD)*float(row_to_append[index]), NUM_ROUND_DECIMALS)
-                                        if type(row_to_append[index]) == int:
-                                            compensated_value = int(round(compensated_value))
-                                        print('                            {:5} - Suspicious Difference detected (taking lower sss_value [{} < {}] row as correct row): reference_db[{:25}]={:6}, db[{:25}]={:6} -> compensated_value = {:6}'.format(row_to_append[g_symbol_index], (reference_db[symbol_index_in_reference_db][g_sss_value_index]), (row_to_append[g_sss_value_index]), g_header_row[index], reference_db[symbol_index_in_reference_db][index], g_header_row[index], row_to_append[index], compensated_value))
-                                        row_to_append[index] = compensated_value  # Overwrite specific index value with compensated value from reference db
+                                if len(reference_db[symbol_index_in_reference_db][index]):
+                                    min_val = min(float(row_to_append[index]), float(reference_db[symbol_index_in_reference_db][index]))
+                                    max_val = max(float(row_to_append[index]), float(reference_db[symbol_index_in_reference_db][index]))
+                                    diff    = abs(max_val-min_val)
+                                    # TODO: ASAFR: 52-week change is not really working and not really needed - fix or eliminate
+                                    indices_list_to_ignore_changes_in = [g_sss_value_index] # [g_fifty_two_week_change_index, g_sss_value_index, g_two_hundred_day_average_index, g_previous_close_percentage_from_200d_ma_index]
+                                    if diff > abs(max_val)*REFERENCE_DB_MAX_VALUE_DIFF_FACTOR_THRESHOLD and index not in indices_list_to_ignore_changes_in:
+                                        if float(reference_db[symbol_index_in_reference_db][g_sss_value_index]) < float(row_to_append[g_sss_value_index]):
+                                            found_differences = True
+                                            compensated_value = round(REFERENCE_DB_MAX_VALUE_DIFF_FACTOR_THRESHOLD*float(reference_db[symbol_index_in_reference_db][index]) + (1-REFERENCE_DB_MAX_VALUE_DIFF_FACTOR_THRESHOLD)*float(row_to_append[index]), NUM_ROUND_DECIMALS)
+                                            if type(row_to_append[index]) == int:
+                                                compensated_value = int(round(compensated_value))
+                                            print('                            {:5} - Suspicious Difference detected (taking lower sss_value [{} < {}] row as correct row): reference_db[{:25}]={:6}, db[{:25}]={:6} -> compensated_value = {:6}'.format(row_to_append[g_symbol_index], (reference_db[symbol_index_in_reference_db][g_sss_value_index]), (row_to_append[g_sss_value_index]), g_header_row[index], reference_db[symbol_index_in_reference_db][index], g_header_row[index], row_to_append[index], compensated_value))
+                                            row_to_append[index] = compensated_value  # Overwrite specific index value with compensated value from reference db
                             except Exception as e:
                                 print("Exception {} in comparison of {}: row_to_append is {} while reference_db is {}".format(e, g_header_row[index], row_to_append[index], reference_db[symbol_index_in_reference_db][index]))
                                 pass
@@ -1359,7 +1386,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
     currency_conversion_tool = CurrencyRates().get_rates('USD') if build_csv_db else None
 
     reference_db = []
-    if not research_mode and reference_run is not None and len(reference_run):  # in non-research mode, compare to reference run
+    if not research_mode and reference_run != None and len(reference_run):  # in non-research mode, compare to reference run
         reference_csv_db_filename = reference_run+'/db.csv'
         with open(reference_csv_db_filename, mode='r', newline='') as engine:
             reader = csv.reader(engine, delimiter=',')
