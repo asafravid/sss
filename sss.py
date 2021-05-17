@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.4 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.11 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021 Asaf Ravid
@@ -24,9 +24,7 @@
 # TODO: ASAF: 0. Remove non-required columns from the indices input CSVs - faster load and down to the point
 #                0.1. Investigate average and ranges of all parameters in the SSS Core Equation - summarise in the document itself (Test Case)
 #             1. Check and multi dim and investigate eqg_min and revenue_quarterly_growth_min: Check why Yahoo Finance always gives QRG values of 0? Unusable if that is always so
-#             2. Square Root of PEG Ratio may be too harsh, try something else perhaps, but only after understanding why Yahoo Finance PEG ratio is sometimes vastly different from zachs and other websites - for instance EXC
 #             3. Take latest yfinance base.py (and other - compare the whole folder) and updates - maybe not required - but just stay up to date
-#             4. What are stocks with '-' and '.' in them? Probably can be pre-filtered as well. Like HIGA-W, for instance
 #             5. Investigate and add: https://www.investopedia.com/terms/o/operatingmargin.asp - operating margin
 #             6. Add Free Cash flow [FCF] (EV/FreeCashFlow): Inverse of the Free Cash Flow Yield (https://www.stockopedia.com/ratios/ev-free-cash-flow-336/#:~:text=What%20is%20the%20definition%20of,the%20Free%20Cash%20Flow%20Yield.)
 #             7. There is already an EV/CFO ratio.
@@ -34,12 +32,8 @@
 #                  EV/CFO * EV/FCF = EV^2 / (CFO * [CFO - CapitalExpenditures]) | EV/CFO + EV/FCF = EV*(1/CFO + 1/(CFO-CapitalExpenditures))
 #                  Conclusion: EV/FCF is better as it provides moe information. But make this a lower priority for development
 #                              Bonus: When there is no CFO, Use FCF, and Vice Versa - more information
-#             8. Calculate Book Value manually: https://www.wallstreetmojo.com/book-value-formula/, https://www.investopedia.com/articles/investing/110613/market-value-versus-book-value.asp#:~:text=How%20do%20you%20calculate%20book,in%20annual%20and%20quarterly%20reports.
 #             9. Which are the most effective parameters? Correlate the sorting of sss_value to the results and each of the sorted-by-parameter list.
 #            10. Important: https://www.oldschoolvalue.com/investing-strategy/walter-schloss-investing-strategy-producing-towering-returns/#:~:text=Walter%20Schloss%20ran%20with%20the,to%20perform%20complex%20valuations%20either.
-#                10.0.  Calculate the Working-Capital, which is calculated by using the current ratio, which is
-#                current assets divided by current liabilities. A ratio above 1 means current assets exceed liabilities, and, generally,
-#                the higher the ratio, the better. https://www.investopedia.com/terms/c/currentratio.asp
 #                10.1.  3 years low, 5 years low
 #                10.2.  F-Score, M-Score, Z-Score
 #                10.3.  Multi-Dim scan over the distance from low, and over the Schloff Score - define a Walter-Schloss score
@@ -102,14 +96,14 @@ QUARTERLY_YEARLY_MISSING_FACTOR              = 0.25  # if either yearly or quart
 #              1. The rarety (statistically comapred to all the stocks in scan) - proportionaly to it (the rarest the case - the more boost)
 #              2. The ascent (slope) of the increase and the positive value -> the higher - the more boost
 #              3. Add similar boosters for other annual and quarterly weighted-averaged parameters
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE                = 1.25   # Provide a "bonus" for companies whose profit margins have increased continuously annually
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE             = 1.25   # Provide a "bonus" for companies whose profit margins have increased continuously quarterly
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_POSITIVE                = 2.0    # Provide a "bonus" for companies whose profit margins have been continuously positive annually
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_POSITIVE             = 2.0    # Provide a "bonus" for companies whose profit margins have been continuously positive quarterly
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_EARNINGS    = 1.75   # Provide a "bonus" for companies whose earnings       have been continuously increasing annually
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE                = 2.25   # Provide a "bonus" for companies whose profit margins have increased continuously annually
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE             = 1.75   # Provide a "bonus" for companies whose profit margins have increased continuously quarterly
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_POSITIVE                = 2.5    # Provide a "bonus" for companies whose profit margins have been continuously positive annually
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_POSITIVE             = 2.5    # Provide a "bonus" for companies whose profit margins have been continuously positive quarterly
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_EARNINGS    = 2.75   # Provide a "bonus" for companies whose earnings       have been continuously increasing annually
 PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_REVENUE     = 2.25   # Provide a "bonus" for companies whose revenue        has  been continuously increasing annually
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_EARNINGS = 1.75   # Provide a "bonus" for companies whose earnings       have been continuously increasing quarterly
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_REVENUE  = 1.5    # Provide a "bonus" for companies whose revenue        has  been continuously increasing quarterly
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_EARNINGS = 2.75   # Provide a "bonus" for companies whose earnings       have been continuously increasing quarterly
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_REVENUE  = 2.5    # Provide a "bonus" for companies whose revenue        has  been continuously increasing quarterly
 PROFIT_MARGIN_DUPLICATION_FACTOR                                  = 8.0    # When copying profit margin (if either quarterized/annualized/profit_margin is missing) - devide by this factor
 NEGATIVE_CFO_FACTOR                                               = 10.0   #
 NEGATIVE_PEG_RATIO_FACTOR                                         = 10.0   # -0.5 -> 5, and -0.001 -> 0.01
@@ -309,9 +303,9 @@ def check_quote_type(stock_data, research_mode):
 
 def check_sector(stock_data, sectors_list):
     # Fix stocks' Sectors to Correct Sector. yfinance sometimes has those mistaken
-    if   stock_data.symbol in ['BRMG.TA',   'RLCO.TA',   'DELT.TA'                              ]: stock_data.sector = 'Consumer Cyclical'
+    if   stock_data.symbol in ['BRMG.TA',   'RLCO.TA',   'DELT.TA',  'TDRN.TA',   'ECP.TA'      ]: stock_data.sector = 'Consumer Cyclical'
     elif stock_data.symbol in ['EFNC.TA',   'GIBUI.TA',  'KMNK-M.TA'                            ]: stock_data.sector = 'Financial Services'
-    elif stock_data.symbol in ['DEDR-L.TA', 'GLEX-L',    'RPAC.TA'                              ]: stock_data.sector = 'Energy'
+    elif stock_data.symbol in ['DEDR-L.TA', 'GLEX-L',    'RPAC.TA',  'CDEV.TA',   'GNRS.TA'     ]: stock_data.sector = 'Energy'
     elif stock_data.symbol in ['GLRS.TA',   'WILC.TA',   'MEDN.TA'                              ]: stock_data.sector = 'Consumer Defensive'
     elif stock_data.symbol in ['POLY.TA',   'WTS.TA',    'YBOX.TA',  'PLAZ-L.TA', 'TIGBUR.TA',
                                'ROTS.TA',   'AZRT.TA',   'SKBN.TA',  'DUNI.TA',   'DNYA.TA',
@@ -367,7 +361,7 @@ def text_to_num(text):
 def weighted_average(values_list, weights):
     return sum([values_list[i]*weights[i] for i in range(len(values_list))])/sum(weights)
 
-
+# TODO: ASAFR: Investigate NSR stocks who have sss value of 0...: AMG, HPP, RPRX, SQ, FAST, HAE, DVA, FBHS
 def sss_core_equation_value_set(stock_data):
     if stock_data.shares_outstanding and stock_data.net_income_to_common_shareholders != None: stock_data.nitcsh_to_shares_outstanding = float(stock_data.net_income_to_common_shareholders) / float(stock_data.shares_outstanding)
     if stock_data.employees          and stock_data.net_income_to_common_shareholders != None: stock_data.nitcsh_to_num_employees = float(stock_data.net_income_to_common_shareholders) / float(stock_data.employees)
@@ -1401,8 +1395,8 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
 
     # Working Mode:
     relaxed_access                     = (num_threads-1)/10.0                                       if build_csv_db else 0  # In seconds
-    interval_threads                   = 4 +     1*tase_mode -  2*read_united_states_input_symbols  if build_csv_db else 0
-    interval_secs_to_avoid_http_errors = 60*(7 - 1*tase_mode + 30*read_united_states_input_symbols) if build_csv_db else 0  # Every interval_threads, a INTERVALS_TO_AVOID_HTTP_ERRORS sec sleep will take place
+    interval_threads                   = 5 +     1*tase_mode -    read_united_states_input_symbols  if build_csv_db else 0
+    interval_secs_to_avoid_http_errors = 60*(7 - 1*tase_mode + 60*read_united_states_input_symbols) if build_csv_db else 0  # Every interval_threads, a INTERVALS_TO_AVOID_HTTP_ERRORS sec sleep will take place
 
     # Working Parameters:
     eqg_min                      = EQG_UNKNOWN                          # The earnings can decrease but there is still a requirement that price_to_earnings_to_growth_ratio > 0. TODO: ASAFR: Add to multi-dimension
@@ -1507,21 +1501,34 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
     # ftp.nasdaqtrader.com/SymbolDirectory/otherlisted.txt
     # ftp.nasdaqtrader.com/SymbolDirectory/nasdaqtraded.txt
     if not research_mode and build_csv_db:
-        symbols_united_states     = []
-        stocks_list_united_states = []
+        symbols_united_states               = []
+        stocks_list_united_states_effective = []
+        etf_and_nextshares_list             = []
         if read_united_states_input_symbols:
             nasdaq_filenames_list = ['Indices/nasdaqlisted.csv', 'Indices/otherlisted.csv', 'Indices/nasdaqtraded.csv']  # Checkout http://www.nasdaqtrader.com/trader.aspx?id=symboldirdefs for all symbol definitions (for instance - `$` in stock names, 5-letter stocks ending with `Y`)
             ticker_clumn_list     = [0,                          0,                         1                         ]  # nasdaqtraded.csv - 1st column is Y/N (traded or not) - so take row[1] instead!!!
             for index, filename in enumerate(nasdaq_filenames_list):
                 with open(filename, mode='r', newline='') as engine:
                     reader = csv.reader(engine, delimiter='|')
+                    next_shares_column = None
+                    etf_column         = None
                     row_index = 0
                     for row in reader:
-                        if row_index == 0 or 'ETF' in row[1]:
+                        if row_index == 0:
                             row_index += 1
+                            # Find ETF and next shares Column:
+                            for column_index, column in enumerate(row):
+                                if   column == 'ETF':        etf_column         = column_index
+                                elif column == 'NextShares': next_shares_column = column_index
                             continue
                         else:
                             row_index += 1
+                            if next_shares_column and row[next_shares_column] == 'Y':
+                                etf_and_nextshares_list.append(row[ticker_clumn_list[index]])
+                                continue
+                            if etf_column         and row[etf_column]         == 'Y':
+                                etf_and_nextshares_list.append(row[ticker_clumn_list[index]])
+                                continue
                             if '$' in row[ticker_clumn_list[index]]: # AAIC$B -> <stock_symbol>$<letter> --> keep just the stock_Symbol
                                 stock_symbol = row[ticker_clumn_list[index]].split('$')[0]
                             else:
@@ -1531,17 +1538,33 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
                                     continue
                                 if stock_symbol[4] in ['Y'] and SKIP_5LETTER_Y_STOCK_LISTINGS: # Configurable - harder to buy (from Israel, at least), but not impossible of coure
                                     continue
+                            elif len(stock_symbol) == 6: # https://www.investopedia.com/ask/answers/06/nasdaqfifthletter.asp
+                                if stock_symbol[5] in ['Q', 'W', 'C']: # Q: Bankruptcy, W: Warrant, C: Nextshares (Example: https://funds.eatonvance.com/includes/loadDocument.php?fn=20939.pdf&dt=fundPDFs)
+                                    continue
+                                if stock_symbol[5] in ['Y'] and SKIP_5LETTER_Y_STOCK_LISTINGS: # Configurable - harder to buy (from Israel, at least), but not impossible of coure
+                                    continue
                             symbols_united_states.append(stock_symbol)
 
             stocks_list_united_states = investpy.get_stocks_list(country='united states')
-
-        symbols = symbols_snp500 + symbols_snp500_download + symbols_nasdaq100 + symbols_nasdaq_100_csv + symbols_russel1000 + symbols_russel1000_csv + symbols_united_states + stocks_list_united_states
+            for stock_symbol in stocks_list_united_states:
+                if stock_symbol in etf_and_nextshares_list: continue
+                if len(stock_symbol) == 5:  # https://www.investopedia.com/ask/answers/06/nasdaqfifthletter.asp
+                    if stock_symbol[4] in ['Q', 'W', 'C']:  # Q: Bankruptcy, W: Warrant, C: Nextshares (Example: https://funds.eatonvance.com/includes/loadDocument.php?fn=20939.pdf&dt=fundPDFs)
+                        continue
+                    if stock_symbol[4] in [ 'Y'] and SKIP_5LETTER_Y_STOCK_LISTINGS:  # Configurable - harder to buy (from Israel, at least), but not impossible of coure
+                        continue
+                elif len(stock_symbol) == 6:  # https://www.investopedia.com/ask/answers/06/nasdaqfifthletter.asp
+                    if stock_symbol[5] in ['Q', 'W', 'C']:  # Q: Bankruptcy, W: Warrant, C: Nextshares (Example: https://funds.eatonvance.com/includes/loadDocument.php?fn=20939.pdf&dt=fundPDFs)
+                        continue
+                    if stock_symbol[5] in ['Y'] and SKIP_5LETTER_Y_STOCK_LISTINGS:  # Configurable - harder to buy (from Israel, at least), but not impossible of coure
+                        continue
+                stocks_list_united_states_effective.append(stock_symbol)
+            symbols = symbols_snp500 + symbols_snp500_download + symbols_nasdaq100 + symbols_nasdaq_100_csv + symbols_russel1000 + symbols_russel1000_csv + symbols_united_states + stocks_list_united_states_effective
 
     if not research_mode and tase_mode and build_csv_db:
         symbols = symbols_tase + stocks_list_tase
 
     if not research_mode and build_csv_db: symbols = sorted(list(set(symbols)))
-
 
     # Temporary to test and debug: DEBUG MODE
     # =======================================
@@ -1550,28 +1573,17 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
 
     if not research_mode: print('\n{} Symbols for SSS to Scan (Using {} threads): {}\n'.format(len(symbols), num_threads, symbols))
 
-
     csv_db_data   = [];	rows   = []; rows_no_div   = []; rows_only_div   = []; rows_diff   = []
-    csv_db_data0  = []; rows0  = []; rows0_no_div  = []; rows0_only_div  = []; rows0_diff  = []
-    csv_db_data1  = []; rows1  = []; rows1_no_div  = []; rows1_only_div  = []; rows1_diff  = []
-    csv_db_data2  = []; rows2  = []; rows2_no_div  = []; rows2_only_div  = []; rows2_diff  = []
-    csv_db_data3  = []; rows3  = []; rows3_no_div  = []; rows3_only_div  = []; rows3_diff  = []
-    csv_db_data4  = []; rows4  = []; rows4_no_div  = []; rows4_only_div  = []; rows4_diff  = []
-    csv_db_data5  = []; rows5  = []; rows5_no_div  = []; rows5_only_div  = []; rows5_diff  = []
-    csv_db_data6  = []; rows6  = []; rows6_no_div  = []; rows6_only_div  = []; rows6_diff  = []
-    csv_db_data7  = []; rows7  = []; rows7_no_div  = []; rows7_only_div  = []; rows7_diff  = []
-    csv_db_data8  = []; rows8  = []; rows8_no_div  = []; rows8_only_div  = []; rows8_diff  = []
-    csv_db_data9  = []; rows9  = []; rows9_no_div  = []; rows9_only_div  = []; rows9_diff  = []
-    csv_db_data10 = []; rows10 = []; rows10_no_div = []; rows10_only_div = []; rows10_diff = []
-    csv_db_data11 = []; rows11 = []; rows11_no_div = []; rows11_only_div = []; rows11_diff = []
-    csv_db_data12 = []; rows12 = []; rows12_no_div = []; rows12_only_div = []; rows12_diff = []
-    csv_db_data13 = []; rows13 = []; rows13_no_div = []; rows13_only_div = []; rows13_diff = []
-    csv_db_data14 = []; rows14 = []; rows14_no_div = []; rows14_only_div = []; rows14_diff = []
-    csv_db_data15 = []; rows15 = []; rows15_no_div = []; rows15_only_div = []; rows15_diff = []
-    csv_db_data16 = []; rows16 = []; rows16_no_div = []; rows16_only_div = []; rows16_diff = []
-    csv_db_data17 = []; rows17 = []; rows17_no_div = []; rows17_only_div = []; rows17_diff = []
-    csv_db_data18 = []; rows18 = []; rows18_no_div = []; rows18_only_div = []; rows18_diff = []
-    csv_db_data19 = []; rows19 = []; rows19_no_div = []; rows19_only_div = []; rows19_diff = []
+    csv_db_data0  = []; rows0  = []; rows0_no_div  = []; rows0_only_div  = []; rows0_diff  = []; csv_db_data1  = []; rows1  = []; rows1_no_div  = []; rows1_only_div  = []; rows1_diff  = []
+    csv_db_data2  = []; rows2  = []; rows2_no_div  = []; rows2_only_div  = []; rows2_diff  = []; csv_db_data3  = []; rows3  = []; rows3_no_div  = []; rows3_only_div  = []; rows3_diff  = []
+    csv_db_data4  = []; rows4  = []; rows4_no_div  = []; rows4_only_div  = []; rows4_diff  = []; csv_db_data5  = []; rows5  = []; rows5_no_div  = []; rows5_only_div  = []; rows5_diff  = []
+    csv_db_data6  = []; rows6  = []; rows6_no_div  = []; rows6_only_div  = []; rows6_diff  = []; csv_db_data7  = []; rows7  = []; rows7_no_div  = []; rows7_only_div  = []; rows7_diff  = []
+    csv_db_data8  = []; rows8  = []; rows8_no_div  = []; rows8_only_div  = []; rows8_diff  = []; csv_db_data9  = []; rows9  = []; rows9_no_div  = []; rows9_only_div  = []; rows9_diff  = []
+    csv_db_data10 = []; rows10 = []; rows10_no_div = []; rows10_only_div = []; rows10_diff = []; csv_db_data11 = []; rows11 = []; rows11_no_div = []; rows11_only_div = []; rows11_diff = []
+    csv_db_data12 = []; rows12 = []; rows12_no_div = []; rows12_only_div = []; rows12_diff = []; csv_db_data13 = []; rows13 = []; rows13_no_div = []; rows13_only_div = []; rows13_diff = []
+    csv_db_data14 = []; rows14 = []; rows14_no_div = []; rows14_only_div = []; rows14_diff = []; csv_db_data15 = []; rows15 = []; rows15_no_div = []; rows15_only_div = []; rows15_diff = []
+    csv_db_data16 = []; rows16 = []; rows16_no_div = []; rows16_only_div = []; rows16_diff = []; csv_db_data17 = []; rows17 = []; rows17_no_div = []; rows17_only_div = []; rows17_diff = []
+    csv_db_data18 = []; rows18 = []; rows18_no_div = []; rows18_only_div = []; rows18_diff = []; csv_db_data19 = []; rows19 = []; rows19_no_div = []; rows19_only_div = []; rows19_diff = []
 
     if build_csv_db == 0: # if DB is already present, read from it and prepare input to threads
         symbols = []

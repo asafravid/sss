@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.2 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.11 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021 Asaf Ravid
@@ -273,15 +273,15 @@ def research_db(sectors_list, sectors_filter_out, countries_list, countries_filt
 # Reuse Existing Already-Built DB All/Others:
 # sss.sss_run(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=0, build_csv_db=0, csv_db_path='Results/All/20210315-185230_Technology3.5_FinancialServices0.75_A_Bdb_nRes8877', read_united_states_input_symbols=1, tase_mode=0, num_threads=1,  market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit = 20000.0, debt_to_equity_limit = 1000.0, min_enterprise_value_millions_usd=5, enterprise_value_to_revenue_limit=1000, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[4.0, 0.75], generate_result_folders=1)
 
-run_custom_tase = True   # Custom Portfolio
+run_custom_tase = False   # Custom Portfolio
 run_custom      = False
 run_tase        = False   # Tel Aviv Stock Exchange
 run_nsr         = False   # NASDAQ100+S&P500+RUSSEL1000
-run_all         = False   # All Nasdaq Stocks
+run_all         = True   # All Nasdaq Stocks
 research_mode   = False  # Research Mode
 
 reference_run_custom = 'Results/All/20210424-173726_Technology3.5_FinancialServices0.5_A_Bdb_nRes2946'
-reference_run_tase   = 'Results/Tase/20210507-014300_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes258'
+reference_run_tase   = 'Results/Tase/20210514-062411_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes262'
 reference_run_nsr    = 'Results/Nsr/20210508-081425_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes858'
 reference_run_all    = 'Results/All/20210508-150920_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes2978'
 
@@ -293,7 +293,7 @@ if not research_mode: # Run Build DB Only:
     if run_all:         sss.sss_run(reference_run=reference_run_all,  sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', db_filename='None', read_united_states_input_symbols=1, tase_mode=0, num_threads=20, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, min_enterprise_value_millions_usd=5, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[3.0,  0.5], generate_result_folders=1)
 else: # Research Mode:
     if run_tase:
-        new_run = 'Results/Tase/20210507-223906_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes262'
+        new_run = 'Results/Tase/20210514-062411_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes262'
         ev_range_tase          = get_range(csv_db_path=new_run, db_filename=DB_FILENAME, column_name='enterprise_value',        num_sections=4, reverse=0, pop_1st_percentile_range=False)
         pe_range_tase          = get_range(csv_db_path=new_run, db_filename=DB_FILENAME, column_name='pe_effective',            num_sections=7, reverse=1, pop_1st_percentile_range=False)
         evr_range_tase         = get_range(csv_db_path=new_run, db_filename=DB_FILENAME, column_name='evr_effective',           num_sections=7, reverse=1, pop_1st_percentile_range=False)
@@ -302,14 +302,14 @@ else: # Research Mode:
         ev_millions_range_tase = [int(  ev/1000000                       ) for ev in ev_range_tase       ]
         pm_range_tase          = [round(pm*100,    sss.NUM_ROUND_DECIMALS) for pm in pm_ratios_range_tase]
 
-        research_db(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, ev_millions_range=ev_millions_range_tase, pe_range=pe_range_tase, evr_range=evr_range_tase, pm_range=pm_range_tase,   csv_db_path=new_run, db_filename=DB_FILENAME,   read_united_states_input_symbols=0, scan_mode=SCAN_MODE_TASE, generate_result_folders=0, appearance_counter_min=RESEARCH_MODE_MIN_ENTRIES_LIMIT, appearance_counter_max=500, favor_sectors=['Technology', 'Real Estate'], favor_sectors_by=[3.0, 1.0],
+        research_db(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, ev_millions_range=ev_millions_range_tase, pe_range=pe_range_tase, evr_range=evr_range_tase, pm_range=pm_range_tase,   csv_db_path=new_run, db_filename=DB_FILENAME,   read_united_states_input_symbols=0, scan_mode=SCAN_MODE_TASE, generate_result_folders=0, appearance_counter_min=3, appearance_counter_max=500, favor_sectors=['Technology', 'Real Estate'], favor_sectors_by=[3.0, 1.0],
                     newer_path=new_run, older_path=reference_run_tase, db_exists_in_both_folders=1, diff_only_result=1, movement_threshold=0, res_length=400)
 
         # Generate TASE:
         # research_db(evr_range=[8,8],  pm_range=[10,10], ev_millions_range=[5,5], csv_db_path=new_run,   read_united_states_input_symbols=0, scan_mode=SCAN_MODE_TASE, generate_result_folders=1, appearance_counter_min=1, appearance_counter_max=250, favor_technology_sector=4.5,
         #             newer_path=new_run, older_path=None, db_exists_in_both_folders=1, diff_only_result=1, movement_threshold=0, newer_res_ranges=[5,1,54,1,50], older_res_ranges=[5,1,54,1,50], res_length=80)
     if run_nsr:
-        new_run = 'Results/Nsr/20210508-081425_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes858'
+        new_run = 'Results/Nsr/20210515-191743_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes848'
         ev_range_nsr          = get_range(csv_db_path=new_run, db_filename=DB_FILENAME, column_name='enterprise_value',        num_sections=4, reverse=0)
         pe_range_nsr          = get_range(csv_db_path=new_run, db_filename=DB_FILENAME, column_name='pe_effective',            num_sections=8, reverse=1)
         evr_range_nsr         = get_range(csv_db_path=new_run, db_filename=DB_FILENAME, column_name='evr_effective',           num_sections=8, reverse=1)
@@ -339,18 +339,3 @@ else: # Research Mode:
         # Generate ALL:
         # research_db(sectors_list=[], sectors_filter_out=0, evr_range=[30,30], pm_range=[40,40], ev_millions_range=[100,100], csv_db_path=new_run,  read_united_states_input_symbols=1, tase_mode=0, generate_result_folders=1, appearance_counter_min=5, appearance_counter_max=75, favor_technology_sector=4.5)
 
-
-# Custom:
-# =======
-# old_run = 'Results/All/20210320-160910_Technology3.5_FinancialServices0.5_A_Bdb_nRes8908'
-# new_run = 'Results/All/20210325-210925_Technology4.0_FinancialServices0.5_Bdb_nRes181_Custom'
-# ev_range_all          = get_range(csv_db_path=new_run, column_name='enterprise_value',         num_sections=2, reverse=0, pop_1st_percentile_range=False)
-# pe_range_all          = get_range(csv_db_path=new_run, column_name='pe_effective',             num_sections=3, reverse=1)
-# evr_range_all         = get_range(csv_db_path=new_run, column_name='evr_effective',            num_sections=3, reverse=1)
-# pm_ratios_range_all   = get_range(csv_db_path=new_run, column_name='effective_profit_margin',  num_sections=3, reverse=0)
-#
-# ev_millions_range_all = [int(  ev/1000000                       ) for ev in ev_range_all       ]
-# pm_range_all          = [round(pm*100,    sss.NUM_ROUND_DECIMALS) for pm in pm_ratios_range_all]
-#
-# research_db(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, ev_millions_range=ev_millions_range_all, pe_range=pe_range_all, evr_range=evr_range_all, pm_range=pm_range_all, csv_db_path=new_run, read_united_states_input_symbols=1, scan_mode=SCAN_MODE_ALL, generate_result_folders=0, appearance_counter_min=RESEARCH_MODE_MIN_ENTRIES_LIMIT, appearance_counter_max=1500, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[4.0, 0.5],
-#             newer_path=new_run, older_path=None, db_exists_in_both_folders=1, diff_only_result=1, movement_threshold=0, newer_res_ranges=[ev_millions_range_all[0],ev_millions_range_all[-1],pe_range_all[0],pe_range_all[-1],evr_range_all[0],evr_range_all[-1],pm_range_all[0],pm_range_all[-1]], older_res_ranges=[0,17170, 100,1, 8260.35271,0.92414, 0.047,1224.42], res_length=80)
