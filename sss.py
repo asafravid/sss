@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.14 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.15 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021 Asaf Ravid
@@ -1393,6 +1393,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
             "IDR": 14394.70,
             "ILS": 3.27,
             "KRW": 1131.24,
+            "PEN": 3.74,
             "RUB": 73.78,
             "SGD": 1.33,
             "TRY": 8.41,
