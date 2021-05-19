@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.12 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.13 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021 Asaf Ravid
@@ -1395,8 +1395,8 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
 
     # Working Mode:
     relaxed_access                     = (num_threads-1)/10.0                                       if build_csv_db else 0  # In seconds
-    interval_threads                   = 5 +     1*tase_mode -    read_united_states_input_symbols  if build_csv_db else 0
-    interval_secs_to_avoid_http_errors = 60*(7 - 1*tase_mode + 60*read_united_states_input_symbols) if build_csv_db else 0  # Every interval_threads, a INTERVALS_TO_AVOID_HTTP_ERRORS sec sleep will take place
+    interval_threads                   = 4 +     1*tase_mode -    read_united_states_input_symbols  if build_csv_db else 0
+    interval_secs_to_avoid_http_errors = num_threads*(num_threads - 1*tase_mode + num_threads*read_united_states_input_symbols) if build_csv_db else 0  # Every interval_threads, a INTERVALS_TO_AVOID_HTTP_ERRORS sec sleep will take place
 
     # Working Parameters:
     eqg_min                      = EQG_UNKNOWN                          # The earnings can decrease but there is still a requirement that price_to_earnings_to_growth_ratio > 0. TODO: ASAFR: Add to multi-dimension
@@ -1545,20 +1545,21 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
                                     continue
                             symbols_united_states.append(stock_symbol)
 
-            stocks_list_united_states = investpy.get_stocks_list(country='united states')
-            for stock_symbol in stocks_list_united_states:
-                if stock_symbol in etf_and_nextshares_list: continue
-                if len(stock_symbol) == 5:  # https://www.investopedia.com/ask/answers/06/nasdaqfifthletter.asp
-                    if stock_symbol[4] in ['Q', 'W', 'C']:  # Q: Bankruptcy, W: Warrant, C: Nextshares (Example: https://funds.eatonvance.com/includes/loadDocument.php?fn=20939.pdf&dt=fundPDFs)
-                        continue
-                    if stock_symbol[4] in [ 'Y'] and SKIP_5LETTER_Y_STOCK_LISTINGS:  # Configurable - harder to buy (from Israel, at least), but not impossible of coure
-                        continue
-                elif len(stock_symbol) == 6:  # https://www.investopedia.com/ask/answers/06/nasdaqfifthletter.asp
-                    if stock_symbol[5] in ['Q', 'W', 'C']:  # Q: Bankruptcy, W: Warrant, C: Nextshares (Example: https://funds.eatonvance.com/includes/loadDocument.php?fn=20939.pdf&dt=fundPDFs)
-                        continue
-                    if stock_symbol[5] in ['Y'] and SKIP_5LETTER_Y_STOCK_LISTINGS:  # Configurable - harder to buy (from Israel, at least), but not impossible of coure
-                        continue
-                stocks_list_united_states_effective.append(stock_symbol)
+            if use_investpy:
+                stocks_list_united_states = investpy.get_stocks_list(country='united states')
+                for stock_symbol in stocks_list_united_states:
+                    if stock_symbol in etf_and_nextshares_list: continue
+                    if len(stock_symbol) == 5:  # https://www.investopedia.com/ask/answers/06/nasdaqfifthletter.asp
+                        if stock_symbol[4] in ['Q', 'W', 'C']:  # Q: Bankruptcy, W: Warrant, C: Nextshares (Example: https://funds.eatonvance.com/includes/loadDocument.php?fn=20939.pdf&dt=fundPDFs)
+                            continue
+                        if stock_symbol[4] in [ 'Y'] and SKIP_5LETTER_Y_STOCK_LISTINGS:  # Configurable - harder to buy (from Israel, at least), but not impossible of coure
+                            continue
+                    elif len(stock_symbol) == 6:  # https://www.investopedia.com/ask/answers/06/nasdaqfifthletter.asp
+                        if stock_symbol[5] in ['Q', 'W', 'C']:  # Q: Bankruptcy, W: Warrant, C: Nextshares (Example: https://funds.eatonvance.com/includes/loadDocument.php?fn=20939.pdf&dt=fundPDFs)
+                            continue
+                        if stock_symbol[5] in ['Y'] and SKIP_5LETTER_Y_STOCK_LISTINGS:  # Configurable - harder to buy (from Israel, at least), but not impossible of coure
+                            continue
+                    stocks_list_united_states_effective.append(stock_symbol)
             symbols = symbols_snp500 + symbols_snp500_download + symbols_nasdaq100 + symbols_nasdaq_100_csv + symbols_russel1000 + symbols_russel1000_csv + symbols_united_states + stocks_list_united_states_effective
 
     if not research_mode and tase_mode and build_csv_db:
@@ -1640,7 +1641,9 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
     if num_threads >= 19: symbols18 = symbols[18:][::num_threads] # 18, 18+num_threads, 19+2*num_threads, 19+3*num_threads, ...
     if num_threads >= 20: symbols19 = symbols[19:][::num_threads] # 19, 19+num_threads, 20+2*num_threads, 20+3*num_threads, ...
 
-    if num_threads >=  1:
+    if num_threads ==  1:
+        process_symbols(symbols0, csv_db_data0, rows0, rows0_no_div, rows0_only_div, 0, build_csv_db_only, use_investpy, tase_mode, sectors_list, sectors_filter_out, countries_list, countries_filter_out, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, min_enterprise_value_millions_usd, eqg_min, revenue_quarterly_growth_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, reference_db, rows0_diff)
+    elif num_threads >= 1:
         check_interval(0, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
         thread0  = Thread(target=process_symbols, args=(symbols0,  csv_db_data0,  rows0,  rows0_no_div,  rows0_only_div,   0, build_csv_db_only, use_investpy, tase_mode, sectors_list, sectors_filter_out, countries_list, countries_filter_out, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, min_enterprise_value_millions_usd, eqg_min, revenue_quarterly_growth_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, reference_db, rows0_diff))
         thread0.start()
@@ -1721,7 +1724,9 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
         thread19 = Thread(target=process_symbols, args=(symbols19, csv_db_data19, rows19, rows19_no_div, rows19_only_div, 19, build_csv_db_only, use_investpy, tase_mode, sectors_list, sectors_filter_out, countries_list, countries_filter_out, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, min_enterprise_value_millions_usd, eqg_min, revenue_quarterly_growth_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, reference_db, rows19_diff))
         thread19.start()
 
-    if num_threads >=  1: thread0.join()
+    if num_threads == 1:
+        pass
+    elif num_threads >=  1: thread0.join()
     if num_threads >=  2: thread1.join()
     if num_threads >=  3: thread2.join()
     if num_threads >=  4: thread3.join()
