@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.13 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.14 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021 Asaf Ravid
@@ -1377,7 +1377,27 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
 # reference_run : Used for identifying anomalies in which some symbol information is completely different from last run. It can be different but only in new quartely reports
 #                 It is sometimes observed that stocks information is wrongly fetched. Is such cases, the last run's reference point shall be used, with a forgetting factor
 def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, countries_filter_out,build_csv_db_only, build_csv_db, csv_db_path, db_filename, read_united_states_input_symbols, tase_mode, num_threads, market_cap_included, use_investpy, research_mode, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, min_enterprise_value_millions_usd, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, generate_result_folders=1, appearance_counter_dict_sss={}, appearance_counter_min=25, appearance_counter_max=35, custom_portfolio=[]):
-    currency_conversion_tool = CurrencyRates().get_rates('USD') if build_csv_db else None
+    try:
+        currency_conversion_tool = CurrencyRates().get_rates('USD') if build_csv_db else None
+    except Exception as e:
+        print('Exchange Rates down, some countries shall be filtered out unless exchange rate provided manualy')
+        currency_conversion_tool = {
+            "AUD": 1.29,
+            "BMD": 1.0,
+            "BRL": 5.32,
+            "CAD": 1.21,
+            "CHF": 0.9,
+            "CNY": 6.44,
+            "EUR": 0.82,
+            "GBP": 0.71,
+            "IDR": 14394.70,
+            "ILS": 3.27,
+            "KRW": 1131.24,
+            "RUB": 73.78,
+            "SGD": 1.33,
+            "TRY": 8.41,
+            "USD": 1.0
+        }
 
     reference_db = []
     if not research_mode and reference_run != None and len(reference_run):  # in non-research mode, compare to reference run
