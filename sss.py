@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.15 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.16 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021 Asaf Ravid
@@ -1381,23 +1381,35 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
         currency_conversion_tool = CurrencyRates().get_rates('USD') if build_csv_db else None
     except Exception as e:
         print('Exchange Rates down, some countries shall be filtered out unless exchange rate provided manualy')
-        currency_conversion_tool = {
+        currency_conversion_tool = {  # https://en.wikipedia.org/wiki/ISO_4217
+            "ARS": 94.2,     # Argentine Peso
             "AUD": 1.29,
             "BMD": 1.0,
             "BRL": 5.32,
             "CAD": 1.21,
             "CHF": 0.9,
+            "CLP": 715.1,
             "CNY": 6.44,
+            "COP": 3684.95,
+            "DKK": 6.1,       # Danish Krone
             "EUR": 0.82,
             "GBP": 0.71,
+            "HKD": 7.76,      # Hong Kong Dollar
             "IDR": 14394.70,
             "ILS": 3.27,
+            "INR": 73.13,     # Indian Rupee
+            "JPY": 108.97,    # Japanese Yen
             "KRW": 1131.24,
+            "MXN": 19.9,
             "PEN": 3.74,
+            "PHP": 3.74,     # Philippine Peso
             "RUB": 73.78,
+            "SEK": 1.33,     # Swedish Krona
             "SGD": 1.33,
             "TRY": 8.41,
-            "USD": 1.0
+            "TWD": 27.98,
+            "USD": 1.0,
+            "ZAR": 14.1     # South African Rand
         }
 
     reference_db = []
