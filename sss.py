@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.20 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.21 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021 Asaf Ravid
@@ -1608,7 +1608,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
                         if stock_symbol[5] in ['Y'] and SKIP_5LETTER_Y_STOCK_LISTINGS:  # Configurable - harder to buy (from Israel, at least), but not impossible of coure
                             continue
                     stocks_list_united_states_effective.append(stock_symbol)
-            symbols = symbols_snp500 + symbols_snp500_download + symbols_nasdaq100 + symbols_nasdaq_100_csv + symbols_russel1000 + symbols_russel1000_csv + symbols_united_states + stocks_list_united_states_effective
+        symbols = symbols_snp500 + symbols_snp500_download + symbols_nasdaq100 + symbols_nasdaq_100_csv + symbols_russel1000 + symbols_russel1000_csv + symbols_united_states + stocks_list_united_states_effective
 
     if not research_mode and tase_mode and build_csv_db:
         symbols = symbols_tase + stocks_list_tase
