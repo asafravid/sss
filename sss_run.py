@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.24 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.25 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021 Asaf Ravid
@@ -282,18 +282,18 @@ research_mode   = True  # Research Mode
 
 reference_run_custom = 'Results/All/20210424-173726_Technology3.5_FinancialServices0.5_A_Bdb_nRes2946'
 reference_run_tase   = 'Results/Tase/20210520-202634_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes266'
-reference_run_nsr    = 'Results/Nsr/20210515-191743_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes848'
-reference_run_all    = 'Results/All/20210508-150920_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes2978'
+reference_run_nsr    = 'Results/Nsr/20210522-084813_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes873'
+reference_run_all    = 'Results/All/20210522-221748_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes2966'
 
 if not research_mode: # Run Build DB Only:
-    if run_custom_tase: sss.sss_run(reference_run=reference_run_tase, sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', db_filename='None', read_united_states_input_symbols=0, tase_mode=1, num_threads=1, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, min_enterprise_value_millions_usd=5, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=[],                                   favor_sectors_by=[],          generate_result_folders=1, custom_portfolio=['UNCR.TA', 'GIBU.TA', 'OPAL.TA', 'SRAC.TA', 'BLND.TA', 'VALU.TA', 'MCMN.TA', 'MLRN.TA', 'MNIF.TA', 'NAWI.TA', 'EFNC.TA', 'PEN.TA', 'SHOM.TA'])
+    if run_custom_tase: sss.sss_run(reference_run=reference_run_tase, sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', db_filename='None', read_united_states_input_symbols=0, tase_mode=1, num_threads=1, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, min_enterprise_value_millions_usd=5, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=[],                                   favor_sectors_by=[],          generate_result_folders=1, custom_portfolio=['ELWS.TA', 'ENLT.TA', 'AUGN.TA', 'ENRG.TA', 'DORL.TA', 'ORA.TA', 'ELLO.TA', 'GNCL.TA', 'SLGN.TA', 'NOFR.TA', 'APLP.TA', 'PNRG.TA', 'MSKE.TA', 'HMGS.TA', 'BNRG.TA', 'SOLR.TA', 'SNFL.TA', 'TIGI.TA', 'AFHL.TA', 'BRND.TA', 'ININ.TA', 'ELMR.TA', 'NXTM.TA']) # -> Credit Sector -> ['UNCR.TA', 'GIBU.TA', 'OPAL.TA', 'SRAC.TA', 'BLND.TA', 'VALU.TA', 'MCMN.TA', 'MLRN.TA', 'MNIF.TA', 'NAWI.TA', 'EFNC.TA', 'PEN.TA', 'SHOM.TA'])
     if run_custom:      sss.sss_run(reference_run=reference_run_nsr,  sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', db_filename='None', read_united_states_input_symbols=0, tase_mode=0, num_threads=1, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, min_enterprise_value_millions_usd=5, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[3.0,  0.5], generate_result_folders=1, custom_portfolio=['AMG', 'HPP', 'RPRX', 'SQ', 'FAST', 'HAE', 'DVA', 'FBHS'])
     if run_tase:        sss.sss_run(reference_run=reference_run_tase, sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', db_filename='None', read_united_states_input_symbols=0, tase_mode=1, num_threads=1, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, min_enterprise_value_millions_usd=1, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=['Technology', 'Real Estate'       ], favor_sectors_by=[3.0,  1.0], generate_result_folders=1)
     if run_nsr:         sss.sss_run(reference_run=reference_run_nsr,  sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', db_filename='None', read_united_states_input_symbols=0, tase_mode=0, num_threads=1, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, min_enterprise_value_millions_usd=5, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[3.0,  0.5], generate_result_folders=1)
     if run_all:         sss.sss_run(reference_run=reference_run_all,  sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', db_filename='None', read_united_states_input_symbols=1, tase_mode=0, num_threads=1, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, min_enterprise_value_millions_usd=5, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[3.0,  0.5], generate_result_folders=1)
 else: # Research Mode:
     if run_tase:
-        new_run = 'Results/Tase/20210524-033137_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes287'
+        new_run = 'Results/Tase/20210526-173101_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes288'
         ev_range_tase          = get_range(csv_db_path=new_run, db_filename=DB_FILENAME, column_name='enterprise_value',        num_sections=4, reverse=0, pop_1st_percentile_range=False)
         pe_range_tase          = get_range(csv_db_path=new_run, db_filename=DB_FILENAME, column_name='pe_effective',            num_sections=7, reverse=1, pop_1st_percentile_range=False)
         evr_range_tase         = get_range(csv_db_path=new_run, db_filename=DB_FILENAME, column_name='evr_effective',           num_sections=7, reverse=1, pop_1st_percentile_range=False)
@@ -309,7 +309,7 @@ else: # Research Mode:
         # research_db(evr_range=[8,8],  pm_range=[10,10], ev_millions_range=[5,5], csv_db_path=new_run,   read_united_states_input_symbols=0, scan_mode=SCAN_MODE_TASE, generate_result_folders=1, appearance_counter_min=1, appearance_counter_max=250, favor_technology_sector=4.5,
         #             newer_path=new_run, older_path=None, db_exists_in_both_folders=1, diff_only_result=1, movement_threshold=0, newer_res_ranges=[5,1,54,1,50], older_res_ranges=[5,1,54,1,50], res_length=80)
     if run_nsr:
-        new_run = 'Results/Nsr/20210522-084813_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes873'
+        new_run = 'Results/Nsr/20210524-115230_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes860'
         ev_range_nsr          = get_range(csv_db_path=new_run, db_filename=DB_FILENAME, column_name='enterprise_value',        num_sections=4, reverse=0)
         pe_range_nsr          = get_range(csv_db_path=new_run, db_filename=DB_FILENAME, column_name='pe_effective',            num_sections=8, reverse=1)
         evr_range_nsr         = get_range(csv_db_path=new_run, db_filename=DB_FILENAME, column_name='evr_effective',           num_sections=8, reverse=1)
