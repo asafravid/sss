@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.27 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.30 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021 Asaf Ravid
@@ -214,7 +214,7 @@ def research_db(sectors_list, sectors_filter_out, countries_list, countries_filt
         for pe_index, price_to_earnings_limit                in enumerate(pe_range):
             for evr_index, enterprise_value_to_revenue_limit in enumerate(evr_range):
                 for pm_index, profit_margin_limit            in enumerate(pm_range): # TODO: ASAFR: Below 1. Ambiguity of parameters - narrow down. 2. Some magic numbers on ev_to_cfo_ration etc 100.0 and 1000.0 - make order and defines/constants/multi_dim here
-                    num_results_for_ev_pe_evr_and_pm = sss.sss_run(reference_run=[], sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, build_csv_db_only=0, build_csv_db=0, csv_db_path=csv_db_path, db_filename=db_filename, read_united_states_input_symbols=read_united_states_input_symbols, tase_mode=tase_mode, num_threads=1, market_cap_included=1, use_investpy=0, research_mode=1, profit_margin_limit=float(profit_margin_limit)/100.0, min_enterprise_value_millions_usd=ev_millions_limit, ev_to_cfo_ratio_limit = 10e9, debt_to_equity_limit = 10e9, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, generate_result_folders=generate_result_folders, appearance_counter_dict_sss=appearance_counter_dict_sss, appearance_counter_min=appearance_counter_min, appearance_counter_max=appearance_counter_max)
+                    num_results_for_ev_pe_evr_and_pm = sss.sss_run(reference_run=[], sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, build_csv_db_only=0, build_csv_db=0, csv_db_path=csv_db_path, db_filename=db_filename, read_united_states_input_symbols=read_united_states_input_symbols, tase_mode=tase_mode, num_threads=1, market_cap_included=1, use_investpy=0, research_mode=1, profit_margin_limit=float(profit_margin_limit)/100.0, min_enterprise_value_millions_usd=ev_millions_limit, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, generate_result_folders=generate_result_folders, appearance_counter_dict_sss=appearance_counter_dict_sss, appearance_counter_min=appearance_counter_min, appearance_counter_max=appearance_counter_max)
                     if num_results_for_ev_pe_evr_and_pm < appearance_counter_min:
                         break  # already lower than appearance_counter_min results. With higher profit margin limit there will always be less results -> save running time by breaking
                     research_rows_sss  [ev_millions_index][pe_index][evr_index][pm_index] = int(num_results_for_ev_pe_evr_and_pm)
@@ -274,8 +274,8 @@ def research_db(sectors_list, sectors_filter_out, countries_list, countries_filt
 # sss.sss_run(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=0, build_csv_db=0, csv_db_path='Results/All/20210315-185230_Technology3.5_FinancialServices0.75_A_Bdb_nRes8877', read_united_states_input_symbols=1, tase_mode=0, num_threads=1,  market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit = 20000.0, debt_to_equity_limit = 1000.0, min_enterprise_value_millions_usd=5, enterprise_value_to_revenue_limit=1000, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[4.0, 0.75], generate_result_folders=1)
 
 run_custom_tase = False   # Custom Portfolio
-run_custom      = True
-run_tase        = False   # Tel Aviv Stock Exchange
+run_custom      = False
+run_tase        = True   # Tel Aviv Stock Exchange
 run_nsr         = False   # NASDAQ100+S&P500+RUSSEL1000
 run_all         = False   # All Nasdaq Stocks
 research_mode   = True  # Research Mode
@@ -293,7 +293,7 @@ if not research_mode: # Run Build DB Only:
     if run_all:         sss.sss_run(reference_run=reference_run_all,  sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', db_filename='None', read_united_states_input_symbols=1, tase_mode=0, num_threads=1, market_cap_included=1, use_investpy=0, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, min_enterprise_value_millions_usd=5, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[3.0,  0.5], generate_result_folders=1)
 else: # Research Mode:
     if run_tase:
-        new_run = 'Results/Tase/20210527-224740_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes287'
+        new_run = 'Results/Tase/20210601-000143_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes292'
         ev_range_tase          = get_range(csv_db_path=new_run, db_filename=DB_FILENAME, column_name='enterprise_value',        num_sections=4, reverse=0, pop_1st_percentile_range=False)
         pe_range_tase          = get_range(csv_db_path=new_run, db_filename=DB_FILENAME, column_name='pe_effective',            num_sections=7, reverse=1, pop_1st_percentile_range=False)
         evr_range_tase         = get_range(csv_db_path=new_run, db_filename=DB_FILENAME, column_name='evr_effective',           num_sections=7, reverse=1, pop_1st_percentile_range=False)
