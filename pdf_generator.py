@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.1 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.30 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance and investpy
 #    Copyright (C) 2021 Asaf Ravid
@@ -31,7 +31,7 @@ import numpy as np
 
 
 def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, diff_list, tase_mode):
-    title_for_figures = data_time_str + ' ' + (title[::-1] if tase_mode else title)
+    title_for_figures = data_time_str + ' ' + (title[::-1] if tase_mode else title) + ']כתב ויתור: תוצאות הסריקה אינן המלצה בשום צורה, אלא אך ורק בסיס למחקר.['[::-1]
 
     # Read CSV file:
     csv_rows = []
@@ -59,7 +59,7 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
     for row_index, row in enumerate(csv_rows):
         if row_index > limit_num_rows: break
         if row_index > 0:  # row 0 is title
-            names.append(row[1][0:24])
+            names.append(row[1][0:28])
             appearances.append(float(row[5]))
         if row_index == 0:
             if tase_mode: # overrwrite to hebrew
@@ -68,8 +68,8 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
                 row = ['Symbol', 'Name', 'Sector', 'Value', 'Close', 'Rank']
         for col_index, col in enumerate(row):
             w_diff                =0
-            if   col_index == 0: w=18 # Symbol
-            elif col_index == 1: w=50 # Name
+            if   col_index == 0: w=14 # Symbol
+            elif col_index == 1: w=42 # Name
             elif col_index == 2: w=33 # Sector
             elif col_index == 3: w=30 # S value
             elif col_index == 4: w=20 # Close
@@ -105,6 +105,7 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
 
     ax.barh(y_pos, appearances, align='center')
     ax.set_yticks(y_pos)
+    ax.tick_params(axis='y', labelsize=8)
     ax.set_yticklabels(names)
     ax.invert_yaxis()  # labels read top-to-bottom
     ax.set_xlabel('ציון'[::-1] if tase_mode else 'Rank')
@@ -152,6 +153,7 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
              "<p>Updates, Discussions and Technical Support on Telegram: <A HREF=""https://t.me/StockScannerIL"">https://t.me/StockScannerIL</A></p>" \
              "<p>This Scanner is Open Source. fork() here: <A HREF=""http://bit.ly/OpenSourceStockScanner"">http://bit.ly/OpenSourceStockScanner</A></p>" \
              "<p>Lecture: <A HREF=""http://bit.ly/SssLecture"">http://bit.ly/SssLecture</A>, One-Pagers: <A HREF=""http://bit.ly/SssCoreEquation"">http://bit.ly/SssCoreEquation</A>, <A HREF=""http://bit.ly/MultiDimensionalScan"">http://bit.ly/MultiDimensionalScan</A></p>" \
+             "<p>Disclaimer: Scan Results are not recommendations! They only represent a basis for Research and Analysis.</p>" \
              "<p><img src=""{}"" width=""600"" height=""250""></p>".format(csv_filename+"_fig.png")
         pdf.write_html(text=html)
 
