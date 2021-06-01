@@ -46,9 +46,8 @@ https://bit.ly/MultiDimensionalScan
 - Checkout http://www.nasdaqtrader.com/trader.aspx?id=symboldirdefs for all symbol definitions (for instance - `$` in stock names, 5-letter stocks ending with `Y`)
 
 # Disclaimer
-- Make your analysis before buying any of the Results stocks
-- Buying the Results stocks is at your own risk
-- Study the Results companies - read their financial reports, and only then decide if and how much to buy
+- The Scan Results are __By No Neans__ to be interpreted as reccomendations.
+- The Results are merely a basis for Research and Analysis.
 
 # yfinance.7z Usage
 - `yfinance` is a known library which this scanner uses
