@@ -49,11 +49,6 @@ https://bit.ly/MultiDimensionalScan
 - The Scan Results are __By No Neans__ to be interpreted as reccomendations.
 - The Results are merely a basis for Research and Analysis.
 
-# yfinance.7z Usage
-- `yfinance` is a known library which this scanner uses
-- Several Bugs were found upon examining the code of `yfinance`, and I have created pull requests for those.
-- For simplicity, unzip `yfinance.7z` and beyond[or other comparison software]-compare it with the official [`pip3` it] one, and take the changes provided within this library's `yfinance.7z`.
-
 # Understanding and Verifying Units of yfinance parameters
 - Units can compared to https://www.macroaxis.com/stock-analysis/CMRE/Costamare (i.e. CMRE can be replaced for any stock ticker/symbol)
 - Use case: `CMRE`'s `yfinance` `earningsQuarterlyGrowth` is `-0.298`, and website shows `-29.80%` so the match yields that `yfinance` reports in direct ratio (not `%`)
