@@ -6,6 +6,9 @@
  - https://pypi.org/project/pandas/
  - https://pypi.org/project/forex-python/
  - https://pypi.org/project/CurrencyConverter/
+ - https://pypi.org/project/py-currency-converter/
+ - https://pypi.org/project/PyCurrency-Converter/
+ - https://pypi.org/project/currency.converter/
  - https://fonts2u.com/dejavu-sans-condensed.font
 
 The stocks scan and sorting is done according to the below documentation (Core Equation and Multi-Dimensional scan) written using Google Documents (https://www.google.com/docs/about/):
