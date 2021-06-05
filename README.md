@@ -21,14 +21,17 @@ https://bit.ly/MultiDimensionalScan
 - Install `Pycharm Community Edition` from https://www.jetbrains.com/pycharm/download/
 - Download the `SSS` source code as a Zip file from this page (https://github.com/asafravid/sss/archive/master.zip) or clone/fork the repository directly
 - Open Project from folder (to which you unzipped the `sss` source code)
-- No further steps required apart from `pip3` installing relevant libraries:
+- No further steps required apart from `pip[3]` installing relevant libraries:
   - `cd <[path to]Python 3.8>`
-  - `pip3 install pandas`
-  - `pip3 install yfinance`
-  - `pip3 install investpy`
-  - `pip3 install fpdf`
-  - `pip3 install forex_python`
-  - `pip3 install numpy`
+  - `pip[3] install pandas`
+  - `pip[3] install yfinance`
+  - `pip[3] install investpy`
+  - `pip[3] install fpdf`
+  - `pip[3] install forex_python` and/or `pip[3] install forex-ython`
+  - `pip[3] install numpy`
+  - `pip[3] install CurrencyConverter`
+  - `pip[3] install PyCurrency-Converter`
+  - `pip[3] install currency.converter`
 - Note that for `yfinance` - I may be providing updated sources since they take time to update by the developers, so `pip3 install yfinance` from the origin, and then update (using comparison SW) the necessary changes I made (not too many) to run the `SSS` most efficiently and informatively.
   
 # Run Step-By-Step Instructions
