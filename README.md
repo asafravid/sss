@@ -63,10 +63,10 @@ https://bit.ly/MultiDimensionalScan
 
 # Looking Forward for Contributions
 - Good luck and you are welcome to contribute to this project:
-  - Add other contries' stocks
-  - Past reccomendations and present results - for proving that the model works
+  - Add other contries' stock markets
+  - Past reccomendations and present results - for proving that the model works (a prototype is ready `sss_results_performance.py`)
   - Multi-Dimensional Scan enhancements (scan over `EQG`s, etc)
-  - For any questions / issues / suggestions: You can reach me here: asaf.rvd@gmail.com
+  - For any questions / issues / suggestions: You can reach me here: mailto:asaf.rvd@gmail.com
 
 # License
           Copyright (C) 2021  Asaf Ravid <asaf.rvd@gmail.com>
