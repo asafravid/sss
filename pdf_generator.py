@@ -2,7 +2,7 @@
 #
 # Version 0.1.30 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
-#    Stock Screener and Scanner - based on yfinance and investpy
+#    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
 #
 #    This program is free software: you can redistribute it and/or modify
