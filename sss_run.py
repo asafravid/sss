@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.35 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.42 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -275,8 +275,8 @@ def research_db(sectors_list, sectors_filter_out, countries_list, countries_filt
 
 run_custom_tase = False   # Custom Portfolio
 run_custom      = False
-run_tase        = False   # Tel Aviv Stock Exchange
-run_nsr         = True   # NASDAQ100+S&P500+RUSSEL1000
+run_tase        = True   # Tel Aviv Stock Exchange
+run_nsr         = False   # NASDAQ100+S&P500+RUSSEL1000
 run_all         = False   # All Nasdaq Stocks
 research_mode   = True  # Research Mode
 
@@ -293,7 +293,7 @@ if not research_mode: # Run Build DB Only:
     if run_all:         sss.sss_run(reference_run=reference_run_all,  sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', db_filename='None', read_united_states_input_symbols=1, tase_mode=0, num_threads=1, market_cap_included=1, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, min_enterprise_value_millions_usd=5, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[3.0,  0.5], generate_result_folders=1)
 else: # Research Mode:
     if run_tase:
-        new_run = 'Results/Tase/20210607-030201_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes300'
+        new_run = 'Results/Tase/20210611-132439_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes306'
         ev_range_tase          = get_range(csv_db_path=new_run, db_filename=DB_FILENAME, column_name='enterprise_value',        num_sections=4, reverse=0, pop_1st_percentile_range=False)
         pe_range_tase          = get_range(csv_db_path=new_run, db_filename=DB_FILENAME, column_name='pe_effective',            num_sections=7, reverse=1, pop_1st_percentile_range=False)
         evr_range_tase         = get_range(csv_db_path=new_run, db_filename=DB_FILENAME, column_name='evr_effective',           num_sections=7, reverse=1, pop_1st_percentile_range=False)
