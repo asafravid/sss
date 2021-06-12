@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.42 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.43 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -275,13 +275,13 @@ def research_db(sectors_list, sectors_filter_out, countries_list, countries_filt
 
 run_custom_tase = False   # Custom Portfolio
 run_custom      = False
-run_tase        = True   # Tel Aviv Stock Exchange
-run_nsr         = False   # NASDAQ100+S&P500+RUSSEL1000
+run_tase        = False   # Tel Aviv Stock Exchange
+run_nsr         = True   # NASDAQ100+S&P500+RUSSEL1000
 run_all         = False   # All Nasdaq Stocks
-research_mode   = True  # Research Mode
+research_mode   = False  # Research Mode
 
 reference_run_custom = 'Results/All/20210529-223532_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes3187'
-reference_run_tase   = 'Results/Tase/20210603-231310_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes292'
+reference_run_tase   = 'Results/Tase/20210611-132439_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes306'
 reference_run_nsr    = 'Results/Nsr/20210605-102948_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes871'
 reference_run_all    = 'Results/All/20210606-011608_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes3195'
 
