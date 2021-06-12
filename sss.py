@@ -22,7 +22,7 @@
 
 
 # TODO: ASAF: 0. Remove non-required columns from the indices input CSVs - faster load and down to the point
-#                0.1. Investigate average and ranges of all parameters in the SSS Core Equation - summarise in the document itself (Test Case)
+#                0.1. Investigate average and ranges of all parameters in the SSS Core Equation - summarize in the document itself (Test Case)
 #             1. Check and multi dim and investigate eqg_min and rqg_min: Check why Yahoo Finance always gives QRG values of 0? Unusable if that is always so
 #             2. Implement:
 #             2.1. https://en.wikipedia.org/wiki/Piotroski_F-score
