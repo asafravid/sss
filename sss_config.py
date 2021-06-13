@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.50 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.51 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -24,20 +24,20 @@
 
 run_custom_tase = False   # Custom Portfolio
 run_custom      = False
-run_tase        = True   # Tel Aviv Stock Exchange
+run_tase        = False   # Tel Aviv Stock Exchange
 run_nsr         = False   # NASDAQ100+S&P500+RUSSEL1000
-run_all         = False   # All Nasdaq Stocks
-research_mode   = True  # Research Mode
+run_all         = True   # All Nasdaq Stocks
+research_mode   = False  # Research Mode
 
 # Upon 1st ever run: reference must be set to None
 # After 1st ever Run: Recommended to use reference (filter and damper)
-# the reasearch mode shall run on new_run as input (new_run >= reference_run) where > means newer
-reference_run_custom = 'Results/All/20210529-223532_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes3187'
+# The research mode shall run on new_run as input (new_run >= reference_run) where > means newer
+reference_run_custom = 'Results/All/20210606-011608_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes3195'
 reference_run_tase   = 'Results/Tase/20210611-132439_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes306'
 reference_run_nsr    = 'Results/Nsr/20210605-102948_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes871'
 reference_run_all    = 'Results/All/20210606-011608_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes3195'
 
 new_run_tase   = 'Results/Tase/20210611-132439_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes306'
-new_run_nsr    = 'Results/Nsr/20210607-051510_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes863'
+new_run_nsr    = 'Results/Nsr/20210605-102948_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes871'
 new_run_all    = 'Results/All/20210606-011608_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes3195'
-new_run_custom = 'Results/Custom/20210530-152330_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes246_Custom'
+new_run_custom = 'Results/Custom/20210607-002552_Bdb_nRes3_Custom'
