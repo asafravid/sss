@@ -40,6 +40,61 @@ SCAN_MODE_ALL  = 2  # All Nasdaq Stocks
 
 TITLES = ["_תוצאות_סריקה_עבור_בורסת_תל_אביב", "_Scan_Results_for_Nasdaq100_SNP500_Russel1000", "_Scan_Results_for_All_Nasdaq_Stocks"]
 
+
+# retrieve_scan_settings()
+#
+# Parameters:
+#  manual_setting_flag: by default is False. When set to True it allows to explicitly specify
+#  desired scan type and paths values
+#
+# If a manual setting is desired, then a 'True' flag should be provided as a parameter and the relevant
+# paths and scan modes should be updated in this function
+# If manual setting is 'False' (default), then values are taken from sss_config.py
+def retrieve_scan_settings(manual_setting_flag=False):
+    setting_dict1 = {}
+
+    if manual_setting_flag:
+        setting_dict1['run_custom_tase'] = False
+        setting_dict1['run_custom'] = False
+        setting_dict1['run_tase'] = True
+        setting_dict1['run_nsr'] = False
+        setting_dict1['run_all'] = False
+        setting_dict1['research_mode'] = True
+
+        # Upon 1st ever run: reference must be set to None
+        # After 1st ever Run: Recommended to use reference (filter and damper)
+        setting_dict1['reference_run_custom'] = 'Results/All/20210529-223532_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes3187'
+        setting_dict1['reference_run_tase'] = 'Results/Tase/20210611-132439_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes306'
+        setting_dict1['reference_run_nsr'] = 'Results/Nsr/20210605-102948_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes871'
+        setting_dict1['reference_run_all'] = 'Results/All/20210606-011608_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes3195'
+
+        # The research mode shall run on new_run as input (new_run >= reference_run) where > means newer
+        setting_dict1['new_run_tase'] = 'Results/Tase/20210611-132439_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes306'
+        setting_dict1['new_run_nsr'] = 'Results/Nsr/20210607-051510_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes863'
+        setting_dict1['new_run_all'] = 'Results/All/20210606-011608_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes3195'
+        setting_dict1['new_run_custom'] = 'Results/Custom/20210530-152330_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes246_Custom'
+
+    else:
+        setting_dict1['run_custom_tase'] = sss_config.run_custom_tase  # Custom Portfolio
+        setting_dict1['run_custom'] = sss_config.run_custom
+        setting_dict1['run_tase'] = sss_config.run_tase  # Tel Aviv Stock Exchange
+        setting_dict1['run_nsr'] = sss_config.run_nsr  # NASDAQ100+S&P500+RUSSEL1000
+        setting_dict1['run_all'] = sss_config.run_all  # All Nasdaq Stocks
+        setting_dict1['research_mode'] = sss_config.research_mode  # Research Mode
+
+        setting_dict1['reference_run_custom'] = sss_config.reference_run_custom
+        setting_dict1['reference_run_tase'] = sss_config.reference_run_tase
+        setting_dict1['reference_run_nsr'] = sss_config.reference_run_nsr
+        setting_dict1['reference_run_all'] = sss_config.reference_run_all
+
+        setting_dict1['new_run_tase'] = sss_config.new_run_tase
+        setting_dict1['new_run_nsr'] = sss_config.new_run_nsr
+        setting_dict1['new_run_all'] = sss_config.new_run_all
+        setting_dict1['new_run_custom'] = sss_config.new_run_custom
+
+    return setting_dict1
+
+
 #
 # Percentiles:
 # index   x        1         2        3  ...  n-1
@@ -273,22 +328,26 @@ def research_db(sectors_list, sectors_filter_out, countries_list, countries_filt
 # Reuse Existing Already-Built DB All/Others:
 # sss.sss_run(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=0, build_csv_db=0, csv_db_path='Results/All/20210315-185230_Technology3.5_FinancialServices0.75_A_Bdb_nRes8877', read_united_states_input_symbols=1, tase_mode=0, num_threads=1,  market_cap_included=1, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit = 20000.0, debt_to_equity_limit = 1000.0, min_enterprise_value_millions_usd=5, enterprise_value_to_revenue_limit=1000, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[4.0, 0.75], generate_result_folders=1)
 
-run_custom_tase = sss_config.run_custom_tase   # Custom Portfolio
-run_custom      = sss_config.run_custom
-run_tase        = sss_config.run_tase       # Tel Aviv Stock Exchange
-run_nsr         = sss_config.run_nsr        # NASDAQ100+S&P500+RUSSEL1000
-run_all         = sss_config.run_all        # All Nasdaq Stocks
-research_mode   = sss_config.research_mode  # Research Mode
+manual_setting = True
+scan_setting_dict = retrieve_scan_settings(manual_setting)
 
-reference_run_custom = sss_config.reference_run_custom
-reference_run_tase   = sss_config.reference_run_tase
-reference_run_nsr    = sss_config.reference_run_nsr
-reference_run_all    = sss_config.reference_run_all
 
-new_run_tase   = sss_config.new_run_tase
-new_run_nsr    = sss_config.new_run_nsr
-new_run_all    = sss_config.new_run_all
-new_run_custom = sss_config.new_run_custom
+run_custom_tase = scan_setting_dict['run_custom_tase']   # Custom Portfolio
+run_custom      = scan_setting_dict['run_custom']
+run_tase        = scan_setting_dict['run_tase']          # Tel Aviv Stock Exchange
+run_nsr         = scan_setting_dict['run_nsr']           # NASDAQ100+S&P500+RUSSEL1000
+run_all         = scan_setting_dict['run_all']           # All Nasdaq Stocks
+research_mode   = scan_setting_dict['research_mode']     # Research Mode
+
+reference_run_custom = scan_setting_dict['reference_run_custom']
+reference_run_tase   = scan_setting_dict['reference_run_tase']
+reference_run_nsr    = scan_setting_dict['reference_run_nsr']
+reference_run_all    = scan_setting_dict['reference_run_all']
+
+new_run_tase   = scan_setting_dict['new_run_tase']
+new_run_nsr    = scan_setting_dict['new_run_nsr']
+new_run_all    = scan_setting_dict['new_run_all']
+new_run_custom = scan_setting_dict['new_run_custom']
 
 if not research_mode: # Run Build DB Only:
     if run_custom_tase: sss.sss_run(reference_run=reference_run_tase, sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', db_filename='None', read_united_states_input_symbols=0, tase_mode=1, num_threads=1, market_cap_included=1, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, min_enterprise_value_millions_usd=5, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=[],                                   favor_sectors_by=[],          generate_result_folders=1, custom_portfolio=['IGLD-M.TA'])#, 'NICE.TA', 'KEN.TA']) # -> Credit Sector -> ['UNCR.TA', 'GIBU.TA', 'OPAL.TA', 'SRAC.TA', 'BLND.TA', 'VALU.TA', 'MCMN.TA', 'MLRN.TA', 'MNIF.TA', 'NAWI.TA', 'EFNC.TA', 'PEN.TA', 'SHOM.TA']); -> Green Energy Sector -> ['ELWS.TA', 'ENLT.TA', 'AUGN.TA', 'ENRG.TA', 'DORL.TA', 'ORA.TA', 'ELLO.TA', 'GNCL.TA', 'SLGN.TA', 'NOFR.TA', 'APLP.TA', 'PNRG.TA', 'MSKE.TA', 'HMGS.TA', 'BNRG.TA', 'SOLR.TA', 'SNFL.TA', 'TIGI.TA', 'AFHL.TA', 'BRND.TA', 'ININ.TA', 'ELMR.TA', 'NXTM.TA']
