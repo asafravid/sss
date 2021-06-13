@@ -40,6 +40,7 @@ SCAN_MODE_ALL  = 2  # All Nasdaq Stocks
 
 TITLES = ["_תוצאות_סריקה_עבור_בורסת_תל_אביב", "_Scan_Results_for_Nasdaq100_SNP500_Russel1000", "_Scan_Results_for_All_Nasdaq_Stocks"]
 
+
 #
 # Percentiles:
 # index   x        1         2        3  ...  n-1
