@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.51 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.52 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -22,12 +22,13 @@
 
 
 
-run_custom_tase = False   # Custom Portfolio
-run_custom      = False
-run_tase        = False   # Tel Aviv Stock Exchange
-run_nsr         = False   # NASDAQ100+S&P500+RUSSEL1000
-run_all         = True   # All Nasdaq Stocks
-research_mode   = False  # Research Mode
+run_custom_tase      = False   # Custom Portfolio
+run_custom           = False
+run_tase             = True   # Tel Aviv Stock Exchange
+run_nsr              = False   # NASDAQ100+S&P500+RUSSEL1000
+run_all              = False   # All Nasdaq Stocks
+research_mode        = False  # Research Mode
+research_mode_max_ev = False  # @JustLearning's suggestion in Telegram: Multi-Dimentional Scan by Max EV Limit rather than Min EV Limit
 
 # Upon 1st ever run: reference must be set to None
 # After 1st ever Run: Recommended to use reference (filter and damper)
