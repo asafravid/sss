@@ -97,7 +97,7 @@ def prepare_appearance_counters_dictionaries(csv_db_path, db_filename, appearanc
                     row_index += 1
                     continue
                 else:
-                    appearance_counter_dict_sss[  (row[ticker_index],row[name_index],row[sector_index],float(row[sss_index  ]),float(0 if row[previous_close_index] == '' else row[previous_close_index]))] = 0.0  # Symbol, Short Name, Sector, SSS   Value, previousClose
+                    appearance_counter_dict_sss[  (row[ticker_index], row[name_index], row[sector_index],float(row[sss_index  ]),float(0 if row[previous_close_index] == '' else row[previous_close_index]))] = 0.0  # Symbol, Short Name, Sector, SSS   Value, previousClose
     except Exception as e:
         if print("              Exception in {}: {}".format(row, e)):
             pass
@@ -276,8 +276,8 @@ def research_db(sectors_list, sectors_filter_out, countries_list, countries_filt
 
 run_custom_tase = False   # Custom Portfolio
 run_custom      = False
-run_tase        = False   # Tel Aviv Stock Exchange
-run_nsr         = True   # NASDAQ100+S&P500+RUSSEL1000
+run_tase        = True   # Tel Aviv Stock Exchange
+run_nsr         = False   # NASDAQ100+S&P500+RUSSEL1000
 run_all         = False   # All Nasdaq Stocks
 research_mode   = False  # Research Mode
 
