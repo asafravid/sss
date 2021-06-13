@@ -328,7 +328,7 @@ def research_db(sectors_list, sectors_filter_out, countries_list, countries_filt
 # Reuse Existing Already-Built DB All/Others:
 # sss.sss_run(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=0, build_csv_db=0, csv_db_path='Results/All/20210315-185230_Technology3.5_FinancialServices0.75_A_Bdb_nRes8877', read_united_states_input_symbols=1, tase_mode=0, num_threads=1,  market_cap_included=1, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit = 20000.0, debt_to_equity_limit = 1000.0, min_enterprise_value_millions_usd=5, enterprise_value_to_revenue_limit=1000, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[4.0, 0.75], generate_result_folders=1)
 
-manual_setting = True
+manual_setting = False
 scan_setting_dict = retrieve_scan_settings(manual_setting)
 
 
