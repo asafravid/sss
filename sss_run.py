@@ -20,12 +20,14 @@
 #
 #############################################################################
 
-import sss
-import sss_config # This is the configuration file for the run modes
 import numpy as np
 import csv
 import os
 import pdf_generator
+from glob import glob
+
+import sss
+import sss_config # This is the configuration file for the run modes
 import sss_diff
 
 DB_FILENAME = 'sss_engine.csv'  # 'db.csv' -> faster with sss_engine.csv
@@ -39,6 +41,58 @@ SCAN_MODE_NSR  = 1  # Nasdaq100 + S&P500 + Russel1000
 SCAN_MODE_ALL  = 2  # All Nasdaq Stocks
 
 TITLES = ["_תוצאות_סריקה_עבור_בורסת_תל_אביב", "_Scan_Results_for_Nasdaq100_SNP500_Russel1000", "_Scan_Results_for_All_Nasdaq_Stocks"]
+
+
+def automatic_folder_selection(research_mode_flag, results_input_folder, path_dict1, ref_key, new_run_key):
+    results_input_paths = glob(results_input_folder + '/*/')
+    if research_mode_flag:
+        path_dict1[new_run_key] = results_input_paths[-1]
+        if len(results_input_paths) > 1:
+            path_dict1[ref_key] = results_input_paths[-2]
+        else:
+            print('Warning: only one folder in result folder {}, using the same for reference and new_run'.format(
+                results_input_folder))
+            path_dict1[ref_key] = results_input_paths[-1]
+    else:
+        path_dict1[new_run_key] = None
+        path_dict1[ref_key] = results_input_paths[-1]
+
+
+# retrieve_path_settings()
+#
+# Parameters:
+#  automatic_results_folder_selection_flag: by default is True.
+#      When set to False paths are taken from sss_config.py otherwise paths are automatically derived
+#      by taking the most recent folders.
+def retrieve_path_settings(automatic_results_folder_selection_flag, research_mode_flag):
+    path_dict1 = {}
+    if automatic_results_folder_selection_flag:
+
+        results_input_folder = 'Results/Custom'
+        automatic_folder_selection(research_mode_flag, results_input_folder, path_dict1, 'reference_run_custom',
+                                   'new_run_custom')
+        results_input_folder = 'Results/Tase'
+        automatic_folder_selection(research_mode_flag, results_input_folder, path_dict1, 'reference_run_tase',
+                                   'new_run_tase')
+        results_input_folder = 'Results/Nsr'
+        automatic_folder_selection(research_mode_flag, results_input_folder, path_dict1, 'reference_run_nsr',
+                                   'new_run_nsr')
+        results_input_folder = 'Results/All'
+        automatic_folder_selection(research_mode_flag, results_input_folder, path_dict1, 'reference_run_all',
+                                   'new_run_all')
+    else:
+        path_dict1['reference_run_custom'] = sss_config.reference_run_custom
+        path_dict1['reference_run_tase']   = sss_config.reference_run_tase
+        path_dict1['reference_run_nsr']    = sss_config.reference_run_nsr
+        path_dict1['reference_run_all']    = sss_config.reference_run_all
+
+        path_dict1['new_run_custom'] = sss_config.new_run_custom
+        path_dict1['new_run_tase']   = sss_config.new_run_tase
+        path_dict1['new_run_nsr']    = sss_config.new_run_nsr
+        path_dict1['new_run_all']    = sss_config.new_run_all
+
+    return path_dict1
+
 
 #
 # Percentiles:
@@ -283,16 +337,21 @@ run_nsr              = sss_config.run_nsr               # NASDAQ100+S&P500+RUSSE
 run_all              = sss_config.run_all               # All Nasdaq Stocks
 research_mode        = sss_config.research_mode         # Research Mode
 research_mode_max_ev = sss_config.research_mode_max_ev
+automatic_results_folder_selection = sss_config.automatic_results_folder_selection
 
-reference_run_custom = sss_config.reference_run_custom
-reference_run_tase   = sss_config.reference_run_tase
-reference_run_nsr    = sss_config.reference_run_nsr
-reference_run_all    = sss_config.reference_run_all
+path_setting_dict = retrieve_path_settings(automatic_results_folder_selection, research_mode)
+print(path_setting_dict)
 
-new_run_tase   = sss_config.new_run_tase
-new_run_nsr    = sss_config.new_run_nsr
-new_run_all    = sss_config.new_run_all
-new_run_custom = sss_config.new_run_custom
+reference_run_custom = path_setting_dict['reference_run_custom']
+reference_run_tase   = path_setting_dict['reference_run_tase']
+reference_run_nsr    = path_setting_dict['reference_run_nsr']
+reference_run_all    = path_setting_dict['reference_run_all']
+
+new_run_custom = path_setting_dict['new_run_custom']
+new_run_tase   = path_setting_dict['new_run_tase']
+new_run_nsr    = path_setting_dict['new_run_nsr']
+new_run_all    = path_setting_dict['new_run_all']
+
 
 if not research_mode: # Run Build DB Only:
     if run_custom_tase: sss.sss_run(reference_run=reference_run_tase, sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', db_filename='None', read_united_states_input_symbols=0, tase_mode=1, num_threads=1, market_cap_included=1, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, enterprise_value_millions_usd_limit=5, research_mode_max_ev=False, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=[],                                   favor_sectors_by=[],          generate_result_folders=1, custom_portfolio=['IGLD-M.TA'])#, 'NICE.TA', 'KEN.TA']) # -> Credit Sector -> ['UNCR.TA', 'GIBU.TA', 'OPAL.TA', 'SRAC.TA', 'BLND.TA', 'VALU.TA', 'MCMN.TA', 'MLRN.TA', 'MNIF.TA', 'NAWI.TA', 'EFNC.TA', 'PEN.TA', 'SHOM.TA']); -> Green Energy Sector -> ['ELWS.TA', 'ENLT.TA', 'AUGN.TA', 'ENRG.TA', 'DORL.TA', 'ORA.TA', 'ELLO.TA', 'GNCL.TA', 'SLGN.TA', 'NOFR.TA', 'APLP.TA', 'PNRG.TA', 'MSKE.TA', 'HMGS.TA', 'BNRG.TA', 'SOLR.TA', 'SNFL.TA', 'TIGI.TA', 'AFHL.TA', 'BRND.TA', 'ININ.TA', 'ELMR.TA', 'NXTM.TA']
