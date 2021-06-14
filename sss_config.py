@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.52 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.53 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -20,6 +20,7 @@
 #
 #############################################################################
 
+
 run_custom_tase      = False   # Custom Portfolio
 run_custom           = False
 run_tase             = True   # Tel Aviv Stock Exchange
@@ -32,7 +33,7 @@ research_mode_max_ev = False  # @JustLearning's suggestion in Telegram: Multi-Di
 # reference and new_run folder locations.
 # When automatic_results_folder_selection is True, the program will automatically use the most recently created
 # folder(s).
-automatic_results_folder_selection = True
+automatic_results_folder_selection = False
 
 # Upon 1st ever run: reference must be set to None
 # After 1st ever Run: Recommended to use reference (filter and damper)
