@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.54 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.55 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -590,6 +590,43 @@ def round_and_avoid_none_values(stock_data):
     if stock_data.effective_current_ratio                         is None: stock_data.effective_current_ratio                         = 0
 
 
+def calculate_weighted_stock_data_on_non_reversed_dict(non_reversed_dict, dict_name, str_in_dict, weights, stock_data):
+    weight_index = 0
+    weighted_list = []
+    weights_sum = 0
+    try:
+        for key in reversed(list(non_reversed_dict)):  # The 1st element will be the oldest, receiving the lowest weight
+            if str_in_dict in non_reversed_dict[key] and not math.isnan(non_reversed_dict[key][str_in_dict]):
+                weighted_list.append(non_reversed_dict[key][str_in_dict] * weights[weight_index])
+                weights_sum  += weights[weight_index]
+                weight_index += 1
+        if weights_sum > 0:
+            return_value = stock_data.financial_currency_conversion_rate_mult_to_usd * sum(weighted_list) / weights_sum  # Multiplying by the factor to get the valu in USD.
+        else:
+            return_value = None
+    except Exception as e:
+        print("Exception in {} {}}: {}".format(stock_data.symbol, dict_name, e))
+        return_value = None
+        pass
+
+    return return_value
+
+
+def calculate_weighted_ratio_from_non_reversed_dict(non_reversed_dict, dict_name, str_in_dict_numerator, str_in_dict_denominator, weights, stock_data):
+    return_value = 0
+    weighted_ratios_list = []
+    try:
+        for key in reversed(list(non_reversed_dict)):  # The 1st element will be the oldest, receiving the lowest weight
+            if str_in_dict_denominator in non_reversed_dict[key] and not math.isnan(non_reversed_dict[key][str_in_dict_denominator]) and str_in_dict_numerator in non_reversed_dict[key] and not math.isnan(non_reversed_dict[key][str_in_dict_numerator]):
+                weighted_ratios_list.append((non_reversed_dict[key][str_in_dict_numerator] / non_reversed_dict[key][str_in_dict_denominator]))
+    except Exception as e:
+        print("Exception in {} {}}: {}".format(stock_data.symbol, dict_name, e))
+        pass
+    if len(weighted_ratios_list): return_value = weighted_average(weighted_ratios_list, weights[:len(weighted_ratios_list)])
+
+    return return_value
+
+
 def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list, sectors_filter_out, countries_list, countries_filter_out, build_csv_db, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db):
     try:
         return_value = True
@@ -651,94 +688,15 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
             if 'shortName' in info: stock_data.short_name = info['shortName']
             else:                   stock_data.short_name = 'None'
 
-            total_ratios_list         = []
-            try:
-                for key in reversed(list(balance_sheets_yearly)):  # The 1st element will be the oldest, receiving the lowest weight
-                    if 'Total Liab' in balance_sheets_yearly[key] and not math.isnan(balance_sheets_yearly[key]['Total Liab']) and 'Total Assets' in balance_sheets_yearly[key] and not math.isnan(balance_sheets_yearly[key]['Total Assets']):
-                        total_ratios_list.append((balance_sheets_yearly[key]['Total Assets']/balance_sheets_yearly[key]['Total Liab']))
-            except Exception as e:
-                print("Exception in {} annualized_total_ratio: {}".format(stock_data.symbol, e))
-                stock_data.annualized_total_ratio              = 0
-                pass
-            if len(total_ratios_list): stock_data.annualized_total_ratio = weighted_average(total_ratios_list, BALANCE_SHEETS_WEIGHTS[:len(total_ratios_list)])
+            stock_data.annualized_total_ratio          = calculate_weighted_ratio_from_non_reversed_dict(balance_sheets_yearly,    'annualized_total_ratio',          'Total Assets',         'Total Liab',                BALANCE_SHEETS_WEIGHTS, stock_data)
+            stock_data.annualized_other_current_ratio  = calculate_weighted_ratio_from_non_reversed_dict(balance_sheets_yearly,    'annualized_other_current_ratio',  'Other Current Assets', 'Other Current Liab',        BALANCE_SHEETS_WEIGHTS, stock_data)
+            stock_data.annualized_other_ratio          = calculate_weighted_ratio_from_non_reversed_dict(balance_sheets_yearly,    'annualized_other_ratio',          'Other Assets',         'Other Liab',                BALANCE_SHEETS_WEIGHTS, stock_data)
+            stock_data.annualized_total_current_ratio  = calculate_weighted_ratio_from_non_reversed_dict(balance_sheets_yearly,    'annualized_total_current_ratio',  'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data)
 
-            other_current_ratios_list = []
-            try:
-                for key in reversed(list(balance_sheets_yearly)):  # The 1st element will be the oldest, receiving the lowest weight
-                    if 'Other Current Liab' in balance_sheets_yearly[key] and not math.isnan(balance_sheets_yearly[key]['Other Current Liab']) and 'Other Current Assets' in balance_sheets_yearly[key] and not math.isnan(balance_sheets_yearly[key]['Other Current Assets']):
-                        other_current_ratios_list.append((balance_sheets_yearly[key]['Other Current Assets']/balance_sheets_yearly[key]['Other Current Liab']))
-            except Exception as e:
-                print("Exception in {} annualized_other_current_ratio: {}".format(stock_data.symbol, e))
-                stock_data.annualized_other_current_ratio       = 0
-                pass
-            if len(other_current_ratios_list): stock_data.annualized_other_current_ratio = weighted_average(other_current_ratios_list, BALANCE_SHEETS_WEIGHTS[:len(other_current_ratios_list)])
-
-            other_ratios_list         = []
-            try:
-                for key in reversed(list(balance_sheets_yearly)):  # The 1st element will be the oldest, receiving the lowest weight
-                    if 'Other Liab' in balance_sheets_yearly[key] and not math.isnan(balance_sheets_yearly[key]['Other Liab']) and 'Other Assets' in balance_sheets_yearly[key] and not math.isnan(balance_sheets_yearly[key]['Other Assets']):
-                        other_ratios_list.append((balance_sheets_yearly[key]['Other Assets']/balance_sheets_yearly[key]['Other Liab']))
-            except Exception as e:
-                print("Exception in {} annualized_other_ratio: {}".format(stock_data.symbol, e))
-                stock_data.annualized_other_ratio              = 0
-                pass
-            if len(other_ratios_list): stock_data.annualized_other_ratio = weighted_average(other_ratios_list, BALANCE_SHEETS_WEIGHTS[:len(other_ratios_list)])
-
-            total_current_ratios_list         = []
-            try:
-                for key in reversed(list(balance_sheets_yearly)):  # The 1st element will be the oldest, receiving the lowest weight
-                    if 'Total Current Liabilities' in balance_sheets_yearly[key] and not math.isnan(balance_sheets_yearly[key]['Total Current Liabilities']) and 'Total Current Assets' in balance_sheets_yearly[key] and not math.isnan(balance_sheets_yearly[key]['Total Current Assets']):
-                        total_current_ratios_list.append((balance_sheets_yearly[key]['Total Current Assets']/balance_sheets_yearly[key]['Total Current Liabilities']))
-            except Exception as e:
-                print("Exception in {} annualized_total_current_ratio: {}".format(stock_data.symbol, e))
-                stock_data.annualized_total_current_ratio              = 0
-                pass
-            if len(total_current_ratios_list): stock_data.annualized_total_current_ratio = weighted_average(total_current_ratios_list, BALANCE_SHEETS_WEIGHTS[:len(total_current_ratios_list)])
-
-
-            total_ratios_list         = []
-            try:
-                for key in reversed(list(balance_sheets_quarterly)):  # The 1st element will be the oldest, receiving the lowest weight
-                    if 'Total Liab' in balance_sheets_quarterly[key] and not math.isnan(balance_sheets_quarterly[key]['Total Liab']) and 'Total Assets' in balance_sheets_quarterly[key] and not math.isnan(balance_sheets_quarterly[key]['Total Assets']):
-                        total_ratios_list.append((balance_sheets_quarterly[key]['Total Assets']/balance_sheets_quarterly[key]['Total Liab']))
-            except Exception as e:
-                print("Exception in {} quarterized_total_ratio: {}".format(stock_data.symbol, e))
-                stock_data.quarterized_total_ratio              = 0
-                pass
-            if len(total_ratios_list): stock_data.quarterized_total_ratio = weighted_average(total_ratios_list, BALANCE_SHEETS_WEIGHTS[:len(total_ratios_list)])
-
-            other_current_ratios_list = []
-            try:
-                for key in reversed(list(balance_sheets_quarterly)):  # The 1st element will be the oldest, receiving the lowest weight
-                    if 'Other Current Liab' in balance_sheets_quarterly[key] and not math.isnan(balance_sheets_quarterly[key]['Other Current Liab']) and 'Other Current Assets' in balance_sheets_quarterly[key] and not math.isnan(balance_sheets_quarterly[key]['Other Current Assets']):
-                        other_current_ratios_list.append((balance_sheets_quarterly[key]['Other Current Assets']/balance_sheets_quarterly[key]['Other Current Liab']))
-            except Exception as e:
-                print("Exception in {} quarterized_other_current_ratio: {}".format(stock_data.symbol, e))
-                stock_data.quarterized_other_current_ratio       = 0
-                pass
-            if len(other_current_ratios_list): stock_data.quarterized_other_current_ratio = weighted_average(other_current_ratios_list, BALANCE_SHEETS_WEIGHTS[:len(other_current_ratios_list)])
-
-            other_ratios_list         = []
-            try:
-                for key in reversed(list(balance_sheets_quarterly)):  # The 1st element will be the oldest, receiving the lowest weight
-                    if 'Other Liab' in balance_sheets_quarterly[key] and not math.isnan(balance_sheets_quarterly[key]['Other Liab']) and 'Other Assets' in balance_sheets_quarterly[key] and not math.isnan(balance_sheets_quarterly[key]['Other Assets']):
-                        other_ratios_list.append((balance_sheets_quarterly[key]['Other Assets']/balance_sheets_quarterly[key]['Other Liab']))
-            except Exception as e:
-                print("Exception in {} quarterized_other_ratio: {}".format(stock_data.symbol, e))
-                stock_data.quarterized_other_ratio              = 0
-                pass
-            if len(other_ratios_list): stock_data.quarterized_other_ratio = weighted_average(other_ratios_list, BALANCE_SHEETS_WEIGHTS[:len(other_ratios_list)])
-
-            total_current_ratios_list         = []
-            try:
-                for key in reversed(list(balance_sheets_quarterly)):  # The 1st element will be the oldest, receiving the lowest weight
-                    if 'Total Current Liabilities' in balance_sheets_quarterly[key] and not math.isnan(balance_sheets_quarterly[key]['Total Current Liabilities']) and 'Total Current Assets' in balance_sheets_quarterly[key] and not math.isnan(balance_sheets_quarterly[key]['Total Current Assets']):
-                        total_current_ratios_list.append((balance_sheets_quarterly[key]['Total Current Assets']/balance_sheets_quarterly[key]['Total Current Liabilities']))
-            except Exception as e:
-                print("Exception in {} quarterized_total_current_ratio: {}".format(stock_data.symbol, e))
-                stock_data.quarterized_total_current_ratio              = 0
-                pass
-            if len(total_current_ratios_list): stock_data.quarterized_total_current_ratio = weighted_average(total_current_ratios_list, BALANCE_SHEETS_WEIGHTS[:len(total_current_ratios_list)])
+            stock_data.quarterized_total_ratio         = calculate_weighted_ratio_from_non_reversed_dict(balance_sheets_quarterly, 'quarterized_total_ratio',         'Total Assets',         'Total Liab',                BALANCE_SHEETS_WEIGHTS, stock_data)
+            stock_data.quarterized_other_current_ratio = calculate_weighted_ratio_from_non_reversed_dict(balance_sheets_quarterly, 'quarterized_other_current_ratio', 'Other Current Assets', 'Other Current Liab',        BALANCE_SHEETS_WEIGHTS, stock_data)
+            stock_data.quarterized_other_ratio          = calculate_weighted_ratio_from_non_reversed_dict(balance_sheets_quarterly, 'quarterized_other_ratio',         'Other Assets',         'Other Liab',                BALANCE_SHEETS_WEIGHTS, stock_data)
+            stock_data.quarterized_total_current_ratio = calculate_weighted_ratio_from_non_reversed_dict(balance_sheets_quarterly, 'quarterized_total_current_ratio', 'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data)
 
             if stock_data.annualized_total_ratio          == 0.0: stock_data.annualized_total_ratio          = stock_data.quarterized_total_ratio        *QUARTERLY_YEARLY_MISSING_FACTOR
             if stock_data.quarterized_total_ratio         == 0.0: stock_data.quarterized_total_ratio         = stock_data.annualized_total_ratio         *QUARTERLY_YEARLY_MISSING_FACTOR
@@ -802,37 +760,8 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
                 if stock_data.debt_to_equity_effective >= 0:
                     stock_data.debt_to_equity_effective_used = math.sqrt(stock_data.debt_to_equity_effective)
 
-            weight_index    = 0
-            cash_flows_list = []
-            weights_sum     = 0
-            try:
-                for key in reversed(list(cash_flows_yearly)):  # The 1st element will be the oldest, receiving the lowest weight
-                    if 'Total Cash From Operating Activities' in cash_flows_yearly[key] and not math.isnan(cash_flows_yearly[key]['Total Cash From Operating Activities']):
-                        cash_flows_list.append(cash_flows_yearly[key]['Total Cash From Operating Activities']*CASH_FLOW_WEIGHTS[weight_index])
-                        weights_sum += CASH_FLOW_WEIGHTS[weight_index]
-                        weight_index += 1
-                if weights_sum > 0: stock_data.annualized_cash_flow_from_operating_activities = stock_data.financial_currency_conversion_rate_mult_to_usd*sum(cash_flows_list) / weights_sum  # Multiplying by the factor to get the valu in USD.
-                else:               stock_data.annualized_cash_flow_from_operating_activities = None
-            except Exception as e:
-                print("Exception in {} cash_flows_yearly: {}".format(stock_data.symbol, e))
-                stock_data.annualized_cash_flow_from_operating_activities = None
-                pass
-
-            weight_index    = 0
-            cash_flows_list = []
-            weights_sum     = 0
-            try:
-                for key in reversed(list(cash_flows_quarterly)):  # The 1st element will be the oldest, receiving the lowest weight
-                    if 'Total Cash From Operating Activities' in cash_flows_quarterly[key] and not math.isnan(cash_flows_quarterly[key]['Total Cash From Operating Activities']):
-                        cash_flows_list.append(cash_flows_quarterly[key]['Total Cash From Operating Activities']*CASH_FLOW_WEIGHTS[weight_index])
-                        weights_sum += CASH_FLOW_WEIGHTS[weight_index]
-                        weight_index += 1
-                if weights_sum > 0: stock_data.quarterized_cash_flow_from_operating_activities = stock_data.financial_currency_conversion_rate_mult_to_usd*sum(cash_flows_list) / weights_sum  # Multiplying by the factor to get the valu in USD.
-                else:               stock_data.quarterized_cash_flow_from_operating_activities = None
-            except Exception as e:
-                print("Exception in {} cash_flows_quarterly: {}".format(stock_data.symbol, e))
-                stock_data.quarterized_cash_flow_from_operating_activities = None
-                pass
+            stock_data.annualized_cash_flow_from_operating_activities  = calculate_weighted_stock_data_on_non_reversed_dict(cash_flows_yearly,    'cash_flows_yearly',    'Total Cash From Operating Activities', CASH_FLOW_WEIGHTS, stock_data)
+            stock_data.quarterized_cash_flow_from_operating_activities = calculate_weighted_stock_data_on_non_reversed_dict(cash_flows_quarterly, 'cash_flows_quarterly', 'Total Cash From Operating Activities', CASH_FLOW_WEIGHTS, stock_data)
 
         if stock_data.short_name is     None:                       stock_data.short_name = 'None'
         if stock_data.short_name != None and not research_mode: print('              {:35}:'.format(stock_data.short_name))
