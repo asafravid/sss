@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.55 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.56 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -591,9 +591,9 @@ def round_and_avoid_none_values(stock_data):
 
 
 def calculate_weighted_stock_data_on_non_reversed_dict(non_reversed_dict, dict_name, str_in_dict, weights, stock_data):
-    weight_index = 0
+    weight_index  = 0
     weighted_list = []
-    weights_sum = 0
+    weights_sum   = 0
     try:
         for key in reversed(list(non_reversed_dict)):  # The 1st element will be the oldest, receiving the lowest weight
             if str_in_dict in non_reversed_dict[key] and not math.isnan(non_reversed_dict[key][str_in_dict]):
@@ -612,8 +612,8 @@ def calculate_weighted_stock_data_on_non_reversed_dict(non_reversed_dict, dict_n
     return return_value
 
 
-def calculate_weighted_ratio_from_non_reversed_dict(non_reversed_dict, dict_name, str_in_dict_numerator, str_in_dict_denominator, weights, stock_data):
-    return_value = 0
+def calculate_weighted_ratio_from_non_reversed_dict(non_reversed_dict, dict_name, str_in_dict_numerator, str_in_dict_denominator, weights, stock_data, default_return_value):
+    return_value         = default_return_value
     weighted_ratios_list = []
     try:
         for key in reversed(list(non_reversed_dict)):  # The 1st element will be the oldest, receiving the lowest weight
@@ -688,15 +688,15 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
             if 'shortName' in info: stock_data.short_name = info['shortName']
             else:                   stock_data.short_name = 'None'
 
-            stock_data.annualized_total_ratio          = calculate_weighted_ratio_from_non_reversed_dict(balance_sheets_yearly,    'annualized_total_ratio',          'Total Assets',         'Total Liab',                BALANCE_SHEETS_WEIGHTS, stock_data)
-            stock_data.annualized_other_current_ratio  = calculate_weighted_ratio_from_non_reversed_dict(balance_sheets_yearly,    'annualized_other_current_ratio',  'Other Current Assets', 'Other Current Liab',        BALANCE_SHEETS_WEIGHTS, stock_data)
-            stock_data.annualized_other_ratio          = calculate_weighted_ratio_from_non_reversed_dict(balance_sheets_yearly,    'annualized_other_ratio',          'Other Assets',         'Other Liab',                BALANCE_SHEETS_WEIGHTS, stock_data)
-            stock_data.annualized_total_current_ratio  = calculate_weighted_ratio_from_non_reversed_dict(balance_sheets_yearly,    'annualized_total_current_ratio',  'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data)
+            stock_data.annualized_total_ratio          = calculate_weighted_ratio_from_non_reversed_dict(balance_sheets_yearly,    'annualized_total_ratio',          'Total Assets',         'Total Liab',                BALANCE_SHEETS_WEIGHTS, stock_data, 0)
+            stock_data.annualized_other_current_ratio  = calculate_weighted_ratio_from_non_reversed_dict(balance_sheets_yearly,    'annualized_other_current_ratio',  'Other Current Assets', 'Other Current Liab',        BALANCE_SHEETS_WEIGHTS, stock_data, 0)
+            stock_data.annualized_other_ratio          = calculate_weighted_ratio_from_non_reversed_dict(balance_sheets_yearly,    'annualized_other_ratio',          'Other Assets',         'Other Liab',                BALANCE_SHEETS_WEIGHTS, stock_data, 0)
+            stock_data.annualized_total_current_ratio  = calculate_weighted_ratio_from_non_reversed_dict(balance_sheets_yearly,    'annualized_total_current_ratio',  'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data, 0)
 
-            stock_data.quarterized_total_ratio         = calculate_weighted_ratio_from_non_reversed_dict(balance_sheets_quarterly, 'quarterized_total_ratio',         'Total Assets',         'Total Liab',                BALANCE_SHEETS_WEIGHTS, stock_data)
-            stock_data.quarterized_other_current_ratio = calculate_weighted_ratio_from_non_reversed_dict(balance_sheets_quarterly, 'quarterized_other_current_ratio', 'Other Current Assets', 'Other Current Liab',        BALANCE_SHEETS_WEIGHTS, stock_data)
-            stock_data.quarterized_other_ratio          = calculate_weighted_ratio_from_non_reversed_dict(balance_sheets_quarterly, 'quarterized_other_ratio',         'Other Assets',         'Other Liab',                BALANCE_SHEETS_WEIGHTS, stock_data)
-            stock_data.quarterized_total_current_ratio = calculate_weighted_ratio_from_non_reversed_dict(balance_sheets_quarterly, 'quarterized_total_current_ratio', 'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data)
+            stock_data.quarterized_total_ratio         = calculate_weighted_ratio_from_non_reversed_dict(balance_sheets_quarterly, 'quarterized_total_ratio',         'Total Assets',         'Total Liab',                BALANCE_SHEETS_WEIGHTS, stock_data, 0)
+            stock_data.quarterized_other_current_ratio = calculate_weighted_ratio_from_non_reversed_dict(balance_sheets_quarterly, 'quarterized_other_current_ratio', 'Other Current Assets', 'Other Current Liab',        BALANCE_SHEETS_WEIGHTS, stock_data, 0)
+            stock_data.quarterized_other_ratio         = calculate_weighted_ratio_from_non_reversed_dict(balance_sheets_quarterly, 'quarterized_other_ratio',         'Other Assets',         'Other Liab',                BALANCE_SHEETS_WEIGHTS, stock_data, 0)
+            stock_data.quarterized_total_current_ratio = calculate_weighted_ratio_from_non_reversed_dict(balance_sheets_quarterly, 'quarterized_total_current_ratio', 'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data, 0)
 
             if stock_data.annualized_total_ratio          == 0.0: stock_data.annualized_total_ratio          = stock_data.quarterized_total_ratio        *QUARTERLY_YEARLY_MISSING_FACTOR
             if stock_data.quarterized_total_ratio         == 0.0: stock_data.quarterized_total_ratio         = stock_data.annualized_total_ratio         *QUARTERLY_YEARLY_MISSING_FACTOR
@@ -714,30 +714,9 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
             stock_data.total_current_ratio_effective = RATIO_DAMPER+(stock_data.annualized_total_current_ratio + stock_data.quarterized_total_current_ratio)/2.0
             stock_data.effective_current_ratio       = (stock_data.total_ratio_effective + stock_data.total_current_ratio_effective) / 2.0  # TODO: ASAFR: In the next stage - add the other and current other ratios - more information -> more completeness
 
-            total_debt_to_equity_list     = []
-            try:
-                for key in reversed(list(balance_sheets_yearly)):  # The 1st element will be the oldest, receiving the lowest weight
-                    if 'Total Liab' in balance_sheets_yearly[key] and not math.isnan(balance_sheets_yearly[key]['Total Liab']) and 'Total Stockholder Equity' in balance_sheets_yearly[key] and not math.isnan(balance_sheets_yearly[key]['Total Stockholder Equity']):
-                        total_debt_to_equity_list.append(balance_sheets_yearly[key]['Total Liab']/balance_sheets_yearly[key]['Total Stockholder Equity'])
-            except Exception as e:
-                print("Exception in {} annualized_debt_to_equity: {}".format(stock_data.symbol, e))
-                stock_data.annualized_debt_to_equity           = None
-                pass
-            if len(total_debt_to_equity_list): stock_data.annualized_debt_to_equity = weighted_average(total_debt_to_equity_list, BALANCE_SHEETS_WEIGHTS[:len(total_debt_to_equity_list)])
-            else:                              stock_data.annualized_debt_to_equity = None
-
             # TODO: ASAFR: Add Other Current Liab / Other Stockholder Equity
-            total_debt_to_equity_list     = []
-            try:
-                for key in reversed(list(balance_sheets_quarterly)):  # The 1st element will be the oldest, receiving the lowest weight
-                    if 'Total Liab' in balance_sheets_quarterly[key] and not math.isnan(balance_sheets_quarterly[key]['Total Liab']) and 'Total Stockholder Equity' in balance_sheets_quarterly[key] and not math.isnan(balance_sheets_quarterly[key]['Total Stockholder Equity']):
-                        total_debt_to_equity_list.append(balance_sheets_quarterly[key]['Total Liab']/balance_sheets_quarterly[key]['Total Stockholder Equity'])
-            except Exception as e:
-                print("Exception in {} quarterized_debt_to_equity: {}".format(stock_data.symbol, e))
-                stock_data.quarterized_debt_to_equity = None
-                pass
-            if len(total_debt_to_equity_list): stock_data.quarterized_debt_to_equity = weighted_average(total_debt_to_equity_list, BALANCE_SHEETS_WEIGHTS[:len(total_debt_to_equity_list)])
-            else:                              stock_data.quarterized_debt_to_equity = None
+            stock_data.annualized_debt_to_equity  = calculate_weighted_ratio_from_non_reversed_dict(balance_sheets_yearly,    'annualized_debt_to_equity',  'Total Liab', 'Total Stockholder Equity', BALANCE_SHEETS_WEIGHTS, stock_data, None)
+            stock_data.quarterized_debt_to_equity = calculate_weighted_ratio_from_non_reversed_dict(balance_sheets_quarterly, 'quarterized_debt_to_equity', 'Total Liab', 'Total Stockholder Equity', BALANCE_SHEETS_WEIGHTS, stock_data, None)
 
             if stock_data.annualized_debt_to_equity is None and stock_data.quarterized_debt_to_equity is None:
                 stock_data.annualized_debt_to_equity = stock_data.quarterized_debt_to_equity = 1000.0*debt_to_equity_limit
