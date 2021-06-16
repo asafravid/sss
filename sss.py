@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.52 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.54 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -21,34 +21,33 @@
 #############################################################################
 
 
-# TODO: ASAF: 0. Investigate average and ranges of all parameters in the SSS Core Equation - Summarize in the document itself (Test Case)
-#             1. Check and multi dim and investigate eqg_min and rqg_min: Check why Yahoo Finance always gives QRG values of 0? Unusable if that is always so
-#             2. Implement:
-#             2.1. https://en.wikipedia.org/wiki/Piotroski_F-score
-#             2.2. https://en.wikipedia.org/wiki/Magic_formula_investing
-#             2.3. https://www.oldschoolvalue.com/investing-strategy/backtest-graham-nnwc-ncav-screen/
-#             3. Take latest yfinance base.py (and other - compare the whole folder) and updates - maybe not required - but just stay up to date
-#             5. Investigate and add: https://www.investopedia.com/terms/o/operatingmargin.asp - operating margin
-#             6. Add Free Cash flow [FCF] (EV/FreeCashFlow): Inverse of the Free Cash Flow Yield (https://www.stockopedia.com/ratios/ev-free-cash-flow-336/#:~:text=What%20is%20the%20definition%20of,the%20Free%20Cash%20Flow%20Yield.)
-#             7. There is already an EV/CFO ratio.
-#                  CFO - CapitalExpenditures = FCF
-#                  EV/CFO * EV/FCF = EV^2 / (CFO * [CFO - CapitalExpenditures]) | EV/CFO + EV/FCF = EV*(1/CFO + 1/(CFO-CapitalExpenditures))
-#                  Conclusion: EV/FCF is better as it provides moe information. But make this a lower priority for development
-#                              Bonus: When there is no CFO, Use FCF, and Vice Versa - more information
-#             9. Which are the most effective parameters? Correlate the sorting of sss_value to the results and each of the sorted-by-parameter list.
-#            10. Important: https://www.oldschoolvalue.com/investing-strategy/walter-schloss-investing-strategy-producing-towering-returns/#:~:text=Walter%20Schloss%20ran%20with%20the,to%20perform%20complex%20valuations%20either.
-#                10.1.  3 years low, 5 years low
-#                10.2.  F-Score, M-Score, Z-Score
-#                10.3.  Multi-Dim scan over the distance from low, and over the Schloff Score - define a Walter-Schloss score
-#                10.4.  Remove the square root from DtoE ?
-#                10.5.  MktCapM is >= US$ 300 million (basis year 2000) adjusted yearly
-#                10.6.  Consider only stocks that are listed at least 10 years
-#                10.7.  Price 1 Day ago within 15% of the 52 week low
-#                10.8.  Take the top 1000 stocks with highest Number of Insiders owning shares#            11. Calculate share_price/52weekLow 0.1
-#                10.9.  Take the top 500 stocks with highest Current Dividend Yield %#            12. https://pyportfolioopt.readthedocs.io/en/latest/UserGuide.html -> Use
-#                10.10. Take the top 250 stocks with lowest Latest Filing P/E ratio#            13. Calculate the ROE - Return on equity
-#                10.11. Take the top 125 stocks with lowest Latest Filing P/B ratio#            14. Operating Cash Flow Growth - interesting: https://github.com/JerBouma/FundamentalAnalysis
-#                10.12. Take the top 75 stocks with lowest Latest Filing Long Term Debt#            15. Quick Ratio - https://github.com/JerBouma/FinanceDatabase - interesting
+# TODO: ASAFR: 1. Check and multi dim and investigate eqg_min and rqg_min: Check why Yahoo Finance always gives QRG values of 0? Unusable if that is always so
+#              2. Implement:
+#              2.1. https://en.wikipedia.org/wiki/Piotroski_F-score
+#              2.2. https://en.wikipedia.org/wiki/Magic_formula_investing
+#              2.3. https://www.oldschoolvalue.com/investing-strategy/backtest-graham-nnwc-ncav-screen/
+#              3. Take latest yfinance base.py (and other - compare the whole folder) and updates - maybe not required - but just stay up to date
+#              5. Investigate and add: https://www.investopedia.com/terms/o/operatingmargin.asp - operating margin
+#              6. Add Free Cash flow [FCF] (EV/FreeCashFlow): Inverse of the Free Cash Flow Yield (https://www.stockopedia.com/ratios/ev-free-cash-flow-336/#:~:text=What%20is%20the%20definition%20of,the%20Free%20Cash%20Flow%20Yield.)
+#              7. There is already an EV/CFO ratio.
+#                   CFO - CapitalExpenditures = FCF
+#                   EV/CFO * EV/FCF = EV^2 / (CFO * [CFO - CapitalExpenditures]) | EV/CFO + EV/FCF = EV*(1/CFO + 1/(CFO-CapitalExpenditures))
+#                   Conclusion: EV/FCF is better as it provides moe information. But make this a lower priority for development
+#                               Bonus: When there is no CFO, Use FCF, and Vice Versa - more information
+#              9. Which are the most effective parameters? Correlate the sorting of sss_value to the results and each of the sorted-by-parameter list.
+#             10. Important: https://www.oldschoolvalue.com/investing-strategy/walter-schloss-investing-strategy-producing-towering-returns/#:~:text=Walter%20Schloss%20ran%20with%20the,to%20perform%20complex%20valuations%20either.
+#                 10.1.  3 years low, 5 years low
+#                 10.2.  F-Score, M-Score, Z-Score
+#                 10.3.  Multi-Dim scan over the distance from low, and over the Schloff Score - define a Walter-Schloss score
+#                 10.4.  Remove the square root from DtoE ?
+#                 10.5.  MktCapM is >= US$ 300 million (basis year 2000) adjusted yearly
+#                 10.6.  Consider only stocks that are listed at least 10 years
+#                 10.7.  Price 1 Day ago within 15% of the 52 week low
+#                 10.8.  Take the top 1000 stocks with highest Number of Insiders owning shares#            11. Calculate share_price/52weekLow 0.1
+#                 10.9.  Take the top 500 stocks with highest Current Dividend Yield %#            12. https://pyportfolioopt.readthedocs.io/en/latest/UserGuide.html -> Use
+#                 10.10. Take the top 250 stocks with lowest Latest Filing P/E ratio#            13. Calculate the ROE - Return on equity
+#                 10.11. Take the top 125 stocks with lowest Latest Filing P/B ratio#            14. Operating Cash Flow Growth - interesting: https://github.com/JerBouma/FundamentalAnalysis
+#                 10.12. Take the top 75 stocks with lowest Latest Filing Long Term Debt#            15. Quick Ratio - https://github.com/JerBouma/FinanceDatabase - interesting
 #
 
 
