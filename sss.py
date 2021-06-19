@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.57 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.61 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -21,12 +21,15 @@
 #############################################################################
 
 
-# TODO: ASAFR: 1. Check and multi dim and investigate eqg_min and rqg_min: Check why Yahoo Finance always gives QRG values of 0? Unusable if that is always so
+# TODO: ASAFR: 0. Direct address to download TASE CSV: https://info.tase.co.il/_layouts/Tase/ManagementPages/Export.aspx?sn=none&action=1&SubAction=0&GridId=33&CurGuid={85603D39-703A-4619-97D9-CE9F16E27615}&ExportType=3
+#              1. Check and multi dim and investigate eqg_min and rqg_min: Check why Yahoo Finance always gives QRG values of 0? Unusable if that is always so
 #              2. Implement:
 #              2.1. https://en.wikipedia.org/wiki/Piotroski_F-score
 #              2.1.1. ROA: https://www.investopedia.com/ask/answers/031215/what-formula-calculating-return-assets-roa.asp
 #              2.2. https://en.wikipedia.org/wiki/Magic_formula_investing
 #              2.3. https://www.oldschoolvalue.com/investing-strategy/backtest-graham-nnwc-ncav-screen/
+#              2.4. Altman Z Score
+#              2.5. Beneish M Score
 #              3. Take latest yfinance base.py (and other - compare the whole folder) and updates - maybe not required - but just stay up to date
 #              5. Investigate and add: https://www.investopedia.com/terms/o/operatingmargin.asp - operating margin
 #              6. Add Free Cash flow [FCF] (EV/FreeCashFlow): Inverse of the Free Cash Flow Yield (https://www.stockopedia.com/ratios/ev-free-cash-flow-336/#:~:text=What%20is%20the%20definition%20of,the%20Free%20Cash%20Flow%20Yield.)
@@ -66,6 +69,8 @@ from dataclasses import dataclass
 # TODO: ASAFR: Try again the CurrencyConverter and check it on venv as well
 from forex_python.converter import CurrencyRates
 from currency_converter import CurrencyConverter
+
+import sss_indices
 
 VERBOSE_LOGS = 0
 
@@ -1697,6 +1702,10 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
         stocks_list_tase = []  # https://info.tase.co.il/eng/MarketData/Stocks/MarketData/Pages/MarketData.aspx
 
     if tase_mode and not research_mode and build_csv_db:
+        try:
+            sss_indices.update_tase_indices()
+        except Exception as e:
+            print("Error updating Indices/Data_TASE.csv: {}".format(e))
         tase_filenames_list = ['Indices/Data_TASE.csv']
 
         for filename in tase_filenames_list:

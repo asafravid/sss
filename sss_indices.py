@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.60 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.61 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -26,13 +26,14 @@
 import urllib3
 import certifi
 
+def update_tase_indices():
+    url_tase_indices = 'https://info.tase.co.il/_layouts/Tase/ManagementPages/Export.aspx?sn=none&action=1&SubAction=0&GridId=33&CurGuid={85603D39-703A-4619-97D9-CE9F16E27615}&ExportType=3'
+    http             = urllib3.PoolManager(ca_certs=certifi.where())
+    headers          = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
 
-url_tase_indices = 'https://info.tase.co.il/_layouts/Tase/ManagementPages/Export.aspx?sn=none&action=1&SubAction=0&GridId=33&CurGuid={85603D39-703A-4619-97D9-CE9F16E27615}&ExportType=3'
-
-http = urllib3.PoolManager(ca_certs=certifi.where())
-
-headers = {'User-Agent': 'Mozilla/5.0 (Macintosh; Intel Mac OS X 10_10_1) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/39.0.2171.95 Safari/537.36'}
-
-
-req = http.request('GET', url_tase_indices, headers=headers)
-print(req.data.decode('utf-8'))
+    req       = http.request('GET', url_tase_indices, headers=headers)
+    data_tase = req.data.decode('utf-8')
+    data_tase_no_extra_lines = "\n".join(data_tase.splitlines())
+    f = open('Indices/Data_TASE.csv','w')
+    f.write(data_tase_no_extra_lines)
+    f.close()
