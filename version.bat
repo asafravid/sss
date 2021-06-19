@@ -30,5 +30,6 @@ copy pdf_generator.py           Backup\%1\pdf_generator.py
 copy Math.xlsx                  Backup\%1\Math.xlsx
 copy sss_results_performance.py Backup\%1\sss_results_performance.py
 copy sss_config.py              Backup\%1\sss_config.py
+copy sss_indices.py             Backup\%1\sss_indices.py
 
 copy version.bat                Backup\%1\version.bat
