@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.61 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.63 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -21,8 +21,7 @@
 #############################################################################
 
 
-# TODO: ASAFR: 0. Direct address to download TASE CSV: https://info.tase.co.il/_layouts/Tase/ManagementPages/Export.aspx?sn=none&action=1&SubAction=0&GridId=33&CurGuid={85603D39-703A-4619-97D9-CE9F16E27615}&ExportType=3
-#              1. Check and multi dim and investigate eqg_min and rqg_min: Check why Yahoo Finance always gives QRG values of 0? Unusable if that is always so
+# TODO: ASAFR: 1. Check and multi dim and investigate eqg_min and rqg_min: Check why Yahoo Finance always gives QRG values of 0? Unusable if that is always so
 #              2. Implement:
 #              2.1. https://en.wikipedia.org/wiki/Piotroski_F-score
 #              2.1.1. ROA: https://www.investopedia.com/ask/answers/031215/what-formula-calculating-return-assets-roa.asp
@@ -53,6 +52,14 @@
 #                 10.11. Take the top 125 stocks with lowest Latest Filing P/B ratio#            14. Operating Cash Flow Growth - interesting: https://github.com/JerBouma/FundamentalAnalysis
 #                 10.12. Take the top 75 stocks with lowest Latest Filing Long Term Debt#            15. Quick Ratio - https://github.com/JerBouma/FinanceDatabase - interesting
 #
+#              11. [Building DB: thread_id  0 Sleeping for        0.0 sec] Checking AVCT      ( 634/ 648/7231 [Diff:    0]):
+#               American Virtual Cloud Technolo    :
+# C:\Users\Administrator\Downloads\sss-master\venv\lib\site-packages\yfinance\base.py:519: UserWarning: DataFrame columns are not unique, some columns will be omitted.
+#   return data.to_dict()
+# C:\Users\Administrator\Downloads\sss-master\venv\lib\site-packages\yfinance\base.py:509: UserWarning: DataFrame columns are not unique, some columns will be omitted.
+#   return data.to_dict()
+# C:\Users\Administrator\Downloads\sss-master\venv\lib\site-packages\yfinance\base.py:502: UserWarning: DataFrame columns are not unique, some columns will be omitted.
+#   return data.to_dict()
 
 
 import time
