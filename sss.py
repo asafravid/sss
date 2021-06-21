@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.66 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.67 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -107,6 +107,7 @@ RQG_DAMPER                                   = 0.05
 TRAILING_EPS_PERCENTAGE_DAMP_FACTOR          = 0.01   # When the trailing_eps_percentage is very low (units are ratio here), this damper shall limit the affect to x100 not more)
 PROFIT_MARGIN_DAMPER                         = 0.01   # When the profit_margin                   is very low (units are ratio here), this damper shall limit the affect to x100 not more)
 RATIO_DAMPER                                 = 0.01   # When the total/current_other_other ratio is very low (units are ratio here), this damper shall limit the affect to x100 not more)
+ROA_DAMPER                                   = 0.02   # When the ROA is very low (units are ratio here), this damper shall limit the affect to x50 not more)
 REFERENCE_DB_MAX_VALUE_DIFF_FACTOR_THRESHOLD = 0.9   # if there is a parameter difference from reference db, in which the difference of values is higher than 0.75*abs(max_value) then something went wrong with the fetch of values from yfinance. Compensate smartly from reference database
 QUARTERLY_YEARLY_MISSING_FACTOR              = 0.25  # if either yearly or quarterly values are missing - compensate by other with bad factor (less information means less attractive)
 
@@ -1276,9 +1277,7 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
                 stock_data.effective_total_assets = (stock_data.annualized_total_assets+stock_data.quarterized_total_assets)/2
 
             if stock_data.effective_total_assets != None and stock_data.effective_total_assets > 0 and stock_data.effective_net_income != None:
-                stock_data.calculated_roa = stock_data.effective_net_income/stock_data.effective_total_assets
-                if stock_data.calculated_roa > 0:
-                    stock_data.calculated_roa = math.sqrt(stock_data.calculated_roa)
+                stock_data.calculated_roa = ROA_DAMPER + stock_data.effective_net_income/stock_data.effective_total_assets
 
             if stock_data.annualized_cash_flow_from_operating_activities is None and stock_data.quarterized_cash_flow_from_operating_activities is None:
                 if stock_data.effective_earnings != None:
