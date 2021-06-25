@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.67 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.70 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -126,8 +126,8 @@ PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_REVENUE  = 2.5    # Pro
 PROFIT_MARGIN_DUPLICATION_FACTOR                                  = 8.0    # When copying profit margin (if either quarterized/annualized/profit_margin is missing) - devide by this factor
 NEGATIVE_CFO_FACTOR                                               = 10.0   #
 NEGATIVE_PEG_RATIO_FACTOR                                         = 10.0   # -0.5 -> 5, and -0.001 -> 0.01
-NEGATIVE_DEBT_TO_EQUITY_FACTOR                                    = 10.0   # -0.5 -> 5, and -0.001 -> 0.01
-NEGATIVE_PRICE_TO_EARNINGS_FACTOR                                 = 1000000.0
+NEGATIVE_DEBT_TO_EQUITY_FACTOR                                    = 100.0   # -0.5 -> 50, and -0.001 -> 0.1
+NEGATIVE_EARNINGS_FACTOR                                          = 10000.0
 
 FORWARD_PRICE_TO_EARNINGS_WEIGHT  = 0.125 # Give less weight to forward (estimation)
 TRAILING_PRICE_TO_EARNINGS_WEIGHT = 1-FORWARD_PRICE_TO_EARNINGS_WEIGHT
@@ -1122,10 +1122,10 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
 
             if 'enterpriseToEbitda' in info:
                 stock_data.enterprise_value_to_ebitda  = info['enterpriseToEbitda']
-                if stock_data.enterprise_value_to_ebitda != None: stock_data.summary_currency_conversion_rate_mult_to_usd  # The lower the better: https://www.investopedia.com/ask/answers/072715/what-considered-healthy-evebitda.asp
+                if stock_data.enterprise_value_to_ebitda != None: stock_data.enterprise_value_to_ebitda *= stock_data.summary_currency_conversion_rate_mult_to_usd  # The lower the better: https://www.investopedia.com/ask/answers/072715/what-considered-healthy-evebitda.asp
             else:
                 stock_data.enterprise_value_to_ebitda  = None
-            if isinstance(stock_data.enterprise_value_to_ebitda,str):  stock_data.enterprise_value_to_ebitda  = None
+            if isinstance(stock_data.enterprise_value_to_ebitda,str):  stock_data.enterprise_value_to_ebitda = None
 
             if 'marketCap' in info and info['marketCap'] != None:
                 stock_data.market_cap = info['marketCap']*stock_data.summary_currency_conversion_rate_mult_to_usd
@@ -1162,8 +1162,8 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
 
             # Handle Negative Values of P/E: Negative P/E handling (TODO: ASAFR: Research this, maybe a smiling parabola is preferred, or some different less harsh function than 1/-x, like some damper n/[e+X])
             # Sources: https://www.investopedia.com/ask/answers/05/negativeeps.asp
-            if stock_data.trailing_price_to_earnings < 0.0: stock_data.trailing_price_to_earnings = NEGATIVE_PRICE_TO_EARNINGS_FACTOR/(-stock_data.trailing_price_to_earnings)
-            if stock_data.forward_price_to_earnings  < 0.0: stock_data.forward_price_to_earnings  = NEGATIVE_PRICE_TO_EARNINGS_FACTOR/(-stock_data.forward_price_to_earnings )
+            if stock_data.trailing_price_to_earnings != None and stock_data.trailing_price_to_earnings <= 0.0: stock_data.trailing_price_to_earnings = 1-NEGATIVE_EARNINGS_FACTOR*stock_data.trailing_price_to_earnings
+            if stock_data.forward_price_to_earnings  != None and stock_data.forward_price_to_earnings  <= 0.0: stock_data.forward_price_to_earnings  = 1-NEGATIVE_EARNINGS_FACTOR*stock_data.forward_price_to_earnings
 
             # Calculate the weighted average of the forward and trailing P/E:
             stock_data.effective_price_to_earnings = (stock_data.trailing_price_to_earnings*TRAILING_PRICE_TO_EARNINGS_WEIGHT+stock_data.forward_price_to_earnings*FORWARD_PRICE_TO_EARNINGS_WEIGHT)
@@ -1185,10 +1185,10 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
             if build_csv_db and 'fiftyTwoWeekHigh'     in info: stock_data.fifty_two_week_high     = info['fiftyTwoWeekHigh']
             if build_csv_db and 'twoHundredDayAverage' in info: stock_data.two_hundred_day_average = info['twoHundredDayAverage']
 
-            if build_csv_db and stock_data.fifty_two_week_change                                                            is None: stock_data.fifty_two_week_change   = stock_data.previous_close
-            if build_csv_db and stock_data.fifty_two_week_low                                                               is None: stock_data.fifty_two_week_low      = stock_data.previous_close
-            if build_csv_db and stock_data.fifty_two_week_high                                                              is None: stock_data.fifty_two_week_high     = stock_data.previous_close
-            if build_csv_db and stock_data.two_hundred_day_average                                                          is None: stock_data.two_hundred_day_average = stock_data.previous_close
+            if build_csv_db and stock_data.fifty_two_week_change                                                        is None: stock_data.fifty_two_week_change   = stock_data.previous_close
+            if build_csv_db and stock_data.fifty_two_week_low                                                           is None: stock_data.fifty_two_week_low      = stock_data.previous_close
+            if build_csv_db and stock_data.fifty_two_week_high                                                          is None: stock_data.fifty_two_week_high     = stock_data.previous_close
+            if build_csv_db and stock_data.two_hundred_day_average                                                      is None: stock_data.two_hundred_day_average = stock_data.previous_close
             if build_csv_db and stock_data.previous_close != None and stock_data.previous_close < stock_data.fifty_two_week_low: stock_data.previous_close          = stock_data.fifty_two_week_low
 
             if build_csv_db:
@@ -1210,8 +1210,9 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
                 if tase_mode and stock_data.price_to_book != None: # Yahoo Finance mistakenly multiplies value by 100 and doesn't convert price to USD, so compenate:
                     stock_data.price_to_book /= 100
                     stock_data.price_to_book *= stock_data.summary_currency_conversion_rate_mult_to_usd
-            else:                                                    stock_data.price_to_book                     = None # Mark as None, so as to try and calculate manually.
-            if isinstance(stock_data.price_to_book,str):             stock_data.price_to_book                     = None # Mark as None, so as to try and calculate manually.
+            else:
+                stock_data.price_to_book      = None # Mark as None, so as to try and calculate manually.
+            if isinstance(stock_data.price_to_book,str): stock_data.price_to_book = None # Mark as None, so as to try and calculate manually.
             if stock_data.price_to_book is None:
                 stock_data.price_to_book = PRICE_TO_BOOK_UNKNOWN * (10 if tase_mode else 1) # TODO: ASAFR: Until calculated manually, do not allow N/A in price2book to ruin the whole value, just set a very unatractive one, and let the rest of the parameters cope
 
@@ -1249,7 +1250,7 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
             else:
                 stock_data.rqg_factor_effective = (RQG_DAMPER + 1 + stock_data.rqg_effective)
 
-            # TODO: ASAFR: Can Now actually really calculate the growth ratio - if it is the earnings growth ration than the data is known!!
+            # TODO: ASAFR: Important - There is enough data to actually calculate the growth ratio (if it is missing) - if it is the earnings growth ratio than the data is known!!
             if 'pegRatio'                                   in info: stock_data.price_to_earnings_to_growth_ratio = info['pegRatio']
             else:                                                    stock_data.price_to_earnings_to_growth_ratio = PEG_UNKNOWN
             if stock_data.price_to_earnings_to_growth_ratio is None: stock_data.price_to_earnings_to_growth_ratio = PEG_UNKNOWN
@@ -1263,8 +1264,11 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
             else:                           stock_data.net_income_to_common_shareholders = None # TODO: ASAFR: It may be possible to calculate this manually
 
             # if no enterprise_value_to_ebitda, use earnings.
-            if (stock_data.enterprise_value_to_ebitda is None or stock_data.enterprise_value_to_ebitda < 0) and stock_data.effective_earnings != None and stock_data.effective_earnings != 0:
+            if (stock_data.enterprise_value_to_ebitda is None or stock_data.enterprise_value_to_ebitda < 0) and stock_data.enterprise_value != None and stock_data.enterprise_value != 0 and stock_data.effective_earnings != None and stock_data.effective_earnings != 0:
                 stock_data.enterprise_value_to_ebitda = float(stock_data.enterprise_value) / stock_data.effective_earnings  #  effective_earnings is already in USD
+
+            if stock_data.enterprise_value_to_ebitda != None and stock_data.enterprise_value_to_ebitda <= 0:
+                stock_data.enterprise_value_to_ebitda = (1 - NEGATIVE_EARNINGS_FACTOR*stock_data.enterprise_value_to_ebitda)
 
             if stock_data.annualized_total_assets is None and stock_data.quarterized_total_assets is None:
                 stock_data.effective_total_assets = None
@@ -1283,9 +1287,15 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
                 if stock_data.effective_earnings != None:
                     stock_data.annualized_cash_flow_from_operating_activities = stock_data.quarterized_cash_flow_from_operating_activities = stock_data.effective_earnings
             elif stock_data.annualized_cash_flow_from_operating_activities is None and stock_data.quarterized_cash_flow_from_operating_activities != None:
-                stock_data.annualized_cash_flow_from_operating_activities = stock_data.quarterized_cash_flow_from_operating_activities*QUARTERLY_YEARLY_MISSING_FACTOR
+                if stock_data.quarterized_cash_flow_from_operating_activities >= 0:
+                    stock_data.annualized_cash_flow_from_operating_activities = stock_data.quarterized_cash_flow_from_operating_activities*QUARTERLY_YEARLY_MISSING_FACTOR
+                else:
+                    stock_data.annualized_cash_flow_from_operating_activities = stock_data.quarterized_cash_flow_from_operating_activities/QUARTERLY_YEARLY_MISSING_FACTOR
             elif stock_data.annualized_cash_flow_from_operating_activities != None and stock_data.quarterized_cash_flow_from_operating_activities is None:
-                stock_data.quarterized_cash_flow_from_operating_activities = stock_data.annualized_cash_flow_from_operating_activities*QUARTERLY_YEARLY_MISSING_FACTOR
+                if stock_data.annualized_cash_flow_from_operating_activities >= 0:
+                    stock_data.quarterized_cash_flow_from_operating_activities = stock_data.annualized_cash_flow_from_operating_activities*QUARTERLY_YEARLY_MISSING_FACTOR
+                else:
+                    stock_data.quarterized_cash_flow_from_operating_activities = stock_data.annualized_cash_flow_from_operating_activities/QUARTERLY_YEARLY_MISSING_FACTOR
 
             if stock_data.annualized_cash_flow_from_operating_activities != None:
                 if stock_data.annualized_cash_flow_from_operating_activities >= 0:
@@ -1307,7 +1317,7 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
                 else:  # stock_data.quarterized_cash_flow_from_operating_activities < 0
                     stock_data.quarterized_ev_to_cfo_ratio = (1.0-NEGATIVE_CFO_FACTOR*float(stock_data.enterprise_value)/stock_data.quarterized_cash_flow_from_operating_activities)**3
             else:
-                stock_data.quarterized_cash_flow_from_operating_activities = ev_to_cfo_ratio_limit * 1000
+                stock_data.quarterized_ev_to_cfo_ratio = ev_to_cfo_ratio_limit * 1000
 
             # Seems value is calculated relatively similarly in dual (TASE, NASDAQ) stocks so no compensation required
             stock_data.ev_to_cfo_ratio_effective = (stock_data.annualized_ev_to_cfo_ratio+stock_data.quarterized_ev_to_cfo_ratio)/2.0
@@ -1315,15 +1325,16 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
             if 'priceToSalesTrailing12Months' in info and info['priceToSalesTrailing12Months'] != None:
                 stock_data.trailing_12months_price_to_sales = info['priceToSalesTrailing12Months'] # https://www.investopedia.com/articles/fundamental/03/032603.asp#:~:text=The%20price%2Dto%2Dsales%20ratio%20(Price%2FSales%20or,the%20more%20attractive%20the%20investment.
                 if isinstance(stock_data.trailing_12months_price_to_sales, str):  stock_data.trailing_12months_price_to_sales = None
-                if tase_mode and stock_data.trailing_12months_price_to_sales != None: stock_data.trailing_12months_price_to_sales *= stock_data.summary_currency_conversion_rate_mult_to_usd # Wrongly calculated by Yahoo for TASE
+                if tase_mode and stock_data.trailing_12months_price_to_sales != None: stock_data.trailing_12months_price_to_sales *= (stock_data.summary_currency_conversion_rate_mult_to_usd/100) # Wrongly calculated by Yahoo for TASE
             else:
-                if stock_data.effective_revenue != None and stock_data.market_cap and stock_data.effective_revenue > 0:
+                if stock_data.effective_revenue != None and stock_data.effective_revenue > 0 and stock_data.market_cap != None and stock_data.market_cap > 0:
                     stock_data.trailing_12months_price_to_sales  = stock_data.market_cap / stock_data.effective_revenue  # effective_revenue and_market_cap are already in USD (converted earlier)
                 elif stock_data.ev_to_cfo_ratio_effective != None:
                     stock_data.trailing_12months_price_to_sales  = stock_data.ev_to_cfo_ratio_effective
                 else:
                     stock_data.trailing_12months_price_to_sales  = None # Mark as None, so as to try and calculate manually.
             if isinstance(stock_data.trailing_12months_price_to_sales,str):  stock_data.trailing_12months_price_to_sales  = None # Mark as None, so as to try and calculate manually.
+
         # TODO: ASAFR: Here: id no previous_close, use market_high, low regular, or anything possible to avoid none!
         if not build_csv_db_only and (stock_data.previous_close is None or stock_data.previous_close < 1.0): # Avoid Penny Stocks
             if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} previous_close: {}'.format(stock_data.symbol, stock_data.previous_close)
@@ -1390,7 +1401,7 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
             elif stock_data.quarterized_profit_margin is None: stock_data.quarterized_profit_margin = max(stock_data.profit_margin, stock_data.annualized_profit_margin)/PROFIT_MARGIN_DUPLICATION_FACTOR
 
             sorted_pms = sorted([stock_data.profit_margin, stock_data.annualized_profit_margin, stock_data.quarterized_profit_margin])
-            weighted_average_pm = weighted_average(sorted_pms, PROFIT_MARGIN_WEIGHTS[:len(sorted_pms)]) # Do provide higher weight to the higher profit margin when averaging out
+            weighted_average_pm = weighted_average(sorted_pms, PROFIT_MARGIN_WEIGHTS[:len(sorted_pms)]) # Higher weight to the higher profit margin when averaging out
             stock_data.effective_profit_margin = PROFIT_MARGIN_DAMPER + weighted_average_pm
             
         if not build_csv_db_only and stock_data.effective_profit_margin < profit_margin_limit:
