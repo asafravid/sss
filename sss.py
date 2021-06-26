@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.70 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.75 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -88,7 +88,9 @@ NUM_EMPLOYEES_UNKNOWN                        = 10000000   # This will make the c
 PROFIT_MARGIN_UNKNOWN                        = 0.00001    # This will make the company almost not profitable terms of profit margins, thus less attractive
 PRICE_TO_BOOK_UNKNOWN                        = 1000.0
 PERCENT_HELD_INSTITUTIONS_LOW                = 0.01       # low, to make less relevant
-PEG_UNKNOWN                                  = 1          # use a neutral value when PEG is unknown. TODO: ASAFR: Can now actually calcualte the PEG Ratio for TASE! Check this
+PEG_UNKNOWN                                  = 10000      # Use a non-attractive value
+QEG_MAX                                      = 10000
+REG_MAX                                      = 10000
 SHARES_OUTSTANDING_UNKNOWN                   = 100000000  # 100 Million Shares - just a value for calculation of a currently unused vaue
 BAD_SSS                                      = 10.0 ** 50.0
 PROFIT_MARGIN_WEIGHTS                        = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0, 512.0]  # from oldest to newest
@@ -98,12 +100,12 @@ EARNINGS_WEIGHTS                             = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 
 BALANCE_SHEETS_WEIGHTS                       = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0, 512.0]  # from oldest to newest
 EQG_UNKNOWN                                  = -0.9   # -90% TODO: ASAFR: 1. Scan (like pm and ever) values of eqg for big data research better recommendations
 RQG_UNKNOWN                                  = -0.9   # -90% TODO: ASAFR: 1. Scan (like pm and ever) values of rqg for big data research better recommendations
-EQG_POSITIVE_FACTOR                          = 5.0   # When positive, it will have a 5x factor on the 1 + function
-RQG_POSITIVE_FACTOR                          = 5.0   # When positive, it will have a 5x factor on the 1 + function
+EQG_POSITIVE_FACTOR                          = 50.0   # When positive, it will have a 5x factor on the 1 + function
+RQG_POSITIVE_FACTOR                          = 50.0   # When positive, it will have a 5x factor on the 1 + function
 EQG_WEIGHT_VS_YOY                            = 0.75   # the provided EQG is weighted more than the manually calculated one
 RQG_WEIGHT_VS_YOY                            = 0.1   # the provided RQG (Actually Yahoo never provides it) is weighted less than the manually calculated one
-EQG_DAMPER                                   = 0.05
-RQG_DAMPER                                   = 0.05
+EQG_DAMPER                                   = 0.125
+RQG_DAMPER                                   = 0.125
 TRAILING_EPS_PERCENTAGE_DAMP_FACTOR          = 0.01   # When the trailing_eps_percentage is very low (units are ratio here), this damper shall limit the affect to x100 not more)
 PROFIT_MARGIN_DAMPER                         = 0.01   # When the profit_margin                   is very low (units are ratio here), this damper shall limit the affect to x100 not more)
 RATIO_DAMPER                                 = 0.01   # When the total/current_other_other ratio is very low (units are ratio here), this damper shall limit the affect to x100 not more)
@@ -124,8 +126,8 @@ PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_REVENUE     = 2.25   # Pro
 PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_EARNINGS = 2.75   # Provide a "bonus" for companies whose earnings       have been continuously increasing quarterly
 PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_REVENUE  = 2.5    # Provide a "bonus" for companies whose revenue        has  been continuously increasing quarterly
 PROFIT_MARGIN_DUPLICATION_FACTOR                                  = 8.0    # When copying profit margin (if either quarterized/annualized/profit_margin is missing) - devide by this factor
-NEGATIVE_CFO_FACTOR                                               = 10.0   #
-NEGATIVE_PEG_RATIO_FACTOR                                         = 10.0   # -0.5 -> 5, and -0.001 -> 0.01
+NEGATIVE_CFO_FACTOR                                               = 10000.0   #
+NEGATIVE_PEG_RATIO_FACTOR                                         = 100000.0
 NEGATIVE_DEBT_TO_EQUITY_FACTOR                                    = 100.0   # -0.5 -> 50, and -0.001 -> 0.1
 NEGATIVE_EARNINGS_FACTOR                                          = 10000.0
 
@@ -659,6 +661,28 @@ def calculate_weighted_ratio_from_non_reversed_dict(non_reversed_dict, dict_name
     return return_value
 
 
+def calculate_current_vs_previous_change_ratio(current_value, previous_value):
+    if   current_value >  0 and previous_value >  0: value_to_return = current_value /previous_value - 1  #  100/ 1000 - 1 = -0.9;  1000/ 100 - 1 = 9
+    elif current_value == 0 and previous_value >  0: value_to_return = current_value /previous_value - 1  #  100/ 1000 - 1 = -0.9;  1000/ 100 - 1 = 9
+    elif current_value >  0 and previous_value == 0: value_to_return =  1  #  100% Growth (from     0        to     positive)
+
+    elif current_value <  0 and previous_value <  0: value_to_return = previous_value/current_value  - 1  # -100/-1000 - 1 = -0.9; -1000/-100 - 1 = 9
+    elif current_value == 0 and previous_value <  0: value_to_return =  1  #  100% Growth (from     negative to            0)
+    elif current_value <  0 and previous_value == 0: value_to_return = -1  # -100% Growth (from     0        to     negative)
+
+    elif current_value >  0 and previous_value <  0: value_to_return =  1  #  100% Growth (from     negative to     positive)
+   #elif current_value == 0 and previous_value <  0: value_to_return =  1  #  Already handled above
+   #elif current_value >  0 and previous_value == 0: value_to_return =  1  #  Already handled above
+
+    elif current_value <  0 and previous_value >  0: value_to_return = -1  # -100% Growth (from     positive to     negative)
+   #elif current_value == 0 and previous_value >  0: value_to_return = -1  #  Already handled above
+   #elif current_value <  0 and previous_value == 0: value_to_return = -1  #  Already handled above
+    else: # current_value == 0 and previous_value == 0:
+        value_to_return = 0.0  # No change
+
+    return value_to_return
+
+
 def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list, sectors_filter_out, countries_list, countries_filter_out, build_csv_db, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db):
     try:
         return_value = True
@@ -924,7 +948,7 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
                     if weight_index > 0:
                         current_earnings = earnings_yearly['Earnings'][key]
                         if float(previous_earnings) != 0.0 and float(current_earnings) != 0.0: # (this-prev)/(abs(this)+abs(prev))
-                            value_to_append = (float(current_earnings)-float(previous_earnings))/(abs(current_earnings)+abs(previous_earnings))
+                            value_to_append = calculate_current_vs_previous_change_ratio(current_earnings, previous_earnings)
                             qeg_list.append(value_to_append*EARNINGS_WEIGHTS[weight_index-1])
                         else:
                             qeg_list.append(0.0) # No change
@@ -933,9 +957,9 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
                     weight_index     += 1
                 stock_data.annualized_earnings = stock_data.financial_currency_conversion_rate_mult_to_usd*sum(earnings_list) / weights_sum  # Multiplying by the factor to get the valu in USD.
                 if len(qeg_list):
-                    stock_data.eqg_yoy         =                                        sum(qeg_list)      / qeg_weights_sum
+                    stock_data.eqg_yoy         = sum(qeg_list) / qeg_weights_sum
                 else:
-                    stock_data.eqg_yoy         =                                        None
+                    stock_data.eqg_yoy         = None
             else:
                 stock_data.eqg_yoy             = None
                 stock_data.annualized_earnings = None
@@ -949,7 +973,7 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
                     if weight_index > 0:
                         current_revenue = earnings_yearly['Revenue'][key]
                         if float(previous_revenue) != 0.0 and float(current_revenue) != 0.0: # (this-prev)/(abs(this)+abs(prev))
-                            value_to_append = (float(current_revenue)-float(previous_revenue))/(abs(current_revenue)+abs(previous_revenue))
+                            value_to_append = calculate_current_vs_previous_change_ratio(current_revenue, previous_revenue)
                             qrg_list.append(value_to_append*REVENUES_WEIGHTS[weight_index-1])
                         else:
                             qrg_list.append(0.0) # No change
@@ -957,11 +981,11 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
                     previous_revenue = earnings_yearly['Revenue'][key]
                     weight_index     += 1
                 if len(qrg_list):
-                    stock_data.rqg_yoy         =                                        sum(qrg_list)      / qrg_weights_sum
+                    stock_data.rqg_yoy = sum(qrg_list) / qrg_weights_sum
                 else:
-                    stock_data.rqg_yoy         =                                        None
+                    stock_data.rqg_yoy = None
             else:
-                stock_data.rqg_yoy             = None
+                stock_data.rqg_yoy     = None
 
             # Net Income Quarterly Growth Year-Over-Year Calculation:
             if financials_yearly != None and len(financials_yearly):
@@ -982,7 +1006,7 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
                         if qnig_weight_index > 0:
                             current_net_income = financials_yearly[key]['Net Income']
                             if float(previous_net_income) != 0.0 and float(current_net_income) != 0.0:  # (this-prev)/(abs(this)+abs(prev))
-                                value_to_append = (float(current_net_income) - float(previous_net_income)) / (abs(current_net_income) + abs(previous_net_income))
+                                value_to_append = calculate_current_vs_previous_change_ratio(current_net_income, previous_net_income)
                                 qnig_list.append(value_to_append * EARNINGS_WEIGHTS[qnig_weight_index - 1])
                             else:
                                 qnig_list.append(0.0)  # No change
@@ -993,7 +1017,7 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
                         if qtrg_weight_index > 0:
                             current_total_revenue = financials_yearly[key]['Total Revenue']
                             if float(previous_total_revenue) != 0.0 and float(current_total_revenue) != 0.0:  # (this-prev)/(abs(this)+abs(prev))
-                                value_to_append = (float(current_total_revenue) - float(previous_total_revenue)) / (abs(current_total_revenue) + abs(previous_total_revenue))
+                                value_to_append = calculate_current_vs_previous_change_ratio(current_total_revenue, previous_total_revenue)
                                 qtrg_list.append(value_to_append * REVENUES_WEIGHTS[qtrg_weight_index - 1])
                             else:
                                 qtrg_list.append(0.0)  # No change
@@ -1162,8 +1186,12 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
 
             # Handle Negative Values of P/E: Negative P/E handling (TODO: ASAFR: Research this, maybe a smiling parabola is preferred, or some different less harsh function than 1/-x, like some damper n/[e+X])
             # Sources: https://www.investopedia.com/ask/answers/05/negativeeps.asp
-            if stock_data.trailing_price_to_earnings != None and stock_data.trailing_price_to_earnings <= 0.0: stock_data.trailing_price_to_earnings = 1-NEGATIVE_EARNINGS_FACTOR*stock_data.trailing_price_to_earnings
-            if stock_data.forward_price_to_earnings  != None and stock_data.forward_price_to_earnings  <= 0.0: stock_data.forward_price_to_earnings  = 1-NEGATIVE_EARNINGS_FACTOR*stock_data.forward_price_to_earnings
+            if stock_data.trailing_price_to_earnings != None:
+                if   stock_data.trailing_price_to_earnings  < 0: stock_data.trailing_price_to_earnings = -NEGATIVE_EARNINGS_FACTOR/stock_data.trailing_price_to_earnings
+                elif stock_data.trailing_price_to_earnings == 0: stock_data.trailing_price_to_earnings =  NEGATIVE_EARNINGS_FACTOR
+            if stock_data.forward_price_to_earnings  != None:
+                if   stock_data.forward_price_to_earnings   < 0: stock_data.forward_price_to_earnings  = -NEGATIVE_EARNINGS_FACTOR/stock_data.forward_price_to_earnings
+                elif stock_data.forward_price_to_earnings  == 0: stock_data.forward_price_to_earnings  =  NEGATIVE_EARNINGS_FACTOR
 
             # Calculate the weighted average of the forward and trailing P/E:
             stock_data.effective_price_to_earnings = (stock_data.trailing_price_to_earnings*TRAILING_PRICE_TO_EARNINGS_WEIGHT+stock_data.forward_price_to_earnings*FORWARD_PRICE_TO_EARNINGS_WEIGHT)
@@ -1241,19 +1269,14 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
             stock_data.rqg_effective = RQG_WEIGHT_VS_YOY*stock_data.rqg + (1.0-RQG_WEIGHT_VS_YOY)*stock_data.rqg_yoy
 
             if stock_data.eqg_effective > 0:
-                stock_data.eqg_factor_effective = (EQG_DAMPER + 1 + EQG_POSITIVE_FACTOR * stock_data.eqg_effective)
+                stock_data.eqg_factor_effective = (EQG_DAMPER + EQG_POSITIVE_FACTOR * stock_data.eqg_effective)
             else:
-                stock_data.eqg_factor_effective = (EQG_DAMPER + 1 + stock_data.eqg_effective)
+                stock_data.eqg_factor_effective = (EQG_DAMPER + stock_data.eqg_effective/EQG_POSITIVE_FACTOR)
 
             if stock_data.rqg_effective > 0:
-                stock_data.rqg_factor_effective = (RQG_DAMPER + 1 + RQG_POSITIVE_FACTOR * stock_data.rqg_effective)
+                stock_data.rqg_factor_effective = (RQG_DAMPER + RQG_POSITIVE_FACTOR * stock_data.rqg_effective)
             else:
-                stock_data.rqg_factor_effective = (RQG_DAMPER + 1 + stock_data.rqg_effective)
-
-            # TODO: ASAFR: Important - There is enough data to actually calculate the growth ratio (if it is missing) - if it is the earnings growth ratio than the data is known!!
-            if 'pegRatio'                                   in info: stock_data.price_to_earnings_to_growth_ratio = info['pegRatio']
-            else:                                                    stock_data.price_to_earnings_to_growth_ratio = PEG_UNKNOWN
-            if stock_data.price_to_earnings_to_growth_ratio is None: stock_data.price_to_earnings_to_growth_ratio = PEG_UNKNOWN
+                stock_data.rqg_factor_effective = (RQG_DAMPER + stock_data.rqg_effective)
 
             if 'sharesOutstanding'                          in info: stock_data.shares_outstanding                = info['sharesOutstanding']
             else:                                                    stock_data.shares_outstanding                = SHARES_OUTSTANDING_UNKNOWN
@@ -1267,8 +1290,9 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
             if (stock_data.enterprise_value_to_ebitda is None or stock_data.enterprise_value_to_ebitda < 0) and stock_data.enterprise_value != None and stock_data.enterprise_value != 0 and stock_data.effective_earnings != None and stock_data.effective_earnings != 0:
                 stock_data.enterprise_value_to_ebitda = float(stock_data.enterprise_value) / stock_data.effective_earnings  #  effective_earnings is already in USD
 
-            if stock_data.enterprise_value_to_ebitda != None and stock_data.enterprise_value_to_ebitda <= 0:
-                stock_data.enterprise_value_to_ebitda = (1 - NEGATIVE_EARNINGS_FACTOR*stock_data.enterprise_value_to_ebitda)
+            if stock_data.enterprise_value_to_ebitda != None:
+                if   stock_data.enterprise_value_to_ebitda  < 0: stock_data.enterprise_value_to_ebitda = -NEGATIVE_EARNINGS_FACTOR/stock_data.enterprise_value_to_ebitda
+                elif stock_data.enterprise_value_to_ebitda == 0: stock_data.enterprise_value_to_ebitda =  NEGATIVE_EARNINGS_FACTOR
 
             if stock_data.annualized_total_assets is None and stock_data.quarterized_total_assets is None:
                 stock_data.effective_total_assets = None
@@ -1304,7 +1328,7 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
                     else:
                         stock_data.annualized_ev_to_cfo_ratio = float(stock_data.enterprise_value)/stock_data.annualized_cash_flow_from_operating_activities  # annualized_cash_flow_from_operating_activities has been converted to USD earlier
                 else:  # stock_data.annualized_cash_flow_from_operating_activities < 0
-                    stock_data.annualized_ev_to_cfo_ratio = (1.0-NEGATIVE_CFO_FACTOR*float(stock_data.enterprise_value)/stock_data.annualized_cash_flow_from_operating_activities)**3
+                    stock_data.annualized_ev_to_cfo_ratio = -NEGATIVE_CFO_FACTOR/(float(stock_data.enterprise_value)/stock_data.annualized_cash_flow_from_operating_activities)
             else:
                 stock_data.annualized_ev_to_cfo_ratio = ev_to_cfo_ratio_limit * 1000
 
@@ -1315,7 +1339,7 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
                     else:
                         stock_data.quarterized_ev_to_cfo_ratio = float(stock_data.enterprise_value)/stock_data.quarterized_cash_flow_from_operating_activities  # quarterized_cash_flow_from_operating_activities has been converted to USD earlier
                 else:  # stock_data.quarterized_cash_flow_from_operating_activities < 0
-                    stock_data.quarterized_ev_to_cfo_ratio = (1.0-NEGATIVE_CFO_FACTOR*float(stock_data.enterprise_value)/stock_data.quarterized_cash_flow_from_operating_activities)**3
+                    stock_data.quarterized_ev_to_cfo_ratio = -NEGATIVE_CFO_FACTOR*(float(stock_data.enterprise_value)/stock_data.quarterized_cash_flow_from_operating_activities)
             else:
                 stock_data.quarterized_ev_to_cfo_ratio = ev_to_cfo_ratio_limit * 1000
 
@@ -1429,8 +1453,20 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
             return_value = False
 
         if build_csv_db_only:
+            # The PEG Ratio is equal to (share_price / earnings_per_share) / (earnings_per_share_growth_ratio [% units])
+            if 'pegRatio' in info:
+                stock_data.price_to_earnings_to_growth_ratio = info['pegRatio']
+            else:
+                stock_data.price_to_earnings_to_growth_ratio = PEG_UNKNOWN
+
+            if stock_data.price_to_earnings_to_growth_ratio is None or stock_data.price_to_earnings_to_growth_ratio == PEG_UNKNOWN:
+                if stock_data.eqg_effective != 0 and stock_data.effective_price_to_earnings > 0:
+                    stock_data.price_to_earnings_to_growth_ratio = stock_data.effective_price_to_earnings / stock_data.eqg_effective
+                else:
+                    stock_data.price_to_earnings_to_growth_ratio = stock_data.effective_price_to_earnings * PEG_UNKNOWN # At this stage effective_price_to_earnings is always positive so this code will not be reached
+
             if   stock_data.price_to_earnings_to_growth_ratio > 0: stock_data.effective_peg_ratio =  stock_data.price_to_earnings_to_growth_ratio
-            elif stock_data.price_to_earnings_to_growth_ratio < 0: stock_data.effective_peg_ratio = -stock_data.price_to_earnings_to_growth_ratio*NEGATIVE_PEG_RATIO_FACTOR
+            elif stock_data.price_to_earnings_to_growth_ratio < 0: stock_data.effective_peg_ratio = -NEGATIVE_PEG_RATIO_FACTOR/stock_data.price_to_earnings_to_growth_ratio
             else                                                 : stock_data.effective_peg_ratio =  1.0  # Something must be wrong, so take a neutral value of 1.0
 
         if build_csv_db:
