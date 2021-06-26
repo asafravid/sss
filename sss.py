@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.75 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.76 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -1630,34 +1630,34 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
 def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, countries_filter_out,build_csv_db_only, build_csv_db, csv_db_path, db_filename, read_united_states_input_symbols, tase_mode, num_threads, market_cap_included, research_mode, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, generate_result_folders=1, appearance_counter_dict_sss={}, appearance_counter_min=25, appearance_counter_max=35, custom_portfolio=[]):
     currency_conversion_tool = currency_conversion_tool_alternative = None
     currency_conversion_tool_manual = {  # https://en.wikipedia.org/wiki/ISO_4217
-        "ARS": 94.2,  # Argentine Peso
-        "AUD": 1.29,
+        "ARS": 95.51,  # Argentine Peso
+        "AUD": 1.318,
         "BMD": 1.0,
-        "BRL": 5.32,
-        "CAD": 1.21,
-        "CHF": 0.9,
-        "CLP": 715.1,
-        "CNY": 6.44,
-        "COP": 3684.95,
-        "DKK": 6.1,  # Danish Krone
-        "EUR": 0.82,
-        "GBP": 0.71,
-        "HKD": 7.76,  # Hong Kong Dollar
-        "IDR": 14394.70,
-        "ILS": 3.27,
-        "INR": 73.13,  # Indian Rupee
-        "JPY": 108.97,  # Japanese Yen
-        "KRW": 1131.24,
-        "MXN": 19.9,
-        "PEN": 3.74,
-        "PHP": 3.74,  # Philippine Peso
-        "RUB": 73.78,
-        "SEK": 1.33,  # Swedish Krona
-        "SGD": 1.33,
-        "TRY": 8.41,
-        "TWD": 27.98,
+        "BRL": 4.935,
+        "CAD": 1.229,
+        "CHF": 0.9168,
+        "CLP": 733.202,
+        "CNY": 6.4562,
+        "COP": 3769.357,
+        "DKK": 6.23,  # Danish Krone
+        "EUR": 0.837696,
+        "GBP": 0.7202,
+        "HKD": 7.7613,  # Hong Kong Dollar
+        "IDR": 14457.5,
+        "ILS": 3.2518,
+        "INR": 74.184,  # Indian Rupee
+        "JPY": 110.795,  # Japanese Yen
+        "KRW": 1127.33,
+        "MXN": 19.8155,
+        "PEN": 3.9795,
+        "PHP": 48.545,  # Philippine Peso
+        "RUB": 72.211,
+        "SEK": 8.493,  # Swedish Krona
+        "SGD": 1.3427,
+        "TRY": 8.7659,
+        "TWD": 27.881,
         "USD": 1.0,
-        "ZAR": 14.1  # South African Rand
+        "ZAR": 14.153  # South African Rand
     }
 
     try:
