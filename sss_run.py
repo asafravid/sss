@@ -43,6 +43,17 @@ SCAN_MODE_ALL  = 2  # All Nasdaq Stocks
 TITLES = ["_תוצאות_סריקה_עבור_בורסת_תל_אביב", "_Scan_Results_for_Nasdaq100_SNP500_Russel1000", "_Scan_Results_for_All_Nasdaq_Stocks"]
 
 
+# automatic_folder_selection()
+#
+# Description:
+# This function is called by retrieve_path_settings() when when automatic_folder_selection is True.
+# If run is not in research mode, then the reference folder is identified as the most recent results folder from a
+# previous run.
+# If run is in research mode, then the the new_run folder is identified as the most recent results folder and
+# the reference folder is the folder before the most recent one (if such exists, otherwise a warning message
+# is printed and both set to the most recent).
+#
+# Results are returned via the path_dict1 dictionary
 def automatic_folder_selection(research_mode_flag, results_input_folder, path_dict1, ref_key, new_run_key):
     results_input_paths = glob(results_input_folder + '/*/')
     if research_mode_flag:
@@ -61,9 +72,13 @@ def automatic_folder_selection(research_mode_flag, results_input_folder, path_di
 # retrieve_path_settings()
 #
 # Parameters:
-#  automatic_results_folder_selection_flag: by default is True.
-#      When set to False paths are taken from sss_config.py otherwise paths are automatically derived
-#      by taking the most recent folders.
+#   automatic_results_folder_selection_flag: boolean flag, by default is False.
+#   research_mode_flag - boolean flag, identifies if 'research mode' is applied
+# Description:
+#      When automatic_results_folder_selection_flag is set to False, paths are taken from sss_config.py
+#      otherwise paths are automatically derived  by taking the most recent folders.
+#
+# Results are returned using a dictionary
 def retrieve_path_settings(automatic_results_folder_selection_flag, research_mode_flag):
     path_dict1 = {}
     if automatic_results_folder_selection_flag:
@@ -321,7 +336,9 @@ def research_db(sectors_list, sectors_filter_out, countries_list, countries_filt
         pdf_generator.csv_to_pdf(csv_filename=result_list_filename_sss,   csv_db_path=csv_db_path, data_time_str=result_list_filename_sss.replace(  'Results','').replace('Tase','').replace('Nsr','').replace('All','').replace('Custom','').replace('/','')[0:15], title=TITLES[scan_mode].replace('_',' '),         limit_num_rows=PDF_NUM_ENTRIES_IN_REPORT, diff_list=diff_lists[0], tase_mode=tase_mode)
 
 
-#
+############################
+# main ()
+###########################
 # TODO: ASAFR: 1. Export Results to the SSS Google Sheet automatically
 
 # Reuse:
@@ -353,13 +370,13 @@ new_run_nsr    = path_setting_dict['new_run_nsr']
 new_run_all    = path_setting_dict['new_run_all']
 
 
-if not research_mode: # Run Build DB Only:
+if not research_mode:   # Run Build DB Only:
     if run_custom_tase: sss.sss_run(reference_run=reference_run_tase, sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', db_filename='None', read_united_states_input_symbols=0, tase_mode=1, num_threads=1, market_cap_included=1, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, enterprise_value_millions_usd_limit=5, research_mode_max_ev=False, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=[],                                   favor_sectors_by=[],          generate_result_folders=1, custom_portfolio=sss_config.custom_portfolio_tase)
     if run_custom:      sss.sss_run(reference_run=reference_run_all,  sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', db_filename='None', read_united_states_input_symbols=0, tase_mode=0, num_threads=1, market_cap_included=1, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, enterprise_value_millions_usd_limit=5, research_mode_max_ev=False, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=[],                                   favor_sectors_by=[],          generate_result_folders=1, custom_portfolio=sss_config.custom_portfolio)
     if run_tase:        sss.sss_run(reference_run=reference_run_tase, sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', db_filename='None', read_united_states_input_symbols=0, tase_mode=1, num_threads=1, market_cap_included=1, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, enterprise_value_millions_usd_limit=1, research_mode_max_ev=False, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=['Technology', 'Real Estate'       ], favor_sectors_by=[3.0,  1.0], generate_result_folders=1)
     if run_nsr:         sss.sss_run(reference_run=reference_run_nsr,  sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', db_filename='None', read_united_states_input_symbols=0, tase_mode=0, num_threads=1, market_cap_included=1, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, enterprise_value_millions_usd_limit=5, research_mode_max_ev=False, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[3.0,  0.5], generate_result_folders=1)
     if run_all:         sss.sss_run(reference_run=reference_run_all,  sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', db_filename='None', read_united_states_input_symbols=1, tase_mode=0, num_threads=1, market_cap_included=1, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, enterprise_value_millions_usd_limit=5, research_mode_max_ev=False, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[3.0,  0.5], generate_result_folders=1)
-else: # Research Mode:
+else:                   # Research Mode:
     if run_tase:
         ev_range_tase          = get_range(csv_db_path=new_run_tase, db_filename=DB_FILENAME, column_name='enterprise_value',        num_sections=4, reverse=0, pop_1st_percentile_range=False)
         pe_range_tase          = get_range(csv_db_path=new_run_tase, db_filename=DB_FILENAME, column_name='pe_effective',            num_sections=7, reverse=1, pop_1st_percentile_range=False)
