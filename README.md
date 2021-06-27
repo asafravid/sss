@@ -12,10 +12,10 @@
 
 The stocks scan and sorting is done according to the below documentation (Core Equation and Multi-Dimensional scan) written using Google Documents (https://www.google.com/docs/about/):
 
-# SSS Core Equation
+# Core Equation
 http://bit.ly/SssCoreEquation
 
-# SSS Muti-Dimensional Scan and Ranking Equation
+# Muti-Dimensional Scan and Ranking Equation
 https://bit.ly/MultiDimensionalScan
 
 # Setup
