@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.80 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.81 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -980,7 +980,8 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
                         pass
 
             # Earnings are ordered from oldest to newest so no reversing required for weights:
-            stock_data.annualized_revenue       = calculate_weighted_stock_data_on_dict(earnings_yearly['Revenue'],    'earnings_yearly[Revenue]', None,            REVENUES_WEIGHTS, stock_data, False)
+            if earnings_yearly != None and 'Revenue' in earnings_yearly: stock_data.annualized_revenue = calculate_weighted_stock_data_on_dict(earnings_yearly['Revenue'],    'earnings_yearly[Revenue]', None,            REVENUES_WEIGHTS, stock_data, False)
+            else:                                                        stock_data.annualized_revenue = None
 
             # TODO: ASAFR: Add a calculation of net_income_to_total_revenue_list
             # Financials are ordered newest to oldest so reversing is required for weights:
@@ -1093,13 +1094,15 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
                 stock_data.annualized_net_income = None
 
             # Earnings are ordered from oldest to newest so no reversing required for weights:
-            stock_data.quarterized_revenue       = calculate_weighted_stock_data_on_dict(earnings_quarterly['Revenue'],   'earnings_quarterly[Revenue]',   None,            REVENUES_WEIGHTS, stock_data, False)
+            if earnings_quarterly != None and 'Revenue' in earnings_quarterly: stock_data.quarterized_revenue = calculate_weighted_stock_data_on_dict(earnings_quarterly['Revenue'],   'earnings_quarterly[Revenue]',   None,            REVENUES_WEIGHTS, stock_data, False)
+            else:                                                              stock_data.quarterized_revenue = None
 
             # Financials are ordered newest to oldest so reversing is required for weights:
             stock_data.quarterized_total_revenue = calculate_weighted_stock_data_on_dict(financials_quarterly,            'financials_quarterly',          'Total Revenue', REVENUES_WEIGHTS, stock_data, True)
 
             # Earnings are ordered from oldest to newest so no reversing required for weights:
-            stock_data.quarterized_earnings      = calculate_weighted_stock_data_on_dict(earnings_quarterly['Earnings'],  'earnings_quarterly[Earnings]',  None,            EARNINGS_WEIGHTS, stock_data, False)
+            if earnings_quarterly != None and 'Earnings' in earnings_quarterly: stock_data.quarterized_earnings = calculate_weighted_stock_data_on_dict(earnings_quarterly['Earnings'],  'earnings_quarterly[Earnings]',  None,            EARNINGS_WEIGHTS, stock_data, False)
+            else:                                                               stock_data.quarterized_earnings = None
 
             # TODO: ASAFR: Add a calculation of net_income_to_total_revenue_list
             # Financials are ordered newest to oldest so reversing is required for weights:
@@ -1150,6 +1153,12 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
                 stock_data.enterprise_value_to_revenue = None # Mark as None, so as to try and calculate manually. TODO: ASAFR: Do the same to the Price and to the Earnings and the Price/Earnings (Also to sales if possible)
             if isinstance(stock_data.enterprise_value_to_revenue,str): stock_data.enterprise_value_to_revenue = None # Mark as None, so as to try and calculate manually.
 
+            # TODO: ASAFR: 1. ebit (within financials) can be used instead of simply taking the earnings
+            #              1.1. is ebit available for all/most TASE stocks?
+            #              1.2. There is a similar field (same value different name) besides ebit - see if it is always the same? Low priority
+            #              1.3. If enterpriseToEbitda is available (for most stocks it is? Check), then EBITDA = EV/enterpriseToEbitda
+            #              1.3.1. But if EV is negative for some stocks... then Market Capital might be used...
+            #              1.4. Suggestion: take average such that EBITDA = (EV/enterpriseToEbitda + CalculatedEbitFromFinancials)/2
             if 'enterpriseToEbitda' in info:
                 stock_data.enterprise_value_to_ebitda  = info['enterpriseToEbitda']
                 if stock_data.enterprise_value_to_ebitda != None: stock_data.enterprise_value_to_ebitda *= stock_data.summary_currency_conversion_rate_mult_to_usd  # The lower the better: https://www.investopedia.com/ask/answers/072715/what-considered-healthy-evebitda.asp
