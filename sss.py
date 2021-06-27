@@ -71,6 +71,7 @@ import csv
 import os
 import sss_filenames
 import math
+import json
 
 from threading import Thread
 from dataclasses import dataclass
@@ -1629,44 +1630,52 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
 #                 It is sometimes observed that stocks information is wrongly fetched. Is such cases, the last run's reference point shall be used, with a forgetting factor
 def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, countries_filter_out,build_csv_db_only, build_csv_db, csv_db_path, db_filename, read_united_states_input_symbols, tase_mode, num_threads, market_cap_included, research_mode, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, generate_result_folders=1, appearance_counter_dict_sss={}, appearance_counter_min=25, appearance_counter_max=35, custom_portfolio=[]):
     currency_conversion_tool = currency_conversion_tool_alternative = None
-    currency_conversion_tool_manual = {  # https://en.wikipedia.org/wiki/ISO_4217
-        "ARS": 95.51,  # Argentine Peso
-        "AUD": 1.318,
-        "BMD": 1.0,
-        "BRL": 4.935,
-        "CAD": 1.229,
-        "CHF": 0.9168,
-        "CLP": 733.202,
-        "CNY": 6.4562,
-        "COP": 3769.357,
-        "DKK": 6.23,  # Danish Krone
-        "EUR": 0.837696,
-        "GBP": 0.7202,
-        "HKD": 7.7613,  # Hong Kong Dollar
-        "IDR": 14457.5,
-        "ILS": 3.2518,
-        "INR": 74.184,  # Indian Rupee
-        "JPY": 110.795,  # Japanese Yen
-        "KRW": 1127.33,
-        "MXN": 19.8155,
-        "PEN": 3.9795,
-        "PHP": 48.545,  # Philippine Peso
-        "RUB": 72.211,
-        "SEK": 8.493,  # Swedish Krona
-        "SGD": 1.3427,
-        "TRY": 8.7659,
-        "TWD": 27.881,
-        "USD": 1.0,
-        "ZAR": 14.153  # South African Rand
-    }
 
-    try:
-        currency_conversion_tool = CurrencyRates().get_rates('USD') if build_csv_db else None
-    except Exception as e:
-        try:
-            currency_conversion_tool_alternative = CurrencyConverter() if build_csv_db else None
-        except Exception as e:
-            print('Exchange Rates down, some countries shall be filtered out unless exchange rate provided manualy')
+    # https://en.wikipedia.org/wiki/ISO_4217
+    currency_filename = 'Indices/currencies.json'
+    with open(currency_filename, 'r') as file:
+        currency_rates_raw_dict = json.loads(file.read())
+    currency_conversion_tool_manual = {k: round(float(v), NUM_ROUND_DECIMALS) for k, v in currency_rates_raw_dict.items()}
+    # print(currency_conversion_tool_manual)
+
+    # currency_conversion_tool_manual = {
+    #     "ARS": 95.51,  # Argentine Peso
+    #     "AUD": 1.318,
+    #     "BMD": 1.0,
+    #     "BRL": 4.935,
+    #     "CAD": 1.229,
+    #     "CHF": 0.9168,
+    #     "CLP": 733.202,
+    #     "CNY": 6.4562,
+    #     "COP": 3769.357,
+    #     "DKK": 6.23,  # Danish Krone
+    #     "EUR": 0.837696,
+    #     "GBP": 0.7202,
+    #     "HKD": 7.7613,  # Hong Kong Dollar
+    #     "IDR": 14457.5,
+    #     "ILS": 3.2518,
+    #     "INR": 74.184,  # Indian Rupee
+    #     "JPY": 110.795,  # Japanese Yen
+    #     "KRW": 1127.33,
+    #     "MXN": 19.8155,
+    #     "PEN": 3.9795,
+    #     "PHP": 48.545,  # Philippine Peso
+    #     "RUB": 72.211,
+    #     "SEK": 8.493,  # Swedish Krona
+    #     "SGD": 1.3427,
+    #     "TRY": 8.7659,
+    #     "TWD": 27.881,
+    #     "USD": 1.0,
+    #     "ZAR": 14.153  # South African Rand
+    # }
+    #
+    # try:
+    #     currency_conversion_tool = CurrencyRates().get_rates('USD') if build_csv_db else None
+    # except Exception as e:
+    #     try:
+    #         currency_conversion_tool_alternative = CurrencyConverter() if build_csv_db else None
+    #     except Exception as e:
+    #         print('Exchange Rates down, some countries shall be filtered out unless exchange rate provided manually')
 
     reference_db = []
     if not research_mode and reference_run != None and len(reference_run):  # in non-research mode, compare to reference run
