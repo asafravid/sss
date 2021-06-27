@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.79 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.80 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -658,16 +658,22 @@ def round_and_avoid_none_values(stock_data):
     if stock_data.effective_working_capital                       is None: stock_data.effective_working_capital                       = 0
 
 
-def calculate_weighted_stock_data_on_non_reversed_dict(non_reversed_dict, dict_name, str_in_dict, weights, stock_data):
+def calculate_weighted_stock_data_on_dict(dict_input, dict_name, str_in_dict, weights, stock_data, reverse_required):
     weight_index  = 0
     weighted_list = []
     weights_sum   = 0
     try:
-        for key in reversed(list(non_reversed_dict)):  # The 1st element will be the oldest, receiving the lowest weight
-            if str_in_dict in non_reversed_dict[key] and not math.isnan(non_reversed_dict[key][str_in_dict]):
-                weighted_list.append(non_reversed_dict[key][str_in_dict] * weights[weight_index])
-                weights_sum  += weights[weight_index]
+        if str_in_dict is None:
+            for key in (reversed(list(dict_input)) if reverse_required else list(dict_input)):
+                weighted_list.append((float(dict_input[key])) * weights[weight_index])
+                weights_sum += weights[weight_index]
                 weight_index += 1
+        else:
+            for key in (reversed(list(dict_input)) if reverse_required else list(dict_input)):  # The 1st element will be the oldest, receiving the lowest weight
+                if str_in_dict in dict_input[key] and not math.isnan(dict_input[key][str_in_dict]):
+                    weighted_list.append(dict_input[key][str_in_dict] * weights[weight_index])
+                    weights_sum  += weights[weight_index]
+                    weight_index += 1
         if weights_sum > 0:
             return_value = stock_data.financial_currency_conversion_rate_mult_to_usd * sum(weighted_list) / weights_sum  # Multiplying by the factor to get the valu in USD.
         else:
@@ -680,13 +686,13 @@ def calculate_weighted_stock_data_on_non_reversed_dict(non_reversed_dict, dict_n
     return return_value
 
 
-def calculate_weighted_ratio_from_non_reversed_dict(non_reversed_dict, dict_name, str_in_dict_numerator, str_in_dict_denominator, weights, stock_data, default_return_value):
+def calculate_weighted_ratio_from_dict(dict_input, dict_name, str_in_dict_numerator, str_in_dict_denominator, weights, stock_data, default_return_value, reverse_required):
     return_value         = default_return_value
     weighted_ratios_list = []
     try:
-        for key in reversed(list(non_reversed_dict)):  # The 1st element will be the oldest, receiving the lowest weight
-            if str_in_dict_denominator in non_reversed_dict[key] and not math.isnan(non_reversed_dict[key][str_in_dict_denominator]) and str_in_dict_numerator in non_reversed_dict[key] and not math.isnan(non_reversed_dict[key][str_in_dict_numerator]):
-                weighted_ratios_list.append((non_reversed_dict[key][str_in_dict_numerator] / non_reversed_dict[key][str_in_dict_denominator]))
+        for key in (reversed(list(dict_input)) if reverse_required else list(dict_input)):  # The 1st element will be the oldest, receiving the lowest weight
+            if str_in_dict_denominator in dict_input[key] and not math.isnan(dict_input[key][str_in_dict_denominator]) and str_in_dict_numerator in dict_input[key] and not math.isnan(dict_input[key][str_in_dict_numerator]):
+                weighted_ratios_list.append((dict_input[key][str_in_dict_numerator] / dict_input[key][str_in_dict_denominator]))
     except Exception as e:
         print("Exception in {} {}}: {}".format(stock_data.symbol, dict_name, e))
         pass
@@ -695,13 +701,13 @@ def calculate_weighted_ratio_from_non_reversed_dict(non_reversed_dict, dict_name
     return return_value
 
 
-def calculate_weighted_diff_from_non_reversed_dict(non_reversed_dict, dict_name, str_in_dict_left_term, str_in_dict_right_term, weights, stock_data, default_return_value):
+def calculate_weighted_diff_from_dict(dict_input, dict_name, str_in_dict_left_term, str_in_dict_right_term, weights, stock_data, default_return_value, reverse_required):
     return_value         = default_return_value
     weighted_diffs_list = []
     try:
-        for key in reversed(list(non_reversed_dict)):  # The 1st element will be the oldest, receiving the lowest weight
-            if str_in_dict_right_term in non_reversed_dict[key] and not math.isnan(non_reversed_dict[key][str_in_dict_right_term]) and str_in_dict_left_term in non_reversed_dict[key] and not math.isnan(non_reversed_dict[key][str_in_dict_left_term]):
-                weighted_diffs_list.append((non_reversed_dict[key][str_in_dict_left_term] / non_reversed_dict[key][str_in_dict_right_term]))
+        for key in (reversed(list(dict_input)) if reverse_required else list(dict_input)):  # The 1st element will be the oldest, receiving the lowest weight
+            if str_in_dict_right_term in dict_input[key] and not math.isnan(dict_input[key][str_in_dict_right_term]) and str_in_dict_left_term in dict_input[key] and not math.isnan(dict_input[key][str_in_dict_left_term]):
+                weighted_diffs_list.append((dict_input[key][str_in_dict_left_term] / dict_input[key][str_in_dict_right_term]))
     except Exception as e:
         print("Exception in {} {}}: {}".format(stock_data.symbol, dict_name, e))
         pass
@@ -793,18 +799,19 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
             if 'shortName' in info: stock_data.short_name = info['shortName']
             else:                   stock_data.short_name = 'None'
 
-            stock_data.annualized_total_ratio          = calculate_weighted_ratio_from_non_reversed_dict(balance_sheets_yearly,    'annualized_total_ratio',          'Total Assets',         'Total Liab',                BALANCE_SHEETS_WEIGHTS, stock_data, 0)
-            stock_data.annualized_other_current_ratio  = calculate_weighted_ratio_from_non_reversed_dict(balance_sheets_yearly,    'annualized_other_current_ratio',  'Other Current Assets', 'Other Current Liab',        BALANCE_SHEETS_WEIGHTS, stock_data, 0)
-            stock_data.annualized_other_ratio          = calculate_weighted_ratio_from_non_reversed_dict(balance_sheets_yearly,    'annualized_other_ratio',          'Other Assets',         'Other Liab',                BALANCE_SHEETS_WEIGHTS, stock_data, 0)
-            stock_data.annualized_total_current_ratio  = calculate_weighted_ratio_from_non_reversed_dict(balance_sheets_yearly,    'annualized_total_current_ratio',  'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data, 0)
+            # Balance sheets are listed from newest to oldest, so for the weights, must reverse the dictionary:
+            stock_data.annualized_total_ratio          = calculate_weighted_ratio_from_dict(balance_sheets_yearly,    'annualized_total_ratio',          'Total Assets',         'Total Liab',                BALANCE_SHEETS_WEIGHTS, stock_data, 0, True)
+            stock_data.annualized_other_current_ratio  = calculate_weighted_ratio_from_dict(balance_sheets_yearly,    'annualized_other_current_ratio',  'Other Current Assets', 'Other Current Liab',        BALANCE_SHEETS_WEIGHTS, stock_data, 0, True)
+            stock_data.annualized_other_ratio          = calculate_weighted_ratio_from_dict(balance_sheets_yearly,    'annualized_other_ratio',          'Other Assets',         'Other Liab',                BALANCE_SHEETS_WEIGHTS, stock_data, 0, True)
+            stock_data.annualized_total_current_ratio  = calculate_weighted_ratio_from_dict(balance_sheets_yearly,    'annualized_total_current_ratio',  'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data, 0, True)
 
-            stock_data.quarterized_total_ratio         = calculate_weighted_ratio_from_non_reversed_dict(balance_sheets_quarterly, 'quarterized_total_ratio',         'Total Assets',         'Total Liab',                BALANCE_SHEETS_WEIGHTS, stock_data, 0)
-            stock_data.quarterized_other_current_ratio = calculate_weighted_ratio_from_non_reversed_dict(balance_sheets_quarterly, 'quarterized_other_current_ratio', 'Other Current Assets', 'Other Current Liab',        BALANCE_SHEETS_WEIGHTS, stock_data, 0)
-            stock_data.quarterized_other_ratio         = calculate_weighted_ratio_from_non_reversed_dict(balance_sheets_quarterly, 'quarterized_other_ratio',         'Other Assets',         'Other Liab',                BALANCE_SHEETS_WEIGHTS, stock_data, 0)
-            stock_data.quarterized_total_current_ratio = calculate_weighted_ratio_from_non_reversed_dict(balance_sheets_quarterly, 'quarterized_total_current_ratio', 'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data, 0)
+            stock_data.quarterized_total_ratio         = calculate_weighted_ratio_from_dict(balance_sheets_quarterly, 'quarterized_total_ratio',         'Total Assets',         'Total Liab',                BALANCE_SHEETS_WEIGHTS, stock_data, 0, True)
+            stock_data.quarterized_other_current_ratio = calculate_weighted_ratio_from_dict(balance_sheets_quarterly, 'quarterized_other_current_ratio', 'Other Current Assets', 'Other Current Liab',        BALANCE_SHEETS_WEIGHTS, stock_data, 0, True)
+            stock_data.quarterized_other_ratio         = calculate_weighted_ratio_from_dict(balance_sheets_quarterly, 'quarterized_other_ratio',         'Other Assets',         'Other Liab',                BALANCE_SHEETS_WEIGHTS, stock_data, 0, True)
+            stock_data.quarterized_total_current_ratio = calculate_weighted_ratio_from_dict(balance_sheets_quarterly, 'quarterized_total_current_ratio', 'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data, 0, True)
 
-            stock_data.annualized_working_capital      = calculate_weighted_diff_from_non_reversed_dict( balance_sheets_yearly,    'annualized_working_capital',      'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data, None)
-            stock_data.quarterized_working_capital     = calculate_weighted_diff_from_non_reversed_dict( balance_sheets_quarterly, 'quarterized_working_capital',     'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data, None)
+            stock_data.annualized_working_capital      = calculate_weighted_diff_from_dict( balance_sheets_yearly,    'annualized_working_capital',      'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data, None, True)
+            stock_data.quarterized_working_capital     = calculate_weighted_diff_from_dict( balance_sheets_quarterly, 'quarterized_working_capital',     'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data, None, True)
 
             if stock_data.annualized_total_ratio          == 0.0: stock_data.annualized_total_ratio          = stock_data.quarterized_total_ratio        *QUARTERLY_YEARLY_MISSING_FACTOR
             if stock_data.quarterized_total_ratio         == 0.0: stock_data.quarterized_total_ratio         = stock_data.annualized_total_ratio         *QUARTERLY_YEARLY_MISSING_FACTOR
@@ -828,8 +835,9 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
             stock_data.effective_working_capital     = (stock_data.annualized_working_capital + stock_data.quarterized_working_capital) / 2.0
 
             # TODO: ASAFR: Add Other Current Liab / Other Stockholder Equity
-            stock_data.annualized_debt_to_equity  = calculate_weighted_ratio_from_non_reversed_dict(balance_sheets_yearly,    'annualized_debt_to_equity',  'Total Liab', 'Total Stockholder Equity', BALANCE_SHEETS_WEIGHTS, stock_data, None)
-            stock_data.quarterized_debt_to_equity = calculate_weighted_ratio_from_non_reversed_dict(balance_sheets_quarterly, 'quarterized_debt_to_equity', 'Total Liab', 'Total Stockholder Equity', BALANCE_SHEETS_WEIGHTS, stock_data, None)
+            # Balance Sheets are listed from newest to olders, so for proper weight: Reverse required
+            stock_data.annualized_debt_to_equity  = calculate_weighted_ratio_from_dict(balance_sheets_yearly,    'annualized_debt_to_equity',  'Total Liab', 'Total Stockholder Equity', BALANCE_SHEETS_WEIGHTS, stock_data, None, True)
+            stock_data.quarterized_debt_to_equity = calculate_weighted_ratio_from_dict(balance_sheets_quarterly, 'quarterized_debt_to_equity', 'Total Liab', 'Total Stockholder Equity', BALANCE_SHEETS_WEIGHTS, stock_data, None, True)
 
             if stock_data.annualized_debt_to_equity is None and stock_data.quarterized_debt_to_equity is None:
                 stock_data.annualized_debt_to_equity = stock_data.quarterized_debt_to_equity = 1000.0*debt_to_equity_limit
@@ -852,14 +860,17 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
                 if stock_data.debt_to_equity_effective >= 0:
                     stock_data.debt_to_equity_effective_used = math.sqrt(stock_data.debt_to_equity_effective)
 
-            stock_data.annualized_cash_flow_from_operating_activities  = calculate_weighted_stock_data_on_non_reversed_dict(cash_flows_yearly,    'cash_flows_yearly',    'Total Cash From Operating Activities', CASH_FLOW_WEIGHTS, stock_data)
-            stock_data.quarterized_cash_flow_from_operating_activities = calculate_weighted_stock_data_on_non_reversed_dict(cash_flows_quarterly, 'cash_flows_quarterly', 'Total Cash From Operating Activities', CASH_FLOW_WEIGHTS, stock_data)
+            # Cash Flows are listed from newest to oldest, so reverse required for weights:
+            stock_data.annualized_cash_flow_from_operating_activities  = calculate_weighted_stock_data_on_dict(cash_flows_yearly,    'cash_flows_yearly',    'Total Cash From Operating Activities', CASH_FLOW_WEIGHTS, stock_data, True)
+            stock_data.quarterized_cash_flow_from_operating_activities = calculate_weighted_stock_data_on_dict(cash_flows_quarterly, 'cash_flows_quarterly', 'Total Cash From Operating Activities', CASH_FLOW_WEIGHTS, stock_data, True)
 
-            stock_data.annualized_total_assets      = calculate_weighted_stock_data_on_non_reversed_dict(balance_sheets_yearly,    'balance_sheets_yearly',    'Total Assets', BALANCE_SHEETS_WEIGHTS, stock_data)
-            stock_data.quarterized_total_assets     = calculate_weighted_stock_data_on_non_reversed_dict(balance_sheets_quarterly, 'balance_sheets_quarterly', 'Total Assets', BALANCE_SHEETS_WEIGHTS, stock_data)
+            # Balance Sheets are listed from newest to oldest, so reverse required for weights:
+            stock_data.annualized_total_assets      = calculate_weighted_stock_data_on_dict(balance_sheets_yearly,    'balance_sheets_yearly',    'Total Assets', BALANCE_SHEETS_WEIGHTS, stock_data, True)
+            stock_data.quarterized_total_assets     = calculate_weighted_stock_data_on_dict(balance_sheets_quarterly, 'balance_sheets_quarterly', 'Total Assets', BALANCE_SHEETS_WEIGHTS, stock_data, True)
 
-            stock_data.annualized_retained_earnings  = calculate_weighted_stock_data_on_non_reversed_dict(balance_sheets_yearly,    'balance_sheets_yearly',    'Retained Earnings', BALANCE_SHEETS_WEIGHTS, stock_data)
-            stock_data.quarterized_retained_earnings = calculate_weighted_stock_data_on_non_reversed_dict(balance_sheets_quarterly, 'balance_sheets_yearly',    'Retained Earnings', BALANCE_SHEETS_WEIGHTS, stock_data)
+            # Balance Sheets are listed from newest to oldest, so reverse required for weights:
+            stock_data.annualized_retained_earnings  = calculate_weighted_stock_data_on_dict(balance_sheets_yearly,    'balance_sheets_yearly',    'Retained Earnings', BALANCE_SHEETS_WEIGHTS, stock_data, True)
+            stock_data.quarterized_retained_earnings = calculate_weighted_stock_data_on_dict(balance_sheets_quarterly, 'balance_sheets_yearly',    'Retained Earnings', BALANCE_SHEETS_WEIGHTS, stock_data, True)
 
         if stock_data.short_name is     None:                       stock_data.short_name = 'None'
         if stock_data.short_name != None and not research_mode: print('              {:35}:'.format(stock_data.short_name))
@@ -968,32 +979,12 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
                         stock_data.quarterized_profit_margin = None
                         pass
 
-            if earnings_yearly != None and 'Revenue' in earnings_yearly:
-                weight_index  = 0
-                revenues_list = []
-                weights_sum   = 0
-                for key in earnings_yearly['Revenue']:
-                    revenues_list.append((float(earnings_yearly['Revenue'][key])) * REVENUES_WEIGHTS[weight_index])
-                    weights_sum += REVENUES_WEIGHTS[weight_index]
-                    weight_index += 1
-                stock_data.annualized_revenue = stock_data.financial_currency_conversion_rate_mult_to_usd*sum(revenues_list) / weights_sum  # Multiplying by the factor to get the valu in USD.
-            else:
-                stock_data.annualized_revenue = None
+            # Earnings are ordered from oldest to newest so no reversing required for weights:
+            stock_data.annualized_revenue       = calculate_weighted_stock_data_on_dict(earnings_yearly['Revenue'],    'earnings_yearly[Revenue]', None,            REVENUES_WEIGHTS, stock_data, False)
 
-            if financials_yearly != None and len(financials_yearly):
-                weight_index  = 0
-                weights_sum   = 0
-                total_revenue_list               = []
-                for key in reversed(list(financials_yearly)):  # 1st will be oldest - TODO: ASAFR: verify
-                    if 'Total Revenue' in financials_yearly[key]:
-                        total_revenue_list.append(float(financials_yearly[key]['Total Revenue']) * REVENUES_WEIGHTS[weight_index])
-                        weights_sum  += REVENUES_WEIGHTS[weight_index]
-                        weight_index += 1
-                        # TODO: ASAFR: Add a calculation of net_income_to_total_revenue_list
-                if len(total_revenue_list):
-                    stock_data.annualized_total_revenue = stock_data.financial_currency_conversion_rate_mult_to_usd * sum(total_revenue_list) / weights_sum  # Multiplying by the factor to get the value in USD.
-                else:
-                    stock_data.annualized_total_revenue = None
+            # TODO: ASAFR: Add a calculation of net_income_to_total_revenue_list
+            # Financials are ordered newest to oldest so reversing is required for weights:
+            stock_data.annualized_total_revenue = calculate_weighted_stock_data_on_dict(financials_yearly,             'financials_yearly',        'Total Revenue', REVENUES_WEIGHTS, stock_data, True)
 
             if earnings_yearly != None and 'Earnings' in earnings_yearly:
                 weight_index      = 0
@@ -1101,63 +1092,18 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
                 stock_data.trqg_yoy              = None
                 stock_data.annualized_net_income = None
 
-            if earnings_quarterly != None and 'Revenue' in earnings_quarterly:
-                weight_index  = 0
-                revenues_list = []
-                weights_sum   = 0
-                for key in earnings_quarterly['Revenue']:
-                    revenues_list.append((float(earnings_quarterly['Revenue'][key])) * REVENUES_WEIGHTS[weight_index])
-                    weights_sum += REVENUES_WEIGHTS[weight_index]
-                    weight_index += 1
-                stock_data.quarterized_revenue = stock_data.financial_currency_conversion_rate_mult_to_usd*sum(revenues_list) / weights_sum  # Multiplying by the factor to get the valu in USD.
-            else:
-                stock_data.quarterized_revenue = None
+            # Earnings are ordered from oldest to newest so no reversing required for weights:
+            stock_data.quarterized_revenue       = calculate_weighted_stock_data_on_dict(earnings_quarterly['Revenue'],   'earnings_quarterly[Revenue]',   None,            REVENUES_WEIGHTS, stock_data, False)
 
-            if financials_quarterly != None and len(financials_quarterly):
-                weight_index  = 0
-                weights_sum   = 0
-                total_revenue_list               = []
-                for key in reversed(list(financials_quarterly)):  # 1st will be oldest - TODO: ASAFR: verify
-                    if 'Total Revenue' in financials_quarterly[key]:
-                        total_revenue_list.append(float(financials_quarterly[key]['Total Revenue']) * REVENUES_WEIGHTS[weight_index])
-                        weights_sum  += REVENUES_WEIGHTS[weight_index]
-                        weight_index += 1
-                        # TODO: ASAFR: Add a calculation of net_income_to_total_revenue_list
-                if len(total_revenue_list):
-                    stock_data.quarterized_total_revenue = stock_data.financial_currency_conversion_rate_mult_to_usd * sum(total_revenue_list) / weights_sum  # Multiplying by the factor to get the value in USD.
-                else:
-                    stock_data.quarterized_total_revenue = None
-            else:
-                stock_data.quarterized_total_revenue = None
+            # Financials are ordered newest to oldest so reversing is required for weights:
+            stock_data.quarterized_total_revenue = calculate_weighted_stock_data_on_dict(financials_quarterly,            'financials_quarterly',          'Total Revenue', REVENUES_WEIGHTS, stock_data, True)
 
-            if earnings_quarterly != None and 'Earnings' in earnings_quarterly:
-                weight_index  = 0
-                earnings_list = []
-                weights_sum   = 0
-                for key in earnings_quarterly['Earnings']:
-                    earnings_list.append((float(earnings_quarterly['Earnings'][key])) * EARNINGS_WEIGHTS[weight_index])
-                    weights_sum += EARNINGS_WEIGHTS[weight_index]
-                    weight_index += 1
-                stock_data.quarterized_earnings = stock_data.financial_currency_conversion_rate_mult_to_usd*sum(earnings_list) / weights_sum  # Multiplying by the factor to get the valu in USD.
-            else:
-                stock_data.quarterized_earnings = None
+            # Earnings are ordered from oldest to newest so no reversing required for weights:
+            stock_data.quarterized_earnings      = calculate_weighted_stock_data_on_dict(earnings_quarterly['Earnings'],  'earnings_quarterly[Earnings]',  None,            EARNINGS_WEIGHTS, stock_data, False)
 
-            if financials_quarterly != None and len(financials_quarterly):
-                weight_index  = 0
-                net_income_list = []
-                weights_sum   = 0
-                for key in reversed(list(financials_quarterly)):  # 1st will be oldest - TODO: ASAFR: verify
-                    if 'Net Income' in financials_quarterly[key]:
-                        net_income_list.append(float(financials_quarterly[key]['Net Income']) * REVENUES_WEIGHTS[weight_index])
-                        weights_sum  += REVENUES_WEIGHTS[weight_index]
-                        weight_index += 1
-                        # TODO: ASAFR: Add a calculation of net_income_to_total_revenue_list
-                if len(net_income_list):
-                    stock_data.quarterized_net_income = stock_data.financial_currency_conversion_rate_mult_to_usd * sum(net_income_list) / weights_sum  # Multiplying by the factor to get the value in USD.
-                else:
-                    stock_data.quarterized_net_income = None
-            else:
-                stock_data.quarterized_net_income = None
+            # TODO: ASAFR: Add a calculation of net_income_to_total_revenue_list
+            # Financials are ordered newest to oldest so reversing is required for weights:
+            stock_data.quarterized_net_income    = calculate_weighted_stock_data_on_dict(financials_quarterly,            'financials_quarterly',          'Net Income',    EARNINGS_WEIGHTS, stock_data, True)
 
             # At this stage, use the Total Revenue and Net Income as backups for revenues and earnings. TODO: ASAFR: Later on run comparisons and take them into account as well!
             if   stock_data.annualized_net_income  is None and stock_data.quarterized_net_income is None: stock_data.effective_net_income = None
