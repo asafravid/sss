@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.81 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.82 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -84,9 +84,8 @@ import json
 
 from threading import Thread
 from dataclasses import dataclass
-# TODO: ASAFR: Try again the CurrencyConverter and check it on venv as well
-from forex_python.converter import CurrencyRates
-from currency_converter import CurrencyConverter
+# from forex_python.converter import CurrencyRates
+# from currency_converter import CurrencyConverter
 
 import sss_indices
 
