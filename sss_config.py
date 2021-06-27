@@ -23,11 +23,11 @@
 
 run_custom_tase      = False   # Custom Portfolio
 run_custom           = False
-run_tase             = False   # Tel Aviv Stock Exchange
+run_tase             = True    # Tel Aviv Stock Exchange
 run_nsr              = False   # NASDAQ100+S&P500+RUSSEL1000
-run_all              = True   # All Nasdaq Stocks
-research_mode        = False  # Research Mode
-research_mode_max_ev = False  # @JustLearning's suggestion in Telegram: Multi-Dimentional Scan by Max EV Limit rather than Min EV Limit
+run_all              = False   # All Nasdaq Stocks
+research_mode        = False   # Research Mode
+research_mode_max_ev = False   # @JustLearning's suggestion in Telegram: Multi-Dimentional Scan by Max EV Limit rather than Min EV Limit
 
 # When automatic_results_folder_selection is False, the explicitly specified paths below are used for the
 # reference and new_run folder locations.
