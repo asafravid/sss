@@ -1,14 +1,17 @@
 # Overview
  Stock Scanner & Screener: A `yfinance`-based Stock Scanner & Screener for the Israeli and US Stock Markets (Extendable to other stock markets as well). Within the code, the following libraries and fonts are used:
- - https://pypi.org/project/yfinance/
- - https://pypi.org/project/fpdf/
- - https://pypi.org/project/pandas/
- - https://pypi.org/project/forex-python/
- - https://pypi.org/project/CurrencyConverter/
- - https://pypi.org/project/py-currency-converter/
- - https://pypi.org/project/PyCurrency-Converter/
- - https://pypi.org/project/currency.converter/
- - https://fonts2u.com/dejavu-sans-condensed.font
+ - Mandatory Python Libraries:
+   - https://pypi.org/project/yfinance/
+   - https://pypi.org/project/fpdf/
+   - https://pypi.org/project/pandas/
+ - Optional Python Libraries (Internal independent Forex Tables are maintained):
+   - https://pypi.org/project/forex-python/
+   - https://pypi.org/project/CurrencyConverter/
+   - https://pypi.org/project/py-currency-converter/
+   - https://pypi.org/project/PyCurrency-Converter/
+   - https://pypi.org/project/currency.converter/
+ - Fonts:
+   - https://fonts2u.com/dejavu-sans-condensed.font
 
 The stocks scan and sorting is done according to the below documentation (Core Equation and Multi-Dimensional scan) written using Google Documents (https://www.google.com/docs/about/):
 
