@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.82 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.83 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -21,49 +21,50 @@
 #############################################################################
 
 
-# TODO: ASAFR: 0. Auto-Update Nasdaq (All, NSR) Indices as done with TASE
-#              1. Check and multi dim and investigate eqg_min and rqg_min: Check why Yahoo Finance always gives QRG values of 0? Unusable if that is always so
-#              2. Implement:
-#              2.1. https://en.wikipedia.org/wiki/Piotroski_F-score
-#              2.1.1. ROA: https://www.investopedia.com/ask/answers/031215/what-formula-calculating-return-assets-roa.asp
-#              2.2. https://en.wikipedia.org/wiki/Magic_formula_investing
-#              2.3. https://www.oldschoolvalue.com/investing-strategy/backtest-graham-nnwc-ncav-screen/
-#              2.4. Altman Z Score: The formula for Altman Z-Score is:
-#                   Formula: 2 calculation methods: Simple is effective_<parameter1> / effective_<parameter2>. Complex (but better) is effective(parameter1/parameter2) and best (most complex) is effective((parameter1-parameter2)/(parameter3-parameter4))
-#                                   1.2*(working capital                  / total assets     ) +
-#                                   1.4*(retained earnings                / total assets     ) +
-#                                   3.3*(earnings before interest and tax / total assets     ) +
-#                                   0.6*(market value of equity           / total liabilities) +
-#                                   1.0*(sales                            / total assets     )
-#                   Instructions:
-#                   How Should an Investor Interpret Altman Z-Score?
-#                   - Investors can use Altman Z-score Plus to evaluate corporate credit risk. A score below 1.8 means it's likely the company is headed for bankruptcy, while companies with scores above 3 are not likely to go bankrupt. Investors may consider purchasing a stock if its Altman Z-Score value is closer to 3 and selling, or shorting, a stock if the value is closer to 1.8.
-#              2.5. Beneish M Score
-#              3. Take latest yfinance base.py (and other - compare the whole folder) and updates - maybe not required - but just stay up to date
-#              5. Investigate and add: https://www.investopedia.com/terms/o/operatingmargin.asp - operating margin
-#              6. Add Free Cash flow [FCF] (EV/FreeCashFlow): Inverse of the Free Cash Flow Yield (https://www.stockopedia.com/ratios/ev-free-cash-flow-336/#:~:text=What%20is%20the%20definition%20of,the%20Free%20Cash%20Flow%20Yield.)
-#              7. There is already an EV/CFO ratio.
-#                   CFO - CapitalExpenditures = FCF
-#                   EV/CFO * EV/FCF = EV^2 / (CFO * [CFO - CapitalExpenditures]) | EV/CFO + EV/FCF = EV*(1/CFO + 1/(CFO-CapitalExpenditures))
-#                   Conclusion: EV/FCF is better as it provides moe information. But make this a lower priority for development
-#                               Bonus: When there is no CFO, Use FCF, and Vice Versa - more information
-#              9. Which are the most effective parameters? Correlate the sorting of sss_value to the results and each of the sorted-by-parameter list.
-#             10. Important: https://www.oldschoolvalue.com/investing-strategy/walter-schloss-investing-strategy-producing-towering-returns/#:~:text=Walter%20Schloss%20ran%20with%20the,to%20perform%20complex%20valuations%20either.
-#                 10.1.  3 years low, 5 years low
-#                 10.2.  F-Score, M-Score, Z-Score
-#                 10.3.  Multi-Dim scan over the distance from low, and over the Schloff Score - define a Walter-Schloss score
-#                 10.4.  Remove the square root from DtoE ?
-#                 10.5.  MktCapM is >= US$ 300 million (basis year 2000) adjusted yearly
-#                 10.6.  Consider only stocks that are listed at least 10 years
-#                 10.7.  Price 1 Day ago within 15% of the 52 week low
-#                 10.8.  Take the top 1000 stocks with highest Number of Insiders owning shares#            11. Calculate share_price/52weekLow 0.1
-#                 10.9.  Take the top 500 stocks with highest Current Dividend Yield %#            12. https://pyportfolioopt.readthedocs.io/en/latest/UserGuide.html -> Use
-#                 10.10. Take the top 250 stocks with lowest Latest Filing P/E ratio#            13. Calculate the ROE - Return on equity
-#                 10.11. Take the top 125 stocks with lowest Latest Filing P/B ratio#            14. Operating Cash Flow Growth - interesting: https://github.com/JerBouma/FundamentalAnalysis
-#                 10.12. Take the top 75 stocks with lowest Latest Filing Long Term Debt#            15. Quick Ratio - https://github.com/JerBouma/FinanceDatabase - interesting
+# TODO: ASAFR: -1. (Highest Priority:) Update yfinance and commit the pull requests from internaly-used/improved yfinance
+#               0. Auto-Update Nasdaq (All, NSR) Indices as done with TASE
+#               1. Check and multi dim and investigate eqg_min and rqg_min: Check why Yahoo Finance always gives QRG values of 0? Unusable if that is always so
+#               2. Implement:
+#               2.1. https://en.wikipedia.org/wiki/Piotroski_F-score
+#               2.1.1. ROA: https://www.investopedia.com/ask/answers/031215/what-formula-calculating-return-assets-roa.asp
+#               2.2. https://en.wikipedia.org/wiki/Magic_formula_investing
+#               2.3. https://www.oldschoolvalue.com/investing-strategy/backtest-graham-nnwc-ncav-screen/
+#               2.4. Altman Z Score: The formula for Altman Z-Score is:
+#                    Formula: 2 calculation methods: Simple is effective_<parameter1> / effective_<parameter2>. Complex (but better) is effective(parameter1/parameter2) and best (most complex) is effective((parameter1-parameter2)/(parameter3-parameter4))
+#                                    1.2*(working capital                  / total assets     ) +
+#                                    1.4*(retained earnings                / total assets     ) +
+#                                    3.3*(earnings before interest and tax / total assets     ) +
+#                                    0.6*(market value of equity           / total liabilities) +
+#                                    1.0*(sales                            / total assets     )
+#                    Instructions:
+#                    How Should an Investor Interpret Altman Z-Score?
+#                    - Investors can use Altman Z-score Plus to evaluate corporate credit risk. A score below 1.8 means it's likely the company is headed for bankruptcy, while companies with scores above 3 are not likely to go bankrupt. Investors may consider purchasing a stock if its Altman Z-Score value is closer to 3 and selling, or shorting, a stock if the value is closer to 1.8.
+#               2.5. Beneish M Score
+#               3. Take latest yfinance base.py (and other - compare the whole folder) and updates - maybe not required - but just stay up to date
+#               5. Investigate and add: https://www.investopedia.com/terms/o/operatingmargin.asp - operating margin
+#               6. Add Free Cash flow [FCF] (EV/FreeCashFlow): Inverse of the Free Cash Flow Yield (https://www.stockopedia.com/ratios/ev-free-cash-flow-336/#:~:text=What%20is%20the%20definition%20of,the%20Free%20Cash%20Flow%20Yield.)
+#               7. There is already an EV/CFO ratio.
+#                    CFO - CapitalExpenditures = FCF
+#                    EV/CFO * EV/FCF = EV^2 / (CFO * [CFO - CapitalExpenditures]) | EV/CFO + EV/FCF = EV*(1/CFO + 1/(CFO-CapitalExpenditures))
+#                    Conclusion: EV/FCF is better as it provides moe information. But make this a lower priority for development
+#                                Bonus: When there is no CFO, Use FCF, and Vice Versa - more information
+#               9. Which are the most effective parameters? Correlate the sorting of sss_value to the results and each of the sorted-by-parameter list.
+#              10. Important: https://www.oldschoolvalue.com/investing-strategy/walter-schloss-investing-strategy-producing-towering-returns/#:~:text=Walter%20Schloss%20ran%20with%20the,to%20perform%20complex%20valuations%20either.
+#                  10.1.  3 years low, 5 years low
+#                  10.2.  F-Score, M-Score, Z-Score
+#                  10.3.  Multi-Dim scan over the distance from low, and over the Schloff Score - define a Walter-Schloss score
+#                  10.4.  Remove the square root from DtoE ?
+#                  10.5.  MktCapM is >= US$ 300 million (basis year 2000) adjusted yearly
+#                  10.6.  Consider only stocks that are listed at least 10 years
+#                  10.7.  Price 1 Day ago within 15% of the 52 week low
+#                  10.8.  Take the top 1000 stocks with highest Number of Insiders owning shares#            11. Calculate share_price/52weekLow 0.1
+#                  10.9.  Take the top 500 stocks with highest Current Dividend Yield %#            12. https://pyportfolioopt.readthedocs.io/en/latest/UserGuide.html -> Use
+#                  10.10. Take the top 250 stocks with lowest Latest Filing P/E ratio#            13. Calculate the ROE - Return on equity
+#                  10.11. Take the top 125 stocks with lowest Latest Filing P/B ratio#            14. Operating Cash Flow Growth - interesting: https://github.com/JerBouma/FundamentalAnalysis
+#                  10.12. Take the top 75 stocks with lowest Latest Filing Long Term Debt#            15. Quick Ratio - https://github.com/JerBouma/FinanceDatabase - interesting
 #
-#              11. [Building DB: thread_id  0 Sleeping for        0.0 sec] Checking AVCT      ( 634/ 648/7231 [Diff:    0]):
-#               American Virtual Cloud Technolo    :
+#               11. [Building DB: thread_id  0 Sleeping for        0.0 sec] Checking AVCT      ( 634/ 648/7231 [Diff:    0]):
+#                American Virtual Cloud Technolo    :
 # C:\Users\Administrator\Downloads\sss-master\venv\lib\site-packages\yfinance\base.py:519: UserWarning: DataFrame columns are not unique, some columns will be omitted.
 #   return data.to_dict()
 # C:\Users\Administrator\Downloads\sss-master\venv\lib\site-packages\yfinance\base.py:509: UserWarning: DataFrame columns are not unique, some columns will be omitted.
@@ -809,8 +810,8 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
             stock_data.quarterized_other_ratio         = calculate_weighted_ratio_from_dict(balance_sheets_quarterly, 'quarterized_other_ratio',         'Other Assets',         'Other Liab',                BALANCE_SHEETS_WEIGHTS, stock_data, 0, True)
             stock_data.quarterized_total_current_ratio = calculate_weighted_ratio_from_dict(balance_sheets_quarterly, 'quarterized_total_current_ratio', 'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data, 0, True)
 
-            stock_data.annualized_working_capital      = calculate_weighted_diff_from_dict( balance_sheets_yearly,    'annualized_working_capital',      'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data, None, True)
-            stock_data.quarterized_working_capital     = calculate_weighted_diff_from_dict( balance_sheets_quarterly, 'quarterized_working_capital',     'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data, None, True)
+            stock_data.annualized_working_capital      = calculate_weighted_diff_from_dict( balance_sheets_yearly,    'annualized_working_capital',      'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data, 0, True)
+            stock_data.quarterized_working_capital     = calculate_weighted_diff_from_dict( balance_sheets_quarterly, 'quarterized_working_capital',     'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data, 0, True)
 
             if stock_data.annualized_total_ratio          == 0.0: stock_data.annualized_total_ratio          = stock_data.quarterized_total_ratio        *QUARTERLY_YEARLY_MISSING_FACTOR
             if stock_data.quarterized_total_ratio         == 0.0: stock_data.quarterized_total_ratio         = stock_data.annualized_total_ratio         *QUARTERLY_YEARLY_MISSING_FACTOR
@@ -821,8 +822,8 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
             if stock_data.annualized_total_current_ratio  == 0.0: stock_data.annualized_total_current_ratio  = stock_data.quarterized_total_current_ratio*QUARTERLY_YEARLY_MISSING_FACTOR
             if stock_data.quarterized_total_current_ratio == 0.0: stock_data.quarterized_total_current_ratio = stock_data.annualized_total_current_ratio *QUARTERLY_YEARLY_MISSING_FACTOR
 
-            if stock_data.annualized_working_capital      == None: stock_data.annualized_working_capital  = stock_data.quarterized_working_capital*QUARTERLY_YEARLY_MISSING_FACTOR
-            if stock_data.quarterized_working_capital     == None: stock_data.quarterized_working_capital = stock_data.annualized_working_capital *QUARTERLY_YEARLY_MISSING_FACTOR
+            if stock_data.annualized_working_capital      == 0.0: stock_data.annualized_working_capital  = stock_data.quarterized_working_capital*QUARTERLY_YEARLY_MISSING_FACTOR
+            if stock_data.quarterized_working_capital     == 0.0: stock_data.quarterized_working_capital = stock_data.annualized_working_capital *QUARTERLY_YEARLY_MISSING_FACTOR
 
             # TODO: ASAFR: In the next stage - add the other current and other ratio to a sum of the ratios Investigate prior
             stock_data.total_ratio_effective         = RATIO_DAMPER+(stock_data.annualized_total_ratio         + stock_data.quarterized_total_ratio        )/2.0
