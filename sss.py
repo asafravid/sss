@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.86 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.87 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -99,12 +99,12 @@ EARNINGS_WEIGHTS                             = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 
 BALANCE_SHEETS_WEIGHTS                       = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0, 512.0]  # from oldest to newest
 EQG_UNKNOWN                                  = -0.9   # -90% TODO: ASAFR: 1. Scan (like pm and ever) values of eqg for big data research better recommendations
 RQG_UNKNOWN                                  = -0.9   # -90% TODO: ASAFR: 1. Scan (like pm and ever) values of rqg for big data research better recommendations
-EQG_POSITIVE_FACTOR                          = 50.0   # When positive, it will have a 5x factor on the 1 + function
-RQG_POSITIVE_FACTOR                          = 50.0   # When positive, it will have a 5x factor on the 1 + function
+EQG_POSITIVE_FACTOR                          = 10.0   # When positive, it will have a 5x factor on the 1 + function
+RQG_POSITIVE_FACTOR                          = 10.0   # When positive, it will have a 5x factor on the 1 + function
 EQG_WEIGHT_VS_YOY                            = 0.75   # the provided EQG is weighted more than the manually calculated one
 RQG_WEIGHT_VS_YOY                            = 0.1   # the provided RQG (Actually Yahoo never provides it) is weighted less than the manually calculated one
-EQG_DAMPER                                   = 0.125
-RQG_DAMPER                                   = 0.125
+EQG_DAMPER                                   = 0.25
+RQG_DAMPER                                   = 0.25
 TRAILING_EPS_PERCENTAGE_DAMP_FACTOR          = 0.01   # When the trailing_eps_percentage is very low (units are ratio here), this damper shall limit the affect to x100 not more)
 PROFIT_MARGIN_DAMPER                         = 0.01   # When the profit_margin                   is very low (units are ratio here), this damper shall limit the affect to x100 not more)
 RATIO_DAMPER                                 = 0.01   # When the total/current_other_other ratio is very low (units are ratio here), this damper shall limit the affect to x100 not more)
@@ -459,8 +459,8 @@ def sss_core_equation_value_set(stock_data):
     if stock_data.shares_outstanding and stock_data.net_income_to_common_shareholders != None: stock_data.nitcsh_to_shares_outstanding = float(stock_data.net_income_to_common_shareholders) / float(stock_data.shares_outstanding)
     if stock_data.employees          and stock_data.net_income_to_common_shareholders != None: stock_data.nitcsh_to_num_employees = float(stock_data.net_income_to_common_shareholders) / float(stock_data.employees)
 
-    if stock_data.trailing_12months_price_to_sales != None and stock_data.trailing_12months_price_to_sales > 0 and stock_data.effective_profit_margin != None and stock_data.effective_profit_margin > 0 and stock_data.eqg_factor_effective and stock_data.eqg_factor_effective > 0 != None and stock_data.rqg_factor_effective and stock_data.rqg_factor_effective > 0 != None and stock_data.pe_effective != None and stock_data.pe_effective > 0 and stock_data.effective_ev_to_ebitda != None and stock_data.effective_ev_to_ebitda > 0 and stock_data.ev_to_cfo_ratio_effective != None and stock_data.ev_to_cfo_ratio_effective > 0 and stock_data.effective_peg_ratio != None and stock_data.effective_peg_ratio > 0 and stock_data.price_to_book != None and stock_data.price_to_book > 0 and stock_data.debt_to_equity_effective > 0 and stock_data.total_ratio_effective > 0 and stock_data.total_current_ratio_effective > 0 and stock_data.evr_effective != None and stock_data.evr_effective > 0.0 and stock_data.calculated_roa != None and stock_data.calculated_roa > 0:
-        stock_data.sss_value = float(stock_data.eff_dist_from_low_factor * ((stock_data.evr_effective * stock_data.pe_effective * stock_data.effective_ev_to_ebitda * stock_data.trailing_12months_price_to_sales * stock_data.price_to_book) / (stock_data.effective_profit_margin * stock_data.effective_current_ratio * stock_data.calculated_roa)) * ((stock_data.effective_peg_ratio * stock_data.ev_to_cfo_ratio_effective * stock_data.debt_to_equity_effective_used) / (stock_data.eqg_factor_effective * stock_data.rqg_factor_effective)))  # The lower  the better
+    if stock_data.trailing_12months_price_to_sales != None and stock_data.trailing_12months_price_to_sales > 0 and stock_data.effective_profit_margin != None and stock_data.effective_profit_margin > 0 and stock_data.eqg_factor_effective and stock_data.eqg_factor_effective > 0 != None and stock_data.rqg_factor_effective and stock_data.rqg_factor_effective > 0 != None and stock_data.pe_effective != None and stock_data.pe_effective > 0 and stock_data.effective_ev_to_ebitda != None and stock_data.effective_ev_to_ebitda > 0 and stock_data.ev_to_cfo_ratio_effective != None and stock_data.ev_to_cfo_ratio_effective > 0 and stock_data.effective_peg_ratio != None and stock_data.effective_peg_ratio > 0 and stock_data.price_to_book != None and stock_data.price_to_book > 0 and stock_data.debt_to_equity_effective > 0 and stock_data.total_ratio_effective > 0 and stock_data.total_current_ratio_effective > 0 and stock_data.evr_effective != None and stock_data.evr_effective > 0.0 and stock_data.calculated_roa != None and stock_data.calculated_roa > 0 and stock_data.altman_z_score_factor != None and stock_data.altman_z_score_factor > 0:
+        stock_data.sss_value = float(stock_data.eff_dist_from_low_factor * ((stock_data.evr_effective * stock_data.pe_effective * stock_data.effective_ev_to_ebitda * stock_data.trailing_12months_price_to_sales * stock_data.price_to_book) / (stock_data.effective_profit_margin * stock_data.effective_current_ratio * stock_data.calculated_roa)) * ((stock_data.effective_peg_ratio * stock_data.ev_to_cfo_ratio_effective * stock_data.debt_to_equity_effective_used) / (stock_data.eqg_factor_effective * stock_data.rqg_factor_effective * stock_data.altman_z_score_factor)))  # The lower  the better
     else:
         stock_data.sss_value = BAD_SSS
 
@@ -810,6 +810,11 @@ def calculate_altman_z_score_factor(stock_data):
         stock_data.altman_z_score_factor += 1.0 * ((stock_data.effective_revenue           if stock_data.effective_revenue           != None else 0)/ stock_data.effective_total_assets)
     if stock_data.effective_total_liabilities != None and stock_data.effective_total_liabilities != 0:
         stock_data.altman_z_score_factor += 0.6 * ((stock_data.market_cap                  if stock_data.market_cap                  != None else 0)/ stock_data.effective_total_liabilities)
+
+    # https://www.accountingtools.com/articles/the-altman-z-score-formula.html
+    if    3 <= stock_data.altman_z_score_factor:        stock_data.altman_z_score_factor **= 0.5  # f(        x >= 3   ) = 1.71+...square root     growth
+    if 1.81 <= stock_data.altman_z_score_factor < 3:    stock_data.altman_z_score_factor  /= 2    # f(1.81 <= x <  3   ) = 1.5 -...         linear decay
+    if    0 <  stock_data.altman_z_score_factor < 1.81: stock_data.altman_z_score_factor  /= 4    # f(   0 <  x <  1.81) = 0.45-...stronger linear decay
 
 
 def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list, sectors_filter_out, countries_list, countries_filter_out, build_csv_db, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row):
@@ -1418,12 +1423,12 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
             stock_data.rqg_effective = RQG_WEIGHT_VS_YOY*stock_data.rqg + (1.0-RQG_WEIGHT_VS_YOY)*stock_data.rqg_yoy
 
             if stock_data.eqg_effective > 0:
-                stock_data.eqg_factor_effective = (EQG_DAMPER + EQG_POSITIVE_FACTOR * stock_data.eqg_effective)
+                stock_data.eqg_factor_effective = (EQG_DAMPER + EQG_POSITIVE_FACTOR * math.sqrt(stock_data.eqg_effective))
             else:
                 stock_data.eqg_factor_effective = (EQG_DAMPER + stock_data.eqg_effective/EQG_POSITIVE_FACTOR)
 
-            if stock_data.rqg_effective > 0:
-                stock_data.rqg_factor_effective = (RQG_DAMPER + RQG_POSITIVE_FACTOR * stock_data.rqg_effective)
+            if stock_data.rqg_effective >= 0:
+                stock_data.rqg_factor_effective = (RQG_DAMPER + RQG_POSITIVE_FACTOR * math.sqrt(stock_data.rqg_effective))
             else:
                 stock_data.rqg_factor_effective = (RQG_DAMPER + stock_data.rqg_effective)
 
