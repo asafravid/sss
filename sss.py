@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.87 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.88 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -1430,7 +1430,7 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
             if stock_data.rqg_effective >= 0:
                 stock_data.rqg_factor_effective = (RQG_DAMPER + RQG_POSITIVE_FACTOR * math.sqrt(stock_data.rqg_effective))
             else:
-                stock_data.rqg_factor_effective = (RQG_DAMPER + stock_data.rqg_effective)
+                stock_data.rqg_factor_effective = (RQG_DAMPER + stock_data.rqg_effective/RQG_POSITIVE_FACTOR)
 
             if 'sharesOutstanding'                          in info: stock_data.shares_outstanding                = info['sharesOutstanding']
             else:                                                    stock_data.shares_outstanding                = SHARES_OUTSTANDING_UNKNOWN
