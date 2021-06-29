@@ -28,15 +28,16 @@ https://bit.ly/MultiDimensionalScan
 - Open Project from folder (to which you unzipped the `sss` source code)
 - No further steps required apart from `pip[3]` installing relevant libraries:
   - `cd <[path to]Python 3.8>`
-  - `pip[3] install pandas`
-  - `pip[3] install yfinance`
-  - `pip[3] install fpdf`
-  - `pip[3] install forex_python` and/or `pip[3] install forex-ython`
-  - `pip[3] install numpy`
-  - `pip[3] install CurrencyConverter`
-  - `pip[3] install PyCurrency-Converter`
-  - `pip[3] install currency.converter`
-- Note that for `yfinance` - I may be providing updated sources since they take time to update by the developers, so `pip3 install yfinance` from the origin, and then update (using comparison SW) the necessary changes I made (not too many) to run the `SSS` most efficiently and informatively.
+  - Mandatory
+    - `pip[3] install pandas`
+    - `pip[3] install yfinance`
+    - `pip[3] install fpdf`
+    - `pip[3] install numpy`
+  - Optional
+    - `pip[3] install forex_python` and/or `pip[3] install forex-ython`
+    - `pip[3] install CurrencyConverter`
+    - `pip[3] install PyCurrency-Converter`
+    - `pip[3] install currency.converter`
   
 # Run Step-By-Step Instructions
 - 1: Set the required scanning mode (`custom`/`tase`/`nsr`/`all`) in `sss_run.py` and run `sss_run.py`
