@@ -26,7 +26,7 @@ run_custom           = False
 run_tase             = True    # Tel Aviv Stock Exchange
 run_nsr              = False   # NASDAQ100+S&P500+RUSSEL1000
 run_all              = False   # All Nasdaq Stocks
-research_mode        = False   # Research Mode
+research_mode        = True   # Research Mode
 research_mode_max_ev = False   # @JustLearning's suggestion in Telegram: Multi-Dimentional Scan by Max EV Limit rather than Min EV Limit
 
 # When automatic_results_folder_selection is False, the explicitly specified paths below are used for the
@@ -39,11 +39,11 @@ automatic_results_folder_selection = False
 # After 1st ever Run: Recommended to use reference (filter and damper)
 # The research mode shall run on new_run as input (new_run >= reference_run) where > means newer
 reference_run_custom = 'Results/All/20210606-011608_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes3195'
-reference_run_tase   = 'Results/Tase/20210618-002745_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes311'
+reference_run_tase   = 'Results/Tase/20210625-005617_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes297'
 reference_run_nsr    = 'Results/Nsr/20210619-173839_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes870'
 reference_run_all    = None # 'Results/All/20210606-011608_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes3195'
 
-new_run_tase   = 'Results/Tase/20210618-002745_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes311'
+new_run_tase   = 'Results/Tase/20210702-085910_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes295'
 new_run_nsr    = 'Results/Nsr/20210619-173839_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes870'
 new_run_all    = 'Results/All/20210606-011608_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes3195'
 new_run_custom = 'Results/Custom/20210607-002552_Bdb_nRes3_Custom'
