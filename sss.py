@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.89 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.91 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -95,6 +95,7 @@ BAD_SSS                                      = 10.0 ** 50.0
 PROFIT_MARGIN_WEIGHTS                        = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0, 512.0]  # from oldest to newest
 CASH_FLOW_WEIGHTS                            = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0, 512.0]  # from oldest to newest
 REVENUES_WEIGHTS                             = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0, 512.0]  # from oldest to newest
+NO_WEIGHTS                                   = [1.0, 1.0, 1.0, 1.0,  1.0,  1.0,  1.0,   1.0,   1.0,   1.0]  # from oldest to newest
 EARNINGS_WEIGHTS                             = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0, 512.0]  # from oldest to newest
 BALANCE_SHEETS_WEIGHTS                       = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0, 512.0]  # from oldest to newest
 EQG_UNKNOWN                                  = -0.9   # -90% TODO: ASAFR: 1. Scan (like pm and ever) values of eqg for big data research better recommendations
@@ -687,7 +688,7 @@ def round_and_avoid_none_values(stock_data):
     if stock_data.altman_z_score_factor                           is None: stock_data.altman_z_score_factor                           = 0
 
 
-def calculate_weighted_stock_data_on_dict(dict_input, dict_name, str_in_dict, weights, stock_data, reverse_required):
+def calculate_weighted_stock_data_on_dict(dict_input, dict_name, str_in_dict, weights, stock_data, reverse_required, force_only_sum=False):
     if VERBOSE_LOGS: print("[{} calculate_weighted_stock_data_on_dict]".format(__name__))
     weight_index  = 0
     weighted_list = []
@@ -705,7 +706,7 @@ def calculate_weighted_stock_data_on_dict(dict_input, dict_name, str_in_dict, we
                     weights_sum  += weights[weight_index]
                     weight_index += 1
         if weights_sum > 0:
-            return_value = stock_data.financial_currency_conversion_rate_mult_to_usd * sum(weighted_list) / weights_sum  # Multiplying by the factor to get the valu in USD.
+            return_value = stock_data.financial_currency_conversion_rate_mult_to_usd * sum(weighted_list) / (1 if force_only_sum else weights_sum)  # Multiplying by the factor to get the valu in USD.
         else:
             return_value = None
     except Exception as e:
@@ -732,7 +733,7 @@ def calculate_weighted_ratio_from_dict(dict_input, dict_name, str_in_dict_numera
     return return_value
 
 
-def calculate_weighted_diff_from_dict(dict_input, dict_name, str_in_dict_left_term, str_in_dict_right_term, weights, stock_data, default_return_value, reverse_required):
+def calculate_weighted_diff_from_dict(dict_input, dict_name, str_in_dict_left_term, str_in_dict_right_term, weights, stock_data, default_return_value, reverse_required, force_only_sum=False):
     if VERBOSE_LOGS: print("[{} calculate_weighted_diff_from_dict]".format(__name__))
     return_value         = default_return_value
     weighted_diffs_list = []
@@ -743,12 +744,12 @@ def calculate_weighted_diff_from_dict(dict_input, dict_name, str_in_dict_left_te
     except Exception as e:
         print("Exception in {} {}}: {}".format(stock_data.symbol, dict_name, e))
         pass
-    if len(weighted_diffs_list): return_value = weighted_average(weighted_diffs_list, weights[:len(weighted_diffs_list)])
+    if len(weighted_diffs_list): return_value = sum(weighted_diffs_list) if force_only_sum else weighted_average(weighted_diffs_list, weights[:len(weighted_diffs_list)])
 
     return return_value
 
 
-def calculate_weighted_sum_from_2_dicts(dict1_input, dict1_name, str_in_dict1, dict2_input, dict2_name, str_in_dict2, weights, stock_data, default_return_value, reverse_required1, reverse_required2):
+def calculate_weighted_sum_from_2_dicts(dict1_input, dict1_name, str_in_dict1, dict2_input, dict2_name, str_in_dict2, weights, stock_data, default_return_value, reverse_required1, reverse_required2, force_only_sum=False):
     if VERBOSE_LOGS: print("[{} calculate_weighted_sum_from_2_dicts]".format(__name__))
     return_value       = default_return_value
     weighted_sums_list = []
@@ -759,7 +760,7 @@ def calculate_weighted_sum_from_2_dicts(dict1_input, dict1_name, str_in_dict1, d
     except Exception as e:
         print("Exception in {} {} {}}: {}".format(stock_data.symbol, dict1_name, dict2_name, e))
         pass
-    if len(weighted_sums_list): return_value = weighted_average(weighted_sums_list, weights[:len(weighted_sums_list)])
+    if len(weighted_sums_list): return_value = sum(weighted_sums_list) if force_only_sum else weighted_average(weighted_sums_list, weights[:len(weighted_sums_list)])
 
     return return_value
 
@@ -812,9 +813,9 @@ def calculate_altman_z_score_factor(stock_data):
         stock_data.altman_z_score_factor += 0.6 * ((stock_data.market_cap                  if stock_data.market_cap                  != None else 0)/ stock_data.effective_total_liabilities)
 
     # https://www.accountingtools.com/articles/the-altman-z-score-formula.html
-    if    3 <= stock_data.altman_z_score_factor:        stock_data.altman_z_score_factor **= 0.5  # f(        x >= 3   ) = 1.71+...square root     growth
-    if 1.81 <= stock_data.altman_z_score_factor < 3:    stock_data.altman_z_score_factor  /= 2    # f(1.81 <= x <  3   ) = 1.5 -...         linear decay
-    if    0 <  stock_data.altman_z_score_factor < 1.81: stock_data.altman_z_score_factor  /= 4    # f(   0 <  x <  1.81) = 0.45-...stronger linear decay
+    if    3 <= stock_data.altman_z_score_factor:          stock_data.altman_z_score_factor **= 0.5  # f(        x >= 3   ) = 1.71+...square root     growth
+    elif 1.81 <= stock_data.altman_z_score_factor < 3:    stock_data.altman_z_score_factor  /= 2    # f(1.81 <= x <  3   ) = 1.5 -...         linear decay
+    elif    0 <  stock_data.altman_z_score_factor < 1.81: stock_data.altman_z_score_factor  /= 4    # f(   0 <  x <  1.81) = 0.45-...stronger linear decay
 
 
 def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list, sectors_filter_out, countries_list, countries_filter_out, build_csv_db, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row):
@@ -954,7 +955,7 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
 
             # Cash Flows are listed from newest to oldest, so reverse required for weights:
             stock_data.annualized_cash_flow_from_operating_activities  = calculate_weighted_stock_data_on_dict(cash_flows_yearly,    'cash_flows_yearly',    'Total Cash From Operating Activities', CASH_FLOW_WEIGHTS, stock_data, True)
-            stock_data.quarterized_cash_flow_from_operating_activities = calculate_weighted_stock_data_on_dict(cash_flows_quarterly, 'cash_flows_quarterly', 'Total Cash From Operating Activities', CASH_FLOW_WEIGHTS, stock_data, True)
+            stock_data.quarterized_cash_flow_from_operating_activities = calculate_weighted_stock_data_on_dict(cash_flows_quarterly, 'cash_flows_quarterly', 'Total Cash From Operating Activities', NO_WEIGHTS,        stock_data, True, True)
 
             # Balance Sheets are listed from newest to oldest, so reverse required for weights:
             stock_data.annualized_total_assets      = calculate_weighted_stock_data_on_dict(balance_sheets_yearly,    'balance_sheets_yearly',    'Total Assets', BALANCE_SHEETS_WEIGHTS, stock_data, True)
@@ -962,7 +963,7 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
 
             # Balance Sheets are listed from newest to oldest, so reverse required for weights:
             stock_data.annualized_retained_earnings  = calculate_weighted_stock_data_on_dict(balance_sheets_yearly,    'balance_sheets_yearly',    'Retained Earnings', BALANCE_SHEETS_WEIGHTS, stock_data, True)
-            stock_data.quarterized_retained_earnings = calculate_weighted_stock_data_on_dict(balance_sheets_quarterly, 'balance_sheets_yearly',    'Retained Earnings', BALANCE_SHEETS_WEIGHTS, stock_data, True)
+            stock_data.quarterized_retained_earnings = calculate_weighted_stock_data_on_dict(balance_sheets_quarterly, 'balance_sheets_yearly',    'Retained Earnings', NO_WEIGHTS,             stock_data, True, True)
 
         if stock_data.short_name is     None:                       stock_data.short_name = 'None'
         if stock_data.short_name != None and not research_mode: print('              {:35}:'.format(stock_data.short_name))
@@ -1200,19 +1201,19 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
                 stock_data.annualized_net_income = None
 
             # Earnings are ordered from oldest to newest so no reversing required for weights:
-            if earnings_quarterly != None and 'Revenue' in earnings_quarterly: stock_data.quarterized_revenue = calculate_weighted_stock_data_on_dict(earnings_quarterly['Revenue'],   'earnings_quarterly[Revenue]',   None,            REVENUES_WEIGHTS, stock_data, False)
+            if earnings_quarterly != None and 'Revenue' in earnings_quarterly: stock_data.quarterized_revenue = calculate_weighted_stock_data_on_dict(earnings_quarterly['Revenue'],   'earnings_quarterly[Revenue]',   None,            NO_WEIGHTS, stock_data, False, True)
             else:                                                              stock_data.quarterized_revenue = None
 
             # Financials are ordered newest to oldest so reversing is required for weights:
-            stock_data.quarterized_total_revenue = calculate_weighted_stock_data_on_dict(financials_quarterly,            'financials_quarterly',          'Total Revenue', REVENUES_WEIGHTS, stock_data, True)
+            stock_data.quarterized_total_revenue = calculate_weighted_stock_data_on_dict(financials_quarterly,            'financials_quarterly',          'Total Revenue', NO_WEIGHTS,       stock_data, True, True)
 
             # Earnings are ordered from oldest to newest so no reversing required for weights:
-            if earnings_quarterly != None and 'Earnings' in earnings_quarterly: stock_data.quarterized_earnings = calculate_weighted_stock_data_on_dict(earnings_quarterly['Earnings'],  'earnings_quarterly[Earnings]',  None,            EARNINGS_WEIGHTS, stock_data, False)
+            if earnings_quarterly != None and 'Earnings' in earnings_quarterly: stock_data.quarterized_earnings = calculate_weighted_stock_data_on_dict(earnings_quarterly['Earnings'],  'earnings_quarterly[Earnings]',  None,            NO_WEIGHTS, stock_data, False, True)
             else:                                                               stock_data.quarterized_earnings = None
 
             # TODO: ASAFR: Add a calculation of net_income_to_total_revenue_list
             # Financials are ordered newest to oldest so reversing is required for weights:
-            stock_data.quarterized_net_income    = calculate_weighted_stock_data_on_dict(financials_quarterly,            'financials_quarterly',          'Net Income',    EARNINGS_WEIGHTS, stock_data, True)
+            stock_data.quarterized_net_income    = calculate_weighted_stock_data_on_dict(financials_quarterly,            'financials_quarterly',          'Net Income',    NO_WEIGHTS, stock_data, True, True)
 
             # At this stage, use the Total Revenue and Net Income as backups for revenues and earnings. TODO: ASAFR: Later on run comparisons and take them into account as well!
             if   stock_data.annualized_net_income  is None and stock_data.quarterized_net_income is None: stock_data.effective_net_income = None
@@ -1274,7 +1275,7 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
 
             # in order to calculate eibtd, take ebit from finantials and add deprecations from cash_flows to it:
             # Financials and Cash Flows are ordered newest to oldest so reversing is required for weights:
-            stock_data.quarterized_ebitd = calculate_weighted_sum_from_2_dicts(financials_quarterly, 'financials_quarterly', 'Ebit', cash_flows_quarterly, 'cash_flows_quarterly', 'Depreciation', EARNINGS_WEIGHTS, stock_data, 0, True, True)
+            stock_data.quarterized_ebitd = calculate_weighted_sum_from_2_dicts(financials_quarterly, 'financials_quarterly', 'Ebit', cash_flows_quarterly, 'cash_flows_quarterly', 'Depreciation', NO_WEIGHTS,       stock_data, 0, True, True, True)
             stock_data.annualized_ebitd  = calculate_weighted_sum_from_2_dicts(financials_yearly,    'financials_yearly',    'Ebit', cash_flows_yearly,    'cash_flows_yearly',    'Depreciation', EARNINGS_WEIGHTS, stock_data, 0, True, True)
             stock_data.ebitd             = (stock_data.quarterized_ebitd+stock_data.annualized_ebitd)/2
 
