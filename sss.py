@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.91 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.92 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -82,7 +82,7 @@ import sss_indices
 VERBOSE_LOGS = 0
 
 SKIP_5LETTER_Y_STOCK_LISTINGS                = False       # Skip ADRs - American Depositary receipts (5 Letter Stocks)
-NUM_ROUND_DECIMALS                           = 5
+NUM_ROUND_DECIMALS                           = 6
 NUM_EMPLOYEES_UNKNOWN                        = 10000000   # This will make the company very inefficient in terms of number of employees
 PROFIT_MARGIN_UNKNOWN                        = 0.00001    # This will make the company almost not profitable terms of profit margins, thus less attractive
 PRICE_TO_BOOK_UNKNOWN                        = 1000.0
