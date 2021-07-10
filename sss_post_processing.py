@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.100 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.102 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -22,9 +22,27 @@
 
 
 import pandas as pd
-import numpy  as np
 
-def read_engine_csv(path, resolution):
-    data = pd.read_csv(path, skiprows=[0])  # 1st row is a description row, irrelevant for the data processing
-    quantiles = data.quantile(np.linspace(1/resolution,1,resolution-1,0))
-    ranks     = data.rank()
+import sss
+import sss_filenames
+
+SSS_VALUE_NORMALIZED_COLUMN_NAME = "sss_value_normalized"
+
+
+def process_engine_csv(path) -> object:
+    filename_path = path+"/"+sss_filenames.ENGINE_FILENAME
+    data = pd.read_csv(filename_path+".csv", skiprows=[0])  # 1st row is a description row, irrelevant for the data processing
+    max_values = data.max()
+    [numerator_parameters_list, denominator_parameters_list] = sss.get_used_parameters_names_in_core_equation()
+    for parameter in numerator_parameters_list:
+        data[parameter+"_normalized"] = data[parameter] / max_values[parameter]
+        if SSS_VALUE_NORMALIZED_COLUMN_NAME in data:
+            data[SSS_VALUE_NORMALIZED_COLUMN_NAME] = data[SSS_VALUE_NORMALIZED_COLUMN_NAME] + data[parameter+"_normalized"]
+        else:
+            data[SSS_VALUE_NORMALIZED_COLUMN_NAME] =                                          data[parameter+"_normalized"]
+    for parameter in denominator_parameters_list:
+        data[parameter+"_normalized"] = data[parameter] / max_values[parameter]
+        data[SSS_VALUE_NORMALIZED_COLUMN_NAME]     = data[SSS_VALUE_NORMALIZED_COLUMN_NAME] - data[parameter+"_normalized"]
+
+    data.sort_values(by=SSS_VALUE_NORMALIZED_COLUMN_NAME)
+    data.to_csv(filename_path+"_normalized.csv")

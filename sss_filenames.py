@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.35 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.102 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -20,11 +20,14 @@
 #
 #############################################################################
 
+ENGINE_FILENAME = "sss_engine"
+
+
 def create_filenames_list(date_and_time):
     filename_csv_db                     = "{}/db.csv".format(date_and_time)
-    filename_sss_engine                 = "{}/sss_engine.csv".format(date_and_time)
-    filename_sss_engine_no_div          = "{}/sss_engine_no_div.csv".format(date_and_time)
-    filename_sss_engine_only_div        = "{}/sss_engine_only_div.csv".format(date_and_time)
+    filename_sss_engine                 = "{}/{}.csv".format(date_and_time, ENGINE_FILENAME)
+    filename_sss_engine_no_div          = "{}/{}_no_div.csv".format(date_and_time, ENGINE_FILENAME)
+    filename_sss_engine_only_div        = "{}/{}_only_div.csv".format(date_and_time, ENGINE_FILENAME)
     filename_diff_from_ref              = "{}/db_diff_from_ref.csv".format(date_and_time)
     filenames_list = [
         filename_csv_db,

@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.92 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.102 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -69,6 +69,8 @@ import yfinance as yf
 import csv
 import os
 import sss_filenames
+import sss_indices
+import sss_post_processing
 import math
 import json
 
@@ -77,7 +79,6 @@ from dataclasses import dataclass
 # from forex_python.converter import CurrencyRates
 # from currency_converter import CurrencyConverter
 
-import sss_indices
 
 VERBOSE_LOGS = 0
 
@@ -464,6 +465,12 @@ def sss_core_equation_value_set(stock_data):
         stock_data.sss_value = float(stock_data.eff_dist_from_low_factor * ((stock_data.evr_effective * stock_data.pe_effective * stock_data.effective_ev_to_ebitda * stock_data.trailing_12months_price_to_sales * stock_data.price_to_book) / (stock_data.effective_profit_margin * stock_data.effective_current_ratio * stock_data.calculated_roa)) * ((stock_data.effective_peg_ratio * stock_data.ev_to_cfo_ratio_effective * stock_data.debt_to_equity_effective_used) / (stock_data.eqg_factor_effective * stock_data.rqg_factor_effective * stock_data.altman_z_score_factor)))  # The lower  the better
     else:
         stock_data.sss_value = BAD_SSS
+
+
+def get_used_parameters_names_in_core_equation():
+    numerator_parameters_list   = ["eff_dist_from_low_factor", "evr_effective", "pe_effective", "effective_ev_to_ebitda", "trailing_12months_price_to_sales", "price_to_book",        "effective_peg_ratio", "ev_to_cfo_ratio_effective", "debt_to_equity_effective_used"]  # The lower  the better
+    denominator_parameters_list = ["effective_profit_margin",  "effective_current_ratio",       "calculated_roa",         "eqg_factor_effective",             "rqg_factor_effective", "altman_z_score_factor"                                                            ]  # The higher the better
+    return [numerator_parameters_list, denominator_parameters_list]
 
 
 # Rounding to non-None values + set None values to 0 for simplicity:
@@ -2262,5 +2269,8 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
                 writer = csv.writer(engine)
                 sorted_lists_list[index].insert(0, evr_pm_col_title_row)
                 writer.writerows(sorted_lists_list[index])
+
+    # Normalized sss_engine:
+    sss_post_processing.process_engine_csv(date_and_time)
 
     return len(compact_rows)

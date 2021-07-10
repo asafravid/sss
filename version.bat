@@ -1,6 +1,6 @@
 REM #############################################################################
 REM #
-REM # Version 0.1.100 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+REM # Version 0.1.102 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 REM #
 REM #    Stock Screener and Scanner - based on yfinance
 REM #    Copyright (C) 2021 Asaf Ravid
