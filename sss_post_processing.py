@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.102 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.103 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -44,5 +44,5 @@ def process_engine_csv(path) -> object:
         data[parameter+"_normalized"] = data[parameter] / max_values[parameter]
         data[SSS_VALUE_NORMALIZED_COLUMN_NAME]     = data[SSS_VALUE_NORMALIZED_COLUMN_NAME] - data[parameter+"_normalized"]
 
-    data.sort_values(by=SSS_VALUE_NORMALIZED_COLUMN_NAME)
+    data.sort_values(by=[SSS_VALUE_NORMALIZED_COLUMN_NAME])
     data.to_csv(filename_path+"_normalized.csv")
