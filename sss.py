@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.102 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.104 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -922,6 +922,8 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
 
             if VERBOSE_LOGS: print("[{} {}]".format(__name__, 3))
 
+            # TODO: ASFAR: The correct methos is the TTM only: avoid the (quareterly+annual)/2 - Keep it Simple -> Apply to all calculations
+            # ==============================================================================================================================
             # TODO: ASAFR: In the next stage - add the other current and other ratio to a sum of the ratios Investigate prior
             stock_data.total_ratio_effective         = RATIO_DAMPER+(stock_data.annualized_total_ratio         + stock_data.quarterized_total_ratio        )/2.0
             stock_data.other_current_ratio_effective = RATIO_DAMPER+(stock_data.annualized_other_current_ratio + stock_data.quarterized_other_current_ratio)/2.0
@@ -1835,7 +1837,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
             row_index = 0
             for row in reader:
                 if row_index <= 1: # first row is just a title of evr and pm, then a title of columns
-                    if row == 1: reference_db_title_row = row
+                    if row_index == 1: reference_db_title_row = row
                     row_index += 1
                     continue
                 else:
