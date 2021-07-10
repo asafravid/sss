@@ -1,6 +1,6 @@
 REM #############################################################################
 REM #
-REM # Version 0.1.50 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+REM # Version 0.1.100 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 REM #
 REM #    Stock Screener and Scanner - based on yfinance
 REM #    Copyright (C) 2021 Asaf Ravid
@@ -31,5 +31,6 @@ copy Math.xlsx                  Backup\%1\Math.xlsx
 copy sss_results_performance.py Backup\%1\sss_results_performance.py
 copy sss_config.py              Backup\%1\sss_config.py
 copy sss_indices.py             Backup\%1\sss_indices.py
+copy sss_post_processing.py     Backup\%1\sss_post_processing.py
 
 copy version.bat                Backup\%1\version.bat
