@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.104 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.109 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -131,6 +131,7 @@ NEGATIVE_CFO_FACTOR                                               = 10000.0   #
 NEGATIVE_PEG_RATIO_FACTOR                                         = 100000.0
 NEGATIVE_DEBT_TO_EQUITY_FACTOR                                    = 100.0   # -0.5 -> 50, and -0.001 -> 0.1
 NEGATIVE_EARNINGS_FACTOR                                          = 10000.0
+DEBT_TO_EQUITY_MIN_BASE                                           = 0.001  # Clearing from 0 values for companies without debt
 
 FORWARD_PRICE_TO_EARNINGS_WEIGHT  = 0.125 # Give less weight to forward (estimation)
 TRAILING_PRICE_TO_EARNINGS_WEIGHT = 1-FORWARD_PRICE_TO_EARNINGS_WEIGHT
@@ -922,19 +923,18 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
 
             if VERBOSE_LOGS: print("[{} {}]".format(__name__, 3))
 
-            # TODO: ASFAR: The correct methos is the TTM only: avoid the (quareterly+annual)/2 - Keep it Simple -> Apply to all calculations
-            # ==============================================================================================================================
+            # The correct methos is the TTM only: avoid (quareterly+annual)/2 - Keep it Simple -> Apply to all calculations
             # TODO: ASAFR: In the next stage - add the other current and other ratio to a sum of the ratios Investigate prior
-            stock_data.total_ratio_effective         = RATIO_DAMPER+(stock_data.annualized_total_ratio         + stock_data.quarterized_total_ratio        )/2.0
-            stock_data.other_current_ratio_effective = RATIO_DAMPER+(stock_data.annualized_other_current_ratio + stock_data.quarterized_other_current_ratio)/2.0
-            stock_data.other_ratio_effective         = RATIO_DAMPER+(stock_data.annualized_other_ratio         + stock_data.quarterized_other_ratio        )/2.0
-            stock_data.total_current_ratio_effective = RATIO_DAMPER+(stock_data.annualized_total_current_ratio + stock_data.quarterized_total_current_ratio)/2.0
+            stock_data.total_ratio_effective         = RATIO_DAMPER+(stock_data.quarterized_total_ratio        ) # Prefer TTM only
+            stock_data.other_current_ratio_effective = RATIO_DAMPER+(stock_data.quarterized_other_current_ratio) # Prefer TTM only
+            stock_data.other_ratio_effective         = RATIO_DAMPER+(stock_data.quarterized_other_ratio        ) # Prefer TTM only
+            stock_data.total_current_ratio_effective = RATIO_DAMPER+(stock_data.quarterized_total_current_ratio) # Prefer TTM only
             stock_data.effective_current_ratio       = (stock_data.total_ratio_effective + stock_data.total_current_ratio_effective) / 2.0  # TODO: ASAFR: In the next stage - add the other and current other ratios - more information -> more completeness
 
-            stock_data.effective_working_capital     = (stock_data.annualized_working_capital + stock_data.quarterized_working_capital) / 2.0
+            stock_data.effective_working_capital     = (stock_data.quarterized_working_capital) # Prefer TTM only
 
-            if stock_data.annualized_total_liabilities != None and stock_data.quarterized_total_liabilities != None:
-                stock_data.effective_total_liabilities = (stock_data.annualized_total_liabilities + stock_data.quarterized_total_liabilities) / 2.0
+            if stock_data.quarterized_total_liabilities != None:
+                stock_data.effective_total_liabilities = (stock_data.quarterized_total_liabilities) # Prefer TTM only
 
             # TODO: ASAFR: Add Other Current Liab / Other Stockholder Equity
             # Balance Sheets are listed from newest to olders, so for proper weight: Reverse required
@@ -949,18 +949,12 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
                 elif stock_data.annualized_debt_to_equity != None and stock_data.quarterized_debt_to_equity is None:
                     stock_data.quarterized_debt_to_equity = stock_data.annualized_debt_to_equity * QUARTERLY_YEARLY_MISSING_FACTOR
 
-                # A mixed sign (one negative, the other positive) quarterized and annualized values cannot simply be averaged, because the may lead to a low D/E value
-                if stock_data.annualized_debt_to_equity > 0.0 and stock_data.quarterized_debt_to_equity > 0.0 or stock_data.annualized_debt_to_equity < 0.0 and stock_data.quarterized_debt_to_equity < 0.0:
-                    stock_data.debt_to_equity_effective = (stock_data.annualized_debt_to_equity+stock_data.quarterized_debt_to_equity)/2.0
-                elif stock_data.annualized_debt_to_equity > 0.0 and stock_data.quarterized_debt_to_equity < 0.0:
-                    stock_data.debt_to_equity_effective = (                                stock_data.annualized_debt_to_equity - NEGATIVE_DEBT_TO_EQUITY_FACTOR*stock_data.quarterized_debt_to_equity)**2
-                else:
-                    stock_data.debt_to_equity_effective = (-NEGATIVE_DEBT_TO_EQUITY_FACTOR*stock_data.annualized_debt_to_equity +                                stock_data.quarterized_debt_to_equity)**2
+                stock_data.debt_to_equity_effective = (stock_data.quarterized_debt_to_equity)  # Prefer TTM only
 
                 if stock_data.debt_to_equity_effective < 0.0:
-                    stock_data.debt_to_equity_effective = (1.0-stock_data.debt_to_equity_effective * NEGATIVE_DEBT_TO_EQUITY_FACTOR)  # (https://www.investopedia.com/terms/d/debtequityratio.asp#:~:text=What%20does%20it%20mean%20for,has%20more%20liabilities%20than%20assets.) What does it mean for debt to equity to be negative? If a company has a negative D/E ratio, this means that the company has negative shareholder equity. In other words, it means that the company has more liabilities than assets
-                if stock_data.debt_to_equity_effective >= 0:
-                    stock_data.debt_to_equity_effective_used = math.sqrt(stock_data.debt_to_equity_effective)
+                    stock_data.debt_to_equity_effective_used = (1.0-stock_data.debt_to_equity_effective * NEGATIVE_DEBT_TO_EQUITY_FACTOR)  # (https://www.investopedia.com/terms/d/debtequityratio.asp#:~:text=What%20does%20it%20mean%20for,has%20more%20liabilities%20than%20assets.) What does it mean for debt to equity to be negative? If a company has a negative D/E ratio, this means that the company has negative shareholder equity. In other words, it means that the company has more liabilities than assets
+                else:
+                    stock_data.debt_to_equity_effective_used = DEBT_TO_EQUITY_MIN_BASE + math.sqrt(stock_data.debt_to_equity_effective)
 
             # Cash Flows are listed from newest to oldest, so reverse required for weights:
             stock_data.annualized_cash_flow_from_operating_activities  = calculate_weighted_stock_data_on_dict(cash_flows_yearly,    'cash_flows_yearly',    'Total Cash From Operating Activities', CASH_FLOW_WEIGHTS, stock_data, True)
@@ -1228,12 +1222,12 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
             if   stock_data.annualized_net_income  is None and stock_data.quarterized_net_income is None: stock_data.effective_net_income = None
             elif stock_data.annualized_net_income  is None and stock_data.quarterized_net_income != None: stock_data.effective_net_income = stock_data.quarterized_net_income
             elif stock_data.quarterized_net_income is None and stock_data.annualized_net_income  != None: stock_data.effective_net_income = stock_data.annualized_net_income
-            else                                                                                        : stock_data.effective_net_income = (stock_data.annualized_net_income+stock_data.quarterized_net_income)/2.0
+            else                                                                                        : stock_data.effective_net_income = (stock_data.quarterized_net_income) # Prefer TTM only
 
             if   stock_data.annualized_total_revenue   is None and stock_data.quarterized_total_revenue  is None: stock_data.effective_total_revenue  = None
             elif stock_data.annualized_total_revenue   is None and stock_data.quarterized_total_revenue  != None: stock_data.effective_total_revenue  = stock_data.quarterized_total_revenue
             elif stock_data.quarterized_total_revenue  is None and stock_data.annualized_total_revenue   != None: stock_data.effective_total_revenue  = stock_data.annualized_total_revenue
-            else                                                                                                : stock_data.effective_total_revenue  = (stock_data.annualized_total_revenue +stock_data.quarterized_total_revenue )/2.0
+            else                                                                                                : stock_data.effective_total_revenue  = (stock_data.quarterized_total_revenue ) # Prefer TTM only
 
             if   stock_data.annualized_earnings  is None: stock_data.annualized_earnings  = stock_data.annualized_net_income
             if   stock_data.quarterized_earnings is None: stock_data.quarterized_earnings = stock_data.quarterized_net_income
@@ -1241,7 +1235,7 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
             if   stock_data.annualized_earnings  is None and stock_data.quarterized_earnings is None: stock_data.effective_earnings = stock_data.effective_net_income
             elif stock_data.annualized_earnings  is None and stock_data.quarterized_earnings != None: stock_data.effective_earnings = stock_data.quarterized_earnings
             elif stock_data.quarterized_earnings is None and stock_data.annualized_earnings  != None: stock_data.effective_earnings = stock_data.annualized_earnings
-            else                                                                                    : stock_data.effective_earnings = (stock_data.annualized_earnings+stock_data.quarterized_earnings)/2.0
+            else                                                                                    : stock_data.effective_earnings = (stock_data.quarterized_earnings) # Prefer TTM only
 
             if   stock_data.annualized_revenue   is None: stock_data.annualized_revenue   = stock_data.annualized_total_revenue
             if   stock_data.quarterized_revenue  is None: stock_data.quarterized_revenue  = stock_data.quarterized_total_revenue
@@ -1249,7 +1243,7 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
             if   stock_data.annualized_revenue   is None and stock_data.quarterized_revenue  is None: stock_data.effective_revenue  = stock_data.effective_total_revenue
             elif stock_data.annualized_revenue   is None and stock_data.quarterized_revenue  != None: stock_data.effective_revenue  = stock_data.quarterized_revenue
             elif stock_data.quarterized_revenue  is None and stock_data.annualized_revenue   != None: stock_data.effective_revenue  = stock_data.annualized_revenue
-            else                                                                                    : stock_data.effective_revenue  = (stock_data.annualized_revenue +stock_data.quarterized_revenue )/2.0
+            else                                                                                    : stock_data.effective_revenue  = (stock_data.quarterized_revenue ) # Prefer TTM only
 
             if 'country' in info:                stock_data.country = info['country']
             else:                                stock_data.country = 'Unknown'
@@ -1286,7 +1280,7 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
             # Financials and Cash Flows are ordered newest to oldest so reversing is required for weights:
             stock_data.quarterized_ebitd = calculate_weighted_sum_from_2_dicts(financials_quarterly, 'financials_quarterly', 'Ebit', cash_flows_quarterly, 'cash_flows_quarterly', 'Depreciation', NO_WEIGHTS,       stock_data, 0, True, True, True)
             stock_data.annualized_ebitd  = calculate_weighted_sum_from_2_dicts(financials_yearly,    'financials_yearly',    'Ebit', cash_flows_yearly,    'cash_flows_yearly',    'Depreciation', EARNINGS_WEIGHTS, stock_data, 0, True, True)
-            stock_data.ebitd             = (stock_data.quarterized_ebitd+stock_data.annualized_ebitd)/2
+            stock_data.ebitd             = (stock_data.quarterized_ebitd) # Prefer TTM only
 
             # TODO: ASAFR: 1. ebit (within financials) can be used instead of simply taking the earnings
             #              1.1. is ebit available for all/most TASE stocks? ebitd
@@ -1467,8 +1461,8 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
             elif stock_data.annualized_total_assets != None and stock_data.quarterized_total_assets is None:
                 stock_data.quarterized_total_assets = stock_data.annualized_total_assets*QUARTERLY_YEARLY_MISSING_FACTOR
 
-            if stock_data.annualized_total_assets != None and stock_data.quarterized_total_assets != None:
-                stock_data.effective_total_assets = (stock_data.annualized_total_assets+stock_data.quarterized_total_assets)/2
+            if stock_data.quarterized_total_assets != None:
+                stock_data.effective_total_assets = (stock_data.quarterized_total_assets) # Prefer TTM only
 
             if stock_data.annualized_retained_earnings is None and stock_data.quarterized_retained_earnings is None:
                 stock_data.effective_retained_earnings = None
@@ -1477,8 +1471,8 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
             elif stock_data.annualized_retained_earnings != None and stock_data.quarterized_retained_earnings is None:
                 stock_data.quarterized_retained_earnings = stock_data.annualized_retained_earnings*QUARTERLY_YEARLY_MISSING_FACTOR
 
-            if stock_data.annualized_retained_earnings != None and stock_data.quarterized_retained_earnings != None:
-                stock_data.effective_retained_earnings = (stock_data.annualized_retained_earnings+stock_data.quarterized_retained_earnings)/2
+            if stock_data.quarterized_retained_earnings != None:
+                stock_data.effective_retained_earnings = (stock_data.quarterized_retained_earnings) # Prefer TTM only
 
             if stock_data.effective_total_assets != None and stock_data.effective_total_assets > 0 and stock_data.effective_net_income != None:
                 stock_data.calculated_roa = ROA_DAMPER + stock_data.effective_net_income/stock_data.effective_total_assets
@@ -1522,7 +1516,7 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
                 stock_data.quarterized_ev_to_cfo_ratio = ev_to_cfo_ratio_limit * 1000
 
             # Seems value is calculated relatively similarly in dual (TASE, NASDAQ) stocks so no compensation required
-            stock_data.ev_to_cfo_ratio_effective = (stock_data.annualized_ev_to_cfo_ratio+stock_data.quarterized_ev_to_cfo_ratio)/2.0
+            stock_data.ev_to_cfo_ratio_effective = (stock_data.quarterized_ev_to_cfo_ratio) # Prefer TTM only
             if VERBOSE_LOGS: print("[{} {}]".format(__name__, 200))
             if 'priceToSalesTrailing12Months' in info and info['priceToSalesTrailing12Months'] != None:
                 stock_data.trailing_12months_price_to_sales = info['priceToSalesTrailing12Months'] # https://www.investopedia.com/articles/fundamental/03/032603.asp#:~:text=The%20price%2Dto%2Dsales%20ratio%20(Price%2FSales%20or,the%20more%20attractive%20the%20investment.
@@ -2273,6 +2267,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
                 writer.writerows(sorted_lists_list[index])
 
     # Normalized sss_engine:
-    sss_post_processing.process_engine_csv(date_and_time)
+    if generate_result_folders:
+        sss_post_processing.process_engine_csv(date_and_time)
 
     return len(compact_rows)
