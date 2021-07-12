@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.30 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.112 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -30,7 +30,7 @@ import matplotlib.pyplot as plt; plt.rcdefaults()
 import numpy as np
 
 
-def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, diff_list, tase_mode):
+def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, diff_list, tase_mode, db_filename):
     title_for_figures = data_time_str + ' ' + (title[::-1] if tase_mode else title) + ']כתב ויתור: תוצאות הסריקה אינן המלצה בשום צורה, אלא אך ורק בסיס למחקר.['[::-1]
 
     # Read CSV file:
@@ -65,16 +65,16 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
             if tase_mode: # overrwrite to hebrew
                 row = ['סימבול'[::-1],'שם החברה'[::-1],'ענף'[::-1],'ערך'[::-1],'סגירה'[::-1],'ציון'[::-1]]
             else:
-                row = ['Symbol', 'Name', 'Sector', 'Value', 'Close', 'Rank']
+                row = ['Symbol', 'Name', 'Sector', 'Value', 'Close', 'Grade']
         for col_index, col in enumerate(row):
             w_diff                =0
             if   col_index == 0: w=14 # Symbol
             elif col_index == 1: w=42 # Name
             elif col_index == 2: w=33 # Sector
-            elif col_index == 3: w=30 # S value
+            elif col_index == 3: w=30 # Value
             elif col_index == 4: w=20 # Close
             elif col_index == 5:
-                w                = 18 # appearance[_counter]
+                w                = 18 # Grade
                 w_diff           = 5  # Diff
 
             if col_index < len(row)-1:
@@ -83,7 +83,7 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
             else:
                 # last col is added with the diff col:
                 pdf.set_text_color(0, 0, 200 if row_index == 0 else 0)  # blue for title and black otherwise
-                pdf.cell(w=w, h=4, txt=col.replace('appearance_counter','rank'), border=1, ln=0, align="C" if row_index == 0 else "L")
+                pdf.cell(w=w, h=4, txt=col.replace('appearance_counter','Grade'), border=1, ln=0, align="C" if row_index == 0 else "L")
                 if w_diff:
                     if diff_list is not None and row_index < len(diff_list):
                         if row_index == 0:
@@ -158,7 +158,7 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
         pdf.write_html(text=html)
 
     if csv_db_path is not None:
-        output_filename = csv_db_path+'/'+data_time_str+title+'.pdf'
+        output_filename = csv_db_path+'/'+data_time_str+title+("_n" if "normalized" in db_filename else "")+'.pdf'
     else:
         output_filename = csv_filename+'.pdf'
     pdf.output(output_filename, 'F')

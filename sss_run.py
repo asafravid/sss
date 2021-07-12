@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.54 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.112 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -30,7 +30,7 @@ import sss
 import sss_config # This is the configuration file for the run modes
 import sss_diff
 
-DB_FILENAME = 'sss_engine.csv'  # 'db.csv' -> faster with sss_engine.csv
+DB_FILENAMES = ['sss_engine.csv', 'sss_engine_normalized.csv']  # 'db.csv' -> faster with sss_engine.csv
 
 # TODO: ASAFR: 1. read_csv in pandas, and then .describe() will provide mean, std and percentiles for all the columns (sss_engine.csv and/or db.csv)
 PDF_NUM_ENTRIES_IN_REPORT       = 35
@@ -119,17 +119,18 @@ def retrieve_path_settings(automatic_results_folder_selection_flag, research_mod
 # In order to give a chance to all stocks fairly, always take the 1st element in the sorted list
 def get_range(csv_db_path, db_filename, column_name, num_sections, reverse, pop_1st_percentile_range=True):
     csv_db_filename = csv_db_path+'/'+db_filename
+    num_title_rows = 1 if "normalized" in db_filename else 2
     with open(csv_db_filename, mode='r', newline='') as engine:
         reader = csv.reader(engine, delimiter=',')
         row_index = 0
         elements_list    = []
         percentile_range = []
         for row in reader:
-            if row_index <= 1:  # first row is just a title of evr and pm, then a title of columns
-                if row_index == 1:
+            if row_index < num_title_rows:  # first row (only in non-normalized sss_engine.csv) is just a title of evr and pm, then a title of columns
+                if row_index == num_title_rows-1:
                     if column_name in row:
                         column_index = row.index(column_name)
-                        sss_index    = row.index('sss_value')
+                        sss_index    = row.index("sss_value_normalized") if "normalized" in db_filename else row.index("sss_value")
                 row_index += 1
                 continue
             else:
@@ -150,17 +151,18 @@ def get_range(csv_db_path, db_filename, column_name, num_sections, reverse, pop_
 
 def prepare_appearance_counters_dictionaries(csv_db_path, db_filename, appearance_counter_dict_sss):
     csv_db_filename = csv_db_path + '/' + db_filename
+    num_title_rows = 1 if "normalized" in db_filename else 2
     try:
         with open(csv_db_filename, mode='r', newline='') as engine:
             reader = csv.reader(engine, delimiter=',')
             row_index = 0
             for row in reader:
-                if row_index <= 1:  # first row is just a title of evr and pm, then a title of columns
-                    if row_index == 1:
+                if row_index < num_title_rows:  # first row (only in non-normalized sss_engine.csv) is just a title of evr and pm, then a title of columns
+                    if row_index == num_title_rows-1:
                         ticker_index         = row.index("Symbol")
                         name_index           = row.index("Name")
                         sector_index         = row.index("Sector")
-                        sss_index            = row.index("sss_value")
+                        sss_index            = row.index("sss_value_normalized") if "normalized" in db_filename else row.index("sss_value")
                         previous_close_index = row.index("previous_close")
                     row_index += 1
                     continue
@@ -291,7 +293,7 @@ def research_db(sectors_list, sectors_filter_out, countries_list, countries_filt
                         break  # already lower than appearance_counter_min results. With higher profit margin limit there will always be less results -> save running time by breaking
                     research_rows_sss  [ev_millions_index][pe_index][evr_index][pm_index] = int(num_results_for_ev_pe_evr_and_pm)
                     print('ev_millions_limit {:6} | price_to_earnings_limit {:8} | row {:3} -> (enterprise_value_to_revenue_limit {:8}) | col {:3} -> (profit_margin_limit {:7}%): num_results_for_ev_pe_evr_and_pm = {}'.format(ev_millions_limit, price_to_earnings_limit, evr_index, enterprise_value_to_revenue_limit, pm_index, profit_margin_limit, num_results_for_ev_pe_evr_and_pm))
-    results_filename    = 'results_without_labels.csv'
+    results_filename    = 'results_without_labels_{}'.format(db_filename)
 
     mesh_combined = combine_multi_dim_to_table_4d(multi_dim=research_rows_sss, dim4=ev_millions_range, dim3=pe_range, rows=evr_range,cols=pm_range)
 
@@ -321,19 +323,19 @@ def research_db(sectors_list, sectors_filter_out, countries_list, countries_filt
     sorted_appearance_counter_dict_sss          = {k: v for k, v in sorted(appearance_counter_dict_sss.items(),   key=lambda item: item[1], reverse=True)}
     result_sorted_appearance_counter_dict_sss   = {k: v for k, v in sorted_appearance_counter_dict_sss.items()    if v > 0.0}
 
-    result_list_filename_sss   = csv_db_path+'/results_sss.csv'
+    result_list_filename_sss   = csv_db_path+'/results_{}'.format(db_filename.replace('_engine',''))
 
     with open(result_list_filename_sss, 'w') as f:
-        f.write("Symbol,Name,Sector,sss_value,close,appearance_counter\n")
+        f.write("Symbol,Name,Sector,Value,Close,Grade\n")
         for key in result_sorted_appearance_counter_dict_sss.keys():
-            #                              Symbol,    Name,                    Sector S      Close        appearance_counter
+            #                              Symbol,    Name,                    Sector Value  Close        Grade
             f.write("%s,%s,%s,%s,%s,%s\n"%(key[0],str(key[1]).replace(',',' '),key[2],key[3],key[4],round(result_sorted_appearance_counter_dict_sss[  key],4)))
 
     if older_path is not None:
-        diff_lists = sss_diff.run(newer_path=newer_path, older_path=older_path, db_exists_in_both_folders=db_exists_in_both_folders, diff_only_result=diff_only_result, movement_threshold=movement_threshold, res_length=res_length, consider_as_new_from=PDF_NUM_ENTRIES_IN_REPORT)
+        diff_lists = sss_diff.run(newer_path=newer_path, older_path=older_path, db_filename=db_filename, db_exists_in_both_folders=db_exists_in_both_folders, diff_only_result=diff_only_result, movement_threshold=movement_threshold, res_length=res_length, consider_as_new_from=PDF_NUM_ENTRIES_IN_REPORT)
 
-        #                                                                                                  0:15 is date and time
-        pdf_generator.csv_to_pdf(csv_filename=result_list_filename_sss,   csv_db_path=csv_db_path, data_time_str=result_list_filename_sss.replace(  'Results','').replace('Tase','').replace('Nsr','').replace('All','').replace('Custom','').replace('/','')[0:15], title=TITLES[scan_mode].replace('_',' '),         limit_num_rows=PDF_NUM_ENTRIES_IN_REPORT, diff_list=diff_lists[0], tase_mode=tase_mode)
+        #                                                                                          0:15 is date and time
+        pdf_generator.csv_to_pdf(csv_filename=result_list_filename_sss,   csv_db_path=csv_db_path, data_time_str=result_list_filename_sss.replace(  'Results','').replace('Tase','').replace('Nsr','').replace('All','').replace('Custom','').replace('/','')[0:15], title=TITLES[scan_mode].replace('_',' '),         limit_num_rows=PDF_NUM_ENTRIES_IN_REPORT, diff_list=diff_lists[0], tase_mode=tase_mode, db_filename=db_filename)
 
 
 ############################
@@ -377,58 +379,59 @@ if not research_mode:   # Run Build DB Only:
     if run_nsr:         sss.sss_run(reference_run=reference_run_nsr,  sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', db_filename='None', read_united_states_input_symbols=0, tase_mode=0, num_threads=1, market_cap_included=1, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, enterprise_value_millions_usd_limit=5, research_mode_max_ev=False, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[3.0,  0.5], generate_result_folders=1)
     if run_all:         sss.sss_run(reference_run=reference_run_all,  sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', db_filename='None', read_united_states_input_symbols=1, tase_mode=0, num_threads=1, market_cap_included=1, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, enterprise_value_millions_usd_limit=5, research_mode_max_ev=False, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[3.0,  0.5], generate_result_folders=1)
 else:                   # Research Mode:
-    if run_tase:
-        ev_range_tase          = get_range(csv_db_path=new_run_tase, db_filename=DB_FILENAME, column_name='enterprise_value',        num_sections=4, reverse=0, pop_1st_percentile_range=False)
-        pe_range_tase          = get_range(csv_db_path=new_run_tase, db_filename=DB_FILENAME, column_name='pe_effective',            num_sections=7, reverse=1, pop_1st_percentile_range=False)
-        evr_range_tase         = get_range(csv_db_path=new_run_tase, db_filename=DB_FILENAME, column_name='evr_effective',           num_sections=7, reverse=1, pop_1st_percentile_range=False)
-        pm_ratios_range_tase   = get_range(csv_db_path=new_run_tase, db_filename=DB_FILENAME, column_name='effective_profit_margin', num_sections=7, reverse=0, pop_1st_percentile_range=False)
+    for db_filename in DB_FILENAMES:
+        if run_tase:
+            ev_range_tase          = get_range(csv_db_path=new_run_tase, db_filename=db_filename, column_name='enterprise_value',        num_sections=4, reverse=0, pop_1st_percentile_range=False)
+            pe_range_tase          = get_range(csv_db_path=new_run_tase, db_filename=db_filename, column_name='pe_effective',            num_sections=7, reverse=1, pop_1st_percentile_range=False)
+            evr_range_tase         = get_range(csv_db_path=new_run_tase, db_filename=db_filename, column_name='evr_effective',           num_sections=7, reverse=1, pop_1st_percentile_range=False)
+            pm_ratios_range_tase   = get_range(csv_db_path=new_run_tase, db_filename=db_filename, column_name='effective_profit_margin', num_sections=7, reverse=0, pop_1st_percentile_range=False)
 
-        ev_millions_range_tase = [int(  ev/1000000                       ) for ev in ev_range_tase       ]
-        pm_range_tase          = [round(pm*100,    sss.NUM_ROUND_DECIMALS) for pm in pm_ratios_range_tase]
+            ev_millions_range_tase = [int(  ev/1000000                       ) for ev in ev_range_tase       ]
+            pm_range_tase          = [round(pm*100,    sss.NUM_ROUND_DECIMALS) for pm in pm_ratios_range_tase]
 
-        research_db(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, research_mode_max_ev=research_mode_max_ev, ev_millions_range=ev_millions_range_tase, pe_range=pe_range_tase, evr_range=evr_range_tase, pm_range=pm_range_tase,   csv_db_path=new_run_tase, db_filename=DB_FILENAME,   read_united_states_input_symbols=0, scan_mode=SCAN_MODE_TASE, generate_result_folders=0, appearance_counter_min=RESEARCH_MODE_MIN_ENTRIES_LIMIT, appearance_counter_max=1000, favor_sectors=['Technology', 'Real Estate'], favor_sectors_by=[3.0, 1.0],
-                    newer_path=new_run_tase, older_path=reference_run_tase, db_exists_in_both_folders=1, diff_only_result=1, movement_threshold=0, res_length=400)
+            research_db(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, research_mode_max_ev=research_mode_max_ev, ev_millions_range=ev_millions_range_tase, pe_range=pe_range_tase, evr_range=evr_range_tase, pm_range=pm_range_tase,   csv_db_path=new_run_tase, db_filename=db_filename,   read_united_states_input_symbols=0, scan_mode=SCAN_MODE_TASE, generate_result_folders=0, appearance_counter_min=RESEARCH_MODE_MIN_ENTRIES_LIMIT, appearance_counter_max=1000, favor_sectors=['Technology', 'Real Estate'], favor_sectors_by=[3.0, 1.0],
+                        newer_path=new_run_tase, older_path=reference_run_tase, db_exists_in_both_folders=1, diff_only_result=1, movement_threshold=0, res_length=400)
 
-        # Generate TASE:
-        # research_db(evr_range=[8,8],  pm_range=[10,10], ev_millions_range=[5,5], csv_db_path=new_run_tase,   read_united_states_input_symbols=0, scan_mode=SCAN_MODE_TASE, generate_result_folders=1, appearance_counter_min=1, appearance_counter_max=250, favor_technology_sector=4.5,
-        #             newer_path=new_run_tase, older_path=None, db_exists_in_both_folders=1, diff_only_result=1, movement_threshold=0, newer_res_ranges=[5,1,54,1,50], older_res_ranges=[5,1,54,1,50], res_length=80)
-    if run_nsr:
-        ev_range_nsr          = get_range(csv_db_path=new_run_nsr, db_filename=DB_FILENAME, column_name='enterprise_value',        num_sections=4, reverse=0)
-        pe_range_nsr          = get_range(csv_db_path=new_run_nsr, db_filename=DB_FILENAME, column_name='pe_effective',            num_sections=8, reverse=1)
-        evr_range_nsr         = get_range(csv_db_path=new_run_nsr, db_filename=DB_FILENAME, column_name='evr_effective',           num_sections=8, reverse=1)
-        pm_ratios_range_nsr   = get_range(csv_db_path=new_run_nsr, db_filename=DB_FILENAME, column_name='effective_profit_margin', num_sections=8, reverse=0)
+            # Generate TASE:
+            # research_db(evr_range=[8,8],  pm_range=[10,10], ev_millions_range=[5,5], csv_db_path=new_run_tase,   read_united_states_input_symbols=0, scan_mode=SCAN_MODE_TASE, generate_result_folders=1, appearance_counter_min=1, appearance_counter_max=250, favor_technology_sector=4.5,
+            #             newer_path=new_run_tase, older_path=None, db_exists_in_both_folders=1, diff_only_result=1, movement_threshold=0, newer_res_ranges=[5,1,54,1,50], older_res_ranges=[5,1,54,1,50], res_length=80)
+        if run_nsr:
+            ev_range_nsr          = get_range(csv_db_path=new_run_nsr, db_filename=db_filename, column_name='enterprise_value',        num_sections=4, reverse=0)
+            pe_range_nsr          = get_range(csv_db_path=new_run_nsr, db_filename=db_filename, column_name='pe_effective',            num_sections=8, reverse=1)
+            evr_range_nsr         = get_range(csv_db_path=new_run_nsr, db_filename=db_filename, column_name='evr_effective',           num_sections=8, reverse=1)
+            pm_ratios_range_nsr   = get_range(csv_db_path=new_run_nsr, db_filename=db_filename, column_name='effective_profit_margin', num_sections=8, reverse=0)
 
-        ev_millions_range_nsr = [int(  ev/1000000                       ) for ev in ev_range_nsr       ]
-        pm_range_nsr          = [round(pm*100,    sss.NUM_ROUND_DECIMALS) for pm in pm_ratios_range_nsr]
+            ev_millions_range_nsr = [int(  ev/1000000                       ) for ev in ev_range_nsr       ]
+            pm_range_nsr          = [round(pm*100,    sss.NUM_ROUND_DECIMALS) for pm in pm_ratios_range_nsr]
 
-        research_db(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, research_mode_max_ev=research_mode_max_ev, ev_millions_range=ev_millions_range_nsr, pe_range=pe_range_nsr, evr_range=evr_range_nsr, pm_range=pm_range_nsr,  csv_db_path=new_run_nsr, db_filename=DB_FILENAME,   read_united_states_input_symbols=0, scan_mode=SCAN_MODE_NSR, generate_result_folders=0, appearance_counter_min=RESEARCH_MODE_MIN_ENTRIES_LIMIT, appearance_counter_max=5000, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[3.5, 0.75],
-                    newer_path=new_run_nsr, older_path=reference_run_nsr, db_exists_in_both_folders=1, diff_only_result=1, movement_threshold=0, res_length=800)
+            research_db(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, research_mode_max_ev=research_mode_max_ev, ev_millions_range=ev_millions_range_nsr, pe_range=pe_range_nsr, evr_range=evr_range_nsr, pm_range=pm_range_nsr,  csv_db_path=new_run_nsr, db_filename=db_filename,   read_united_states_input_symbols=0, scan_mode=SCAN_MODE_NSR, generate_result_folders=0, appearance_counter_min=RESEARCH_MODE_MIN_ENTRIES_LIMIT, appearance_counter_max=5000, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[3.5, 0.75],
+                        newer_path=new_run_nsr, older_path=reference_run_nsr, db_exists_in_both_folders=1, diff_only_result=1, movement_threshold=0, res_length=800)
 
-        # Generate NSR:
-        # research_db(evr_range=[24,24],  pm_range=[31,31], ev_millions_range=[100,100], csv_db_path=new_run_nsr,   read_united_states_input_symbols=0, tase_mode=0, generate_result_folders=1, appearance_counter_min=15, appearance_counter_max=45, favor_technology_sector=4.5)
-    if run_all:
-        ev_range_all          = get_range(csv_db_path=new_run_all, db_filename=DB_FILENAME, column_name='enterprise_value',         num_sections=5, reverse=0)
-        pe_range_all          = get_range(csv_db_path=new_run_all, db_filename=DB_FILENAME, column_name='pe_effective',             num_sections=9, reverse=1)
-        evr_range_all         = get_range(csv_db_path=new_run_all, db_filename=DB_FILENAME, column_name='evr_effective',            num_sections=9, reverse=1)
-        pm_ratios_range_all   = get_range(csv_db_path=new_run_all, db_filename=DB_FILENAME, column_name='effective_profit_margin',  num_sections=9, reverse=0)
+            # Generate NSR:
+            # research_db(evr_range=[24,24],  pm_range=[31,31], ev_millions_range=[100,100], csv_db_path=new_run_nsr,   read_united_states_input_symbols=0, tase_mode=0, generate_result_folders=1, appearance_counter_min=15, appearance_counter_max=45, favor_technology_sector=4.5)
+        if run_all:
+            ev_range_all          = get_range(csv_db_path=new_run_all, db_filename=db_filename, column_name='enterprise_value',         num_sections=5, reverse=0)
+            pe_range_all          = get_range(csv_db_path=new_run_all, db_filename=db_filename, column_name='pe_effective',             num_sections=9, reverse=1)
+            evr_range_all         = get_range(csv_db_path=new_run_all, db_filename=db_filename, column_name='evr_effective',            num_sections=9, reverse=1)
+            pm_ratios_range_all   = get_range(csv_db_path=new_run_all, db_filename=db_filename, column_name='effective_profit_margin',  num_sections=9, reverse=0)
 
-        ev_millions_range_all = [int(  ev/1000000                       ) for ev in ev_range_all       ]
-        pm_range_all          = [round(pm*100,    sss.NUM_ROUND_DECIMALS) for pm in pm_ratios_range_all]
+            ev_millions_range_all = [int(  ev/1000000                       ) for ev in ev_range_all       ]
+            pm_range_all          = [round(pm*100,    sss.NUM_ROUND_DECIMALS) for pm in pm_ratios_range_all]
 
-        research_db(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, research_mode_max_ev=research_mode_max_ev, ev_millions_range=ev_millions_range_all, pe_range=pe_range_all, evr_range=evr_range_all, pm_range=pm_range_all, csv_db_path=new_run_all, db_filename=DB_FILENAME, read_united_states_input_symbols=1, scan_mode=SCAN_MODE_ALL, generate_result_folders=0, appearance_counter_min=RESEARCH_MODE_MIN_ENTRIES_LIMIT, appearance_counter_max=50000, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[3.5, 0.75],
-                    newer_path=new_run_all, older_path=reference_run_all, db_exists_in_both_folders=1, diff_only_result=1, movement_threshold=0, res_length=1000)
+            research_db(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, research_mode_max_ev=research_mode_max_ev, ev_millions_range=ev_millions_range_all, pe_range=pe_range_all, evr_range=evr_range_all, pm_range=pm_range_all, csv_db_path=new_run_all, db_filename=db_filename, read_united_states_input_symbols=1, scan_mode=SCAN_MODE_ALL, generate_result_folders=0, appearance_counter_min=RESEARCH_MODE_MIN_ENTRIES_LIMIT, appearance_counter_max=50000, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[3.5, 0.75],
+                        newer_path=new_run_all, older_path=reference_run_all, db_exists_in_both_folders=1, diff_only_result=1, movement_threshold=0, res_length=1000)
 
-        # Generate ALL:
-        # research_db(sectors_list=[], sectors_filter_out=0, evr_range=[30,30], pm_range=[40,40], ev_millions_range=[100,100], csv_db_path=new_run_all,  read_united_states_input_symbols=1, tase_mode=0, generate_result_folders=1, appearance_counter_min=5, appearance_counter_max=75, favor_technology_sector=4.5)
-    if run_custom:
-        ev_range_all          = get_range(csv_db_path=new_run_custom, db_filename=DB_FILENAME, column_name='enterprise_value',         num_sections=4, reverse=0)
-        pe_range_all          = get_range(csv_db_path=new_run_custom, db_filename=DB_FILENAME, column_name='pe_effective',             num_sections=5, reverse=1)
-        evr_range_all         = get_range(csv_db_path=new_run_custom, db_filename=DB_FILENAME, column_name='evr_effective',            num_sections=5, reverse=1)
-        pm_ratios_range_all   = get_range(csv_db_path=new_run_custom, db_filename=DB_FILENAME, column_name='effective_profit_margin',  num_sections=5, reverse=0)
+            # Generate ALL:
+            # research_db(sectors_list=[], sectors_filter_out=0, evr_range=[30,30], pm_range=[40,40], ev_millions_range=[100,100], csv_db_path=new_run_all,  read_united_states_input_symbols=1, tase_mode=0, generate_result_folders=1, appearance_counter_min=5, appearance_counter_max=75, favor_technology_sector=4.5)
+        if run_custom:
+            ev_range_all          = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='enterprise_value',         num_sections=4, reverse=0)
+            pe_range_all          = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='pe_effective',             num_sections=5, reverse=1)
+            evr_range_all         = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='evr_effective',            num_sections=5, reverse=1)
+            pm_ratios_range_all   = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='effective_profit_margin',  num_sections=5, reverse=0)
 
-        ev_millions_range_all = [int(  ev/1000000                       ) for ev in ev_range_all       ]
-        pm_range_all          = [round(pm*100,    sss.NUM_ROUND_DECIMALS) for pm in pm_ratios_range_all]
+            ev_millions_range_all = [int(  ev/1000000                       ) for ev in ev_range_all       ]
+            pm_range_all          = [round(pm*100,    sss.NUM_ROUND_DECIMALS) for pm in pm_ratios_range_all]
 
-        research_db(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, research_mode_max_ev=research_mode_max_ev, ev_millions_range=ev_millions_range_all, pe_range=pe_range_all, evr_range=evr_range_all, pm_range=pm_range_all, csv_db_path=new_run_custom, db_filename=DB_FILENAME, read_united_states_input_symbols=1, scan_mode=SCAN_MODE_ALL, generate_result_folders=0, appearance_counter_min=RESEARCH_MODE_MIN_ENTRIES_LIMIT, appearance_counter_max=50000, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[3.5, 0.75],
-                    newer_path=new_run_custom, older_path=reference_run_all, db_exists_in_both_folders=1, diff_only_result=1, movement_threshold=0, res_length=1000)
+            research_db(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, research_mode_max_ev=research_mode_max_ev, ev_millions_range=ev_millions_range_all, pe_range=pe_range_all, evr_range=evr_range_all, pm_range=pm_range_all, csv_db_path=new_run_custom, db_filename=db_filename, read_united_states_input_symbols=1, scan_mode=SCAN_MODE_ALL, generate_result_folders=0, appearance_counter_min=RESEARCH_MODE_MIN_ENTRIES_LIMIT, appearance_counter_max=50000, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[3.5, 0.75],
+                        newer_path=new_run_custom, older_path=reference_run_all, db_exists_in_both_folders=1, diff_only_result=1, movement_threshold=0, res_length=1000)
 

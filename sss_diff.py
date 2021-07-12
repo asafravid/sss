@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.35 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.112 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -34,16 +34,16 @@ def get_row_index(symbol_index, symbol, rows):
     return -1
 
 
-def run(newer_path, older_path, db_exists_in_both_folders, diff_only_result, movement_threshold, res_length, consider_as_new_from):
+def run(newer_path, older_path, db_filename, db_exists_in_both_folders, diff_only_result, movement_threshold, res_length, consider_as_new_from):
     newer_filenames_list = sss_filenames.create_filenames_list(newer_path)
     older_filenames_list = sss_filenames.create_filenames_list(older_path)
     diff_path = 'Results/Diff/'+'new'+newer_path.replace('Results','_').replace('/','').replace('nRes','')+'_old'+older_path.replace('Results','_').replace('/','').replace('Tase','').replace('Nsr','').replace('All','').replace('nRes','').replace('a','').replace('e','').replace('i','').replace('o','').replace('u','')
     compact_diff_path = diff_path.replace('FavorTechBy3','FTB3').replace('MCap_','').replace('BuildDb_','').replace('nResults','')
     diff_filenames_list  = sss_filenames.create_filenames_list(compact_diff_path)
-    newer_filenames_list.insert(  0, newer_path +'/results_sss.csv')
-    older_filenames_list.insert(  0, older_path +'/results_sss.csv')
+    newer_filenames_list.insert(  0, newer_path +'/results_{}'.format(db_filename.replace('_engine','')))
+    older_filenames_list.insert(  0, older_path +'/results_{}'.format(db_filename.replace('_engine','')))
 
-    diff_filenames_list.insert(  0,'{}/res_sss.csv'.format(  compact_diff_path))
+    diff_filenames_list.insert(  0,'{}/res_{}'.format(  compact_diff_path, db_filename.replace('_engine','')))
 
     if len(older_filenames_list) != len(newer_filenames_list):
         raise Exception("Different Lengths of lists - Unacceptable")
@@ -81,16 +81,13 @@ def run(newer_path, older_path, db_exists_in_both_folders, diff_only_result, mov
                     diff_lists[index].append('Diff')
                     symbol_index = row.index("Symbol")
                     name_index   = row.index("Name")
-                    if   "sss_index"   in row: sss_index = row.index("sss_value")
-
-                    row_index += 1
+                    row_index   += 1
                     continue
                 else:
                     newer_rows.append(row)
-                    symbol = row[symbol_index]
-                    name   = row[name_index]
+                    symbol            = row[symbol_index]
+                    name              = row[name_index]
                     row_in_older_file = get_row_index(symbol_index, symbol, older_rows)
-                    oldr = older_rows[row_in_older_file-1]  # -1 converts from row to row_index
                     if row_in_older_file >= 0:  # This stock in the new list, appears in the old list as well
                         if abs(row_in_older_file - row_index) > movement_threshold:
                             print("{:5} ({:15}):  {:2} positions change from {:3} to {:3}".format(symbol, name, row_in_older_file-row_index, row_in_older_file, row_index))

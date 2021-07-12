@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.102 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.112 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
