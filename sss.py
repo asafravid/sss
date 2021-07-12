@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.112 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.114 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -2222,7 +2222,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
                         symbols_tase.append(row[1].replace('.','-')+'.TA')
                         row_index += 1
 
-    # All nasdaq and others: ftp://ftp.nasdaqtrader.com/symboldirectory/
+    # All nasdaq and others: ftp://ftp.nasdaqtrader.com/symboldirectory/ -> TODO: ASAFR: Download automatically as in here: https://stackoverflow.com/questions/11768214/python-download-a-file-from-an-ftp-server
     # Legend: http://www.nasdaqtrader.com/trader.aspx?id=symboldirdefs
     # ftp.nasdaqtrader.com/SymbolDirectory/nasdaqlisted.txt
     # ftp.nasdaqtrader.com/SymbolDirectory/otherlisted.txt
@@ -2470,18 +2470,18 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
     compact_rows_no_div   = []
     compact_rows_only_div = []
     for row in rows:
-        if row[g_sss_value_index] != BAD_SSS: compact_rows.append(row)
+        if row[g_sss_value_index_n if "normalized" in db_filename else g_sss_value_index] != BAD_SSS: compact_rows.append(row)
     for row_no_div in rows_no_div:
-        if row_no_div[g_sss_value_index] != BAD_SSS: compact_rows_no_div.append(row_no_div)
+        if row_no_div[g_sss_value_index_n if "normalized" in db_filename else g_sss_value_index] != BAD_SSS: compact_rows_no_div.append(row_no_div)
     for row_only_div in rows_only_div:
-        if row_only_div[g_sss_value_index] != BAD_SSS: compact_rows_only_div.append(row_only_div)
+        if row_only_div[g_sss_value_index_n if "normalized" in db_filename else g_sss_value_index] != BAD_SSS: compact_rows_only_div.append(row_only_div)
 
     # Now, Sort the compact_rows using the sss_value formula: [1:] skips the 1st title row
-    sorted_list_db               = sorted(csv_db_data,           key=lambda row:          row[g_symbol_index],                 reverse=False)  # Sort by symbol
-    sorted_list_sss              = sorted(compact_rows,          key=lambda row:          row[g_sss_value_index   ],           reverse=False)  # Sort by sss_value     -> The lower  - the more attractive
-    sorted_list_sss_no_div       = sorted(compact_rows_no_div,   key=lambda row_no_div:   row_no_div[g_sss_value_index   ],    reverse=False)  # Sort by sss_value     -> The lower  - the more attractive
-    sorted_list_sss_only_div     = sorted(compact_rows_only_div, key=lambda row_only_div: row_only_div[g_sss_value_index   ],  reverse=False)  # Sort by sss_value     -> The lower  - the more attractive
-    sorted_list_diff             = sorted(rows_diff,             key=lambda row_diff:     row_diff[g_symbol_index   ],         reverse=False)  # Sort by symbol
+    sorted_list_db               = sorted(csv_db_data,           key=lambda row:          row[         g_symbol_index_n               if "normalized" in db_filename else g_symbol_index   ],  reverse=False)  # Sort by symbol
+    sorted_list_sss              = sorted(compact_rows,          key=lambda row:          row[         g_sss_value_normalized_index_n if "normalized" in db_filename else g_sss_value_index],  reverse=False)  # Sort by sss_value     -> The lower  - the more attractive
+    sorted_list_sss_no_div       = sorted(compact_rows_no_div,   key=lambda row_no_div:   row_no_div[  g_sss_value_normalized_index_n if "normalized" in db_filename else g_sss_value_index],  reverse=False)  # Sort by sss_value     -> The lower  - the more attractive
+    sorted_list_sss_only_div     = sorted(compact_rows_only_div, key=lambda row_only_div: row_only_div[g_sss_value_normalized_index_n if "normalized" in db_filename else g_sss_value_index],  reverse=False)  # Sort by sss_value     -> The lower  - the more attractive
+    sorted_list_diff             = sorted(rows_diff,             key=lambda row_diff:     row_diff[    g_symbol_index_n               if "normalized" in db_filename else g_symbol_index   ],  reverse=False)  # Sort by symbol
 
     if research_mode: # Update the appearance counter
         list_len_sss = len(sorted_list_sss)
