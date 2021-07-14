@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.118 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.120 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -328,8 +328,8 @@ def research_db(sectors_list, sectors_filter_out, countries_list, countries_filt
     with open(result_list_filename_sss, 'w') as f:
         f.write("Symbol,Name,Sector,Value,Close,Grade\n")
         for key in result_sorted_appearance_counter_dict_sss.keys():
-            #                              Symbol,    Name,                    Sector Value  Close        Grade
-            f.write("%s,%s,%s,%s,%s,%s\n"%(key[0],str(key[1]).replace(',',' '),key[2],key[3],key[4],round(result_sorted_appearance_counter_dict_sss[  key],4)))
+            #                              Symbol,    Name,                    Sector Value           Close        Grade
+            f.write("%s,%s,%s,%s,%s,%s\n"%(key[0],str(key[1]).replace(',',' '),key[2],round(key[3],5),key[4],round(result_sorted_appearance_counter_dict_sss[  key],4)))
 
     if older_path is not None:
         diff_lists = sss_diff.run(newer_path=newer_path, older_path=older_path, db_filename=db_filename, db_exists_in_both_folders=db_exists_in_both_folders, diff_only_result=diff_only_result, movement_threshold=movement_threshold, res_length=res_length, consider_as_new_from=PDF_NUM_ENTRIES_IN_REPORT)

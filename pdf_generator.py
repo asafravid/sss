@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.119 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.120 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -68,7 +68,7 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
                 row = ['Symbol', 'Name', 'Sector', 'Value', 'Close', 'Grade']
         for col_index, col in enumerate(row):
             w_diff                =0
-            if   col_index == 0: w=14 # Symbol
+            if   col_index == 0: w=16 # Symbol
             elif col_index == 1: w=42 # Name
             elif col_index == 2: w=33 # Sector
             elif col_index == 3: w=40 # Value
