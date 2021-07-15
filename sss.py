@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.118 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.123 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -23,7 +23,7 @@
 
 # TODO: ASAFR: -1. (Highest Priority:) Update yfinance and commit the pull requests from internaly-used/improved yfinance
 #               0. Auto-Update Nasdaq (All, NSR) Indices as done with TASE
-#               1. Check and multi dim and investigate eqg_min and rqg_min: Check why Yahoo Finance always gives QRG values of 0? Unusable if that is always so
+#               1. Check and multi dim and investigate eqg_min and rqg_min: Check why yfinance always gives QRG values of 0? Unusable if that is always so
 #               2. Implement:
 #               2.1. https://en.wikipedia.org/wiki/Piotroski_F-score
 #               2.1.1. ROA: https://www.investopedia.com/ask/answers/031215/what-formula-calculating-return-assets-roa.asp
@@ -104,7 +104,7 @@ RQG_UNKNOWN                                  = -0.9   # -90% TODO: ASAFR: 1. Sca
 EQG_POSITIVE_FACTOR                          = 10.0   # When positive, it will have a 5x factor on the 1 + function
 RQG_POSITIVE_FACTOR                          = 10.0   # When positive, it will have a 5x factor on the 1 + function
 EQG_WEIGHT_VS_YOY                            = 0.75   # the provided EQG is weighted more than the manually calculated one
-RQG_WEIGHT_VS_YOY                            = 0.1   # the provided RQG (Actually Yahoo never provides it) is weighted less than the manually calculated one
+RQG_WEIGHT_VS_YOY                            = 0.1   # the provided RQG (Actually yfinance never provides it) is weighted less than the manually calculated one
 EQG_DAMPER                                   = 0.25
 RQG_DAMPER                                   = 0.25
 TRAILING_EPS_PERCENTAGE_DAMP_FACTOR          = 0.01   # When the trailing_eps_percentage is very low (units are ratio here), this damper shall limit the affect to x100 not more)
@@ -1115,7 +1115,7 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
 
                 stock_data.summary_currency = info['currency'] if 'currency' in info else stock_data.financial_currency  # Used for market_cap and enterprise_value conversions
 
-                # Currency Conversion Rules, per Yahoo Finance Data Display Methods:
+                # Currency Conversion Rules, per yfinance Data Display Methods:
                 #
                 # +--------------------+-------------------+-------------------+
                 # |       Mode         | earnings_ Exist   | earnings_ Missing |
@@ -1583,7 +1583,7 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
             if 'trailingPE' in info:
                 stock_data.trailing_price_to_earnings  = info['trailingPE']  # https://www.investopedia.com/terms/t/trailingpe.asp
                 if tase_mode and stock_data.trailing_price_to_earnings != None:
-                    stock_data.trailing_price_to_earnings /= 100.0  # In TLV stocks, Yahoo multiplies trailingPE by a factor of 100, so compensate
+                    stock_data.trailing_price_to_earnings /= 100.0  # In TLV stocks, yfinance multiplies trailingPE by a factor of 100, so compensate
                     stock_data.trailing_price_to_earnings *= stock_data.summary_currency_conversion_rate_mult_to_usd # Additionally, in TLV stocks this ratio is mistakenly calculated using PriceInNis/EarningsInUSD -> so Compensate
             elif stock_data.effective_earnings != None and stock_data.effective_earnings != 0:
                 stock_data.trailing_price_to_earnings  = stock_data.market_cap / stock_data.effective_earnings # Calculate manually.
@@ -1594,7 +1594,7 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
             if 'forwardPE' in info:
                 stock_data.forward_price_to_earnings  = info['forwardPE']  # https://www.investopedia.com/terms/t/trailingpe.asp
                 if tase_mode and stock_data.forward_price_to_earnings != None:
-                    stock_data.forward_price_to_earnings /= 100.0 # In TLV stocks, Yahoo multiplies forwardPE by a factor of 100, so compensate
+                    stock_data.forward_price_to_earnings /= 100.0 # In TLV stocks, yfinance multiplies forwardPE by a factor of 100, so compensate
                     stock_data.forward_price_to_earnings *= stock_data.summary_currency_conversion_rate_mult_to_usd # Additionally, in TLV stocks this ratio is mistakenly calculated using PriceInNis/EarningsInUSD -> so Compensate
             else:  stock_data.forward_price_to_earnings  = None # Mark as None, so as to try and calculate manually. TODO: ASAFR: Calcualte using the forward_eps?
 
@@ -1646,8 +1646,8 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
                 if stock_data.fifty_two_week_low      > 0.0: stock_data.previous_close_percentage_from_52w_low  = 100.0 * ((stock_data.previous_close - stock_data.fifty_two_week_low     ) / stock_data.fifty_two_week_low     )
                 if stock_data.fifty_two_week_high     > 0.0: stock_data.previous_close_percentage_from_52w_high = 100.0 * ((stock_data.previous_close - stock_data.fifty_two_week_high    ) / stock_data.fifty_two_week_high    )
                 if stock_data.fifty_two_week_low      > 0.0 and stock_data.fifty_two_week_high > 0.0 and stock_data.previous_close > 0.0:
-                    if stock_data.fifty_two_week_high == stock_data.fifty_two_week_low:
-                        stock_data.dist_from_low_factor = 1.0  # When there is no range, leave as neutral
+                    if stock_data.fifty_two_week_high == stock_data.fifty_two_week_low or stock_data.previous_close == 0:  # TODO: ASAFR: Take these values from nasdaq_traded.csv when they are not available temporarily on yfinance
+                        stock_data.dist_from_low_factor = 1.0  # When there is no range or no previous_close_data, leave as neutral
                     else:
                         stock_data.dist_from_low_factor = (stock_data.previous_close - stock_data.fifty_two_week_low)/(0.5*(stock_data.fifty_two_week_high-stock_data.fifty_two_week_low))
                     stock_data.eff_dist_from_low_factor = (DIST_FROM_LOW_FACTOR_DAMPER + stock_data.dist_from_low_factor) if stock_data.dist_from_low_factor < 1.0 else (stock_data.dist_from_low_factor**DIST_FROM_LOW_FACTOR_HIGHER_THAN_ONE_POWER)
@@ -1661,7 +1661,7 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
 
             if 'priceToBook'                                in info:
                 stock_data.price_to_book = info['priceToBook']
-                if tase_mode and stock_data.price_to_book != None: # Yahoo Finance mistakenly multiplies value by 100 and doesn't convert price to USD, so compenate:
+                if tase_mode and stock_data.price_to_book != None: # yfinance mistakenly multiplies value by 100 and doesn't convert price to USD, so compenate:
                     stock_data.price_to_book /= 100
                     stock_data.price_to_book *= stock_data.summary_currency_conversion_rate_mult_to_usd
             else:
@@ -1789,7 +1789,7 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
             if 'priceToSalesTrailing12Months' in info and info['priceToSalesTrailing12Months'] != None:
                 stock_data.trailing_12months_price_to_sales = info['priceToSalesTrailing12Months'] # https://www.investopedia.com/articles/fundamental/03/032603.asp#:~:text=The%20price%2Dto%2Dsales%20ratio%20(Price%2FSales%20or,the%20more%20attractive%20the%20investment.
                 if isinstance(stock_data.trailing_12months_price_to_sales, str):  stock_data.trailing_12months_price_to_sales = None
-                if tase_mode and stock_data.trailing_12months_price_to_sales != None: stock_data.trailing_12months_price_to_sales *= (stock_data.summary_currency_conversion_rate_mult_to_usd/100) # Wrongly calculated by Yahoo for TASE
+                if tase_mode and stock_data.trailing_12months_price_to_sales != None: stock_data.trailing_12months_price_to_sales *= (stock_data.summary_currency_conversion_rate_mult_to_usd/100) # Wrongly calculated by yfinance for TASE
             else:
                 if stock_data.effective_revenue != None and stock_data.effective_revenue > 0 and stock_data.market_cap != None and stock_data.market_cap > 0:
                     stock_data.trailing_12months_price_to_sales  = stock_data.market_cap / stock_data.effective_revenue  # effective_revenue and_market_cap are already in USD (converted earlier)
@@ -1863,9 +1863,9 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
                  stock_data.annualized_profit_margin = stock_data.quarterized_profit_margin = stock_data.profit_margin/PROFIT_MARGIN_DUPLICATION_FACTOR
             elif stock_data.profit_margin            is None and stock_data.quarterized_profit_margin is None:
                  stock_data.profit_margin            = stock_data.quarterized_profit_margin = stock_data.annualized_profit_margin/PROFIT_MARGIN_DUPLICATION_FACTOR
-            elif stock_data.profit_margin             is None: stock_data.profit_margin             = stock_data.annualized_profit_margin/PROFIT_MARGIN_DUPLICATION_FACTOR
+            elif stock_data.profit_margin             is None: stock_data.profit_margin             = (stock_data.annualized_profit_margin+stock_data.quarterized_profit_margin)/(2*PROFIT_MARGIN_DUPLICATION_FACTOR)
             elif stock_data.annualized_profit_margin  is None: stock_data.annualized_profit_margin  = stock_data.profit_margin/PROFIT_MARGIN_DUPLICATION_FACTOR
-            elif stock_data.quarterized_profit_margin is None: stock_data.quarterized_profit_margin = max(stock_data.profit_margin, stock_data.annualized_profit_margin)/PROFIT_MARGIN_DUPLICATION_FACTOR
+            elif stock_data.quarterized_profit_margin is None: stock_data.quarterized_profit_margin = stock_data.profit_margin/PROFIT_MARGIN_DUPLICATION_FACTOR
 
             sorted_pms = sorted([stock_data.profit_margin, stock_data.annualized_profit_margin, stock_data.quarterized_profit_margin])
             weighted_average_pm = weighted_average(sorted_pms, PROFIT_MARGIN_WEIGHTS[:len(sorted_pms)]) # Higher weight to the higher profit margin when averaging out
