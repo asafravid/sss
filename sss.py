@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.123 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.1.128 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -73,8 +73,11 @@ import sss_indices
 import sss_post_processing
 import math
 import json
+import shutil
+import urllib.request as request
 
-from threading import Thread
+from contextlib  import closing
+from threading   import Thread
 from dataclasses import dataclass
 # from forex_python.converter import CurrencyRates
 # from currency_converter import CurrencyConverter
@@ -2083,6 +2086,15 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
             else:             rows_no_div.append(  row_to_append)
 
 
+def download_ftp_files(filenames_list, ftp_path):
+    for filename in filenames_list:
+        filename_to_download = filename
+        if '/' in filename_to_download:
+            filename_to_download = filename[filename.index('/')+1:]
+        with closing(request.urlopen(ftp_path+filename_to_download.replace('.csv','.txt'))) as r:
+            with open(filename, 'wb') as f:
+                shutil.copyfileobj(r, f)
+
 # reference_run : Used for identifying anomalies in which some symbol information is completely different from last run. It can be different but only in new quartely reports
 #                 It is sometimes observed that stocks information is wrongly fetched. Is such cases, the last run's reference point shall be used, with a forgetting factor
 def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, countries_filter_out,build_csv_db_only, build_csv_db, csv_db_path, db_filename, read_united_states_input_symbols, tase_mode, num_threads, market_cap_included, research_mode, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, generate_result_folders=1, appearance_counter_dict_sss={}, appearance_counter_min=25, appearance_counter_max=35, custom_portfolio=[]):
@@ -2233,6 +2245,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
         if read_united_states_input_symbols:
             nasdaq_filenames_list = ['Indices/nasdaqlisted.csv', 'Indices/otherlisted.csv', 'Indices/nasdaqtraded.csv']  # Checkout http://www.nasdaqtrader.com/trader.aspx?id=symboldirdefs for all symbol definitions (for instance - `$` in stock names, 5-letter stocks ending with `Y`)
             ticker_clumn_list     = [0,                          0,                         1                         ]  # nasdaqtraded.csv - 1st column is Y/N (traded or not) - so take row[1] instead!!!
+            download_ftp_files(nasdaq_filenames_list, 'ftp://ftp.nasdaqtrader.com/SymbolDirectory/')
             for index, filename in enumerate(nasdaq_filenames_list):
                 with open(filename, mode='r', newline='') as engine:
                     reader = csv.reader(engine, delimiter='|')
@@ -2249,6 +2262,8 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
                             continue
                         else:
                             row_index += 1
+                            if 'File Creation Time' in row[0]:
+                                continue
                             if next_shares_column and row[next_shares_column] == 'Y':
                                 etf_and_nextshares_list.append(row[ticker_clumn_list[index]])
                                 continue
