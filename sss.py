@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.128 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.0 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -22,7 +22,7 @@
 
 
 # TODO: ASAFR: -1. (Highest Priority:) Update yfinance and commit the pull requests from internaly-used/improved yfinance
-#               0. Auto-Update Nasdaq (All, NSR) Indices as done with TASE
+#               0. Auto-Update Nasdaq (NSR) Indices as done with TASE
 #               1. Check and multi dim and investigate eqg_min and rqg_min: Check why yfinance always gives QRG values of 0? Unusable if that is always so
 #               2. Implement:
 #               2.1. https://en.wikipedia.org/wiki/Piotroski_F-score
@@ -64,8 +64,10 @@
 
 import time
 import random                                                                                                          
-import pandas   as pd
-import yfinance as yf
+import shutil
+import urllib.request as request
+import pandas         as pd
+import yfinance       as yf
 import csv
 import os
 import sss_filenames
@@ -73,8 +75,6 @@ import sss_indices
 import sss_post_processing
 import math
 import json
-import shutil
-import urllib.request as request
 
 from contextlib  import closing
 from threading   import Thread
@@ -728,15 +728,49 @@ def weighted_average(values_list, weights):
     return sum([values_list[i]*weights[i] for i in range(len(values_list))])/sum(weights)
 
 
+def set_skip_reason(stock_data):
+    stock_data.skip_reason = ''
+
+    if   stock_data.trailing_12months_price_to_sales is None: stock_data.skip_reason += 'trailing_12months_price_to_sales is None|'
+    elif stock_data.trailing_12months_price_to_sales <= 0:    stock_data.skip_reason += 'trailing_12months_price_to_sales <= 0   |'
+    if   stock_data.effective_profit_margin          is None: stock_data.skip_reason += 'effective_profit_margin          is None|'
+    elif stock_data.effective_profit_margin          <= 0:    stock_data.skip_reason += 'effective_profit_margin          <= 0   |'
+    if   stock_data.eqg_factor_effective             is None: stock_data.skip_reason += 'eqg_factor_effective             is None|'
+    elif stock_data.eqg_factor_effective             <= 0:    stock_data.skip_reason += 'eqg_factor_effective             <= 0   |'
+    if   stock_data.rqg_factor_effective             is None: stock_data.skip_reason += 'rqg_factor_effective             is None|'
+    elif stock_data.rqg_factor_effective             <= 0:    stock_data.skip_reason += 'rqg_factor_effective             <= 0   |'
+    if   stock_data.pe_effective                     is None: stock_data.skip_reason += 'pe_effective                     is None|'
+    elif stock_data.pe_effective                     <= 0:    stock_data.skip_reason += 'pe_effective                     <= 0   |'
+    if   stock_data.effective_ev_to_ebitda           is None: stock_data.skip_reason += 'effective_ev_to_ebitda           is None|'
+    elif stock_data.effective_ev_to_ebitda           <= 0:    stock_data.skip_reason += 'effective_ev_to_ebitda           <= 0   |'
+    if   stock_data.ev_to_cfo_ratio_effective        is None: stock_data.skip_reason += 'ev_to_cfo_ratio_effective        is None|'
+    elif stock_data.ev_to_cfo_ratio_effective        <= 0:    stock_data.skip_reason += 'ev_to_cfo_ratio_effective        <= 0   |'
+    if   stock_data.effective_peg_ratio              is None: stock_data.skip_reason += 'effective_peg_ratio              is None|'
+    elif stock_data.effective_peg_ratio              <= 0:    stock_data.skip_reason += 'effective_peg_ratio              <= 0   |'
+    if   stock_data.price_to_book                    is None: stock_data.skip_reason += 'price_to_book                    is None|'
+    elif stock_data.price_to_book                    <= 0:    stock_data.skip_reason += 'price_to_book                    <= 0   |'
+    if   stock_data.debt_to_equity_effective_used    is None: stock_data.skip_reason += 'debt_to_equity_effective_used    is None|'
+    elif stock_data.debt_to_equity_effective_used    <= 0:    stock_data.skip_reason += 'debt_to_equity_effective_used    <= 0   |'
+    if   stock_data.total_current_ratio_effective    is None: stock_data.skip_reason += 'total_current_ratio_effective    is None|'
+    elif stock_data.total_current_ratio_effective    <= 0:    stock_data.skip_reason += 'total_current_ratio_effective    <= 0   |'
+    if   stock_data.evr_effective                    is None: stock_data.skip_reason += 'evr_effective                    is None|'
+    elif stock_data.evr_effective                    <= 0:    stock_data.skip_reason += 'evr_effective                    <= 0   |'
+    if   stock_data.calculated_roa                   is None: stock_data.skip_reason += 'calculated_roa                   is None|'
+    elif stock_data.calculated_roa                   <= 0:    stock_data.skip_reason += 'calculated_roa                   <= 0   |'
+    if   stock_data.altman_z_score_factor            is None: stock_data.skip_reason += 'altman_z_score_factor            is None|'
+    elif stock_data.altman_z_score_factor            <= 0:    stock_data.skip_reason += 'altman_z_score_factor            <= 0   |'
+
+
 def sss_core_equation_value_set(stock_data):
     if VERBOSE_LOGS: print("[{} sss_core_equation_value_set]".format(__name__))
     if stock_data.shares_outstanding and stock_data.net_income_to_common_shareholders != None: stock_data.nitcsh_to_shares_outstanding = float(stock_data.net_income_to_common_shareholders) / float(stock_data.shares_outstanding)
     if stock_data.employees          and stock_data.net_income_to_common_shareholders != None: stock_data.nitcsh_to_num_employees = float(stock_data.net_income_to_common_shareholders) / float(stock_data.employees)
 
-    if stock_data.trailing_12months_price_to_sales != None and stock_data.trailing_12months_price_to_sales > 0 and stock_data.effective_profit_margin != None and stock_data.effective_profit_margin > 0 and stock_data.eqg_factor_effective and stock_data.eqg_factor_effective > 0 != None and stock_data.rqg_factor_effective and stock_data.rqg_factor_effective > 0 != None and stock_data.pe_effective != None and stock_data.pe_effective > 0 and stock_data.effective_ev_to_ebitda != None and stock_data.effective_ev_to_ebitda > 0 and stock_data.ev_to_cfo_ratio_effective != None and stock_data.ev_to_cfo_ratio_effective > 0 and stock_data.effective_peg_ratio != None and stock_data.effective_peg_ratio > 0 and stock_data.price_to_book != None and stock_data.price_to_book > 0 and stock_data.debt_to_equity_effective > 0 and stock_data.total_ratio_effective > 0 and stock_data.total_current_ratio_effective > 0 and stock_data.evr_effective != None and stock_data.evr_effective > 0.0 and stock_data.calculated_roa != None and stock_data.calculated_roa > 0 and stock_data.altman_z_score_factor != None and stock_data.altman_z_score_factor > 0:
+    if stock_data.trailing_12months_price_to_sales != None and stock_data.trailing_12months_price_to_sales > 0 and stock_data.effective_profit_margin != None and stock_data.effective_profit_margin > 0 and stock_data.eqg_factor_effective != None and stock_data.eqg_factor_effective > 0 and stock_data.rqg_factor_effective != None and stock_data.rqg_factor_effective > 0 and stock_data.pe_effective != None and stock_data.pe_effective > 0 and stock_data.effective_ev_to_ebitda != None and stock_data.effective_ev_to_ebitda > 0 and stock_data.ev_to_cfo_ratio_effective != None and stock_data.ev_to_cfo_ratio_effective > 0 and stock_data.effective_peg_ratio != None and stock_data.effective_peg_ratio > 0 and stock_data.price_to_book != None and stock_data.price_to_book > 0 and stock_data.debt_to_equity_effective_used != None and stock_data.debt_to_equity_effective_used > 0 and stock_data.total_current_ratio_effective != None and stock_data.total_current_ratio_effective > 0 and stock_data.evr_effective != None and stock_data.evr_effective > 0.0 and stock_data.calculated_roa != None and stock_data.calculated_roa > 0 and stock_data.altman_z_score_factor != None and stock_data.altman_z_score_factor > 0:
         stock_data.sss_value = float(stock_data.eff_dist_from_low_factor * ((stock_data.evr_effective * stock_data.pe_effective * stock_data.effective_ev_to_ebitda * stock_data.trailing_12months_price_to_sales * stock_data.price_to_book) / (stock_data.effective_profit_margin * stock_data.effective_current_ratio * stock_data.calculated_roa)) * ((stock_data.effective_peg_ratio * stock_data.ev_to_cfo_ratio_effective * stock_data.debt_to_equity_effective_used) / (stock_data.eqg_factor_effective * stock_data.rqg_factor_effective * stock_data.altman_z_score_factor)))  # The lower  the better
     else:
         stock_data.sss_value = BAD_SSS
+        set_skip_reason(stock_data)
 
 
 def get_used_parameters_names_in_core_equation():
@@ -1944,8 +1978,8 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
 
             round_and_avoid_none_values(stock_data)
 
-        if return_value and not research_mode: print('                                          sector: {:10},     country: {:10},    sss_value: {:10},     annualized_revenue: {:10},     annualized_earnings: {:10},     annualized_retained_earnings: {:10},     quarterized_revenue: {:10},     quarterized_earnings: {:10},     quarterized_retained_earnings: {:10},     effective_earnings: {:10},     effective_retained_earnings: {:10},     effective_revenue: {:10},     annualized_total_revenue: {:10},     annualized_net_income: {:10},     quarterized_total_revenue: {:10},     quarterized_net_income: {:10},     effective_net_income: {:10},     effective_total_revenue: {:10},     enterprise_value_to_revenue: {:10},     evr_effective: {:10},     trailing_price_to_earnings: {:10},     forward_price_to_earnings: {:10},     effective_price_to_earnings: {:10},     trailing_12months_price_to_sales: {:10},     pe_effective: {:10},     effective_ev_to_ebitda: {:10},     profit_margin: {:10},     annualized_profit_margin: {:10},       annualized_profit_margin_boost: {:10},     quarterized_profit_margin: {:10},     quarterized_profit_margin_boost: {:10},     effective_profit_margin_boost: {:10}, held_percent_institutions: {:10},     forward_eps: {:10},     trailing_eps: {:10},     previous_close: {:10},     trailing_eps_percentage: {:10},     price_to_book: {:10},     shares_outstanding: {:10},     net_income_to_common_shareholders: {:10},     nitcsh_to_shares_outstanding: {:10},     employees: {:10},     enterprise_value: {:10},     market_cap: {:10},     nitcsh_to_num_employees: {:10},     eqg_factor_effective: {:10},     rqg_factor_effective: {:10},     price_to_earnings_to_growth_ratio: {:10},     effective_peg_ratio: {:10},     annualized_cash_flow_from_operating_activities: {:10},     quarterized_cash_flow_from_operating_activities: {:10},     annualized_ev_to_cfo_ratio: {:10},     quarterized_ev_to_cfo_ratio: {:10},     ev_to_cfo_ratio_effective: {:10},     annualized_debt_to_equity: {:10},     quarterized_debt_to_equity: {:10},     debt_to_equity_effective: {:10},     debt_to_equity_effective_used: {:10},     financial_currency: {:10},     summary_currency: {:10},     financial_currency_conversion_rate_mult_to_usd: {:10},     summary_currency_conversion_rate_mult_to_usd: {:10}'.format(
-                                                                                                stock_data.sector, stock_data.country,stock_data.sss_value, stock_data.annualized_revenue, stock_data.annualized_earnings, stock_data.annualized_retained_earnings, stock_data.quarterized_revenue, stock_data.quarterized_earnings, stock_data.quarterized_retained_earnings, stock_data.effective_earnings, stock_data.effective_retained_earnings, stock_data.effective_revenue, stock_data.annualized_total_revenue, stock_data.annualized_net_income, stock_data.quarterized_total_revenue, stock_data.quarterized_net_income, stock_data.effective_net_income, stock_data.effective_total_revenue, stock_data.enterprise_value_to_revenue, stock_data.evr_effective, stock_data.trailing_price_to_earnings, stock_data.forward_price_to_earnings, stock_data.effective_price_to_earnings, stock_data.trailing_12months_price_to_sales, stock_data.pe_effective, stock_data.effective_ev_to_ebitda, stock_data.profit_margin, stock_data.annualized_profit_margin,   stock_data.annualized_profit_margin_boost, stock_data.quarterized_profit_margin, stock_data.quarterized_profit_margin_boost, stock_data.effective_profit_margin,   stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.previous_close, stock_data.trailing_eps_percentage, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.employees, stock_data.enterprise_value, stock_data.market_cap, stock_data.nitcsh_to_num_employees, stock_data.eqg_factor_effective, stock_data.rqg_factor_effective, stock_data.price_to_earnings_to_growth_ratio, stock_data.effective_peg_ratio, stock_data.annualized_cash_flow_from_operating_activities, stock_data.quarterized_cash_flow_from_operating_activities, stock_data.annualized_ev_to_cfo_ratio, stock_data.quarterized_ev_to_cfo_ratio, stock_data.ev_to_cfo_ratio_effective, stock_data.annualized_debt_to_equity, stock_data.quarterized_debt_to_equity, stock_data.debt_to_equity_effective, stock_data.debt_to_equity_effective_used, stock_data.financial_currency, stock_data.summary_currency, stock_data.financial_currency_conversion_rate_mult_to_usd, stock_data.summary_currency_conversion_rate_mult_to_usd))
+        if return_value and not research_mode: print('                                          sector: {:10},     country: {:10},    sss_value: {:10},     annualized_revenue: {:10},     annualized_earnings: {:10},     annualized_retained_earnings: {:10},     quarterized_revenue: {:10},     quarterized_earnings: {:10},     quarterized_retained_earnings: {:10},     effective_earnings: {:10},     effective_retained_earnings: {:10},     effective_revenue: {:10},     annualized_total_revenue: {:10},     annualized_net_income: {:10},     quarterized_total_revenue: {:10},     quarterized_net_income: {:10},     effective_net_income: {:10},     effective_total_revenue: {:10},     enterprise_value_to_revenue: {:10},     evr_effective: {:10},     trailing_price_to_earnings: {:10},     forward_price_to_earnings: {:10},     effective_price_to_earnings: {:10},     trailing_12months_price_to_sales: {:10},     pe_effective: {:10},     effective_ev_to_ebitda: {:10},     profit_margin: {:10},     annualized_profit_margin: {:10},       annualized_profit_margin_boost: {:10},     quarterized_profit_margin: {:10},     quarterized_profit_margin_boost: {:10},     effective_profit_margin_boost: {:10}, held_percent_institutions: {:10},     forward_eps: {:10},     trailing_eps: {:10},     previous_close: {:10},     trailing_eps_percentage: {:10},     price_to_book: {:10},     shares_outstanding: {:10},     net_income_to_common_shareholders: {:10},     nitcsh_to_shares_outstanding: {:10},     employees: {:10},     enterprise_value: {:10},     market_cap: {:10},     nitcsh_to_num_employees: {:10},     eqg_factor_effective: {:10},     rqg_factor_effective: {:10},     price_to_earnings_to_growth_ratio: {:10},     effective_peg_ratio: {:10},     annualized_cash_flow_from_operating_activities: {:10},     quarterized_cash_flow_from_operating_activities: {:10},     annualized_ev_to_cfo_ratio: {:10},     quarterized_ev_to_cfo_ratio: {:10},     ev_to_cfo_ratio_effective: {:10},     annualized_debt_to_equity: {:10},     quarterized_debt_to_equity: {:10},     debt_to_equity_effective: {:10},     debt_to_equity_effective_used: {:10},     financial_currency: {:10},     summary_currency: {:10},     financial_currency_conversion_rate_mult_to_usd: {:10},     summary_currency_conversion_rate_mult_to_usd: {:10}, skip_reason: {}'.format(
+                                                                                                stock_data.sector, stock_data.country,stock_data.sss_value, stock_data.annualized_revenue, stock_data.annualized_earnings, stock_data.annualized_retained_earnings, stock_data.quarterized_revenue, stock_data.quarterized_earnings, stock_data.quarterized_retained_earnings, stock_data.effective_earnings, stock_data.effective_retained_earnings, stock_data.effective_revenue, stock_data.annualized_total_revenue, stock_data.annualized_net_income, stock_data.quarterized_total_revenue, stock_data.quarterized_net_income, stock_data.effective_net_income, stock_data.effective_total_revenue, stock_data.enterprise_value_to_revenue, stock_data.evr_effective, stock_data.trailing_price_to_earnings, stock_data.forward_price_to_earnings, stock_data.effective_price_to_earnings, stock_data.trailing_12months_price_to_sales, stock_data.pe_effective, stock_data.effective_ev_to_ebitda, stock_data.profit_margin, stock_data.annualized_profit_margin,   stock_data.annualized_profit_margin_boost, stock_data.quarterized_profit_margin, stock_data.quarterized_profit_margin_boost, stock_data.effective_profit_margin,   stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.previous_close, stock_data.trailing_eps_percentage, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.employees, stock_data.enterprise_value, stock_data.market_cap, stock_data.nitcsh_to_num_employees, stock_data.eqg_factor_effective, stock_data.rqg_factor_effective, stock_data.price_to_earnings_to_growth_ratio, stock_data.effective_peg_ratio, stock_data.annualized_cash_flow_from_operating_activities, stock_data.quarterized_cash_flow_from_operating_activities, stock_data.annualized_ev_to_cfo_ratio, stock_data.quarterized_ev_to_cfo_ratio, stock_data.ev_to_cfo_ratio_effective, stock_data.annualized_debt_to_equity, stock_data.quarterized_debt_to_equity, stock_data.debt_to_equity_effective, stock_data.debt_to_equity_effective_used, stock_data.financial_currency, stock_data.summary_currency, stock_data.financial_currency_conversion_rate_mult_to_usd, stock_data.summary_currency_conversion_rate_mult_to_usd, stock_data.skip_reason))
         if not return_value and (not research_mode or VERBOSE_LOGS): print('                            ' + stock_data.skip_reason)
 
         return return_value
@@ -2091,9 +2125,9 @@ def download_ftp_files(filenames_list, ftp_path):
         filename_to_download = filename
         if '/' in filename_to_download:
             filename_to_download = filename[filename.index('/')+1:]
-        with closing(request.urlopen(ftp_path+filename_to_download.replace('.csv','.txt'))) as r:
-            with open(filename, 'wb') as f:
-                shutil.copyfileobj(r, f)
+        with closing(request.urlopen(ftp_path+filename_to_download.replace('.csv','.txt'))) as read_file:
+            with open(filename, 'wb') as file_write:
+                shutil.copyfileobj(read_file, file_write)
 
 # reference_run : Used for identifying anomalies in which some symbol information is completely different from last run. It can be different but only in new quartely reports
 #                 It is sometimes observed that stocks information is wrongly fetched. Is such cases, the last run's reference point shall be used, with a forgetting factor
