@@ -49,11 +49,9 @@ https://bit.ly/MultiDimensionalScan
 - Download `NASDAQ100` latest components via https://www.nasdaq.com/market-activity/quotes/nasdaq-ndx-index into `Indices/nasdaq100-components.csv`
 - Download `Russel1000` latest components via https://en.wikipedia.org/wiki/Russell_1000_Index into `russell-1000-index.csv` 
 - Download `S&P500` latest components into `Indices/snp500-components.csv`  (Remove last line indicating creation date)
-- Download `NASDAQ` latest components via `ftp://ftp.nasdaqtrader.com/symboldirectory/` into `Indices/nasdaqlisted.csv` (Convert `.txt` to `.csv` and remove last line indicating creation date) using an FTP Client (such as https://filezilla-project.org/)
-- Download `NASDAQ` Other Listed components via `ftp://ftp.nasdaqtrader.com/symboldirectory/` into `Indices/otherlisted.csv` (Convert `.txt` to `.csv` and remove last line indicating creation date) using an FTP Client (such as https://filezilla-project.org/)
-- Download `NASDAQ` Traded components via `ftp://ftp.nasdaqtrader.com/symboldirectory/` into `Indices/nasdaqtraded.csv` (Convert `.txt` to `.csv` and remove last line indicating creation date) using an FTP Client (such as https://filezilla-project.org/)
-- You can also create your own indice/group of stocks by either overriding the above files' contents or simply adding your own indice to the code support. Use Custom Mode, and example in `sss_run.py`
-- Checkout http://www.nasdaqtrader.com/trader.aspx?id=symboldirdefs for all symbol definitions (for instance - `$` in stock names, 5-letter stocks ending with `Y`)
+- Download `NASDAQ` latest components (`otherlisted.txt`, `nasdaqlisted.txt`, `otherlisted.txt`) via `ftp://ftp.nasdaqtrader.com/symboldirectory/` into the `Indices/` folder (Convert `.txt` to `.csv`) using an FTP Client (such as https://filezilla-project.org/) -> This operation is done automatically upon each scan (with `research_mode = False`)
+- You can also create your own indice/group of stocks by either overriding the above files' contents or simply adding your own indice to the code support. Use Custom Mode, and example in `sss_config.py`
+- Checkout http://www.nasdaqtrader.com/trader.aspx?id=symboldirdefs for all symbol definitions (for instance - `$` in stock names, 5-letter stocks ending with `Y`, etc)
 
 # Disclaimer
 - The Scan Results are __By No Neans__ to be interpreted as reccomendations.
