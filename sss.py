@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.0 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.1 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -96,12 +96,14 @@ QEG_MAX                                      = 10000
 REG_MAX                                      = 10000
 SHARES_OUTSTANDING_UNKNOWN                   = 100000000  # 100 Million Shares - just a value for calculation of a currently unused vaue
 BAD_SSS                                      = 10.0 ** 50.0
-PROFIT_MARGIN_WEIGHTS                        = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0, 512.0]  # from oldest to newest
-CASH_FLOW_WEIGHTS                            = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0, 512.0]  # from oldest to newest
-REVENUES_WEIGHTS                             = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0, 512.0]  # from oldest to newest
-NO_WEIGHTS                                   = [1.0, 1.0, 1.0, 1.0,  1.0,  1.0,  1.0,   1.0,   1.0,   1.0]  # from oldest to newest
-EARNINGS_WEIGHTS                             = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0, 512.0]  # from oldest to newest
-BALANCE_SHEETS_WEIGHTS                       = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0, 512.0]  # from oldest to newest
+PROFIT_MARGIN_WEIGHTS                        = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0,   512.0]  # from oldest to newest
+PROFIT_MARGIN_YEARLY_WEIGHTS                 = [1.0, 4.0, 16,  64,  256,  1024, 4096, 16384, 4*16384, 16*16384]  # from oldest to newest
+PROFIT_MARGIN_QUARTERLY_WEIGHTS              = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0,   512.0]  # from oldest to newest
+CASH_FLOW_WEIGHTS                            = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0,   512.0]  # from oldest to newest
+REVENUES_WEIGHTS                             = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0,   512.0]  # from oldest to newest
+NO_WEIGHTS                                   = [1.0, 1.0, 1.0, 1.0,  1.0,  1.0,  1.0,   1.0,   1.0,     1.0]  # from oldest to newest
+EARNINGS_WEIGHTS                             = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0,   512.0]  # from oldest to newest
+BALANCE_SHEETS_WEIGHTS                       = [1.0, 2.0, 4.0, 8.0, 16.0, 32.0, 64.0, 128.0, 256.0,   512.0]  # from oldest to newest
 EQG_UNKNOWN                                  = -0.9   # -90% TODO: ASAFR: 1. Scan (like pm and ever) values of eqg for big data research better recommendations
 RQG_UNKNOWN                                  = -0.9   # -90% TODO: ASAFR: 1. Scan (like pm and ever) values of rqg for big data research better recommendations
 EQG_POSITIVE_FACTOR                          = 10.0   # When positive, it will have a 5x factor on the 1 + function
@@ -116,6 +118,7 @@ RATIO_DAMPER                                 = 0.01   # When the total/current_o
 ROA_DAMPER                                   = 0.02   # When the ROA is very low (units are ratio here), this damper shall limit the affect to x50 not more)
 REFERENCE_DB_MAX_VALUE_DIFF_FACTOR_THRESHOLD = 0.9   # if there is a parameter difference from reference db, in which the difference of values is higher than 0.75*abs(max_value) then something went wrong with the fetch of values from yfinance. Compensate smartly from reference database
 QUARTERLY_YEARLY_MISSING_FACTOR              = 0.25  # if either yearly or quarterly values are missing - compensate by other with bad factor (less information means less attractive)
+NEGATIVE_ALTMAN_Z_FACTOR                     = 0.00001
 
 # TODO: ASAFR: All below boosters should be calibrated by:
 #              1. The rarety (statistically comapred to all the stocks in scan) - proportionaly to it (the rarest the case - the more boost)
@@ -768,6 +771,8 @@ def sss_core_equation_value_set(stock_data):
 
     if stock_data.trailing_12months_price_to_sales != None and stock_data.trailing_12months_price_to_sales > 0 and stock_data.effective_profit_margin != None and stock_data.effective_profit_margin > 0 and stock_data.eqg_factor_effective != None and stock_data.eqg_factor_effective > 0 and stock_data.rqg_factor_effective != None and stock_data.rqg_factor_effective > 0 and stock_data.pe_effective != None and stock_data.pe_effective > 0 and stock_data.effective_ev_to_ebitda != None and stock_data.effective_ev_to_ebitda > 0 and stock_data.ev_to_cfo_ratio_effective != None and stock_data.ev_to_cfo_ratio_effective > 0 and stock_data.effective_peg_ratio != None and stock_data.effective_peg_ratio > 0 and stock_data.price_to_book != None and stock_data.price_to_book > 0 and stock_data.debt_to_equity_effective_used != None and stock_data.debt_to_equity_effective_used > 0 and stock_data.total_current_ratio_effective != None and stock_data.total_current_ratio_effective > 0 and stock_data.evr_effective != None and stock_data.evr_effective > 0.0 and stock_data.calculated_roa != None and stock_data.calculated_roa > 0 and stock_data.altman_z_score_factor != None and stock_data.altman_z_score_factor > 0:
         stock_data.sss_value = float(stock_data.eff_dist_from_low_factor * ((stock_data.evr_effective * stock_data.pe_effective * stock_data.effective_ev_to_ebitda * stock_data.trailing_12months_price_to_sales * stock_data.price_to_book) / (stock_data.effective_profit_margin * stock_data.effective_current_ratio * stock_data.calculated_roa)) * ((stock_data.effective_peg_ratio * stock_data.ev_to_cfo_ratio_effective * stock_data.debt_to_equity_effective_used) / (stock_data.eqg_factor_effective * stock_data.rqg_factor_effective * stock_data.altman_z_score_factor)))  # The lower  the better
+        min_sss_value        = round(10**(-NUM_ROUND_DECIMALS), NUM_ROUND_DECIMALS)
+        stock_data.sss_value = max(stock_data.sss_value, min_sss_value)
     else:
         stock_data.sss_value = BAD_SSS
         set_skip_reason(stock_data)
@@ -1126,9 +1131,10 @@ def calculate_altman_z_score_factor(stock_data):
         stock_data.altman_z_score_factor += 0.6 * ((stock_data.market_cap                  if stock_data.market_cap                  != None else 0)/ stock_data.effective_total_liabilities)
 
     # https://www.accountingtools.com/articles/the-altman-z-score-formula.html
-    if    3 <= stock_data.altman_z_score_factor:          stock_data.altman_z_score_factor **= 0.5  # f(        x >= 3   ) = 1.71+...square root     growth
-    elif 1.81 <= stock_data.altman_z_score_factor < 3:    stock_data.altman_z_score_factor  /= 2    # f(1.81 <= x <  3   ) = 1.5 -...         linear decay
-    elif    0 <  stock_data.altman_z_score_factor < 1.81: stock_data.altman_z_score_factor  /= 4    # f(   0 <  x <  1.81) = 0.45-...stronger linear decay
+    if    3 <= stock_data.altman_z_score_factor:           stock_data.altman_z_score_factor **= 0.5  # f(        x >= 3   ) = 1.71+...square root     growth
+    elif 1.81 <= stock_data.altman_z_score_factor <  3:    stock_data.altman_z_score_factor  /= 2    # f(1.81 <= x <  3   ) = 1.5 -...         linear decay
+    elif    0 <  stock_data.altman_z_score_factor <  1.81: stock_data.altman_z_score_factor  /= 4    # f(   0 <  x <  1.81) = 0.45-...stronger linear decay
+    elif         stock_data.altman_z_score_factor <= 0:    stock_data.altman_z_score_factor   = NEGATIVE_ALTMAN_Z_FACTOR    # a very low value -> Much less attractive
 
 
 def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list, sectors_filter_out, countries_list, countries_filter_out, build_csv_db, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, db_filename):
@@ -1274,7 +1280,7 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
             stock_data.quarterized_retained_earnings = calculate_weighted_stock_data_on_dict(balance_sheets_quarterly, 'balance_sheets_yearly',    'Retained Earnings', NO_WEIGHTS,             stock_data, True, True)
 
         if stock_data.short_name is     None:                       stock_data.short_name = 'None'
-        if stock_data.short_name != None and not research_mode: print('              {:35}:'.format(stock_data.short_name))
+        # if stock_data.short_name != None and not research_mode: print('              {:35}:'.format(stock_data.short_name))
 
         if build_csv_db and 'quoteType' in info: stock_data.quote_type = info['quoteType']
         if not check_quote_type(stock_data, research_mode):     return_value = False
@@ -1315,8 +1321,8 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
 
                         for key in earnings_yearly['Revenue']:
                             if float(earnings_yearly['Revenue'][key]) > 0:
-                                earnings_to_revenues_list.append((float(earnings_yearly['Earnings'][key])/float(earnings_yearly['Revenue'][key]))*PROFIT_MARGIN_WEIGHTS[weight_index])
-                                weights_sum  += PROFIT_MARGIN_WEIGHTS[weight_index]
+                                earnings_to_revenues_list.append((float(earnings_yearly['Earnings'][key])/float(earnings_yearly['Revenue'][key]))*PROFIT_MARGIN_YEARLY_WEIGHTS[weight_index])
+                                weights_sum  += PROFIT_MARGIN_YEARLY_WEIGHTS[weight_index]
                                 used_weights += 1
                                 current_ratio = float(earnings_yearly['Earnings'][key])/float(earnings_yearly['Revenue'][key])
                                 if used_weights > 1:
@@ -1358,8 +1364,8 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
 
                         for key in earnings_quarterly['Revenue']:
                             if float(earnings_quarterly['Revenue'][key]) > 0:
-                                earnings_to_revenues_list.append((float(earnings_quarterly['Earnings'][key])/float(earnings_quarterly['Revenue'][key]))*PROFIT_MARGIN_WEIGHTS[weight_index])
-                                weights_sum  += PROFIT_MARGIN_WEIGHTS[weight_index]
+                                earnings_to_revenues_list.append((float(earnings_quarterly['Earnings'][key])/float(earnings_quarterly['Revenue'][key]))*PROFIT_MARGIN_QUARTERLY_WEIGHTS[weight_index])
+                                weights_sum  += PROFIT_MARGIN_QUARTERLY_WEIGHTS[weight_index]
                                 used_weights += 1
                                 current_ratio = float(earnings_quarterly['Earnings'][key])/float(earnings_quarterly['Revenue'][key])
                                 if used_weights > 1:
@@ -1978,8 +1984,12 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
 
             round_and_avoid_none_values(stock_data)
 
-        if return_value and not research_mode: print('                                          sector: {:10},     country: {:10},    sss_value: {:10},     annualized_revenue: {:10},     annualized_earnings: {:10},     annualized_retained_earnings: {:10},     quarterized_revenue: {:10},     quarterized_earnings: {:10},     quarterized_retained_earnings: {:10},     effective_earnings: {:10},     effective_retained_earnings: {:10},     effective_revenue: {:10},     annualized_total_revenue: {:10},     annualized_net_income: {:10},     quarterized_total_revenue: {:10},     quarterized_net_income: {:10},     effective_net_income: {:10},     effective_total_revenue: {:10},     enterprise_value_to_revenue: {:10},     evr_effective: {:10},     trailing_price_to_earnings: {:10},     forward_price_to_earnings: {:10},     effective_price_to_earnings: {:10},     trailing_12months_price_to_sales: {:10},     pe_effective: {:10},     effective_ev_to_ebitda: {:10},     profit_margin: {:10},     annualized_profit_margin: {:10},       annualized_profit_margin_boost: {:10},     quarterized_profit_margin: {:10},     quarterized_profit_margin_boost: {:10},     effective_profit_margin_boost: {:10}, held_percent_institutions: {:10},     forward_eps: {:10},     trailing_eps: {:10},     previous_close: {:10},     trailing_eps_percentage: {:10},     price_to_book: {:10},     shares_outstanding: {:10},     net_income_to_common_shareholders: {:10},     nitcsh_to_shares_outstanding: {:10},     employees: {:10},     enterprise_value: {:10},     market_cap: {:10},     nitcsh_to_num_employees: {:10},     eqg_factor_effective: {:10},     rqg_factor_effective: {:10},     price_to_earnings_to_growth_ratio: {:10},     effective_peg_ratio: {:10},     annualized_cash_flow_from_operating_activities: {:10},     quarterized_cash_flow_from_operating_activities: {:10},     annualized_ev_to_cfo_ratio: {:10},     quarterized_ev_to_cfo_ratio: {:10},     ev_to_cfo_ratio_effective: {:10},     annualized_debt_to_equity: {:10},     quarterized_debt_to_equity: {:10},     debt_to_equity_effective: {:10},     debt_to_equity_effective_used: {:10},     financial_currency: {:10},     summary_currency: {:10},     financial_currency_conversion_rate_mult_to_usd: {:10},     summary_currency_conversion_rate_mult_to_usd: {:10}, skip_reason: {}'.format(
-                                                                                                stock_data.sector, stock_data.country,stock_data.sss_value, stock_data.annualized_revenue, stock_data.annualized_earnings, stock_data.annualized_retained_earnings, stock_data.quarterized_revenue, stock_data.quarterized_earnings, stock_data.quarterized_retained_earnings, stock_data.effective_earnings, stock_data.effective_retained_earnings, stock_data.effective_revenue, stock_data.annualized_total_revenue, stock_data.annualized_net_income, stock_data.quarterized_total_revenue, stock_data.quarterized_net_income, stock_data.effective_net_income, stock_data.effective_total_revenue, stock_data.enterprise_value_to_revenue, stock_data.evr_effective, stock_data.trailing_price_to_earnings, stock_data.forward_price_to_earnings, stock_data.effective_price_to_earnings, stock_data.trailing_12months_price_to_sales, stock_data.pe_effective, stock_data.effective_ev_to_ebitda, stock_data.profit_margin, stock_data.annualized_profit_margin,   stock_data.annualized_profit_margin_boost, stock_data.quarterized_profit_margin, stock_data.quarterized_profit_margin_boost, stock_data.effective_profit_margin,   stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.previous_close, stock_data.trailing_eps_percentage, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.employees, stock_data.enterprise_value, stock_data.market_cap, stock_data.nitcsh_to_num_employees, stock_data.eqg_factor_effective, stock_data.rqg_factor_effective, stock_data.price_to_earnings_to_growth_ratio, stock_data.effective_peg_ratio, stock_data.annualized_cash_flow_from_operating_activities, stock_data.quarterized_cash_flow_from_operating_activities, stock_data.annualized_ev_to_cfo_ratio, stock_data.quarterized_ev_to_cfo_ratio, stock_data.ev_to_cfo_ratio_effective, stock_data.annualized_debt_to_equity, stock_data.quarterized_debt_to_equity, stock_data.debt_to_equity_effective, stock_data.debt_to_equity_effective_used, stock_data.financial_currency, stock_data.summary_currency, stock_data.financial_currency_conversion_rate_mult_to_usd, stock_data.summary_currency_conversion_rate_mult_to_usd, stock_data.skip_reason))
+        if not research_mode:
+            if return_value:
+                print('    short_name: {:20},     sector: {:10},     country: {:10},    sss_value: {:10},     annualized_revenue: {:10},     annualized_earnings: {:10},     annualized_retained_earnings: {:10},     quarterized_revenue: {:10},     quarterized_earnings: {:10},     quarterized_retained_earnings: {:10},     effective_earnings: {:10},     effective_retained_earnings: {:10},     effective_revenue: {:10},     annualized_total_revenue: {:10},     annualized_net_income: {:10},     quarterized_total_revenue: {:10},     quarterized_net_income: {:10},     effective_net_income: {:10},     effective_total_revenue: {:10},     enterprise_value_to_revenue: {:10},     evr_effective: {:10},     trailing_price_to_earnings: {:10},     forward_price_to_earnings: {:10},     effective_price_to_earnings: {:10},     trailing_12months_price_to_sales: {:10},     pe_effective: {:10},     effective_ev_to_ebitda: {:10},     profit_margin: {:10},     annualized_profit_margin: {:10},       annualized_profit_margin_boost: {:10},     quarterized_profit_margin: {:10},     quarterized_profit_margin_boost: {:10},     effective_profit_margin_boost: {:10}, held_percent_institutions: {:10},     forward_eps: {:10},     trailing_eps: {:10},     previous_close: {:10},     trailing_eps_percentage: {:10},     price_to_book: {:10},     shares_outstanding: {:10},     net_income_to_common_shareholders: {:10},     nitcsh_to_shares_outstanding: {:10},     employees: {:10},     enterprise_value: {:10},     market_cap: {:10},     nitcsh_to_num_employees: {:10},     eqg_factor_effective: {:10},     rqg_factor_effective: {:10},     price_to_earnings_to_growth_ratio: {:10},     effective_peg_ratio: {:10},     annualized_cash_flow_from_operating_activities: {:10},     quarterized_cash_flow_from_operating_activities: {:10},     annualized_ev_to_cfo_ratio: {:10},     quarterized_ev_to_cfo_ratio: {:10},     ev_to_cfo_ratio_effective: {:10},     annualized_debt_to_equity: {:10},     quarterized_debt_to_equity: {:10},     debt_to_equity_effective: {:10},     debt_to_equity_effective_used: {:10},     financial_currency: {:10},     summary_currency: {:10},     financial_currency_conversion_rate_mult_to_usd: {:10},     summary_currency_conversion_rate_mult_to_usd: {:10}, skip_reason: {}'.format(
+                           stock_data.short_name, stock_data.sector, stock_data.country,stock_data.sss_value, stock_data.annualized_revenue, stock_data.annualized_earnings, stock_data.annualized_retained_earnings, stock_data.quarterized_revenue, stock_data.quarterized_earnings, stock_data.quarterized_retained_earnings, stock_data.effective_earnings, stock_data.effective_retained_earnings, stock_data.effective_revenue, stock_data.annualized_total_revenue, stock_data.annualized_net_income, stock_data.quarterized_total_revenue, stock_data.quarterized_net_income, stock_data.effective_net_income, stock_data.effective_total_revenue, stock_data.enterprise_value_to_revenue, stock_data.evr_effective, stock_data.trailing_price_to_earnings, stock_data.forward_price_to_earnings, stock_data.effective_price_to_earnings, stock_data.trailing_12months_price_to_sales, stock_data.pe_effective, stock_data.effective_ev_to_ebitda, stock_data.profit_margin, stock_data.annualized_profit_margin,   stock_data.annualized_profit_margin_boost, stock_data.quarterized_profit_margin, stock_data.quarterized_profit_margin_boost, stock_data.effective_profit_margin,   stock_data.held_percent_institutions, stock_data.forward_eps, stock_data.trailing_eps, stock_data.previous_close, stock_data.trailing_eps_percentage, stock_data.price_to_book, stock_data.shares_outstanding, stock_data.net_income_to_common_shareholders, stock_data.nitcsh_to_shares_outstanding, stock_data.employees, stock_data.enterprise_value, stock_data.market_cap, stock_data.nitcsh_to_num_employees, stock_data.eqg_factor_effective, stock_data.rqg_factor_effective, stock_data.price_to_earnings_to_growth_ratio, stock_data.effective_peg_ratio, stock_data.annualized_cash_flow_from_operating_activities, stock_data.quarterized_cash_flow_from_operating_activities, stock_data.annualized_ev_to_cfo_ratio, stock_data.quarterized_ev_to_cfo_ratio, stock_data.ev_to_cfo_ratio_effective, stock_data.annualized_debt_to_equity, stock_data.quarterized_debt_to_equity, stock_data.debt_to_equity_effective, stock_data.debt_to_equity_effective_used, stock_data.financial_currency, stock_data.summary_currency, stock_data.financial_currency_conversion_rate_mult_to_usd, stock_data.summary_currency_conversion_rate_mult_to_usd, stock_data.skip_reason))
+            else:
+                print('Skipped - skip_reason: {}'.format(stock_data.skip_reason))
         if not return_value and (not research_mode or VERBOSE_LOGS): print('                            ' + stock_data.skip_reason)
 
         return return_value
@@ -2032,11 +2042,16 @@ def get_stock_data_normalized_from_db_row(row, symbol=None):
 def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thread_id, build_csv_db_only, tase_mode, sectors_list, sectors_filter_out, countries_list, countries_filter_out, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, diff_rows, db_filename):
     iteration = 0
     if build_csv_db:
+        elapsed_time_start_sec = time.time()
         for symb in symbols:
             iteration += 1
             sleep_seconds = round(random.uniform(float(relaxed_access)/2.0, float(relaxed_access)*2), NUM_ROUND_DECIMALS)
             time.sleep(sleep_seconds)
-            if not research_mode: print('[Building DB: thread_id {:2} Sleeping for {:10} sec] Checking {:9} ({:4}/{:4}/{:4} [Diff: {:4}]):'.format(thread_id, sleep_seconds, symb, len(rows), iteration, len(symbols), len(diff_rows)))
+            elapsed_time_sample_sec = time.time()
+            elapsed_time_sec        = round(elapsed_time_sample_sec - elapsed_time_start_sec, int(NUM_ROUND_DECIMALS/3))
+            average_sec_per_symbol  = round(elapsed_time_sec/iteration, int(NUM_ROUND_DECIMALS/3))
+            percentage_complete     = round(100*iteration/len(symbols), int(NUM_ROUND_DECIMALS/3))
+            if not research_mode: print('[Building DB: thread_id {:2} Sleeping for {:10} sec] Checking {:9} ({:4}/{:4}/{:4} ({:6}%) [Diff: {:4}], elapsed_time_sec: {} (average_sec_per_symbol: {:6}):'.format(thread_id, sleep_seconds, symb, len(rows), iteration, len(symbols), percentage_complete, len(diff_rows), elapsed_time_sec, average_sec_per_symbol), end='')
             if tase_mode:
                 symbol = yf.Ticker(symb)
             else:

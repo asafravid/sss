@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.0 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.1 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -32,7 +32,7 @@ import sss_diff
 
 DB_FILENAMES = ['sss_engine.csv', 'sss_engine_normalized.csv']  # 'db.csv' -> but faster with 9so hence use) sss_engine.csv
 
-# TODO: ASAFR: 1. read_csv in pandas, and then .describe() will provide mean, std and percentiles for all the columns (sss_engine.csv and/or db.csv)
+# TODO: ASAFR: 1. read_csv in pandas, and then .describe() and .quantiles() will provide mean, std and percentiles for all the columns (sss_engine.csv and/or db.csv)
 PDF_NUM_ENTRIES_IN_REPORT       = 35
 RESEARCH_MODE_MIN_ENTRIES_LIMIT = 7
 
