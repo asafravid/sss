@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.2 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.3 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -2053,7 +2053,7 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
             percentage_complete     = round(100*iteration/len(symbols), int(NUM_ROUND_DECIMALS/3))
             if not research_mode:
                 if sleep_seconds > 0: print('[Building DB: thread_id {:2} Sleeping for {:10} sec] Checking {:9} ({:4}/{:4}/{:4} ({:6}%) [Diff: {:4}], elapsed_time_sec: {} (average_sec_per_symbol: {:6}):'.format(thread_id, sleep_seconds, symb, len(rows), iteration, len(symbols), percentage_complete, len(diff_rows), elapsed_time_sec, average_sec_per_symbol), end='')
-                else:                 print('[Building DB] {:9} ({:04}/{:04}/{:04} [{:06}%], Diff: {:04}), time[sec]: {:5.0f} (avg [sec]: {:2.2f}) -> '.format(symb, len(rows), iteration, len(symbols), percentage_complete, len(diff_rows), elapsed_time_sec, average_sec_per_symbol), end='')
+                else:                 print('[Building DB] {:9} ({:04}/{:04}/{:04} [{:2.2f}%], Diff: {:04}), time[sec]: {:5.0f} (avg [sec]: {:2.2f}) -> '.format(symb, len(rows), iteration, len(symbols), percentage_complete, len(diff_rows), elapsed_time_sec, average_sec_per_symbol), end='')
             if tase_mode:
                 symbol = yf.Ticker(symb)
             else:
