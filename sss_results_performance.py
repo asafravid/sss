@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.1.35 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.5 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -29,9 +29,9 @@ import math
 import pandas as pd
 import sss
 
-END_DATE_STR         = '20210427'
+END_DATE_STR         = '20210720'
 RESULTS_LEN          = 35
-TASE_MODE            = 0
+TASE_MODE            = 1
 RESULTS_INPUT_FOLDER = "Results/Tase"
 YF_DEBUG_MODE        = False
 
@@ -39,7 +39,7 @@ results_input_paths = glob(RESULTS_INPUT_FOLDER+'/*/')
 
 
 # Read Results Input:
-def read_engine_results(path, results_filename, max_results, sss_value_name, optional_rename):
+def read_engine_results(path, results_filename, max_results, sss_value_names_list, optional_rename):
     engine_results_list = []
     effective_row_index = 0
     sss_value_index     = -1
@@ -48,28 +48,32 @@ def read_engine_results(path, results_filename, max_results, sss_value_name, opt
         if optional_rename is not None:
             os.rename(path+'/'+results_filename, path+'/'+optional_rename)
             results_filename = optional_rename
-        with open(path+'/'+results_filename, mode='r', newline='') as engine:
-            reader = csv.reader(engine, delimiter=',')
-            found_title_row = False
-            for row in reader:
-                if not found_title_row:
-                    if row[0] == 'Ticker' or row[0] == 'Symbol':
-                        found_title_row = True
-                        sss_value_index = row.index(sss_value_name)
-                    continue
-                else:
-                    if (sss_value_index >= 0 and float(row[sss_value_index]) > 0.0) or sss_value_index < 0:
-                        row_symbol = row[0]
-                        if 'TLV:' in row_symbol:
-                            row_symbol = row_symbol.replace('TLV:', '')
-                            row_symbol += '.TA'
+        filename_path = path+'/'+results_filename
+        if os.path.isfile(filename_path):
+            with open(filename_path, mode='r', newline='') as engine:
+                reader = csv.reader(engine, delimiter=',')
+                found_title_row = False
+                for row in reader:
+                    if not found_title_row:
+                        if row[0] == 'Ticker' or row[0] == 'Symbol':
+                            found_title_row = True
+                            sss_value_index = -1
+                            for sss_value_name in sss_value_names_list:
+                                if sss_value_name in row: sss_value_index = row.index(sss_value_name)
+                        continue
+                    else:
+                        if (sss_value_index >= 0 and float(row[sss_value_index]) > 0.0) or sss_value_index < 0:
+                            row_symbol = row[0]
+                            if 'TLV:' in row_symbol:
+                                row_symbol = row_symbol.replace('TLV:', '')
+                                row_symbol += '.TA'
 
-                        engine_results_list.append(row_symbol)
-                        effective_row_index += 1
-                        if effective_row_index >= max_results:
-                            break
+                            engine_results_list.append(row_symbol)
+                            effective_row_index += 1
+                            if effective_row_index >= max_results:
+                                break
     except Exception as e:
-        # print('Exception {} in [read_engine_results]: path {}, max_results {}, sss_value_name {}'.format(e, path, max_results, sss_value_name))
+        print('Exception {} in [read_engine_results]: path {}, max_results {}, sss_value_name {}'.format(e, path, max_results, sss_value_names_list))
         pass
     return engine_results_list
 
@@ -96,8 +100,8 @@ def find_start_date_value(symbol_to_check, start_date, pd_database_close_data):
 
 
 symbol_close_values_db = {}
-results_filenames_list = ['sss_engine.csv', 'results_sss.csv'] # 'rec_sss.csv',     'rec_sss_1.csv',     'rec_sss_2.csv',     'rec_sss_3.csv',     'rec_sss_4.csv',     'rec_sss_5.csv'    ]
-optional_rename_list   = [None,             None             ] # 'sss_results.csv', 'sss_results_1.csv', 'sss_results_2.csv', 'sss_results_3.csv', 'sss_results_4.csv', 'sss_results_5.csv']
+results_filenames_list = ['sss_engine.csv', 'sss_engine_normalized.csv', 'results_sss.csv', 'results_sss_normalized.csv', 'results_sss_aggregated.csv'] # 'rec_sss.csv',     'rec_sss_1.csv',     'rec_sss_2.csv',     'rec_sss_3.csv',     'rec_sss_4.csv',     'rec_sss_5.csv'    ]
+optional_rename_list   = [None,             None,                        None,              None,                         None             ] # 'sss_results.csv', 'sss_results_1.csv', 'sss_results_2.csv', 'sss_results_3.csv', 'sss_results_4.csv', 'sss_results_5.csv']
 pd_database_close      = None
 
 for results_input_path in results_input_paths:
@@ -124,7 +128,7 @@ for results_input_path in results_input_paths:
         pd_database_close = data_start_end_indices_list
 
     for index, results_filename in enumerate(results_filenames_list):
-        results_list = read_engine_results(results_input_path, results_filename, RESULTS_LEN, 'sss_value', optional_rename_list[index])
+        results_list = read_engine_results(results_input_path, results_filename, RESULTS_LEN, ['sss_value','value'], optional_rename_list[index])
         results_lists.append(results_list)
 
         existing_symbols_list = []
@@ -142,7 +146,7 @@ for results_input_path in results_input_paths:
 
             if len(new_symbols_list):
                 length_was_1 = False
-                if len(new_symbols_list) == 1:  # take 1 from the existing, to get a proper-clumned dataframe
+                if len(new_symbols_list) == 1:  # take 1 from the existing, to get a proper-columned dataframe
                     new_symbols_list.append(existing_symbols_list[0])
                     length_was_1 = True
 

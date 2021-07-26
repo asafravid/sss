@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.3 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.4 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -21,9 +21,7 @@
 #############################################################################
 
 
-# TODO: ASAFR: -1. (Highest Priority:) Update yfinance and commit the pull requests from internaly-used/improved yfinance
-#               0. Auto-Update Nasdaq (NSR) Indices as done with TASE
-#               1. Check and multi dim and investigate eqg_min and rqg_min: Check why yfinance always gives QRG values of 0? Unusable if that is always so
+# TODO: ASAFR:  0. Auto-Update Nasdaq (NSR) Indices as done with TASE
 #               2. Implement:
 #               2.1. https://en.wikipedia.org/wiki/Piotroski_F-score
 #               2.1.1. ROA: https://www.investopedia.com/ask/answers/031215/what-formula-calculating-return-assets-roa.asp
