@@ -4,7 +4,7 @@
    - https://pypi.org/project/yfinance/
    - https://pypi.org/project/fpdf/
    - https://pypi.org/project/pandas/
- - Optional Python Libraries (Internal independent Forex Tables are maintained):
+ - Reccomended Python Libraries (Backup Internal independent Forex Tables are partially maintained):
    - https://pypi.org/project/forex-python/
    - https://pypi.org/project/CurrencyConverter/
    - https://pypi.org/project/py-currency-converter/
@@ -22,27 +22,25 @@ http://bit.ly/SssCoreEquation
 https://bit.ly/MultiDimensionalScan
 
 # Setup
-- Install `Python 3.8` or higher from https://www.python.org/downloads/
-- Install `Pycharm Community Edition` from https://www.jetbrains.com/pycharm/download/
+- Install `Python 3.7` or higher from https://www.python.org/downloads/
+- (Reccomended but Optional) Install `Pycharm Community Edition` from https://www.jetbrains.com/pycharm/download/
 - Download the `SSS` source code as a Zip file from this page (https://github.com/asafravid/sss/archive/master.zip) or clone/fork the repository directly
 - Open Project from folder (to which you unzipped the `sss` source code)
 - No further steps required apart from `pip[3]` installing relevant libraries:
-  - `cd <[path to]Python 3.8>`
   - Mandatory
     - `pip[3] install pandas`
     - `pip[3] install yfinance`
     - `pip[3] install fpdf`
     - `pip[3] install numpy`
-  - Optional
-    - `pip[3] install forex_python` and/or `pip[3] install forex-ython`
+    - `pip[3] install forex_python` and/or `pip[3] install forex-python`
     - `pip[3] install CurrencyConverter`
     - `pip[3] install PyCurrency-Converter`
     - `pip[3] install currency.converter`
   
 # Run Step-By-Step Instructions
-- 1: Set the required scanning mode (`custom`/`tase`/`nsr`/`all`) in `sss_run.py` and run `sss_run.py`
-- 2: A Results folder shall be created under `Results` Folder
-- 3: Feed the Results path into the `research_mode` (Multi-Dimensional Scan). A `PDF` and `sss_results.csv` files shall be created in the same folder
+- 1: Set the required scanning mode(s) (`custom`/`tase`/`nsr`/`all`) in `sss_run.py` and run `sss_run.py`
+- 2: A Results folder shall be created under `Results/<mode>/` Folder
+- 3: Feed the Results path into the `research_mode` (Multi-Dimensional Scan). A `PDF` and `sss_results_*.csv` files shall be created in the same folder
 
 # Indices Maintenance
 - Download `TASE` latest components via https://info.tase.co.il/eng/MarketData/Stocks/MarketData/Pages/MarketData.aspx into `Indices/Data_TASE.csv` -> This operation is done automatically upon each scan (with `research_mode = False`) via `sss_indices.py`

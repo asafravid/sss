@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.1 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.6 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -42,6 +42,7 @@ SCAN_MODE_ALL  = 2  # All Nasdaq Stocks
 
 TITLES = ["_תוצאות_סריקה_עבור_בורסת_תל_אביב", "_Scan_Results_for_Nasdaq100_SNP500_Russel1000", "_Scan_Results_for_All_Nasdaq_Stocks"]
 
+# TODO: ASAFR: Add dimension to multi-dim-scan: held_percent_insiders (analyze 1st)
 
 # automatic_folder_selection()
 #
