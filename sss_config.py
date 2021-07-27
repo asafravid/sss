@@ -39,8 +39,8 @@ automatic_results_folder_selection = False
 # Upon 1st ever run: reference must be set to None
 # After 1st ever Run: Recommended to use reference (filter and damper)
 # The research mode shall run on new_run as input (new_run >= reference_run) where > means newer
-reference_run_custom = 'Results/All/20210719-065858_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes2550' # 'Results/All/20210606-011608_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes3195'
-reference_run_tase   = None  # 'Results/Tase/20210723-074604_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes296'
+reference_run_custom = None # 'Results/All/20210606-011608_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes3195'
+reference_run_tase   = None # 'Results/Tase/20210728-001631_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes295'
 reference_run_nsr    = 'Results/Nsr/20210703-141918_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes825'
 reference_run_all    = 'Results/All/20210704-014737_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes2752'
 
