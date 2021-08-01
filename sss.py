@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.6 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.8 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -38,13 +38,13 @@
 #               6. Which are the most effective parameters? Correlate the sorting of sss_value to the results and each of the sorted-by-parameter list.
 #               7. Important: https://www.oldschoolvalue.com/investing-strategy/walter-schloss-investing-strategy-producing-towering-returns/#:~:text=Walter%20Schloss%20ran%20with%20the,to%20perform%20complex%20valuations%20either.
 #                  7.1.  3 years low, 5 years low
-#                  7.2.  F-Score, M-Score, Z-Score
+#                  7.2.  F-Score, M-Score
 #                  7.3.  Multi-Dim scan over the distance from low, and over the Schloff Score - define a Walter-Schloss score
 #                  7.4.  Remove the square root from DtoE ?
 #                  7.5.  MktCapM is >= US$ 300 million (basis year 2000) adjusted yearly
 #                  7.6.  Consider only stocks that are listed at least 10 years
 #                  7.7.  Price 1 Day ago within 15% of the 52 week low
-#                  7.8.  Take the top 1000 stocks with highest Number of Insiders owning shares#            11. Calculate share_price/52weekLow 0.1
+#                  7.8.  Calculate share_price/52weekLow 0.1
 #                  7.9.  Take the top 500 stocks with highest Current Dividend Yield %#            12. https://pyportfolioopt.readthedocs.io/en/latest/UserGuide.html -> Use
 #                  7.10. Take the top 250 stocks with lowest Latest Filing P/E ratio#            13. Calculate the ROE - Return on equity
 #                  7.11. Take the top 125 stocks with lowest Latest Filing P/B ratio#            14. Operating Cash Flow Growth - interesting: https://github.com/JerBouma/FundamentalAnalysis
@@ -105,7 +105,8 @@ RQG_DAMPER                                   = 0.25
 TRAILING_EPS_PERCENTAGE_DAMP_FACTOR          = 0.01   # When the trailing_eps_percentage is very low (units are ratio here), this damper shall limit the affect to x100 not more)
 PROFIT_MARGIN_DAMPER                         = 0.01   # When the profit_margin                   is very low (units are ratio here), this damper shall limit the affect to x100 not more)
 RATIO_DAMPER                                 = 0.01   # When the total/current_other_other ratio is very low (units are ratio here), this damper shall limit the affect to x100 not more)
-ROA_DAMPER                                   = 0.02   # When the ROA is very low (units are ratio here), this damper shall limit the affect to x50 not more)
+ROA_DAMPER                                   = 0.1   # When the ROA is very low (units are ratio here), this damper shall limit the affect to x50 not more)
+ROA_NEG_FACTOR                               = 0.000001
 REFERENCE_DB_MAX_VALUE_DIFF_FACTOR_THRESHOLD = 0.9   # if there is a parameter difference from reference db, in which the difference of values is higher than 0.75*abs(max_value) then something went wrong with the fetch of values from yfinance. Compensate smartly from reference database
 QUARTERLY_YEARLY_MISSING_FACTOR              = 0.25  # if either yearly or quarterly values are missing - compensate by other with bad factor (less information means less attractive)
 NEGATIVE_ALTMAN_Z_FACTOR                     = 0.00001
@@ -1791,6 +1792,10 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
 
             if stock_data.effective_total_assets != None and stock_data.effective_total_assets > 0 and stock_data.effective_net_income != None:
                 stock_data.calculated_roa = ROA_DAMPER + stock_data.effective_net_income/stock_data.effective_total_assets
+            if stock_data.calculated_roa != None and 0 < stock_data.calculated_roa < ROA_DAMPER:
+                stock_data.calculated_roa /= 1000
+            elif stock_data.calculated_roa != None and stock_data.calculated_roa <= 0:
+                stock_data.calculated_roa = ROA_NEG_FACTOR
 
             if stock_data.annualized_cash_flow_from_operating_activities is None and stock_data.quarterized_cash_flow_from_operating_activities is None:
                 if stock_data.effective_earnings != None:
@@ -2056,8 +2061,8 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
             average_sec_per_symbol  = round(elapsed_time_sec/iteration, int(NUM_ROUND_DECIMALS/3))
             percentage_complete     = round(100*iteration/len(symbols), int(NUM_ROUND_DECIMALS/3))
             if not research_mode:
-                if sleep_seconds > 0: print('[Building DB: thread_id {:2} Sleeping for {:10} sec] Checking {:9} ({:4}/{:4}/{:4} ({:6}%) [Diff: {:4}], elapsed_time_sec: {} (average_sec_per_symbol: {:6}):'.format(thread_id, sleep_seconds, symb, len(rows), iteration, len(symbols), percentage_complete, len(diff_rows), elapsed_time_sec, average_sec_per_symbol), end='')
-                else:                 print('[Building DB] {:9} ({:04}/{:04}/{:04} [{:2.2f}%], Diff: {:04}), time[sec]: {:5.0f}/{:5.0f} (avg [sec]: {:2.2f}) -> '.format(symb, len(rows), iteration, len(symbols), percentage_complete, len(diff_rows), elapsed_time_sec, average_sec_per_symbol*(len(symbols)-iteration), average_sec_per_symbol), end='')
+                if sleep_seconds > 0: print('[DB]: thread_id {:2} Sleeping for {:10} sec] Checking {:9} ({:4}/{:4}/{:4} ({:6}%) [Diff: {:4}], elapsed_time_sec: {} (average_sec_per_symbol: {:6}):'.format(thread_id, sleep_seconds, symb, len(rows), iteration, len(symbols), percentage_complete, len(diff_rows), elapsed_time_sec, average_sec_per_symbol), end='')
+                else:                 print('[DB] {:9} ({:04}/{:04}/{:04} [{:2.2f}%], Diff: {:04}), time/left/avg [sec]: {:5.0f}/{:5.0f}/{:2.2f} -> '.format(symb, len(rows), iteration, len(symbols), percentage_complete, len(diff_rows), elapsed_time_sec, average_sec_per_symbol*(len(symbols)-iteration), average_sec_per_symbol), end='')
             if tase_mode:
                 symbol = yf.Ticker(symb)
             else:
