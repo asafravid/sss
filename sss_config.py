@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.2 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.10 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -40,12 +40,12 @@ automatic_results_folder_selection = False
 # After 1st ever Run: Recommended to use reference (filter and damper)
 # The research mode shall run on new_run as input (new_run >= reference_run) where > means newer
 reference_run_custom = None # 'Results/All/20210606-011608_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes3195'
-reference_run_tase   = None # 'Results/Tase/20210728-001631_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes295'
-reference_run_nsr    = 'Results/Nsr/20210703-141918_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes825'
+reference_run_tase   = 'Results/Tase/20210730-014733_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes322'
+reference_run_nsr    = 'Results/Nsr/20210731-233407_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes885'
 reference_run_all    = 'Results/All/20210704-014737_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes2752'
 
-new_run_tase   = 'Results/Tase/20210723-074604_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes296'
-new_run_nsr    = 'Results/Nsr/20210717-205110_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes702'
+new_run_tase   = 'Results/Tase/20210730-014733_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes322'
+new_run_nsr    = 'Results/Nsr/20210731-233407_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes885'
 new_run_all    = 'Results/All/20210715-051935_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes2553'
 new_run_custom = 'Results/Custom/20210719-065911_Bdb_nRes236_Custom'
 
