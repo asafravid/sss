@@ -22,7 +22,7 @@ http://bit.ly/SssCoreEquation
 https://bit.ly/MultiDimensionalScan
 
 # Setup
-- Install `Python 3.7` or higher from https://www.python.org/downloads/
+- Install `Python 3.6` or higher from https://www.python.org/downloads/
 - (Reccomended but Optional) Install `Pycharm Community Edition` from https://www.jetbrains.com/pycharm/download/
 - Download the `SSS` source code as a Zip file from this page (https://github.com/asafravid/sss/archive/master.zip) or clone/fork the repository directly
 - Open Project from folder (to which you unzipped the `sss` source code)
