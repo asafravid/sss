@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.10 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.16 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -23,6 +23,7 @@
 
 # TODO: ASAFR:  0. Auto-Update Nasdaq (NSR) Indices as done with TASE
 #               0.1. [DB] GOTU      (2868/2949/7383 [39.94%], Diff: 0000), time/left/avg [sec]: 22589/33964/7.66 ->               Exception in GOTU info: unsupported operand type(s) for /: 'NoneType' and 'float'
+#               0.2. https://www.analyticsvidhya.com/blog/2020/07/read-and-update-google-spreadsheets-with-python/
 #               1. Implement: Graceful (higher SSS, not max) handling of calculated_roa <= 0
 #               1.1. https://en.wikipedia.org/wiki/Piotroski_F-score
 #               1.1.1. ROA: https://www.investopedia.com/ask/answers/031215/what-formula-calculating-return-assets-roa.asp
@@ -1571,7 +1572,7 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
 
             if 'heldPercentInsiders' in info:                                                             stock_data.held_percent_insiders     = info['heldPercentInsiders']
             else:                                                                                         stock_data.held_percent_insiders     = PERCENT_HELD_INSIDERS_UNKNOWN
-            if stock_data.held_percent_insiders     is None or stock_data.held_percent_insiders == 0:     stock_data.held_percent_institutions = PERCENT_HELD_INSIDERS_UNKNOWN
+            if stock_data.held_percent_insiders     is None or stock_data.held_percent_insiders == 0:     stock_data.held_percent_insiders     = PERCENT_HELD_INSIDERS_UNKNOWN
 
             if 'enterpriseToRevenue' in info:
                 stock_data.enterprise_value_to_revenue = info['enterpriseToRevenue']
@@ -2162,7 +2163,7 @@ def download_ftp_files(filenames_list, ftp_path):
 
 # reference_run : Used for identifying anomalies in which some symbol information is completely different from last run. It can be different but only in new quartely reports
 #                 It is sometimes observed that stocks information is wrongly fetched. Is such cases, the last run's reference point shall be used, with a forgetting factor
-def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, countries_filter_out,build_csv_db_only, build_csv_db, csv_db_path, db_filename, read_united_states_input_symbols, tase_mode, num_threads, market_cap_included, research_mode, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, generate_result_folders=1, appearance_counter_dict_sss={}, appearance_counter_min=25, appearance_counter_max=35, custom_portfolio=[]):
+def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, countries_filter_out,build_csv_db_only, build_csv_db, csv_db_path, db_filename, read_united_states_input_symbols, tase_mode, num_threads, market_cap_included, research_mode, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, generate_result_folders=1, appearance_counter_dict_sss={}, appearance_counter_min=25, appearance_counter_max=35, custom_portfolio=[], num_results_list=[], num_results_list_index=0):
     currency_conversion_tool = currency_conversion_tool_alternative = None
 
     # https://en.wikipedia.org/wiki/ISO_4217
@@ -2635,4 +2636,5 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
     if generate_result_folders:
         sss_post_processing.process_engine_csv(date_and_time)
 
+    if num_results_list != None and num_results_list_index < len(num_results_list): num_results_list[num_results_list_index] = len(compact_rows)
     return len(compact_rows)
