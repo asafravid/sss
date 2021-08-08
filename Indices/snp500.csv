@@ -26,7 +26,6 @@ ALGN,Align Technology
 ALK,Alaska Air Group
 ALL,Allstate Corp
 ALLE,Allegion Plc
-ALXN,Alexion Pharm Inc
 AMAT,Applied Materials
 AMCR,Amcor Plc
 AMD,Adv Micro Devices
@@ -269,7 +268,6 @@ KO,Coca-Cola Company
 KR,Kroger Company
 KSU,Kansas City Southern
 L,Loews Corp
-LB,L Brands Inc
 LDOS,Leidos Holdings Inc
 LEG,Leggett & Platt Inc
 LEN,Lennar Corp
@@ -313,6 +311,7 @@ MOS,Mosaic Company
 MPC,Marathon Petroleum Corp
 MPWR,Monolithic Power Sys
 MRK,Merck & Company
+MRNA,Moderna Inc
 MRO,Marathon Oil Corp
 MS,Morgan Stanley
 MSCI,MSCI Inc
@@ -347,7 +346,7 @@ NWSA,News Cp Cl A
 NXPI,Nxp Semiconductors
 O,Realty Income Corp
 ODFL,Old Dominion Freight Line Inc
-OGN,Organon & CO [Ogn/I]
+OGN,Organon & CO
 OKE,Oneok Inc
 OMC,Omnicom Group Inc
 ORCL,Oracle Corp
@@ -417,7 +416,7 @@ SNPS,Synopsys Inc
 SO,Southern Company
 SPG,Simon Property Group
 SPGI,S&P Global Inc
-SRE,Sempra Energy
+SRE,Sempra
 STE,Steris Corp
 STT,State Street Corp
 STX,Seagate Technology Hldgs Plc

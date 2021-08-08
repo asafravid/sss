@@ -48,7 +48,6 @@ ALLE,Allegion Plc
 ALLY,Ally Financial
 ALNY,Alnylam Pharmaceuticals
 ALSN,Allison Transmission Holdings
-ALXN,Alexion Pharm Inc
 AM,Antero Midstream Corp
 AMAT,Applied Materials
 AMCR,Amcor Plc
@@ -131,7 +130,6 @@ BMY,Bristol-Myers Squibb Company
 BOH,Bank of Hawaii Corp
 BOKF,Bok Financial Corp
 BPOP,Popular Inc
-BPYU,Brookfield Property REIT Inc
 BR,Broadridge Financial Solutions Llc
 BRK.B,Berkshire Hathaway Cl B
 BRKR,Bruker Corp
@@ -204,7 +202,7 @@ CMS,Cms Energy Corp
 CNA,Cna Financial Corp
 CNC,Centene Corp
 CNP,Centerpoint Energy Inc
-CNXC,Concentrix Corporation
+CNXC,Concentrix Corp
 COF,Capital One Financial Corp
 COG,Cabot Oil & Gas Corp
 COHR,Coherent Inc
@@ -286,6 +284,7 @@ DRVN,Driven Brands Holdings Inc
 DSEY,Diversey Holdings Ltd
 DT,Dynatrace Inc
 DTE,Dte Energy Company
+DTM,Dt Midstream Inc
 DUK,Duke Energy Corp
 DV,Doubleverify Holdings Inc
 DVA,Davita Healthcare Partners Inc
@@ -519,7 +518,6 @@ L,Loews Corp
 LAD,Lithia Motors
 LAMR,Lamar Advertis A
 LAZ,Lazard Ltd
-LB,L Brands Inc
 LBRDA,Liberty Broadbd A
 LBRDK,Liberty Broadbd C
 LDOS,Leidos Holdings Inc
@@ -619,6 +617,7 @@ MTN,Vail Resorts
 MTZ,Mastec Inc
 MU,Micron Technology
 MXIM,Maxim Integrated
+NABL,N-Able Inc
 NATI,Natl Instruments Cor
 NBIX,Neurocrine Bioscienc
 NCLH,Norwegian Cruise Ord
@@ -670,7 +669,7 @@ O,Realty Income Corp
 OC,Owens Corning Inc
 ODFL,Old Dominion Freight Line Inc
 OGE,Oge Energy Corp
-OGN,Organon & CO [Ogn/I]
+OGN,Organon & CO
 OHI,Omega Healthcare Investors
 OKE,Oneok Inc
 OKTA,Okta Inc Cl A
@@ -736,12 +735,11 @@ PPC,Pilgrim's Pride
 PPD,Ppd Inc
 PPG,PPG Industries
 PPL,PPL Corp
-PRAH,Pra Health
 PRGO,Perrigo Company
 PRI,Primerica Inc
 PRU,Prudential Financial Inc
 PSA,Public Storage
-PSFE,Paysafe Limited
+PSFE,Paysafe Ltd
 PSTG,Pure Storage Inc
 PSX,Phillips 66
 PTC,Ptc Inc
@@ -840,14 +838,14 @@ SPR,Spirit Aerosystems Holdings
 SQ,Square
 SRC,Spirit Realty Capital Inc
 SRCL,Stericycle Inc
-SRE,Sempra Energy
+SRE,Sempra
 SRPT,Sarepta Therapeutics
 SSNC,SS&C Technologies
 ST,Sensata Technologies Holding N.V.
 STE,Steris Corp
 STL,Sterling Bancorp
 STLD,Steel Dynamics Inc
-STNE,Stoneco Ltd Class A Common Share
+STNE,Stoneco Ltd Cl A
 STOR,Store Capital Corp
 STT,State Street Corp
 STWD,Starwood Property Trust
@@ -938,6 +936,7 @@ VEEV,Veeva Systems Inc
 VER,Vereit Inc
 VFC,V.F. Corp
 VIAC,Viacom CBS Cl B
+VIACA,Viacom CBS Cl A
 VICI,Vici Properties Inc
 VIRT,Virtu Financial Cm A
 VLO,Valero Energy Corp
@@ -982,10 +981,8 @@ WMB,Williams Companies
 WMS,Advanced Drainage Systems Inc
 WMT,Wal-Mart Stores
 WOOF,Petco Health and Wellness Company Cl A
-WORK,Slack Technologies Inc
 WPC,W.P. Carey & Co. Llc
 WRB,W.R. Berkley Corp
-WRI,Weingarten Realty Investors
 WRK,Westrock Company
 WSM,Williams-Sonoma
 WSO,Watsco Inc
@@ -999,3 +996,6 @@ WWE,World Wrestling Entertainment
 WY,Weyerhaeuser Company
 WYNN,Wynn Resorts Ltd
 X,United States Steel Corp
+XEC,Cimarex Energy Company
+XEL,XCEL Energy Inc
+XLNX,Xilinx Inc
