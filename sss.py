@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.16 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.17 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -2089,9 +2089,12 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
                             try:
                                 if g_header_row[index] in reference_db_title_row:
                                     column_index_in_reference_db = reference_db_title_row.index(g_header_row[index])
-                                    min_val = min(float(row_to_append[index]), float(reference_db[symbol_index_in_reference_db][column_index_in_reference_db]))
-                                    max_val = max(float(row_to_append[index]), float(reference_db[symbol_index_in_reference_db][column_index_in_reference_db]))
-                                    diff    = abs(max_val-min_val)
+                                    if len(reference_db[symbol_index_in_reference_db][column_index_in_reference_db]):
+                                        min_val = min(float(row_to_append[index]), float(reference_db[symbol_index_in_reference_db][column_index_in_reference_db]))
+                                        max_val = max(float(row_to_append[index]), float(reference_db[symbol_index_in_reference_db][column_index_in_reference_db]))
+                                    else:
+                                        min_val = max_val = float(row_to_append[index])
+                                    diff = abs(max_val-min_val)
                                     # TODO: ASAFR: 52-week change is not really working and not really needed - fix or eliminate
                                     indices_list_to_ignore_changes_in = [g_sss_value_index, g_financial_currency_index, g_summary_currency_index] # [g_fifty_two_week_change_index, g_sss_value_index, g_two_hundred_day_average_index, g_previous_close_percentage_from_200d_ma_index]
                                     if diff > abs(max_val)*REFERENCE_DB_MAX_VALUE_DIFF_FACTOR_THRESHOLD and index not in indices_list_to_ignore_changes_in:
