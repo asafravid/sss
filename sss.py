@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.17 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.19 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -22,7 +22,7 @@
 
 
 # TODO: ASAFR:  0. Auto-Update Nasdaq (NSR) Indices as done with TASE
-#               0.1. [DB] GOTU      (2868/2949/7383 [39.94%], Diff: 0000), time/left/avg [sec]: 22589/33964/7.66 ->               Exception in GOTU info: unsupported operand type(s) for /: 'NoneType' and 'float'
+#               0.1. revenueGrowth is available in info -> use it!
 #               0.2. https://www.analyticsvidhya.com/blog/2020/07/read-and-update-google-spreadsheets-with-python/
 #               1. Implement: Graceful (higher SSS, not max) handling of calculated_roa <= 0
 #               1.1. https://en.wikipedia.org/wiki/Piotroski_F-score
