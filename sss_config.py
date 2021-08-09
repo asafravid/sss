@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.10 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.20 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -22,11 +22,11 @@
 
 
 run_custom_tase      = False   # Custom Portfolio
-run_custom           = False
-run_tase             = True    # Tel Aviv Stock Exchange
+run_custom           = True
+run_tase             = False    # Tel Aviv Stock Exchange
 run_nsr              = False   # NASDAQ100+S&P500+RUSSEL1000
 run_all              = False   # All Nasdaq Stocks
-research_mode        = True    # Research Mode
+research_mode        = False    # Research Mode
 aggregate_only       = False
 research_mode_max_ev = False   # @JustLearning's suggestion in Telegram: Multi-Dimensional Scan by Max EV Limit rather than Min EV Limit
 
@@ -40,7 +40,7 @@ automatic_results_folder_selection = False
 # After 1st ever Run: Recommended to use reference (filter and damper)
 # The research mode shall run on new_run as input (new_run >= reference_run) where > means newer
 reference_run_custom = None # 'Results/All/20210606-011608_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes3195'
-reference_run_tase   = 'Results/Tase/20210730-014733_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes322'
+reference_run_tase   = 'Results/Tase/20210806-093651_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes330'
 reference_run_nsr    = 'Results/Nsr/20210731-233407_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes885'
 reference_run_all    = 'Results/All/20210704-014737_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes2752'
 
@@ -49,5 +49,5 @@ new_run_nsr    = 'Results/Nsr/20210731-233407_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes8
 new_run_all    = 'Results/All/20210715-051935_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes2553'
 new_run_custom = 'Results/Custom/20210719-065911_Bdb_nRes236_Custom'
 
-custom_portfolio      = ['CPRX', 'GRVY', 'ACTG', 'MGM', 'PRIM', 'VST' ]
+custom_portfolio      = ['AAPL' ]
 custom_portfolio_tase = ['FORTY.TA']
