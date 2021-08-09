@@ -22,8 +22,8 @@
 
 
 run_custom_tase      = False   # Custom Portfolio
-run_custom           = True
-run_tase             = False    # Tel Aviv Stock Exchange
+run_custom           = False
+run_tase             = True    # Tel Aviv Stock Exchange
 run_nsr              = False   # NASDAQ100+S&P500+RUSSEL1000
 run_all              = False   # All Nasdaq Stocks
 research_mode        = False    # Research Mode
@@ -44,7 +44,7 @@ reference_run_tase   = 'Results/Tase/20210806-093651_Tase_Tchnlgy3.0_RlEstt1.0_B
 reference_run_nsr    = 'Results/Nsr/20210731-233407_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes885'
 reference_run_all    = 'Results/All/20210704-014737_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes2752'
 
-new_run_tase   = 'Results/Tase/20210806-093651_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes330'
+new_run_tase   = 'Results/Tase/20210809-233619_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes329'
 new_run_nsr    = 'Results/Nsr/20210731-233407_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes885'
 new_run_all    = 'Results/All/20210715-051935_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes2553'
 new_run_custom = 'Results/Custom/20210719-065911_Bdb_nRes236_Custom'
