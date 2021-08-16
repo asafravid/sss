@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.18 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.19 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -399,7 +399,7 @@ def research_db(sectors_list, sectors_filter_out, countries_list, countries_filt
                         average_sec_per_iteration = round(elapsed_time_sec / iteration, int(sss.NUM_ROUND_DECIMALS / 3))
                         percentage_complete       = round(100 * iteration / (pi_range_len*ev_millions_range_len*pe_range_len*evr_range_len*pm_range_len), int(sss.NUM_ROUND_DECIMALS / 3))
 
-                        print('time [sec] total/avg/%_ {:3.0f}/{:1.2f}/{:2.2f} : pi {:6} | evm {:6} | pe {:8} | evr {:8} | pm {:7}% -> num_results = {}'.format(elapsed_time_sec, average_sec_per_iteration, percentage_complete, pi_limit, ev_millions_limit, price_to_earnings_limit, enterprise_value_to_revenue_limit, profit_margin_limit, num_results_for_pi_ev_pe_evr_and_pm))
+                        print('time [sec] total/avg/% {:3.0f}/{:1.2f}/{:2.2f} : pi {:6} | evm {:6} | pe {:8} | evr {:8} | pm {:7}% -> num_results = {}'.format(elapsed_time_sec, average_sec_per_iteration, percentage_complete, pi_limit, ev_millions_limit, price_to_earnings_limit, enterprise_value_to_revenue_limit, profit_margin_limit, num_results_for_pi_ev_pe_evr_and_pm))
     results_filename    = 'results_without_labels_{}'.format(db_filename)
 
     mesh_combined = combine_multi_dim_to_table_5d(multi_dim_data=research_num_results_multi_dim_data, dim5=pi_range, dim4=ev_millions_range, dim3=pe_range, dim2_rows=evr_range, dim1_cols=pm_range)
