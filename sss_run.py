@@ -571,15 +571,15 @@ else:                   # Research Mode:
     if run_custom:
         if not sss_config.aggregate_only:
             for db_filename in DB_FILENAMES:
-                pi_range_custom          = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='held_percent_insiders',    num_sections=5, reverse=0)
-                ev_range_custom          = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='enterprise_value',         num_sections=4, reverse=0)
-                pe_range_custom          = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='pe_effective',             num_sections=5, reverse=1)
-                evr_range_custom         = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='evr_effective',            num_sections=5, reverse=1)
-                pm_ratios_range_custom   = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='effective_profit_margin',  num_sections=5, reverse=0)
+                pi_range_custom          = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='held_percent_insiders',    num_sections=7, reverse=0)
+                ev_range_custom          = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='enterprise_value',         num_sections=7, reverse=0)
+                pe_range_custom          = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='pe_effective',             num_sections=7, reverse=1)
+                evr_range_custom         = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='evr_effective',            num_sections=7, reverse=1)
+                pm_ratios_range_custom   = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='effective_profit_margin',  num_sections=7, reverse=0)
 
                 ev_millions_range_custom = [int(  ev/1000000                       ) for ev in ev_range_custom       ]
                 pm_range_custom          = [round(pm*100,    sss.NUM_ROUND_DECIMALS) for pm in pm_ratios_range_custom]
 
-                research_db(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, research_mode_max_ev=research_mode_max_ev, ev_millions_range=ev_millions_range_custom, pe_range=pe_range_custom, evr_range=evr_range_custom, pm_range=pm_range_custom, csv_db_path=new_run_custom, db_filename=db_filename, read_united_states_input_symbols=1, scan_mode=SCAN_MODE_ALL, generate_result_folders=0, appearance_counter_min=RESEARCH_MODE_MIN_ENTRIES_LIMIT, appearance_counter_max=50000, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[3.5, 0.75],
+                research_db(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, pi_range=pi_range_custom, research_mode_max_ev=research_mode_max_ev, ev_millions_range=ev_millions_range_custom, pe_range=pe_range_custom, evr_range=evr_range_custom, pm_range=pm_range_custom, csv_db_path=new_run_custom, db_filename=db_filename, read_united_states_input_symbols=1, scan_mode=SCAN_MODE_ALL, generate_result_folders=0, appearance_counter_min=RESEARCH_MODE_MIN_ENTRIES_LIMIT, appearance_counter_max=50000, favor_sectors=[], favor_sectors_by=[],
                             newer_path=new_run_custom, older_path=reference_run_custom, db_exists_in_both_folders=1, diff_only_result=1, movement_threshold=0, res_length=1000)
         aggregate_results(newer_path=new_run_custom, older_path=reference_run_custom, res_length=1000, scan_mode=SCAN_MODE_ALL)
