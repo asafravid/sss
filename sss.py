@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.23 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.25 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -62,11 +62,11 @@ import sss_post_processing
 import math
 import json
 
-from contextlib  import closing
-from threading   import Thread
-from dataclasses import dataclass
-# from forex_python.converter import CurrencyRates
-# from currency_converter import CurrencyConverter
+from contextlib             import closing
+from threading              import Thread
+from dataclasses            import dataclass
+from forex_python.converter import CurrencyRates
+from currency_converter     import CurrencyConverter
 
 
 VERBOSE_LOGS = 0
@@ -2213,8 +2213,6 @@ def download_ftp_files(filenames_list, ftp_path):
 # reference_run : Used for identifying anomalies in which some symbol information is completely different from last run. It can be different but only in new quartely reports
 #                 It is sometimes observed that stocks information is wrongly fetched. Is such cases, the last run's reference point shall be used, with a forgetting factor
 def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, countries_filter_out,build_csv_db_only, build_csv_db, csv_db_path, db_filename, read_united_states_input_symbols, tase_mode, num_threads, market_cap_included, research_mode, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, generate_result_folders=1, appearance_counter_dict_sss={}, appearance_counter_min=25, appearance_counter_max=35, custom_portfolio=[], num_results_list=[], num_results_list_index=0):
-    currency_conversion_tool = currency_conversion_tool_alternative = None
-
     # https://en.wikipedia.org/wiki/ISO_4217
     currency_filename = 'Indices/currencies.json'
     with open(currency_filename, 'r') as file:
@@ -2222,13 +2220,22 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
     currency_conversion_tool_manual = {k: round(float(v), NUM_ROUND_DECIMALS) for k, v in currency_rates_raw_dict.items()}
     # print(currency_conversion_tool_manual)
 
-    # try:
-    #     currency_conversion_tool = CurrencyRates().get_rates('USD') if build_csv_db else None
-    # except Exception as e:
-    #     try:
-    #         currency_conversion_tool_alternative = CurrencyConverter() if build_csv_db else None
-    #     except Exception as e:
-    #         print('Exchange Rates down, some countries shall be filtered out unless exchange rate provided manually')
+    try:
+        currency_conversion_tool = CurrencyRates().get_rates('USD') if build_csv_db else None
+    except Exception as e:
+        currency_conversion_tool = None
+
+    try:
+        currency_conversion_tool_alternative = CurrencyConverter() if build_csv_db else None
+    except Exception as e:
+        currency_conversion_tool_alternative = None
+
+    for item in currency_conversion_tool_manual:
+        if item not in currency_conversion_tool:
+            try:
+                currency_conversion_tool[item] = 1/currency_conversion_tool_alternative.convert(1.0, item, 'USD')
+            except:
+                currency_conversion_tool[item] = 1/currency_conversion_tool_manual[item]
 
     reference_db           = []
     reference_db_title_row = []
