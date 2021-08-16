@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.25 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.26 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -2220,22 +2220,25 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
     currency_conversion_tool_manual = {k: round(float(v), NUM_ROUND_DECIMALS) for k, v in currency_rates_raw_dict.items()}
     # print(currency_conversion_tool_manual)
 
-    try:
-        currency_conversion_tool = CurrencyRates().get_rates('USD') if build_csv_db else None
-    except Exception as e:
-        currency_conversion_tool = None
-
-    try:
-        currency_conversion_tool_alternative = CurrencyConverter() if build_csv_db else None
-    except Exception as e:
-        currency_conversion_tool_alternative = None
-
-    for item in currency_conversion_tool_manual:
-        if item not in currency_conversion_tool:
-            try:
-                currency_conversion_tool[item] = 1/currency_conversion_tool_alternative.convert(1.0, item, 'USD')
-            except:
-                currency_conversion_tool[item] = 1/currency_conversion_tool_manual[item]
+    currency_conversion_tool             = None
+    currency_conversion_tool_alternative = None
+    if not research_mode:
+        try:
+            currency_conversion_tool = CurrencyRates().get_rates('USD') if build_csv_db else None
+        except Exception as e:
+            pass
+    
+        try:
+            currency_conversion_tool_alternative = CurrencyConverter() if build_csv_db else None
+        except Exception as e:
+            pass
+    
+        for item in currency_conversion_tool_manual:
+            if currency_conversion_tool != None and item not in currency_conversion_tool:
+                try:
+                    currency_conversion_tool[item] = 1/currency_conversion_tool_alternative.convert(1.0, item, 'USD')
+                except:
+                    currency_conversion_tool[item] = 1/currency_conversion_tool_manual[item]
 
     reference_db           = []
     reference_db_title_row = []
