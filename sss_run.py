@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.15 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.18 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -20,6 +20,7 @@
 #
 #############################################################################
 
+import time
 import numpy as np
 import csv
 import os
@@ -380,6 +381,8 @@ def research_db(sectors_list, sectors_filter_out, countries_list, countries_filt
     evr_range_len         = len(evr_range)
     pm_range_len          = len(pm_range)
     research_num_results_multi_dim_data = np.zeros( (pi_range_len, ev_millions_range_len, pe_range_len, evr_range_len, pm_range_len), dtype=int )
+    elapsed_time_start_sec = time.time()
+    iteration              = 0
     for pi_index, pi_limit                                       in enumerate(pi_range):
         for ev_millions_index, ev_millions_limit                 in enumerate(ev_millions_range):
             for pe_index, price_to_earnings_limit                in enumerate(pe_range):
@@ -389,7 +392,14 @@ def research_db(sectors_list, sectors_filter_out, countries_list, countries_filt
                         if num_results_for_pi_ev_pe_evr_and_pm < appearance_counter_min:
                             break  # Already lower than appearance_counter_min results. With higher profit margin limit there will always be less results -> save running time by breaking
                         research_num_results_multi_dim_data[pi_index][ev_millions_index][pe_index][evr_index][pm_index] = int(num_results_for_pi_ev_pe_evr_and_pm)
-                        print('pi_limit {:6} | ev_millions_limit {:6} | price_to_earnings_limit {:8} | row {:3} -> (enterprise_value_to_revenue_limit {:8}) | col {:3} -> (profit_margin_limit {:7}%): num_results_for_pi_ev_pe_evr_and_pm = {}'.format(pi_limit, ev_millions_limit, price_to_earnings_limit, evr_index, enterprise_value_to_revenue_limit, pm_index, profit_margin_limit, num_results_for_pi_ev_pe_evr_and_pm))
+
+                        iteration += 1
+                        elapsed_time_sample_sec   = time.time()
+                        elapsed_time_sec          = round(elapsed_time_sample_sec - elapsed_time_start_sec, 0)
+                        average_sec_per_iteration = round(elapsed_time_sec / iteration, int(sss.NUM_ROUND_DECIMALS / 3))
+                        percentage_complete       = round(100 * iteration / (pi_range_len*ev_millions_range_len*pe_range_len*evr_range_len*pm_range_len), int(sss.NUM_ROUND_DECIMALS / 3))
+
+                        print('time [sec] total/avg/%_ {:3.0f}/{:1.2f}/{:2.2f} : pi {:6} | evm {:6} | pe {:8} | evr {:8} | pm {:7}% -> num_results = {}'.format(elapsed_time_sec, average_sec_per_iteration, percentage_complete, pi_limit, ev_millions_limit, price_to_earnings_limit, enterprise_value_to_revenue_limit, profit_margin_limit, num_results_for_pi_ev_pe_evr_and_pm))
     results_filename    = 'results_without_labels_{}'.format(db_filename)
 
     mesh_combined = combine_multi_dim_to_table_5d(multi_dim_data=research_num_results_multi_dim_data, dim5=pi_range, dim4=ev_millions_range, dim3=pe_range, dim2_rows=evr_range, dim1_cols=pm_range)
@@ -514,11 +524,11 @@ new_run_nsr    = path_setting_dict['new_run_nsr']
 new_run_all    = path_setting_dict['new_run_all']
 
 if not research_mode:   # Run Build DB Only:
-    if run_custom_tase: sss.sss_run(reference_run=reference_run_tase, sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', db_filename='None', read_united_states_input_symbols=0, tase_mode=1, num_threads=1, market_cap_included=1, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, pi_limit=0, enterprise_value_millions_usd_limit=5, research_mode_max_ev=False, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=[],                                   favor_sectors_by=[],          generate_result_folders=1, custom_portfolio=sss_config.custom_portfolio_tase)
-    if run_custom:      sss.sss_run(reference_run=reference_run_all,  sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', db_filename='None', read_united_states_input_symbols=0, tase_mode=0, num_threads=1, market_cap_included=1, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, pi_limit=0, enterprise_value_millions_usd_limit=5, research_mode_max_ev=False, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=[],                                   favor_sectors_by=[],          generate_result_folders=1, custom_portfolio=sss_config.custom_portfolio)
-    if run_tase:        sss.sss_run(reference_run=reference_run_tase, sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', db_filename='None', read_united_states_input_symbols=0, tase_mode=1, num_threads=1, market_cap_included=1, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, pi_limit=0, enterprise_value_millions_usd_limit=1, research_mode_max_ev=False, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=['Technology', 'Real Estate'       ], favor_sectors_by=[3.0,  1.0], generate_result_folders=1)
-    if run_nsr:         sss.sss_run(reference_run=reference_run_nsr,  sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', db_filename='None', read_united_states_input_symbols=0, tase_mode=0, num_threads=1, market_cap_included=1, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, pi_limit=0, enterprise_value_millions_usd_limit=5, research_mode_max_ev=False, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[3.0,  0.5], generate_result_folders=1)
-    if run_all:         sss.sss_run(reference_run=reference_run_all,  sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', db_filename='None', read_united_states_input_symbols=1, tase_mode=0, num_threads=1, market_cap_included=1, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, pi_limit=0, enterprise_value_millions_usd_limit=5, research_mode_max_ev=False, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[3.0,  0.5], generate_result_folders=1)
+    if run_custom_tase: sss.sss_run(reference_run=reference_run_tase,   sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', db_filename='None', read_united_states_input_symbols=0, tase_mode=1, num_threads=1, market_cap_included=1, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, pi_limit=0, enterprise_value_millions_usd_limit=5, research_mode_max_ev=False, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=[],                                   favor_sectors_by=[],          generate_result_folders=1, custom_portfolio=sss_config.custom_portfolio_tase)
+    if run_custom:      sss.sss_run(reference_run=reference_run_custom, sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', db_filename='None', read_united_states_input_symbols=0, tase_mode=0, num_threads=1, market_cap_included=1, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, pi_limit=0, enterprise_value_millions_usd_limit=5, research_mode_max_ev=False, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=[],                                   favor_sectors_by=[],          generate_result_folders=1, custom_portfolio=sss_config.custom_portfolio)
+    if run_tase:        sss.sss_run(reference_run=reference_run_tase,   sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', db_filename='None', read_united_states_input_symbols=0, tase_mode=1, num_threads=1, market_cap_included=1, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, pi_limit=0, enterprise_value_millions_usd_limit=1, research_mode_max_ev=False, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=['Technology', 'Real Estate'       ], favor_sectors_by=[3.0,  1.0], generate_result_folders=1)
+    if run_nsr:         sss.sss_run(reference_run=reference_run_nsr,    sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', db_filename='None', read_united_states_input_symbols=0, tase_mode=0, num_threads=1, market_cap_included=1, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, pi_limit=0, enterprise_value_millions_usd_limit=5, research_mode_max_ev=False, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[3.0,  0.5], generate_result_folders=1)
+    if run_all:         sss.sss_run(reference_run=reference_run_all,    sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, build_csv_db_only=1, build_csv_db=1, csv_db_path='None', db_filename='None', read_united_states_input_symbols=1, tase_mode=0, num_threads=1, market_cap_included=1, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, pi_limit=0, enterprise_value_millions_usd_limit=5, research_mode_max_ev=False, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[3.0,  0.5], generate_result_folders=1)
 else:                   # Research Mode:
     if run_tase:
         if not sss_config.aggregate_only:
