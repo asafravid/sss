@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.22 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.23 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -23,27 +23,24 @@
 
 # TODO: ASAFR:  0. Auto-Update Nasdaq (NSR) Indices as done with TASE
 #               0.1. revenueGrowth is available in info -> use it!
-#               0.2. https://www.analyticsvidhya.com/blog/2020/07/read-and-update-google-spreadsheets-with-python/
 #               1.0. https://en.wikipedia.org/wiki/Piotroski_F-score
 #               1.2. https://en.wikipedia.org/wiki/Magic_formula_investing
 #               1.3. https://www.oldschoolvalue.com/investing-strategy/backtest-graham-nnwc-ncav-screen/
-#               2. Take latest yfinance base.py (and other - compare the whole folder) and updates - maybe not required - but just stay up to date
 #               3. Investigate and add: https://www.investopedia.com/terms/o/operatingmargin.asp - operating margin
-#               4. Add Free Cash flow [FCF] (EV/FreeCashFlow): Inverse of the Free Cash Flow Yield (https://www.stockopedia.com/ratios/ev-free-cash-flow-336/#:~:text=What%20is%20the%20definition%20of,the%20Free%20Cash%20Flow%20Yield.)
+#               4. Add Free Cash flow [FCF] (EV/FreeCashFlow): Inverse of the Free Cash Flow Yield (https://www.stockopedia.com/ratios/ev-free-cash-flow-336/
 #               5. There is already an EV/CFO ratio.
 #                    CFO - CapitalExpenditures = FCF
 #                    EV/CFO * EV/FCF = EV^2 / (CFO * [CFO - CapitalExpenditures]) | EV/CFO + EV/FCF = EV*(1/CFO + 1/(CFO-CapitalExpenditures))
 #                    Conclusion: EV/FCF is better as it provides moe information. But make this a lower priority for development
 #                                Bonus: When there is no CFO, Use FCF, and Vice Versa - more information
 #               6. Which are the most effective parameters? Correlate the sorting of sss_value to the results and each of the sorted-by-parameter list.
-#               7. Important: https://www.oldschoolvalue.com/investing-strategy/walter-schloss-investing-strategy-producing-towering-returns/#:~:text=Walter%20Schloss%20ran%20with%20the,to%20perform%20complex%20valuations%20either.
+#               7. Important: https://www.oldschoolvalue.com/investing-strategy/walter-schloss-investing-strategy-producing-towering-returns/
 #                  7.1.  3 years low, 5 years low
 #                  7.2.  F-Score, M-Score
 #                  7.3.  Multi-Dim scan over the distance from low, and over the Schloff Score - define a Walter-Schloss score
 #                  7.4.  Remove the square root from DtoE ?
 #                  7.5.  MktCapM is >= US$ 300 million (basis year 2000) adjusted yearly
 #                  7.6.  Consider only stocks that are listed at least 10 years
-#                  7.7.  Price 1 Day ago within 15% of the 52 week low
 #                  7.8.  Calculate share_price/52weekLow 0.1
 #                  7.9.  Take the top 500 stocks with highest Current Dividend Yield %#            12. https://pyportfolioopt.readthedocs.io/en/latest/UserGuide.html -> Use
 #                  7.10. Take the top 250 stocks with lowest Latest Filing P/E ratio#            13. Calculate the ROE - Return on equity
@@ -2043,7 +2040,7 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
                     stock_data.last_dividend_3 = last_4_dividends[-4]
 
             except Exception as e:
-                #if not research_mode: print("Exception in symbol.dividends: {}".format(e))
+                # if not research_mode: print("Exception in symbol.dividends: {}".format(e))
                 pass
 
             round_and_avoid_none_values(stock_data)
