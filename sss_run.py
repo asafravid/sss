@@ -536,7 +536,7 @@ else:                   # Research Mode:
                 pi_range_tase          = get_range(csv_db_path=new_run_tase, db_filename=db_filename, column_name='held_percent_insiders',   num_sections=5, reverse=0, pop_1st_percentile_range=False)
                 ev_range_tase          = get_range(csv_db_path=new_run_tase, db_filename=db_filename, column_name='enterprise_value',        num_sections=4, reverse=0, pop_1st_percentile_range=False)
                 pe_range_tase          = get_range(csv_db_path=new_run_tase, db_filename=db_filename, column_name='pe_effective',            num_sections=7, reverse=1, pop_1st_percentile_range=False)
-                evr_range_tase         = get_range(csv_db_path=new_run_tase, db_filename=db_filename, column_name='evr_effective',           num_sections=7, reverse=1, pop_1st_percentile_range=False)
+                evr_range_tase         = get_range(csv_db_path=new_run_tase, db_filename=db_filename, column_name='evr_effective',           num_sections=6, reverse=1, pop_1st_percentile_range=False)
                 pm_ratios_range_tase   = get_range(csv_db_path=new_run_tase, db_filename=db_filename, column_name='effective_profit_margin', num_sections=7, reverse=0, pop_1st_percentile_range=False)
 
                 ev_millions_range_tase = [int(  ev/1000000                       ) for ev in ev_range_tase       ]
@@ -552,7 +552,7 @@ else:                   # Research Mode:
                 pi_range_nsr          = get_range(csv_db_path=new_run_nsr, db_filename=db_filename, column_name='held_percent_insiders',   num_sections=5, reverse=0)
                 ev_range_nsr          = get_range(csv_db_path=new_run_nsr, db_filename=db_filename, column_name='enterprise_value',        num_sections=4, reverse=0)
                 pe_range_nsr          = get_range(csv_db_path=new_run_nsr, db_filename=db_filename, column_name='pe_effective',            num_sections=8, reverse=1)
-                evr_range_nsr         = get_range(csv_db_path=new_run_nsr, db_filename=db_filename, column_name='evr_effective',           num_sections=8, reverse=1)
+                evr_range_nsr         = get_range(csv_db_path=new_run_nsr, db_filename=db_filename, column_name='evr_effective',           num_sections=7, reverse=1)
                 pm_ratios_range_nsr   = get_range(csv_db_path=new_run_nsr, db_filename=db_filename, column_name='effective_profit_margin', num_sections=8, reverse=0)
 
                 ev_millions_range_nsr = [int(  ev/1000000                       ) for ev in ev_range_nsr       ]
@@ -568,7 +568,7 @@ else:                   # Research Mode:
                 pi_range_all          = get_range(csv_db_path=new_run_all, db_filename=db_filename, column_name='held_percent_insiders',    num_sections=6, reverse=0)
                 ev_range_all          = get_range(csv_db_path=new_run_all, db_filename=db_filename, column_name='enterprise_value',         num_sections=5, reverse=0)
                 pe_range_all          = get_range(csv_db_path=new_run_all, db_filename=db_filename, column_name='pe_effective',             num_sections=9, reverse=1)
-                evr_range_all         = get_range(csv_db_path=new_run_all, db_filename=db_filename, column_name='evr_effective',            num_sections=9, reverse=1)
+                evr_range_all         = get_range(csv_db_path=new_run_all, db_filename=db_filename, column_name='evr_effective',            num_sections=8, reverse=1)
                 pm_ratios_range_all   = get_range(csv_db_path=new_run_all, db_filename=db_filename, column_name='effective_profit_margin',  num_sections=9, reverse=0)
 
                 ev_millions_range_all = [int(  ev/1000000                       ) for ev in ev_range_all       ]
@@ -584,7 +584,7 @@ else:                   # Research Mode:
                 pi_range_custom          = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='held_percent_insiders',    num_sections=7, reverse=0)
                 ev_range_custom          = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='enterprise_value',         num_sections=7, reverse=0)
                 pe_range_custom          = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='pe_effective',             num_sections=7, reverse=1)
-                evr_range_custom         = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='evr_effective',            num_sections=7, reverse=1)
+                evr_range_custom         = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='evr_effective',            num_sections=6, reverse=1)
                 pm_ratios_range_custom   = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='effective_profit_margin',  num_sections=7, reverse=0)
 
                 ev_millions_range_custom = [int(  ev/1000000                       ) for ev in ev_range_custom       ]

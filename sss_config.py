@@ -47,7 +47,7 @@ reference_run_all    = 'Results/All/20210815-173943_Tchnlgy3.0_FnnclSrvcs0.5_A_B
 new_run_custom = 'Results/Custom/20210816-014004_Bdb_nRes289_Custom'
 new_run_tase   = 'Results/Tase/20210813-001618_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes329'
 new_run_nsr    = 'Results/Nsr/20210815-042855_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes881'
-new_run_all    = 'Results/All/20210815-173943_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes3409_Backup'
+new_run_all    = 'Results/All/20210817-144654_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes3414'
 
 custom_portfolio      = ['KMI']
 custom_portfolio_tase = ['FORTY.TA']
