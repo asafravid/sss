@@ -26,7 +26,7 @@ run_custom           = True
 run_tase             = False    # Tel Aviv Stock Exchange
 run_nsr              = False   # NASDAQ100+S&P500+RUSSEL1000
 run_all              = False   # All Nasdaq Stocks
-research_mode        = False    # Research Mode
+research_mode        = True    # Research Mode
 aggregate_only       = False
 research_mode_max_ev = False   # @JustLearning's suggestion in Telegram: Multi-Dimensional Scan by Max EV Limit rather than Min EV Limit
 
@@ -44,7 +44,7 @@ reference_run_tase   = 'Results/Tase/20210820-030153_Tase_Tchnlgy3.0_RlEstt1.0_B
 reference_run_nsr    = 'Results/Nsr/20210815-042855_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes881'
 reference_run_all    = 'Results/All/20210815-173943_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes3409'
 
-new_run_custom = 'Results/Custom/20210816-014004_Bdb_nRes289_Custom'
+new_run_custom = 'Results/Custom/20210820-144435_Bdb_nRes293_Custom'
 new_run_tase   = 'Results/Tase/20210820-030153_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes324'
 new_run_nsr    = 'Results/Nsr/20210815-042855_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes881'
 new_run_all    = 'Results/All/20210817-144654_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes3414'
