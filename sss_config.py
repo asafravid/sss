@@ -40,12 +40,12 @@ automatic_results_folder_selection = False
 # After 1st ever Run: Recommended to use reference (filter and damper)
 # The research mode shall run on new_run as input (new_run >= reference_run) where > means newer
 reference_run_custom = 'Results/Custom/20210816-014004_Bdb_nRes289_Custom'
-reference_run_tase   = 'Results/Tase/20210813-001618_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes329'
-reference_run_nsr    = None # 'Results/Nsr/20210815-042855_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes881'
-reference_run_all    = None # 'Results/All/20210815-173943_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes3409'
+reference_run_tase   = 'Results/Tase/20210820-030153_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes324'
+reference_run_nsr    = 'Results/Nsr/20210815-042855_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes881'
+reference_run_all    = 'Results/All/20210815-173943_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes3409'
 
 new_run_custom = 'Results/Custom/20210816-014004_Bdb_nRes289_Custom'
-new_run_tase   = 'Results/Tase/20210816-234500_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes329'
+new_run_tase   = 'Results/Tase/20210820-030153_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes324'
 new_run_nsr    = 'Results/Nsr/20210815-042855_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes881'
 new_run_all    = 'Results/All/20210817-144654_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes3414'
 
