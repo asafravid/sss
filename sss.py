@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.30 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.31 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -96,7 +96,7 @@ RQG_UNKNOWN                                  = -0.9   # -90% TODO: ASAFR: 1. Sca
 EQG_POSITIVE_FACTOR                          = 10.0   # When positive, it will have a 5x factor on the 1 + function
 RQG_POSITIVE_FACTOR                          = 10.0   # When positive, it will have a 5x factor on the 1 + function
 EQG_WEIGHT_VS_YOY                            = 0.75   # the provided EQG is weighted more than the manually calculated one
-RQG_WEIGHT_VS_YOY                            = 0.1   # the provided RQG (Actually yfinance never provides it) is weighted less than the manually calculated one
+RQG_WEIGHT_VS_YOY                            = 0.75   # the provided RQG (yfinance now provides it) is weighted more than the manually calculated one
 EQG_DAMPER                                   = 0.25
 RQG_DAMPER                                   = 0.25
 TRAILING_EPS_PERCENTAGE_DAMP_FACTOR          = 0.01   # When the trailing_eps_percentage is very low (units are ratio here), this damper shall limit the affect to x100 not more)
@@ -1754,7 +1754,7 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
             else:                                                    stock_data.eqg         = None
 
             # Value is a ratio, such that when multiplied by 100, yields percentage (%) units:
-            if 'revenueQuarterlyGrowth'                     in info: stock_data.rqg         = info['revenueQuarterlyGrowth']
+            if 'revenueQuarterlyGrowth'                     in info: stock_data.rqg         = info['revenueGrowth']
             else:                                                    stock_data.rqg         = None
 
             # TODO: ASAFR: Currently use the niqg_yoy and trqg_yoy as a simple backup. Later on - compare and add to calculations...
