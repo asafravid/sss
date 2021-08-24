@@ -1754,8 +1754,8 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
             else:                                                    stock_data.eqg         = None
 
             # Value is a ratio, such that when multiplied by 100, yields percentage (%) units:
-            if 'revenueQuarterlyGrowth'                     in info: stock_data.rqg         = info['revenueGrowth']
-            else:                                                    stock_data.rqg         = None
+            if 'revenueGrowth'                     in info: stock_data.rqg         = info['revenueGrowth']
+            else:                                           stock_data.rqg         = None
 
             # TODO: ASAFR: Currently use the niqg_yoy and trqg_yoy as a simple backup. Later on - compare and add to calculations...
             if stock_data.eqg_yoy is None: stock_data.eqg_yoy = stock_data.niqg_yoy
