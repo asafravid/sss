@@ -26,7 +26,7 @@ run_custom           = False
 run_tase             = False    # Tel Aviv Stock Exchange
 run_nsr              = True   # NASDAQ100+S&P500+RUSSEL1000
 run_all              = False   # All Nasdaq Stocks
-research_mode        = True    # Research Mode
+research_mode        = False    # Research Mode
 aggregate_only       = False
 research_mode_max_ev = False   # @JustLearning's suggestion in Telegram: Multi-Dimensional Scan by Max EV Limit rather than Min EV Limit
 
@@ -46,7 +46,7 @@ reference_run_all    = 'Results/All/20210815-173943_Tchnlgy3.0_FnnclSrvcs0.5_A_B
 
 new_run_custom = 'Results/Custom/20210820-144435_Bdb_nRes293_Custom'
 new_run_tase   = 'Results/Tase/20210820-030153_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes324'
-new_run_nsr    = 'Results/Nsr/20210823-180142_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes884'
+new_run_nsr    = 'Results/Nsr/20210824-184317_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes921'
 new_run_all    = 'Results/All/20210817-144654_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes3414'
 
 # TODO: ASAFR: Why is normalized AGIO giving a Good low value?? this is deceiving! Check this
