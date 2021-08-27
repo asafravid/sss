@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.19 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.35 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -487,7 +487,7 @@ def aggregate_results(newer_path, older_path, res_length, scan_mode):
         aggregated_diff_lists = sss_diff.run(newer_path=newer_path, older_path=older_path, db_filename='sss_aggregated.csv', db_exists_in_both_folders=1, diff_only_result=1, movement_threshold=0, res_length=res_length, consider_as_new_from=PDF_NUM_ENTRIES_IN_REPORT)
 
         #                                                                                       0:15 is date and time
-        pdf_generator.csv_to_pdf(csv_filename=result_list_filename_sss, csv_db_path=newer_path, data_time_str=result_list_filename_sss.replace('Results', '').replace('Tase', '').replace('Nsr', '').replace('All', '').replace('Custom', '').replace('/', '')[0:15], title=TITLES[scan_mode].replace('_', ' ') + '_aggregated', limit_num_rows=PDF_NUM_ENTRIES_IN_REPORT, diff_list=aggregated_diff_lists[0], tase_mode=(1 if scan_mode==SCAN_MODE_TASE else 0), db_filename="")
+        pdf_generator.csv_to_pdf(csv_filename=result_list_filename_sss, csv_db_path=newer_path, data_time_str=result_list_filename_sss.replace('Results', '').replace('Tase', '').replace('Nsr', '').replace('All', '').replace('Custom', '').replace('/', '')[0:15], title=TITLES[scan_mode].replace('_', ' ') + ' ' + ('aggregated'[::-1] if scan_mode==SCAN_MODE_TASE else 'aggregated'), limit_num_rows=PDF_NUM_ENTRIES_IN_REPORT, diff_list=aggregated_diff_lists[0], tase_mode=(1 if scan_mode==SCAN_MODE_TASE else 0), db_filename="")
 
 
 ############################
