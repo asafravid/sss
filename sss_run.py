@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.35 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.37 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -549,7 +549,7 @@ else:                   # Research Mode:
     if run_nsr:
         if not sss_config.aggregate_only:
             for db_filename in DB_FILENAMES:
-                pi_range_nsr          = get_range(csv_db_path=new_run_nsr, db_filename=db_filename, column_name='held_percent_insiders',   num_sections=5, reverse=0)
+                pi_range_nsr          = get_range(csv_db_path=new_run_nsr, db_filename=db_filename, column_name='held_percent_insiders',   num_sections=4, reverse=0)
                 ev_range_nsr          = get_range(csv_db_path=new_run_nsr, db_filename=db_filename, column_name='enterprise_value',        num_sections=4, reverse=0)
                 pe_range_nsr          = get_range(csv_db_path=new_run_nsr, db_filename=db_filename, column_name='pe_effective',            num_sections=8, reverse=1)
                 evr_range_nsr         = get_range(csv_db_path=new_run_nsr, db_filename=db_filename, column_name='evr_effective',           num_sections=7, reverse=1)
