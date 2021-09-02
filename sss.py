@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.30 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.35 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -2364,7 +2364,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
                         symbols_tase.append(row[1].replace('.','-')+'.TA')
                         row_index += 1
 
-    # All nasdaq and others: ftp://ftp.nasdaqtrader.com/symboldirectory/ -> TODO: ASAFR: Download automatically as in here: https://stackoverflow.com/questions/11768214/python-download-a-file-from-an-ftp-server
+    # All nasdaq and others: ftp://ftp.nasdaqtrader.com/symboldirectory/ -> Download automatically
     # Legend: http://www.nasdaqtrader.com/trader.aspx?id=symboldirdefs
     # ftp.nasdaqtrader.com/SymbolDirectory/nasdaqlisted.txt
     # ftp.nasdaqtrader.com/SymbolDirectory/otherlisted.txt
@@ -2374,7 +2374,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
         etf_and_nextshares_list             = []
         if read_united_states_input_symbols:
             nasdaq_filenames_list = ['Indices/nasdaqlisted.csv', 'Indices/otherlisted.csv', 'Indices/nasdaqtraded.csv']  # Checkout http://www.nasdaqtrader.com/trader.aspx?id=symboldirdefs for all symbol definitions (for instance - `$` in stock names, 5-letter stocks ending with `Y`)
-            ticker_clumn_list     = [0,                          0,                         1                         ]  # nasdaqtraded.csv - 1st column is Y/N (traded or not) - so take row[1] instead!!!
+            ticker_column_list    = [0,                          0,                         1                         ]  # nasdaqtraded.csv - 1st column is Y/N (traded or not) - so take row[1] instead!!!
             download_ftp_files(nasdaq_filenames_list, 'ftp://ftp.nasdaqtrader.com/SymbolDirectory/')
             for index, filename in enumerate(nasdaq_filenames_list):
                 with open(filename, mode='r', newline='') as engine:
@@ -2395,15 +2395,15 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
                             if 'File Creation Time' in row[0]:
                                 continue
                             if next_shares_column and row[next_shares_column] == 'Y':
-                                etf_and_nextshares_list.append(row[ticker_clumn_list[index]])
+                                etf_and_nextshares_list.append(row[ticker_column_list[index]])
                                 continue
                             if etf_column         and row[etf_column]         == 'Y':
-                                etf_and_nextshares_list.append(row[ticker_clumn_list[index]])
+                                etf_and_nextshares_list.append(row[ticker_column_list[index]])
                                 continue
-                            if '$' in row[ticker_clumn_list[index]]: # AAIC$B -> <stock_symbol>$<letter> --> keep just the stock_Symbol
-                                stock_symbol = row[ticker_clumn_list[index]].split('$')[0]
+                            if '$' in row[ticker_column_list[index]]: # AAIC$B -> <stock_symbol>$<letter> --> keep just the stock_Symbol
+                                stock_symbol = row[ticker_column_list[index]].split('$')[0]
                             else:
-                                stock_symbol = row[ticker_clumn_list[index]]
+                                stock_symbol = row[ticker_column_list[index]]
                             if len(stock_symbol) == 5: # https://www.investopedia.com/ask/answers/06/nasdaqfifthletter.asp
                                 if stock_symbol[4] in ['Q', 'W', 'C']: # Q: Bankruptcy, W: Warrant, C: Nextshares (Example: https://funds.eatonvance.com/includes/loadDocument.php?fn=20939.pdf&dt=fundPDFs)
                                     continue
