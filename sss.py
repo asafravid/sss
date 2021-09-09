@@ -22,7 +22,6 @@
 
 
 # TODO: ASAFR:  0. Auto-Update Nasdaq (NSR) Indices as done with TASE
-#               0.1. revenueGrowth is available in info -> use it!
 #               1.0. https://en.wikipedia.org/wiki/Piotroski_F-score
 #               1.2. https://en.wikipedia.org/wiki/Magic_formula_investing
 #               1.3. https://www.oldschoolvalue.com/investing-strategy/backtest-graham-nnwc-ncav-screen/
