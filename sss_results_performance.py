@@ -107,7 +107,7 @@ pd_database_close      = None
 for results_input_path in results_input_paths:
     results_input_path = results_input_path.replace("\\",'/')[:-1]
     print('\n Analyzing {}:'.format(results_input_path))
-    results_date       = results_input_path.replace("Results","").replace("Nsr","").replace("All","").replace("Tase","").replace("/","")[:8]
+    results_date       = results_input_path.replace("Results","").replace("Nsr","").replace("All","").replace('Six','').replace("Tase","").replace("/","")[:8]
     #                             year                    month                   day
     start = datetime.datetime(int(results_date[0:4]), int(results_date[4:6]), int(results_date[6:8]))
     end   = datetime.datetime(int(END_DATE_STR[0:4]), int(END_DATE_STR[4:6]), int(END_DATE_STR[6:8]))

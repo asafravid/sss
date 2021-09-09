@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.35 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.40 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -52,7 +52,7 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
 
     # pdf.set_font("Arial", size=8, style='B')
     pdf.set_text_color(0, 0, 200)  # blue
-    pdf.cell(200, 8, txt=title_for_figures, ln=1, align="C")  # http://fpdf.org/en/doc/cell.htm
+    pdf.cell(200, 5, txt=title_for_figures, ln=1, align="C")  # http://fpdf.org/en/doc/cell.htm
 
     names       = []
     appearances = []
@@ -79,16 +79,16 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
 
             if col_index < len(row)-1:
                 pdf.set_text_color(0, 0, 200 if row_index == 0 else 0)  # blue for title and black otherwise
-                pdf.cell(w=w, h=4, txt=col, border=1, ln=0, align="C" if row_index == 0 else "L")
+                pdf.cell(w=w, h=3, txt=col, border=1, ln=0, align="C" if row_index == 0 else "L")
             else:
                 # last col is added with the diff col:
                 pdf.set_text_color(0, 0, 200 if row_index == 0 else 0)  # blue for title and black otherwise
-                pdf.cell(w=w, h=4, txt=col.replace('appearance_counter','Grade'), border=1, ln=0, align="C" if row_index == 0 else "L")
+                pdf.cell(w=w, h=3, txt=col.replace('appearance_counter','Grade'), border=1, ln=0, align="C" if row_index == 0 else "L")
                 if w_diff:
                     if diff_list is not None and row_index < len(diff_list):
                         if row_index == 0:
                             pdf.set_text_color(0, 0, 200 if row_index == 0 else 0)  # blue for title and black otherwise
-                            pdf.cell(w=w, h=4, txt='שינוי'[::-1] if tase_mode else 'Change', border=1, ln=1, align="C")
+                            pdf.cell(w=w, h=3, txt='שינוי'[::-1] if tase_mode else 'Change', border=1, ln=1, align="C")
                         else:
                             if 'new' in str(diff_list[row_index]):
                                 pdf.set_text_color(0, 0, 200)  # blue
@@ -98,8 +98,8 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
                                 pdf.set_text_color(0,200,0)   # green
                             else:
                                 pdf.set_text_color(0, 0, 0)   # black
-                            pdf.cell(w=w, h=4, txt=str(diff_list[row_index]), border=1, ln=1, align="L")
-    pdf.cell(200, 4, txt='', ln=1, align="L")
+                            pdf.cell(w=w, h=3, txt=str(diff_list[row_index]), border=1, ln=1, align="L")
+    pdf.cell(200, 3, txt='', ln=1, align="L")
     fig, ax = plt.subplots(figsize=(15, 10))
     y_pos = np.arange(len(names))
 
@@ -122,11 +122,11 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
         lecture_description                   = 'הרצאה על הסורק'[::-1]
 
         pdf.set_text_color(0, 0, 200)  # blue
-        pdf.cell(30, 4, txt=telegram_channel_description,          ln=0, align="C", border=1)
-        pdf.cell(39, 4, txt=telegram_discussion_group_description, ln=0, align="C", border=1)
-        pdf.cell(55, 4, txt=open_source_description,               ln=0, align="C", border=1)
-        pdf.cell(40, 4, txt=the_engine_begind_description,         ln=0, align="C", border=1)
-        pdf.cell(32, 4, txt=lecture_description,                   ln=1, align="C", border=1)
+        pdf.cell(30, 3, txt=telegram_channel_description,          ln=0, align="C", border=1)
+        pdf.cell(39, 3, txt=telegram_discussion_group_description, ln=0, align="C", border=1)
+        pdf.cell(55, 3, txt=open_source_description,               ln=0, align="C", border=1)
+        pdf.cell(40, 3, txt=the_engine_begind_description,         ln=0, align="C", border=1)
+        pdf.cell(32, 3, txt=lecture_description,                   ln=1, align="C", border=1)
 
 
         html_telegram_channel_description          = "<A HREF=""https://t.me/investorsIL"">t.me/investorsIL</A><"
@@ -144,7 +144,7 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
         html_lecture_description                   = "  <A HREF=""http://bit.ly/SssLecture"">bit.ly/SssLecture</A>"
         pdf.write_html(text=html_lecture_description)
 
-        pdf.cell(200, 4, txt='', ln=1, align="R")
+        pdf.cell(200, 3, txt='', ln=1, align="R")
         html_telegram_channel_description     = "<p><img src=""{}"" width=""600"" height=""250""></p>".format(csv_filename+"_fig.png")
         
         pdf.write_html(text=html_telegram_channel_description)
@@ -152,7 +152,8 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
         html="<p>Added-Value Channel in Telegram: <A HREF=""https://t.me/investorsIL"">https://t.me/investorsIL</A></p>" \
              "<p>Updates, Discussions and Technical Support on Telegram: <A HREF=""https://t.me/StockScannerIL"">https://t.me/StockScannerIL</A></p>" \
              "<p>This Scanner is Open Source. fork() here: <A HREF=""http://bit.ly/OpenSourceStockScanner"">http://bit.ly/OpenSourceStockScanner</A></p>" \
-             "<p>Lecture: <A HREF=""http://bit.ly/SssLecture"">http://bit.ly/SssLecture</A>, One-Pagers: <A HREF=""http://bit.ly/SssCoreEquation"">http://bit.ly/SssCoreEquation</A>, <A HREF=""http://bit.ly/MultiDimensionalScan"">http://bit.ly/MultiDimensionalScan</A></p>" \
+             "<p>Lectures: <A HREF=""https://bit.ly/ZoomLectureMultiDimScan"">https://bit.ly/ZoomLectureMultiDimScan</A>, <A HREF=""http://bit.ly/SssLecture"">http://bit.ly/SssLecture</A></p>" \
+             "<p>One-Pagers: <A HREF=""http://bit.ly/SssCoreEquation"">http://bit.ly/SssCoreEquation</A>, <A HREF=""http://bit.ly/MultiDimensionalScan"">http://bit.ly/MultiDimensionalScan</A></p>" \
              "<p>Disclaimer: Scan Results are not recommendations! They only represent a basis for Research and Analysis.</p>" \
              "<p><img src=""{}"" width=""600"" height=""250""></p>".format(csv_filename+"_fig.png")
         pdf.write_html(text=html)
