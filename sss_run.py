@@ -608,11 +608,11 @@ else:                   # Research Mode:
     if run_custom:
         if not sss_config.aggregate_only:
             for db_filename in DB_FILENAMES:
-                pi_range_custom          = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='held_percent_insiders',    num_sections=7, reverse=0)
-                ev_range_custom          = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='enterprise_value',         num_sections=7, reverse=0)
-                pe_range_custom          = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='pe_effective',             num_sections=7, reverse=1)
-                evr_range_custom         = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='evr_effective',            num_sections=6, reverse=1)
-                pm_ratios_range_custom   = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='effective_profit_margin',  num_sections=7, reverse=0)
+                pi_range_custom          = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='held_percent_insiders',    num_sections=3, reverse=0)
+                ev_range_custom          = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='enterprise_value',         num_sections=3, reverse=0)
+                pe_range_custom          = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='pe_effective',             num_sections=4, reverse=1)
+                evr_range_custom         = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='evr_effective',            num_sections=5, reverse=1)
+                pm_ratios_range_custom   = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='effective_profit_margin',  num_sections=6, reverse=0)
 
                 ev_millions_range_custom = [int(  ev/1000000                       ) for ev in ev_range_custom       ]
                 pm_range_custom          = [round(pm*100,    sss.NUM_ROUND_DECIMALS) for pm in pm_ratios_range_custom]

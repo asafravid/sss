@@ -25,11 +25,11 @@ ALL_COUNTRY_SYMBOLS_US  = 1  # Nasdaq
 ALL_COUNTRY_SYMBOLS_SIX = 2  # Swiss Stock Exchange
 
 run_custom_tase      = False   # Custom Portfolio
-run_custom           = False
+run_custom           = True
 run_tase             = False    # Tel Aviv Stock Exchange
 run_nsr              = False   # NASDAQ100+S&P500+RUSSEL1000
 run_all              = False   # All Nasdaq Stocks
-run_six              = True    # All Swiss Stocks
+run_six              = False    # All Swiss Stocks
 research_mode        = True    # Research Mode
 aggregate_only       = False
 research_mode_max_ev = False   # @JustLearning's suggestion in Telegram: Multi-Dimensional Scan by Max EV Limit rather than Min EV Limit
@@ -49,7 +49,7 @@ reference_run_nsr    = 'Results/Nsr/20210828-230028_Tchnlgy3.0_FnnclSrvcs0.5_Bdb
 reference_run_all    = 'Results/All/220210829-114414_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes3318'
 reference_run_six    = 'Results/Six/20210909-143511_S_Bdb_nRes30'
 
-new_run_custom = 'Results/Custom/20210820-144435_Bdb_nRes293_Custom'
+new_run_custom = 'Results/Custom/20210909-154648_Bdb_nRes309_Custom'
 new_run_tase   = 'Results/Tase/20210903-130138_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes328'
 new_run_nsr    = 'Results/Nsr/20210828-230028_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes800'
 new_run_all    = 'Results/All/20210829-114414_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes3318'
