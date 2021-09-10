@@ -2131,7 +2131,8 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
                     symbol = yf.Ticker(symb)
             stock_data = StockData(symbol=symb)
             process_info_result = process_info(symbol=symbol, stock_data=stock_data, build_csv_db_only=build_csv_db_only, tase_mode=tase_mode, sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, build_csv_db=build_csv_db, profit_margin_limit=profit_margin_limit, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, debt_to_equity_limit=debt_to_equity_limit, pi_limit=pi_limit, enterprise_value_millions_usd_limit=enterprise_value_millions_usd_limit, research_mode_max_ev=research_mode_max_ev, eqg_min=eqg_min, rqg_min=rqg_min, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, market_cap_included=market_cap_included, research_mode=research_mode, currency_conversion_tool=currency_conversion_tool, currency_conversion_tool_alternative=currency_conversion_tool_alternative, currency_conversion_tool_manual=currency_conversion_tool_manual, reference_db=reference_db, reference_db_title_row=reference_db_title_row, db_filename=None)
-            if tase_mode and 'TLV:' not in stock_data.symbol: stock_data.symbol = 'TLV:' + stock_data.symbol.replace('.TA', '').replace('.', '-')
+            if tase_mode                                                      and 'TLV:' not in stock_data.symbol: stock_data.symbol = 'TLV:' + stock_data.symbol.replace('.TA', '').replace('.', '-')
+            if read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_SIX and 'SWX:' not in stock_data.symbol: stock_data.symbol = 'SWX:' + stock_data.symbol.replace('.SW', '').replace('.', '-')
 
             row_to_append = get_db_row_from_stock_data(stock_data)
             # Find symbol in reference_db:
@@ -2201,7 +2202,8 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
             if not process_info(symbol=symbol, stock_data=stock_data, build_csv_db_only=build_csv_db_only, tase_mode=tase_mode, sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, build_csv_db=build_csv_db, profit_margin_limit=profit_margin_limit, pi_limit=pi_limit, enterprise_value_millions_usd_limit=enterprise_value_millions_usd_limit, research_mode_max_ev=research_mode_max_ev, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, debt_to_equity_limit=debt_to_equity_limit, eqg_min=eqg_min, rqg_min=rqg_min, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, market_cap_included=market_cap_included, research_mode=research_mode, currency_conversion_tool=currency_conversion_tool, currency_conversion_tool_alternative=currency_conversion_tool_alternative, currency_conversion_tool_manual=currency_conversion_tool_manual, reference_db=reference_db, reference_db_title_row=reference_db_title_row, db_filename=db_filename):
                 if research_mode: continue
 
-            if tase_mode and 'TLV:' not in stock_data.symbol: stock_data.symbol = 'TLV:' + stock_data.symbol.replace('.TA', '').replace('.','-')
+            if tase_mode                                                      and 'TLV:' not in stock_data.symbol: stock_data.symbol = 'TLV:' + stock_data.symbol.replace('.TA', '').replace('.','-')
+            if read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_SIX and 'SWX:' not in stock_data.symbol: stock_data.symbol = 'SWX:' + stock_data.symbol.replace('.SW', '').replace('.','-')
 
             dividends_sum = stock_data.last_dividend_0 + stock_data.last_dividend_1 + stock_data.last_dividend_2 + stock_data.last_dividend_3
 
