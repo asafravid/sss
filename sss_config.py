@@ -46,7 +46,7 @@ automatic_results_folder_selection = False
 reference_run_custom = 'Results/Custom/20210816-014004_Bdb_nRes289_Custom'
 reference_run_tase   = 'Results/Tase/20210910-074459_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes332'
 reference_run_nsr    = 'Results/Nsr/20210828-230028_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes800'
-reference_run_all    = 'Results/All/20210829-114414_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes3318'
+reference_run_all    = 'Results/All/20210912-092015_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes3409'
 reference_run_six    = 'Results/Six/20210910-085050_S_Bdb_nRes30'
 
 new_run_custom = 'Results/Custom/20210909-154648_Bdb_nRes309_Custom'
