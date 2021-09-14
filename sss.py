@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.40 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.42 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -2125,14 +2125,16 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
             if tase_mode:
                 symbol = yf.Ticker(symb)
             else:
-                if read_all_country_symbols != sss_config.ALL_COUNTRY_SYMBOLS_SIX:
+                if read_all_country_symbols not in [sss_config.ALL_COUNTRY_SYMBOLS_SIX, sss_config.ALL_COUNTRY_SYMBOLS_ST]:
                     symbol = yf.Ticker(symb.replace('.','-'))  # TODO: ASFAR: Sometimes the '.' Is needed, especially for non-US companies. See for instance 5205.kl. In this case the parameter is also case-sensitive! -> https://github.com/pydata/pandas-datareader/issues/810#issuecomment-789684354
                 else:
+                    if read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_ST and '.ST' not in symb: symb = symb.replace('.S.DX', '.ST')
                     symbol = yf.Ticker(symb)
             stock_data = StockData(symbol=symb)
             process_info_result = process_info(symbol=symbol, stock_data=stock_data, build_csv_db_only=build_csv_db_only, tase_mode=tase_mode, sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, build_csv_db=build_csv_db, profit_margin_limit=profit_margin_limit, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, debt_to_equity_limit=debt_to_equity_limit, pi_limit=pi_limit, enterprise_value_millions_usd_limit=enterprise_value_millions_usd_limit, research_mode_max_ev=research_mode_max_ev, eqg_min=eqg_min, rqg_min=rqg_min, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, market_cap_included=market_cap_included, research_mode=research_mode, currency_conversion_tool=currency_conversion_tool, currency_conversion_tool_alternative=currency_conversion_tool_alternative, currency_conversion_tool_manual=currency_conversion_tool_manual, reference_db=reference_db, reference_db_title_row=reference_db_title_row, db_filename=None)
-            if tase_mode                                                      and 'TLV:' not in stock_data.symbol: stock_data.symbol = 'TLV:' + stock_data.symbol.replace('.TA', '').replace('.', '-')
-            if read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_SIX and 'SWX:' not in stock_data.symbol: stock_data.symbol = 'SWX:' + stock_data.symbol.replace('.SW', '').replace('.', '-')
+            if   tase_mode                                                      and 'TLV:' not in stock_data.symbol: stock_data.symbol = 'TLV:' + stock_data.symbol.replace('.TA', '').replace('.', '-')
+            elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_SIX and 'SWX:' not in stock_data.symbol: stock_data.symbol = 'SWX:' + stock_data.symbol.replace('.SW', '').replace('.', '-')
+            elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_ST  and 'STO:' not in stock_data.symbol: stock_data.symbol = 'STO:' + stock_data.symbol.replace('.ST', '').replace('.', '-')
 
             row_to_append = get_db_row_from_stock_data(stock_data)
             # Find symbol in reference_db:
@@ -2202,8 +2204,9 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
             if not process_info(symbol=symbol, stock_data=stock_data, build_csv_db_only=build_csv_db_only, tase_mode=tase_mode, sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, build_csv_db=build_csv_db, profit_margin_limit=profit_margin_limit, pi_limit=pi_limit, enterprise_value_millions_usd_limit=enterprise_value_millions_usd_limit, research_mode_max_ev=research_mode_max_ev, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, debt_to_equity_limit=debt_to_equity_limit, eqg_min=eqg_min, rqg_min=rqg_min, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, market_cap_included=market_cap_included, research_mode=research_mode, currency_conversion_tool=currency_conversion_tool, currency_conversion_tool_alternative=currency_conversion_tool_alternative, currency_conversion_tool_manual=currency_conversion_tool_manual, reference_db=reference_db, reference_db_title_row=reference_db_title_row, db_filename=db_filename):
                 if research_mode: continue
 
-            if tase_mode                                                      and 'TLV:' not in stock_data.symbol: stock_data.symbol = 'TLV:' + stock_data.symbol.replace('.TA', '').replace('.','-')
-            if read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_SIX and 'SWX:' not in stock_data.symbol: stock_data.symbol = 'SWX:' + stock_data.symbol.replace('.SW', '').replace('.','-')
+            if   tase_mode                                                      and 'TLV:' not in stock_data.symbol: stock_data.symbol = 'TLV:' + stock_data.symbol.replace('.TA',   '').replace('.','-')
+            elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_SIX and 'SWX:' not in stock_data.symbol: stock_data.symbol = 'SWX:' + stock_data.symbol.replace('.SW',   '').replace('.','-')
+            elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_ST  and 'STO:' not in stock_data.symbol: stock_data.symbol = 'STO:' + stock_data.symbol.replace('.S.DX', '').replace('.','-')
 
             dividends_sum = stock_data.last_dividend_0 + stock_data.last_dividend_1 + stock_data.last_dividend_2 + stock_data.last_dividend_3
 
@@ -2288,7 +2291,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
     stocks_list_tase        = []
 
 
-    if not tase_mode and not research_mode and build_csv_db and read_all_country_symbols != sss_config.ALL_COUNTRY_SYMBOLS_SIX:
+    if not tase_mode and not research_mode and build_csv_db and read_all_country_symbols not in [sss_config.ALL_COUNTRY_SYMBOLS_SIX, sss_config.ALL_COUNTRY_SYMBOLS_ST]:
         payload            = pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies') # There are 2 tables on the Wikipedia page, get the first table
         first_table        = payload[0]
         second_table       = payload[1]
@@ -2380,6 +2383,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
     if not research_mode and build_csv_db:
         symbols_united_states               = []
         symbols_six                         = []
+        symbols_st                          = []
         etf_and_nextshares_list             = []
         if read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_SIX:
             filenames_list     = ['Indices/six_closing.csv']  # https://www.six-group.com/en/products-services/the-swiss-stock-exchange/market-data/shares/closing-prices.html -> https://www.six-group.com/fqs/closing.csv?select=ShortName,ISIN,ValorSymbol,ValorNumber,ClosingPrice,DailyHighPrice,DailyLowPrice,LatestTradeDate,PreviousClosingPrice,OpeningPrice,OnMarketVolume,OffBookVolume,SwissAtMidVolume,TotalVolume,TradingBaseCurrency,YearlyHighDate,YearlyHighPrice,YearlyLowDate,YearlyLowPrice,FirstTradingDate,LastTradingDate,Exchange,SecTypeCode,GeographicalAreaCode,Tminus1Volume,VWAP60Price&where=ProductLine=BC&orderby=ShortName&page=1&pagesize=9999999
@@ -2396,6 +2400,24 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
                             row_index += 1
                             stock_symbol = row[ticker_column_list[index]]
                             symbols_six.append(stock_symbol+'.SW')
+
+        elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_ST:
+            filenames_list     = ['Indices/swedish_stocks_list_filtered.csv']
+            ticker_column_list = [0                                         ]  # Column 0 is Symbol
+            for index, filename in enumerate(filenames_list):
+                with open(filename, mode='r', newline='') as engine:
+                    reader = csv.reader(engine, delimiter=',')
+                    row_index = 0
+                    for row in reader:
+                        if row_index == 0:
+                            row_index += 1
+                            continue
+                        else:
+                            row_index += 1
+                            if VERBOSE_LOGS: print('[sss_run] ticker_column_list[index={}] = {}, row = {}'.format(index, ticker_column_list[index], row))
+                            stock_symbol = row[ticker_column_list[index]]
+                            if '.S.DX' not in stock_symbol: continue
+                            symbols_st.append(stock_symbol)
 
         elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_US:
             nasdaq_filenames_list = ['Indices/nasdaqlisted.csv', 'Indices/otherlisted.csv', 'Indices/nasdaqtraded.csv']  # Checkout http://www.nasdaqtrader.com/trader.aspx?id=symboldirdefs for all symbol definitions (for instance - `$` in stock names, 5-letter stocks ending with `Y`)
@@ -2441,7 +2463,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
                                     continue
                             symbols_united_states.append(stock_symbol)
 
-        symbols = symbols_snp500 + symbols_snp500_download + symbols_nasdaq100 + symbols_nasdaq_100_csv + symbols_russel1000 + symbols_russel1000_csv + symbols_united_states + symbols_six
+        symbols = symbols_snp500 + symbols_snp500_download + symbols_nasdaq100 + symbols_nasdaq_100_csv + symbols_russel1000 + symbols_russel1000_csv + symbols_united_states + symbols_six + symbols_st
 
     if not research_mode and tase_mode and build_csv_db:
         symbols = symbols_tase + stocks_list_tase
@@ -2702,10 +2724,12 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
     mode_str = 'Nsr' # Default is Nasdaq100+S&P500+Russel1000
     if   read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_US:  mode_str = 'All'
     elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_SIX: mode_str = 'Six'
+    elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_ST:  mode_str = 'St'
     elif tase_mode:                      mode_str              = 'Tase'
     if   len(custom_portfolio):          mode_str              = 'Custom'
     if   read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_US:  all_str               = '_A'
     elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_SIX: all_str = '_S'
+    elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_ST:  all_str = '_St'
     if build_csv_db == 0:                csv_db_str            = '_DBR'
     if build_csv_db_only:                build_csv_db_only_str = '_Bdb'
     if len(custom_portfolio):            custom_portfolio_str  = '_Custom'
