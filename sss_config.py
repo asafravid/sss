@@ -26,13 +26,13 @@ ALL_COUNTRY_SYMBOLS_SIX = 2  # Swiss Stock Exchange
 ALL_COUNTRY_SYMBOLS_ST  = 3  # Swrdish (Stockholm) Stock Exchange
 
 run_custom_tase      = False   # Custom Portfolio
-run_custom           = False
-run_tase             = True    # Tel Aviv Stock Exchange
+run_custom           = True
+run_tase             = False    # Tel Aviv Stock Exchange
 run_nsr              = False   # NASDAQ100+S&P500+RUSSEL1000
 run_all              = False   # All Nasdaq Stocks
 run_six              = False    # All Swiss Stocks
 run_st               = False    # All (Stockholm) Swedish Stocks
-research_mode        = False    # Research Mode
+research_mode        = True    # Research Mode
 aggregate_only       = False
 research_mode_max_ev = False   # @JustLearning's suggestion in Telegram: Multi-Dimensional Scan by Max EV Limit rather than Min EV Limit
 
@@ -45,14 +45,14 @@ automatic_results_folder_selection = False
 # Upon 1st ever run: reference must be set to None
 # After 1st ever Run: Recommended to use reference (filter and damper)
 # The research mode shall run on new_run as input (new_run >= reference_run) where > means newer
-reference_run_custom = 'Results/Custom/20210816-014004_Bdb_nRes289_Custom'
+reference_run_custom = 'Results/Custom/20210909-154648_Bdb_nRes309_Custom'
 reference_run_tase   = 'Results/Tase/20210915-100103_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes333'
 reference_run_nsr    = 'Results/Nsr/20210912-133814_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes889'
 reference_run_all    = 'Results/All/20210912-092015_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes3409'
 reference_run_six    = 'Results/Six/20210910-085050_S_Bdb_nRes30'
 reference_run_st     = 'Results/St/20210915-023602_St_Bdb_nRes130'
 
-new_run_custom = 'Results/Custom/20210909-154648_Bdb_nRes309_Custom'
+new_run_custom = 'Results/Custom/20210917-201728_Bdb_nRes312_Custom'
 new_run_tase   = 'Results/Tase/20210915-100103_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes333'
 new_run_nsr    = 'Results/Nsr/20210912-133814_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes889'
 new_run_all    = 'Results/All/20210912-092015_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes3409'
@@ -61,7 +61,7 @@ new_run_six    = 'Results/Six/20210910-085050_S_Bdb_nRes30'
 new_run_st     = 'Results/St/20210915-023602_St_Bdb_nRes130'
 
 # TODO: ASAFR: Why is normalized AGIO giving a Good low value?? this is deceiving! Check this
-custom_portfolio      = ['GIS', 'RE', 'STZ', 'COG', 'SWK', 'INVA', 'ACGL', 'ES', 'ATVI', 'RNR', 'ETR', 'ALGN', 'VST', 'EXEL', 'PEG', 'OHI', 'NGG', 'DGX', 'ESGR', 'COO', 'TGT', 'BDN', 'MDLZ', 'SCI', 'SRE', 'AVB', 'CRUS', 'MMM', 'WSM', 'LDOS', 'CDK', 'ABBV', 'UTHR', 'HOLX', 'LH', 'APT', 'DG', 'VRSN', 'BIO', 'NBIX', 'MBT', 'ZIM', 'ALL', 'DOX', 'GD', 'LOPE', 'TROW', 'ARE', 'ADM', 'CHKP', 'AZPN', 'ORCL', 'ICE', 'GLPI', 'HUN', 'AMCR', 'VEDL', 'HD', 'EXR', 'TRP', 'NEU', 'PG', 'WPC', 'TSCO', 'LMT', 'CUZ', 'HIW', 'TMO', 'AKAM', 'TRV', 'DRE', 'MCY', 'VICI', 'FTV', 'GM', 'GHC', 'GPP', 'QDEL', 'GNTX', 'NOC', 'RGLD', 'CB', 'FDUS', 'BTI', 'CDNS', 'AMG', 'WPM', 'CPB', 'LPX', 'CACC', 'LITE', 'KIM', 'COOP', 'BRK.B', 'BXP', 'OLP', 'VZ', 'SMFG', 'SKM', 'WMT', 'LAKE', 'AGO', 'SSNC', 'PRIM', 'VMW', 'REGN', 'SEB', 'MCO', 'PGR', 'JEF', 'MSFT', 'JAZZ', 'PNFP', 'SLM', 'HAPP', 'DLB', 'BLK', 'FCPT', 'AEF', 'TRNO', 'AFL', 'OMF', 'INTC', 'TDS', 'ORAN', 'AMGN', 'DISH', 'FAST', 'PNC', 'CMCSA', 'HTH', 'PCAR', 'BPOP', 'NEM', 'FLGT', 'OLLI', 'ACN', 'CSCO', 'TXN', 'BLDR', 'MFC', 'KNOP', 'BTG', 'GIB', 'CDW', 'VRTX', 'KMI', 'AVGO', 'JPM', 'BBY', 'SONY', 'PKX', 'WTFC', 'FRC', 'PBFX', 'GTLS', 'MS', 'APH', 'HZNP', 'NVO', 'RS', 'ALLY', 'BWXT', 'SCHW', 'LEJU', 'PBCT', 'FCNCA', 'GRMN', 'KNX', 'ATH', 'MRK', 'COLM', 'RKT', 'SNDR', 'PB', 'KGC', 'ARW', 'QCOM', 'USB', 'TM', 'STLD', 'PHI', 'CE', 'SUPN', 'MX', 'CE', 'RF', 'NVR', 'FDX', 'NVEC', 'AAPL', 'OPRA', 'USM', 'EBAY', 'C', 'TER', 'DD', 'WFC', 'TEL', 'TX', 'FB', 'MT', 'HMY', 'GFI', 'BAC', 'GS', 'OZK', 'VIACA', 'EPD', 'RIO', 'MRCY', 'BOKF', 'CI', 'UNH', 'MAS', 'MRVL', 'BMRN', 'NVDA', 'CNC', 'TSN', 'SBSW', 'MPLX', 'KLAC', 'COF', 'CGNX', 'FKWL', 'TPC', 'AL', 'THO', 'HPQ', 'LRCX', 'TLK', 'TKC', 'NUS', 'VIAC', 'UI', 'BIIB', 'ZION', 'ANTM', 'JD', 'ZTO', 'MU', 'FRO', 'MDC', 'WAL', 'DAC', 'ZUMZ', 'FF', 'SWKS', 'TTEC', 'LEN.B', 'ZM', 'SYF', 'AMAT', 'QRVO', 'FOXA', 'WY', 'DFS', 'FOX', 'MKSI', 'PM', 'NUE', 'TSM', 'MTH', 'WLK', 'MGM', 'LYB', 'LOGI', 'STT', 'ASX', 'BIDU', 'ENVA', 'BABA', 'SBNY', 'CPRX', 'DHI', 'BMA', 'FHN', 'UWMC', 'AMD', 'GTN', 'MRNA', 'MOS', 'SNX', 'LEN', 'MHO', 'CCS', 'TROX', 'TOL', 'YY', 'SCCO', 'VALE', 'RILY', 'TRQ', 'SID', 'STX', 'UHS', 'CIG', 'HIMX', 'VIV', 'NTES', 'ABEV', 'ONEW', 'MARA', 'IMOS', 'ACTG', 'CEPU', 'GGB', 'PHM', 'GRVY', 'ELP', 'HMLP', 'IRCP']
+custom_portfolio      = ['AAPL', 'ABBV', 'ABEV', 'ACGL', 'ACN', 'ACTG', 'ADM', 'AEF', 'AFL', 'AGIO', 'AGO', 'AKAM', 'AL', 'ALGN', 'ALL', 'ALLY', 'AMAT', 'AMCR', 'AMD', 'AMG', 'AMGN', 'ANTM', 'APH', 'APT', 'ARE', 'ARW', 'ASX', 'ATH', 'ATVI', 'AVB', 'AVGO', 'AZPN', 'BABA', 'BAC', 'BBY', 'BDN', 'BEN', 'BIDU', 'BIIB', 'BIO', 'BLDR', 'BLK', 'BMA', 'BMRN', 'BOKF', 'BPOP', 'BRK.B', 'BTG', 'BTI', 'BWXT', 'BXP', 'C', 'CACC', 'CB', 'CCS', 'CDK', 'CDNS', 'CDW', 'CE', 'CE', 'CEPU', 'CGNX', 'CHKP', 'CI', 'CIG', 'CMCSA', 'CNC', 'COF', 'COG', 'COLM', 'COO', 'COOP', 'CPB', 'CPRX', 'CRUS', 'CSCO', 'CUZ', 'DAC', 'DD', 'DFS', 'DG', 'DGX', 'DHI', 'DISH', 'DLB', 'DOX', 'DRE', 'DVA', 'EBAY', 'ELP', 'ENVA', 'EPD', 'ES', 'ESGR', 'ETR', 'EXEL', 'EXR', 'FAST', 'FB', 'FCNCA', 'FCPT', 'FDUS', 'FDX', 'FF', 'FHN', 'FKWL', 'FLGT', 'FOX', 'FOXA', 'FRC', 'FRO', 'FTV', 'GD', 'GFI', 'GGB', 'GHC', 'GIB', 'GIS', 'GLPI', 'GM', 'GNTX', 'GPP', 'GRMN', 'GRVY', 'GS', 'GTLS', 'GTN', 'HAPP', 'HD', 'HIMX', 'HIW', 'HMLP', 'HMY', 'HOLX', 'HPQ', 'HTH', 'HUN', 'HZNP', 'ICE', 'IMOS', 'INTC', 'INVA', 'IRCP', 'JAZZ', 'JD', 'JEF', 'JPM', 'KGC', 'KIM', 'KLAC', 'KMI', 'KNOP', 'KNX', 'LAKE', 'LDOS', 'LEJU', 'LEN', 'LEN.B', 'LH', 'LITE', 'LMT', 'LOGI', 'LOPE', 'LPX', 'LRCX', 'LYB', 'MARA', 'MAS', 'MBT', 'MCO', 'MCY', 'MDC', 'MDLZ', 'MFC', 'MGM', 'MHO', 'MKSI', 'MMM', 'MOS', 'MPLX', 'MRCY', 'MRK', 'MRNA', 'MRVL', 'MS', 'MSFT', 'MT', 'MTH', 'MU', 'MX', 'NBIX', 'NEM', 'NEU', 'NGG', 'NOC', 'NTES', 'NUE', 'NUS', 'NVDA', 'NVEC', 'NVO', 'NVR', 'OHI', 'OLLI', 'OLP', 'OMF', 'ONEW', 'OPRA', 'ORAN', 'ORCL', 'OZK', 'PB', 'PBCT', 'PBFX', 'PCAR', 'PEG', 'PG', 'PGR', 'PHI', 'PHM', 'PKX', 'PM', 'PNC', 'PNFP', 'PRIM', 'QCOM', 'QDEL', 'QRVO', 'RE', 'REGN', 'RF', 'RGLD', 'RILY', 'RIO', 'RKT', 'RNR', 'RS', 'SBNY', 'SBSW', 'SCCO', 'SCHW', 'SCI', 'SEB', 'SID', 'SKM', 'SLM', 'SMFG', 'SNDR', 'SNX', 'SONY', 'SRE', 'SSNC', 'STLD', 'STT', 'STX', 'STZ', 'SUPN', 'SWK', 'SWKS', 'SYF', 'TDS', 'TEL', 'TER', 'TGT', 'THO', 'TKC', 'TLK', 'TM', 'TMO', 'TOL', 'TPC', 'TRNO', 'TROW', 'TROX', 'TRP', 'TRQ', 'TRV', 'TSCO', 'TSM', 'TSN', 'TTEC', 'TX', 'TXN', 'UHS', 'UI', 'UNH', 'USB', 'USM', 'UTHR', 'UWMC', 'VALE', 'VEDL', 'VIAC', 'VIACA', 'VICI', 'VIV', 'VMW', 'VRSN', 'VRTX', 'VST', 'VZ', 'WAL', 'WFC', 'WLK', 'WMT', 'WPC', 'WPM', 'WSM', 'WTFC', 'WY', 'YY', 'ZIM', 'ZION', 'ZM', 'ZTO', 'ZUMZ']
 custom_portfolio_tase = ['FORTY.TA']
 
 # TODO: ASAFR: Check these warnings:
