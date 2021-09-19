@@ -26,11 +26,11 @@ ALL_COUNTRY_SYMBOLS_SIX = 2  # Swiss Stock Exchange
 ALL_COUNTRY_SYMBOLS_ST  = 3  # Swrdish (Stockholm) Stock Exchange
 
 run_custom_tase      = False   # Custom Portfolio
-run_custom           = True
+run_custom           = False
 run_tase             = False    # Tel Aviv Stock Exchange
 run_nsr              = False   # NASDAQ100+S&P500+RUSSEL1000
 run_all              = False   # All Nasdaq Stocks
-run_six              = False    # All Swiss Stocks
+run_six              = True    # All Swiss Stocks
 run_st               = False    # All (Stockholm) Swedish Stocks
 research_mode        = True    # Research Mode
 aggregate_only       = False
@@ -57,7 +57,7 @@ new_run_tase   = 'Results/Tase/20210915-100103_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRe
 new_run_nsr    = 'Results/Nsr/20210912-133814_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes889'
 new_run_all    = 'Results/All/20210912-092015_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes3409'
 new_run_six    = 'Results/Six/20210910-085050_S_Bdb_nRes30'
-new_run_six    = 'Results/Six/20210910-085050_S_Bdb_nRes30'
+new_run_six    = 'Results/Six/20210919-072727_S_Bdb_nRes30'
 new_run_st     = 'Results/St/20210915-023602_St_Bdb_nRes130'
 
 # TODO: ASAFR: Why is normalized AGIO giving a Good low value?? this is deceiving! Check this

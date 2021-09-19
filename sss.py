@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.42 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.43 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -2734,7 +2734,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
     if build_csv_db_only:                build_csv_db_only_str = '_Bdb'
     if len(custom_portfolio):            custom_portfolio_str  = '_Custom'
     date_and_time = time.strftime("Results/{}/%Y%m%d-%H%M%S{}{}{}{}{}{}{}{}".format(mode_str, tase_str, sectors_str.replace(' ','').replace('a','').replace('e','').replace('i','').replace('o','').replace('u',''), countries_str, all_str, csv_db_str, build_csv_db_only_str, num_results_str, custom_portfolio_str))
-
+    print('\n[DV] Scan Results placed in {}'.format(date_and_time))
     filenames_list = sss_filenames.create_filenames_list(date_and_time)
 
     evr_pm_col_title_row = ['Maximal price_to_earnings_limit: {}, Maximal enterprise_value_to_revenue_limit: {}, Minimal profit_margin_limit: {}'.format(price_to_earnings_limit, enterprise_value_to_revenue_limit, profit_margin_limit)]
