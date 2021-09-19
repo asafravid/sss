@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.44 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.45 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -23,7 +23,7 @@
 
 # TODO: ASAFR:  0. Auto-Update Nasdaq (NSR) Indices as done with TASE
 #               0.1. Add All Swiss   Stocks to A dedicated scan: https://www.six-group.com/en/products-services/the-swiss-stock-exchange/market-data/shares/closing-prices.html, https://www.six-group.com/fqs/closing.csv?select=ShortName,ISIN,ValorSymbol,ValorNumber,ClosingPrice,DailyHighPrice,DailyLowPrice,LatestTradeDate,PreviousClosingPrice,OpeningPrice,OnMarketVolume,OffBookVolume,SwissAtMidVolume,TotalVolume,TradingBaseCurrency,YearlyHighDate,YearlyHighPrice,YearlyLowDate,YearlyLowPrice,FirstTradingDate,LastTradingDate,Exchange,SecTypeCode,GeographicalAreaCode,Tminus1Volume,VWAP60Price&where=ProductLine=BC&orderby=ShortName&page=1&pagesize=9999999
-#               0.2. Add All Swedish Stocks to a Dedicated Scan
+#               0.2. Run a profiler on the research_mode to try and make it faster (and thus ready for more dimensions!)
 #               1.0. https://en.wikipedia.org/wiki/Piotroski_F-score
 #               1.2. https://en.wikipedia.org/wiki/Magic_formula_investing
 #               1.3. https://www.oldschoolvalue.com/investing-strategy/backtest-graham-nnwc-ncav-screen/
@@ -2658,24 +2658,25 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
     rows_diff.extend(    rows0_diff     + rows1_diff     + rows2_diff     + rows3_diff     + rows4_diff     + rows5_diff     + rows6_diff     + rows7_diff     + rows8_diff     + rows9_diff     + rows10_diff     + rows11_diff     + rows12_diff     + rows13_diff     + rows14_diff     + rows15_diff     + rows16_diff     + rows17_diff     + rows18_diff     + rows19_diff    )
 
     # remove (from rows, not from db or diff) rows whose sss[s[s]]_value is a bad one - irrelevant:
-    # TODO: ASAFR: This can be done for non-research_mode only (optimization for faster research mode)
     compact_rows          = []
     compact_rows_no_div   = []
     compact_rows_only_div = []
-    for row in rows:
-        if row[g_sss_value_index_n if "normalized" in db_filename else g_sss_value_index] != BAD_SSS: compact_rows.append(row)
-    for row_no_div in rows_no_div:
-        if row_no_div[g_sss_value_index_n if "normalized" in db_filename else g_sss_value_index] != BAD_SSS: compact_rows_no_div.append(row_no_div)
-    for row_only_div in rows_only_div:
-        if row_only_div[g_sss_value_index_n if "normalized" in db_filename else g_sss_value_index] != BAD_SSS: compact_rows_only_div.append(row_only_div)
+    if not research_mode:
+        for row in rows:
+            if row[g_sss_value_index_n if "normalized" in db_filename else g_sss_value_index] != BAD_SSS: compact_rows.append(row)
+        for row_no_div in rows_no_div:
+            if row_no_div[g_sss_value_index_n if "normalized" in db_filename else g_sss_value_index] != BAD_SSS: compact_rows_no_div.append(row_no_div)
+        for row_only_div in rows_only_div:
+            if row_only_div[g_sss_value_index_n if "normalized" in db_filename else g_sss_value_index] != BAD_SSS: compact_rows_only_div.append(row_only_div)
 
-    # Now, Sort the compact_rows using the sss_value formula: [1:] skips the 1st title row
-    # TODO: ASAFR: This can be done for non-research_mode only (optimization for faster research mode)
-    sorted_list_db               = sorted(csv_db_data,           key=lambda row:          row[         g_symbol_index_n               if "normalized" in db_filename else g_symbol_index   ],  reverse=False)  # Sort by symbol
-    sorted_list_sss              = sorted(compact_rows,          key=lambda row:          row[         g_sss_value_normalized_index_n if "normalized" in db_filename else g_sss_value_index],  reverse=False)  # Sort by sss_value     -> The lower  - the more attractive
-    sorted_list_sss_no_div       = sorted(compact_rows_no_div,   key=lambda row_no_div:   row_no_div[  g_sss_value_normalized_index_n if "normalized" in db_filename else g_sss_value_index],  reverse=False)  # Sort by sss_value     -> The lower  - the more attractive
-    sorted_list_sss_only_div     = sorted(compact_rows_only_div, key=lambda row_only_div: row_only_div[g_sss_value_normalized_index_n if "normalized" in db_filename else g_sss_value_index],  reverse=False)  # Sort by sss_value     -> The lower  - the more attractive
-    sorted_list_diff             = sorted(rows_diff,             key=lambda row_diff:     row_diff[    g_symbol_index_n               if "normalized" in db_filename else g_symbol_index   ],  reverse=False)  # Sort by symbol
+        # Now, Sort the compact_rows using the sss_value formula: [1:] skips the 1st title row
+        sorted_list_db               = sorted(csv_db_data,           key=lambda row:          row[         g_symbol_index_n               if "normalized" in db_filename else g_symbol_index   ],  reverse=False)  # Sort by symbol
+        sorted_list_sss              = sorted(compact_rows,          key=lambda row:          row[         g_sss_value_normalized_index_n if "normalized" in db_filename else g_sss_value_index],  reverse=False)  # Sort by sss_value     -> The lower  - the more attractive
+        sorted_list_sss_no_div       = sorted(compact_rows_no_div,   key=lambda row_no_div:   row_no_div[  g_sss_value_normalized_index_n if "normalized" in db_filename else g_sss_value_index],  reverse=False)  # Sort by sss_value     -> The lower  - the more attractive
+        sorted_list_sss_only_div     = sorted(compact_rows_only_div, key=lambda row_only_div: row_only_div[g_sss_value_normalized_index_n if "normalized" in db_filename else g_sss_value_index],  reverse=False)  # Sort by sss_value     -> The lower  - the more attractive
+        sorted_list_diff             = sorted(rows_diff,             key=lambda row_diff:     row_diff[    g_symbol_index_n               if "normalized" in db_filename else g_symbol_index   ],  reverse=False)  # Sort by symbol
+    else:
+        sorted_list_sss = compact_rows = rows
 
     if research_mode: # Update the appearance counter
         list_len_sss = len(sorted_list_sss)
@@ -2689,18 +2690,18 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
                 else:
                     appearance_counter_dict_sss[(row[g_symbol_index],   row[g_name_index],   row[g_sector_index],   row[g_sss_value_index],              row[g_previous_close_index])]   = appearance_counter_dict_sss[(row[g_symbol_index],   row[g_name_index],   row[g_sector_index],   row[g_sss_value_index],              row[g_previous_close_index])]   + math.sqrt(float(list_len_sss - index)) / float(list_len_sss)
 
-    sorted_lists_list = [
-        sorted_list_db,
-        sorted_list_sss,
-        sorted_list_sss_no_div,
-        sorted_list_sss_only_div,
-        sorted_list_diff
-    ]
-
-    for sorted_list in sorted_lists_list:
-        sorted_list.insert(0, (g_header_row_normalized if "normalized" in db_filename else g_header_row))
-
     if generate_result_folders:
+        sorted_lists_list = [
+            sorted_list_db,
+            sorted_list_sss,
+            sorted_list_sss_no_div,
+            sorted_list_sss_only_div,
+            sorted_list_diff
+        ]
+
+        for sorted_list in sorted_lists_list:
+            sorted_list.insert(0, (g_header_row_normalized if "normalized" in db_filename else g_header_row))
+
         tase_str              = ""
         sectors_str           = ""
         countries_str         = ""
