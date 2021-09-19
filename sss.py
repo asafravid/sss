@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.43 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.44 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -2658,6 +2658,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
     rows_diff.extend(    rows0_diff     + rows1_diff     + rows2_diff     + rows3_diff     + rows4_diff     + rows5_diff     + rows6_diff     + rows7_diff     + rows8_diff     + rows9_diff     + rows10_diff     + rows11_diff     + rows12_diff     + rows13_diff     + rows14_diff     + rows15_diff     + rows16_diff     + rows17_diff     + rows18_diff     + rows19_diff    )
 
     # remove (from rows, not from db or diff) rows whose sss[s[s]]_value is a bad one - irrelevant:
+    # TODO: ASAFR: This can be done for non-research_mode only (optimization for faster research mode)
     compact_rows          = []
     compact_rows_no_div   = []
     compact_rows_only_div = []
@@ -2669,6 +2670,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
         if row_only_div[g_sss_value_index_n if "normalized" in db_filename else g_sss_value_index] != BAD_SSS: compact_rows_only_div.append(row_only_div)
 
     # Now, Sort the compact_rows using the sss_value formula: [1:] skips the 1st title row
+    # TODO: ASAFR: This can be done for non-research_mode only (optimization for faster research mode)
     sorted_list_db               = sorted(csv_db_data,           key=lambda row:          row[         g_symbol_index_n               if "normalized" in db_filename else g_symbol_index   ],  reverse=False)  # Sort by symbol
     sorted_list_sss              = sorted(compact_rows,          key=lambda row:          row[         g_sss_value_normalized_index_n if "normalized" in db_filename else g_sss_value_index],  reverse=False)  # Sort by sss_value     -> The lower  - the more attractive
     sorted_list_sss_no_div       = sorted(compact_rows_no_div,   key=lambda row_no_div:   row_no_div[  g_sss_value_normalized_index_n if "normalized" in db_filename else g_sss_value_index],  reverse=False)  # Sort by sss_value     -> The lower  - the more attractive
@@ -2698,48 +2700,50 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
     for sorted_list in sorted_lists_list:
         sorted_list.insert(0, (g_header_row_normalized if "normalized" in db_filename else g_header_row))
 
-    tase_str              = ""
-    sectors_str           = ""
-    countries_str         = ""
-    all_str               = ""
-    csv_db_str            = ""
-    custom_portfolio_str  = ""
-    num_results_str       = "_nRes{}".format(len(compact_rows))
-    build_csv_db_only_str = ""
-    if tase_mode:         tase_str       = "_Tase"
-
-    if len(sectors_list):
-        if sectors_filter_out:
-            sectors_list       += 'FO_'
-        sectors_str            += '_'+'_'.join(sectors_list)
-    else:
-        for index, sector in enumerate(favor_sectors):
-            sectors_str += '_{}{}'.format(sector.replace(' ',''),round(favor_sectors_by[index],NUM_ROUND_DECIMALS))
-
-    if len(countries_list):
-        if countries_filter_out:
-            countries_list       += 'FO_'
-        countries_str            += '_'+'_'.join(countries_list).replace(' ','')
-
-    mode_str = 'Nsr' # Default is Nasdaq100+S&P500+Russel1000
-    if   read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_US:  mode_str = 'All'
-    elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_SIX: mode_str = 'Six'
-    elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_ST:  mode_str = 'St'
-    elif tase_mode:                      mode_str              = 'Tase'
-    if   len(custom_portfolio):          mode_str              = 'Custom'
-    if   read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_US:  all_str               = '_A'
-    elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_SIX: all_str = '_S'
-    elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_ST:  all_str = '_St'
-    if build_csv_db == 0:                csv_db_str            = '_DBR'
-    if build_csv_db_only:                build_csv_db_only_str = '_Bdb'
-    if len(custom_portfolio):            custom_portfolio_str  = '_Custom'
-    date_and_time = time.strftime("Results/{}/%Y%m%d-%H%M%S{}{}{}{}{}{}{}{}".format(mode_str, tase_str, sectors_str.replace(' ','').replace('a','').replace('e','').replace('i','').replace('o','').replace('u',''), countries_str, all_str, csv_db_str, build_csv_db_only_str, num_results_str, custom_portfolio_str))
-    print('\n[DV] Scan Results placed in {}'.format(date_and_time))
-    filenames_list = sss_filenames.create_filenames_list(date_and_time)
-
-    evr_pm_col_title_row = ['Maximal price_to_earnings_limit: {}, Maximal enterprise_value_to_revenue_limit: {}, Minimal profit_margin_limit: {}'.format(price_to_earnings_limit, enterprise_value_to_revenue_limit, profit_margin_limit)]
-
     if generate_result_folders:
+        tase_str              = ""
+        sectors_str           = ""
+        countries_str         = ""
+        all_str               = ""
+        csv_db_str            = ""
+        custom_portfolio_str  = ""
+        num_results_str       = "_nRes{}".format(len(compact_rows))
+        build_csv_db_only_str = ""
+        if tase_mode:         tase_str       = "_Tase"
+
+        if len(sectors_list):
+            if sectors_filter_out: sectors_list += 'FO_'
+            sectors_str += '_' + '_'.join(sectors_list)
+        else:
+            for index, sector in enumerate(favor_sectors):
+                sectors_str += '_{}{}'.format(sector.replace(' ', ''), round(favor_sectors_by[index], NUM_ROUND_DECIMALS))
+
+        if len(countries_list):
+            if countries_filter_out: countries_list += 'FO_'
+            countries_str += '_' + '_'.join(countries_list).replace(' ', '')
+
+        mode_str = 'Nsr' # Default is Nasdaq100+S&P500+Russel1000
+        if   read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_US:  mode_str = 'All'
+        elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_SIX: mode_str = 'Six'
+        elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_ST:  mode_str = 'St'
+        elif tase_mode:                                                      mode_str = 'Tase'
+        elif len(custom_portfolio):                                          mode_str = 'Custom'
+
+        if   read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_US:  all_str  = '_A'
+        elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_SIX: all_str  = '_S'
+        elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_ST:  all_str  = '_St'
+
+        if build_csv_db == 0:                csv_db_str            = '_DBR'
+        if build_csv_db_only:                build_csv_db_only_str = '_Bdb'
+        if len(custom_portfolio):            custom_portfolio_str  = '_Custom'
+
+        date_and_time = time.strftime("Results/{}/%Y%m%d-%H%M%S{}{}{}{}{}{}{}{}".format(mode_str, tase_str, sectors_str.replace(' ','').replace('a','').replace('e','').replace('i','').replace('o','').replace('u',''), countries_str, all_str, csv_db_str, build_csv_db_only_str, num_results_str, custom_portfolio_str))
+        print('\n[DV] Scan Results placed in {}'.format(date_and_time))
+
+        filenames_list = sss_filenames.create_filenames_list(date_and_time)
+
+        evr_pm_col_title_row = ['Maximal price_to_earnings_limit: {}, Maximal enterprise_value_to_revenue_limit: {}, Minimal profit_margin_limit: {}'.format(price_to_earnings_limit, enterprise_value_to_revenue_limit, profit_margin_limit)]
+
         for index in range(len(filenames_list)):
             os.makedirs(os.path.dirname(filenames_list[index]), exist_ok=True)
             with open(filenames_list[index], mode='w', newline='') as engine:
@@ -2747,8 +2751,6 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
                 sorted_lists_list[index].insert(0, evr_pm_col_title_row)
                 writer.writerows(sorted_lists_list[index])
 
-    # Normalized sss_engine:
-    if generate_result_folders:
         sss_post_processing.process_engine_csv(date_and_time)
 
     if num_results_list != None and num_results_list_index < len(num_results_list): num_results_list[num_results_list_index] = len(compact_rows)
