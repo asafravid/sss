@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.46 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.47 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -1171,9 +1171,15 @@ def calculate_altman_z_score_factor(stock_data):
 def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list, sectors_filter_out, countries_list, countries_filter_out, build_csv_db, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, db_filename):
     try:
         return_value = True
-        info               = {}
-        earnings_quarterly = {}
-        earnings_yearly    = {}
+        info                     = {}
+        earnings_quarterly       = {}
+        earnings_yearly          = {}
+        balance_sheets_yearly    = {}
+        balance_sheets_quarterly = {}
+        cash_flows_yearly        = {}
+        cash_flows_quarterly     = {}
+        financials_yearly        = {}
+        financials_quarterly     = {}
         if build_csv_db:
             try:
                 info                                   = symbol.get_info()
@@ -1314,26 +1320,25 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
             stock_data.annualized_retained_earnings  = calculate_weighted_stock_data_on_dict(balance_sheets_yearly,    'balance_sheets_yearly',    'Retained Earnings', BALANCE_SHEETS_WEIGHTS, stock_data, True)
             stock_data.quarterized_retained_earnings = calculate_weighted_stock_data_on_dict(balance_sheets_quarterly, 'balance_sheets_yearly',    'Retained Earnings', NO_WEIGHTS,             stock_data, True, True)
 
-        if stock_data.short_name is     None:                       stock_data.short_name = 'None'
-        # if stock_data.short_name != None and not research_mode: print('              {:35}:'.format(stock_data.short_name))
+            if stock_data.short_name is     None:                       stock_data.short_name = 'None'
+            # if stock_data.short_name != None and not research_mode: print('              {:35}:'.format(stock_data.short_name))
 
-        if build_csv_db and 'quoteType' in info: stock_data.quote_type = info['quoteType']
-        if not check_quote_type(stock_data, research_mode):     return_value = False
+            if 'quoteType' in info: stock_data.quote_type = info['quoteType']
+            if not check_quote_type(stock_data, research_mode):     return_value = False
 
-        if build_csv_db and 'sector'  in info:    stock_data.sector = info['sector']
-        if sectors_filter_out:
-            if     check_sector(stock_data, sectors_list):    return_value = False
-        else:
-            if not check_sector(stock_data, sectors_list):    return_value = False
-
-        if build_csv_db and 'country' in info:    stock_data.country = info['country']
-        if len(countries_list):
-            if countries_filter_out:
-                if     check_country(stock_data, countries_list): return_value = False
+            if 'sector'  in info:    stock_data.sector = info['sector']
+            if sectors_filter_out:
+                if     check_sector(stock_data, sectors_list):    return_value = False
             else:
-                if not check_country(stock_data, countries_list): return_value = False
+                if not check_sector(stock_data, sectors_list):    return_value = False
 
-        if build_csv_db:
+            if 'country' in info:    stock_data.country = info['country']
+            if len(countries_list):
+                if countries_filter_out:
+                    if     check_country(stock_data, countries_list): return_value = False
+                else:
+                    if not check_country(stock_data, countries_list): return_value = False
+
             if 'fullTimeEmployees' in info:      stock_data.employees = info['fullTimeEmployees']
             else:                                stock_data.employees = NUM_EMPLOYEES_UNKNOWN
             if stock_data.employees is None: stock_data.employees = NUM_EMPLOYEES_UNKNOWN
@@ -1347,10 +1352,13 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
                     used_weights              = 0
                     earnings_to_revenues_list = []
                     weights_sum               = 0
-                    boost_cont_inc_ratio    = True # Will be set to True if there is a continuous increase in the profit margin
-                    boost_cont_inc_pos      = True # Will be set to True if there is a continuous positive in the profit margin
-                    boost_cont_inc_earnings = True # Will be set to True if there is a continuous increase in the earnings
-                    boost_cont_inc_revenue  = True # Will be set to True if there is a continuous increase in the revenue
+                    last_ratio                = None
+                    last_earnings             = None
+                    last_revenue              = None
+                    boost_cont_inc_ratio      = True # Will be set to True if there is a continuous increase in the profit margin
+                    boost_cont_inc_pos        = True # Will be set to True if there is a continuous positive in the profit margin
+                    boost_cont_inc_earnings   = True # Will be set to True if there is a continuous increase in the earnings
+                    boost_cont_inc_revenue    = True # Will be set to True if there is a continuous increase in the revenue
                     try:
                         if VERBOSE_LOGS: print("[{} {}]".format(__name__, 4))
 
@@ -1390,10 +1398,13 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
                     used_weights              = 0
                     earnings_to_revenues_list = []
                     weights_sum               = 0
-                    boost_cont_inc_ratio    = True # Will be set to True if there is a continuous increase in the profit   margin  TODO: ASAFR: Do the same boosting for cash flows ev_to_cfo
-                    boost_cont_inc_pos      = True # Will be set to True if there is a continuous positive in the profit   margin
-                    boost_cont_inc_earnings = True # Will be set to True if there is a continuous increase in the earnings
-                    boost_cont_inc_revenue  = True # Will be set to True if there is a continuous increase in the revenue
+                    last_ratio                = None
+                    last_earnings             = None
+                    last_revenue              = None
+                    boost_cont_inc_ratio      = True # Will be set to True if there is a continuous increase in the profit   margin  TODO: ASAFR: Do the same boosting for cash flows ev_to_cfo
+                    boost_cont_inc_pos        = True # Will be set to True if there is a continuous positive in the profit   margin
+                    boost_cont_inc_earnings   = True # Will be set to True if there is a continuous increase in the earnings
+                    boost_cont_inc_revenue    = True # Will be set to True if there is a continuous increase in the revenue
                     try:
                         if VERBOSE_LOGS: print("[{} {}]".format(__name__, 5))
 
@@ -1710,29 +1721,28 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
             else:                                                    stock_data.previous_close                    = None
             if isinstance(stock_data.previous_close,str):            stock_data.previous_close                    = None
 
-            if build_csv_db and '52WeekChange'         in info: stock_data.fifty_two_week_change   = info['52WeekChange']
-            if build_csv_db and 'fiftyTwoWeekLow'      in info: stock_data.fifty_two_week_low      = info['fiftyTwoWeekLow']
-            if build_csv_db and 'fiftyTwoWeekHigh'     in info: stock_data.fifty_two_week_high     = info['fiftyTwoWeekHigh']
-            if build_csv_db and 'twoHundredDayAverage' in info: stock_data.two_hundred_day_average = info['twoHundredDayAverage']
+            if '52WeekChange'         in info: stock_data.fifty_two_week_change   = info['52WeekChange']
+            if 'fiftyTwoWeekLow'      in info: stock_data.fifty_two_week_low      = info['fiftyTwoWeekLow']
+            if 'fiftyTwoWeekHigh'     in info: stock_data.fifty_two_week_high     = info['fiftyTwoWeekHigh']
+            if 'twoHundredDayAverage' in info: stock_data.two_hundred_day_average = info['twoHundredDayAverage']
 
-            if build_csv_db and stock_data.fifty_two_week_change                                                        is None: stock_data.fifty_two_week_change   = stock_data.previous_close
-            if build_csv_db and stock_data.fifty_two_week_low                                                           is None: stock_data.fifty_two_week_low      = stock_data.previous_close
-            if build_csv_db and stock_data.fifty_two_week_high                                                          is None: stock_data.fifty_two_week_high     = stock_data.previous_close
-            if build_csv_db and stock_data.two_hundred_day_average                                                      is None: stock_data.two_hundred_day_average = stock_data.previous_close
-            if build_csv_db and stock_data.previous_close != None and stock_data.previous_close < stock_data.fifty_two_week_low: stock_data.previous_close          = stock_data.fifty_two_week_low
+            if stock_data.fifty_two_week_change                                                        is None: stock_data.fifty_two_week_change   = stock_data.previous_close
+            if stock_data.fifty_two_week_low                                                           is None: stock_data.fifty_two_week_low      = stock_data.previous_close
+            if stock_data.fifty_two_week_high                                                          is None: stock_data.fifty_two_week_high     = stock_data.previous_close
+            if stock_data.two_hundred_day_average                                                      is None: stock_data.two_hundred_day_average = stock_data.previous_close
+            if stock_data.previous_close != None and stock_data.previous_close < stock_data.fifty_two_week_low: stock_data.previous_close          = stock_data.fifty_two_week_low
 
-            if build_csv_db:
-                if VERBOSE_LOGS: print("[{} {}]".format(__name__, 17))
+            if VERBOSE_LOGS: print("[{} {}]".format(__name__, 17))
 
-                if stock_data.two_hundred_day_average > 0.0: stock_data.previous_close_percentage_from_200d_ma  = 100.0 * ((stock_data.previous_close - stock_data.two_hundred_day_average) / stock_data.two_hundred_day_average)
-                if stock_data.fifty_two_week_low      > 0.0: stock_data.previous_close_percentage_from_52w_low  = 100.0 * ((stock_data.previous_close - stock_data.fifty_two_week_low     ) / stock_data.fifty_two_week_low     )
-                if stock_data.fifty_two_week_high     > 0.0: stock_data.previous_close_percentage_from_52w_high = 100.0 * ((stock_data.previous_close - stock_data.fifty_two_week_high    ) / stock_data.fifty_two_week_high    )
-                if stock_data.fifty_two_week_low      > 0.0 and stock_data.fifty_two_week_high > 0.0 and stock_data.previous_close > 0.0:
-                    if stock_data.fifty_two_week_high == stock_data.fifty_two_week_low or stock_data.previous_close == 0:  # TODO: ASAFR: Take these values from nasdaq_traded.csv when they are not available temporarily on yfinance
-                        stock_data.dist_from_low_factor = 1.0  # When there is no range or no previous_close_data, leave as neutral
-                    else:
-                        stock_data.dist_from_low_factor = (stock_data.previous_close - stock_data.fifty_two_week_low)/(0.5*(stock_data.fifty_two_week_high-stock_data.fifty_two_week_low))
-                    stock_data.eff_dist_from_low_factor = (DIST_FROM_LOW_FACTOR_DAMPER + stock_data.dist_from_low_factor) if stock_data.dist_from_low_factor < 1.0 else (stock_data.dist_from_low_factor**DIST_FROM_LOW_FACTOR_HIGHER_THAN_ONE_POWER)
+            if stock_data.two_hundred_day_average > 0.0: stock_data.previous_close_percentage_from_200d_ma  = 100.0 * ((stock_data.previous_close - stock_data.two_hundred_day_average) / stock_data.two_hundred_day_average)
+            if stock_data.fifty_two_week_low      > 0.0: stock_data.previous_close_percentage_from_52w_low  = 100.0 * ((stock_data.previous_close - stock_data.fifty_two_week_low     ) / stock_data.fifty_two_week_low     )
+            if stock_data.fifty_two_week_high     > 0.0: stock_data.previous_close_percentage_from_52w_high = 100.0 * ((stock_data.previous_close - stock_data.fifty_two_week_high    ) / stock_data.fifty_two_week_high    )
+            if stock_data.fifty_two_week_low      > 0.0 and stock_data.fifty_two_week_high > 0.0 and stock_data.previous_close > 0.0:
+                if stock_data.fifty_two_week_high == stock_data.fifty_two_week_low or stock_data.previous_close == 0:  # TODO: ASAFR: Take these values from nasdaq_traded.csv when they are not available temporarily on yfinance
+                    stock_data.dist_from_low_factor = 1.0  # When there is no range or no previous_close_data, leave as neutral
+                else:
+                    stock_data.dist_from_low_factor = (stock_data.previous_close - stock_data.fifty_two_week_low)/(0.5*(stock_data.fifty_two_week_high-stock_data.fifty_two_week_low))
+                stock_data.eff_dist_from_low_factor = (DIST_FROM_LOW_FACTOR_DAMPER + stock_data.dist_from_low_factor) if stock_data.dist_from_low_factor < 1.0 else (stock_data.dist_from_low_factor**DIST_FROM_LOW_FACTOR_HIGHER_THAN_ONE_POWER)
 
             if VERBOSE_LOGS: print("[{} {}]".format(__name__, 18))
 
@@ -1862,7 +1872,6 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
                 else:
                     stock_data.quarterized_cash_flow_from_operating_activities = stock_data.annualized_cash_flow_from_operating_activities/QUARTERLY_YEARLY_MISSING_FACTOR
 
-            if VERBOSE_LOGS: print("[{} {}]".format(__name__, 100))
 
             if stock_data.annualized_cash_flow_from_operating_activities != None:
                 if stock_data.annualized_cash_flow_from_operating_activities >= 0:
@@ -1905,22 +1914,72 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
             calculate_altman_z_score_factor(stock_data)
 
         # TODO: ASAFR: Here: id no previous_close, use market_high, low regular, or anything possible to avoid none!
-        if not build_csv_db_only and (stock_data.previous_close is None or stock_data.previous_close < 1.0): # Avoid Penny Stocks
-            if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} previous_close: {}'.format(stock_data.symbol, stock_data.previous_close)
-            return_value = False
+        if not build_csv_db_only:
+            # Checkout http://www.nasdaqtrader.com/trader.aspx?id=symboldirdefs for all symbol definitions (for instance - `$` in stock names, 5-letter stocks ending with `Y`)
+            if not tase_mode and SKIP_5LETTER_Y_STOCK_LISTINGS and stock_data.symbol[-1] == 'Y' and len(stock_data.symbol) == 5 and '.' not in stock_data.symbol and '-' not in stock_data.symbol and '$' not in stock_data.symbol:
+                if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} 5 letter stock listing'.format(stock_data.symbol)
+                return_value = False
 
-        if not build_csv_db_only and (stock_data.enterprise_value is None or (not research_mode_max_ev and stock_data.enterprise_value < enterprise_value_millions_usd_limit*1000000) or (research_mode_max_ev and stock_data.enterprise_value > enterprise_value_millions_usd_limit*1000000)):
-            if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} enterprise_value: {}'.format(stock_data.symbol, stock_data.enterprise_value)
-            return_value = False
+            if (stock_data.previous_close is None or stock_data.previous_close < 1.0): # Avoid Penny Stocks
+                if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} previous_close: {}'.format(stock_data.symbol, stock_data.previous_close)
+                return_value = False
 
-        if not build_csv_db_only and (stock_data.held_percent_insiders is None or stock_data.held_percent_insiders < pi_limit):
-            if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} held_percent_insiders: {}'.format(stock_data.symbol, stock_data.held_percent_insiders)
-            return_value = False
+            if (stock_data.enterprise_value is None or (not research_mode_max_ev and stock_data.enterprise_value < enterprise_value_millions_usd_limit*1000000) or (research_mode_max_ev and stock_data.enterprise_value > enterprise_value_millions_usd_limit*1000000)):
+                if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} enterprise_value: {}'.format(stock_data.symbol, stock_data.enterprise_value)
+                return_value = False
 
-        # Checkout http://www.nasdaqtrader.com/trader.aspx?id=symboldirdefs for all symbol definitions (for instance - `$` in stock names, 5-letter stocks ending with `Y`)
-        if not tase_mode and SKIP_5LETTER_Y_STOCK_LISTINGS and stock_data.symbol[-1] == 'Y' and len(stock_data.symbol) == 5 and '.' not in stock_data.symbol and '-' not in stock_data.symbol and '$' not in stock_data.symbol:
-            if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} 5 letter stock listing'.format(stock_data.symbol)
-            return_value = False
+            if (stock_data.held_percent_insiders is None or stock_data.held_percent_insiders < pi_limit):
+                if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} held_percent_insiders: {}'.format(stock_data.symbol, stock_data.held_percent_insiders)
+                return_value = False
+
+            if (stock_data.evr_effective is None or stock_data.evr_effective <= 0 or stock_data.evr_effective > enterprise_value_to_revenue_limit):
+                if return_value and (not research_mode or VERBOSE_LOGS):
+                    stock_data.skip_reason = 'Skipping {} enterprise_value_to_revenue: {}'.format(stock_data.symbol, stock_data.evr_effective)
+                return_value = False
+
+            if (stock_data.effective_ev_to_ebitda is None or stock_data.effective_ev_to_ebitda <= 0):
+                if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} effective_ev_to_ebitda: {}'.format(stock_data.symbol, stock_data.effective_ev_to_ebitda)
+                return_value = False
+
+            if (stock_data.effective_price_to_earnings is None or stock_data.effective_price_to_earnings <= 0):
+                if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} effective_price_to_earnings: {}'.format(stock_data.symbol, stock_data.effective_price_to_earnings)
+                return_value = False
+
+            if (stock_data.trailing_12months_price_to_sales is None or stock_data.trailing_12months_price_to_sales <= 0):
+                if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} trailing_12months_price_to_sales: {}'.format(stock_data.symbol, stock_data.trailing_12months_price_to_sales)
+                return_value = False
+
+            if (stock_data.price_to_book is None or stock_data.price_to_book <= 0):
+                if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} price_to_book: {}'.format(stock_data.symbol, stock_data.price_to_book)
+                return_value = False
+
+            if (stock_data.pe_effective is None or stock_data.pe_effective <= 0 or stock_data.pe_effective > price_to_earnings_limit):
+                if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} pe_effective: {}'.format(stock_data.symbol, stock_data.pe_effective)
+                return_value = False
+
+            if stock_data.effective_profit_margin < profit_margin_limit:
+                if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} effective_profit_margin: {}'.format(stock_data.symbol, stock_data.effective_profit_margin)
+                return_value = False
+
+            if (stock_data.ev_to_cfo_ratio_effective is None  or stock_data.ev_to_cfo_ratio_effective > ev_to_cfo_ratio_limit or stock_data.ev_to_cfo_ratio_effective <= 0):
+                if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} ev_to_cfo_ratio_effective: {}'.format(stock_data.symbol, stock_data.ev_to_cfo_ratio_effective)
+                return_value = False
+
+            if (stock_data.debt_to_equity_effective is None  or stock_data.debt_to_equity_effective > debt_to_equity_limit or stock_data.debt_to_equity_effective <= 0):
+                if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} debt_to_equity_effective: {}'.format(stock_data.symbol, stock_data.debt_to_equity_effective)
+                return_value = False
+
+            if (stock_data.eqg_factor_effective is None or stock_data.eqg_factor_effective < eqg_min):
+                if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} eqg_factor_effective: {}'.format(stock_data.symbol, stock_data.eqg_factor_effective)
+                return_value = False
+
+            if (stock_data.rqg_factor_effective is None or stock_data.rqg_factor_effective < rqg_min):
+                if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} rqg_factor_effective: {}'.format(stock_data.symbol, stock_data.rqg_factor_effective)
+                return_value = False
+
+            if stock_data.price_to_earnings_to_growth_ratio is None:
+                if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} price_to_earnings_to_growth_ratio: {}'.format(stock_data.symbol, stock_data.price_to_earnings_to_growth_ratio)
+                return_value = False
 
         if build_csv_db_only:
             if (stock_data.enterprise_value_to_revenue != None and stock_data.enterprise_value_to_revenue <= 0 or stock_data.enterprise_value_to_revenue is None) and stock_data.effective_revenue != None and stock_data.effective_revenue > 0:
@@ -1928,81 +1987,29 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
             else:
                 stock_data.evr_effective = stock_data.enterprise_value_to_revenue
 
-        if not build_csv_db_only and (stock_data.evr_effective is None or stock_data.evr_effective <= 0 or stock_data.evr_effective > enterprise_value_to_revenue_limit):
-            if return_value and (not research_mode or VERBOSE_LOGS):
-                stock_data.skip_reason = 'Skipping {} enterprise_value_to_revenue: {}'.format(stock_data.symbol, stock_data.evr_effective)
-            return_value = False
+            if stock_data.effective_price_to_earnings != None:
+                if stock_data.sector in favor_sectors:
+                    index = favor_sectors.index(stock_data.sector)
+                    stock_data.pe_effective = stock_data.effective_price_to_earnings / float(favor_sectors_by[index])  # ** 2
+                else:
+                    stock_data.pe_effective = stock_data.effective_price_to_earnings
 
-        if not build_csv_db_only and (stock_data.effective_ev_to_ebitda is None or stock_data.effective_ev_to_ebitda <= 0):
-            if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} effective_ev_to_ebitda: {}'.format(stock_data.symbol, stock_data.effective_ev_to_ebitda)
-            return_value = False
+                if   stock_data.profit_margin            is None and stock_data.annualized_profit_margin is None and stock_data.quarterized_profit_margin is None:
+                    stock_data.profit_margin             = stock_data.annualized_profit_margin  = stock_data.quarterized_profit_margin = PROFIT_MARGIN_UNKNOWN
+                elif stock_data.profit_margin            is None and stock_data.annualized_profit_margin is None                                                 :
+                     stock_data.profit_margin            = stock_data.annualized_profit_margin  = stock_data.quarterized_profit_margin/PROFIT_MARGIN_DUPLICATION_FACTOR
+                elif stock_data.annualized_profit_margin is None and stock_data.quarterized_profit_margin is None:
+                     stock_data.annualized_profit_margin = stock_data.quarterized_profit_margin = stock_data.profit_margin/PROFIT_MARGIN_DUPLICATION_FACTOR
+                elif stock_data.profit_margin            is None and stock_data.quarterized_profit_margin is None:
+                     stock_data.profit_margin            = stock_data.quarterized_profit_margin = stock_data.annualized_profit_margin/PROFIT_MARGIN_DUPLICATION_FACTOR
+                elif stock_data.profit_margin             is None: stock_data.profit_margin             = (stock_data.annualized_profit_margin+stock_data.quarterized_profit_margin)/(2*PROFIT_MARGIN_DUPLICATION_FACTOR)
+                elif stock_data.annualized_profit_margin  is None: stock_data.annualized_profit_margin  = stock_data.profit_margin/PROFIT_MARGIN_DUPLICATION_FACTOR
+                elif stock_data.quarterized_profit_margin is None: stock_data.quarterized_profit_margin = stock_data.profit_margin/PROFIT_MARGIN_DUPLICATION_FACTOR
 
-        if not build_csv_db_only and (stock_data.effective_price_to_earnings is None or stock_data.effective_price_to_earnings <= 0):
-            if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} effective_price_to_earnings: {}'.format(stock_data.symbol, stock_data.effective_price_to_earnings)
-            return_value = False
-
-        if not build_csv_db_only and (stock_data.trailing_12months_price_to_sales is None or stock_data.trailing_12months_price_to_sales <= 0):
-            if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} trailing_12months_price_to_sales: {}'.format(stock_data.symbol, stock_data.trailing_12months_price_to_sales)
-            return_value = False
-
-        if not build_csv_db_only and (stock_data.price_to_book is None or stock_data.price_to_book <= 0):
-            if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} price_to_book: {}'.format(stock_data.symbol, stock_data.price_to_book)
-            return_value = False
-        if VERBOSE_LOGS: print("[{} {}]".format(__name__, 300))
-        if build_csv_db_only and stock_data.effective_price_to_earnings != None:
-            if stock_data.sector in favor_sectors:
-                index = favor_sectors.index(stock_data.sector)
-                stock_data.pe_effective = stock_data.effective_price_to_earnings / float(favor_sectors_by[index])  # ** 2
-            else:
-                stock_data.pe_effective = stock_data.effective_price_to_earnings
-
-        if not build_csv_db_only and (stock_data.pe_effective is None or stock_data.pe_effective <= 0 or stock_data.pe_effective > price_to_earnings_limit):
-            if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} pe_effective: {}'.format(stock_data.symbol, stock_data.pe_effective)
-            return_value = False
-
-        if build_csv_db_only:
-            if VERBOSE_LOGS: print("[{} {}]".format(__name__, 400))
-            if   stock_data.profit_margin            is None and stock_data.annualized_profit_margin is None and stock_data.quarterized_profit_margin is None:
-                stock_data.profit_margin             = stock_data.annualized_profit_margin  = stock_data.quarterized_profit_margin = PROFIT_MARGIN_UNKNOWN
-            elif stock_data.profit_margin            is None and stock_data.annualized_profit_margin is None                                                 :
-                 stock_data.profit_margin            = stock_data.annualized_profit_margin  = stock_data.quarterized_profit_margin/PROFIT_MARGIN_DUPLICATION_FACTOR
-            elif stock_data.annualized_profit_margin is None and stock_data.quarterized_profit_margin is None:
-                 stock_data.annualized_profit_margin = stock_data.quarterized_profit_margin = stock_data.profit_margin/PROFIT_MARGIN_DUPLICATION_FACTOR
-            elif stock_data.profit_margin            is None and stock_data.quarterized_profit_margin is None:
-                 stock_data.profit_margin            = stock_data.quarterized_profit_margin = stock_data.annualized_profit_margin/PROFIT_MARGIN_DUPLICATION_FACTOR
-            elif stock_data.profit_margin             is None: stock_data.profit_margin             = (stock_data.annualized_profit_margin+stock_data.quarterized_profit_margin)/(2*PROFIT_MARGIN_DUPLICATION_FACTOR)
-            elif stock_data.annualized_profit_margin  is None: stock_data.annualized_profit_margin  = stock_data.profit_margin/PROFIT_MARGIN_DUPLICATION_FACTOR
-            elif stock_data.quarterized_profit_margin is None: stock_data.quarterized_profit_margin = stock_data.profit_margin/PROFIT_MARGIN_DUPLICATION_FACTOR
-
-            sorted_pms = sorted([stock_data.profit_margin, stock_data.annualized_profit_margin, stock_data.quarterized_profit_margin])
-            weighted_average_pm = weighted_average(sorted_pms, PROFIT_MARGIN_WEIGHTS[:len(sorted_pms)]) # Higher weight to the higher profit margin when averaging out
-            stock_data.effective_profit_margin = PROFIT_MARGIN_DAMPER + weighted_average_pm
+                sorted_pms = sorted([stock_data.profit_margin, stock_data.annualized_profit_margin, stock_data.quarterized_profit_margin])
+                weighted_average_pm = weighted_average(sorted_pms, PROFIT_MARGIN_WEIGHTS[:len(sorted_pms)]) # Higher weight to the higher profit margin when averaging out
+                stock_data.effective_profit_margin = PROFIT_MARGIN_DAMPER + weighted_average_pm
             
-        if not build_csv_db_only and stock_data.effective_profit_margin < profit_margin_limit:
-            if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} effective_profit_margin: {}'.format(stock_data.symbol, stock_data.effective_profit_margin)
-            return_value = False
-
-        if not build_csv_db_only and (stock_data.ev_to_cfo_ratio_effective is None  or stock_data.ev_to_cfo_ratio_effective > ev_to_cfo_ratio_limit or stock_data.ev_to_cfo_ratio_effective <= 0):
-            if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} ev_to_cfo_ratio_effective: {}'.format(stock_data.symbol, stock_data.ev_to_cfo_ratio_effective)
-            return_value = False
-
-        if not build_csv_db_only and (stock_data.debt_to_equity_effective is None  or stock_data.debt_to_equity_effective > debt_to_equity_limit or stock_data.debt_to_equity_effective <= 0):
-            if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} debt_to_equity_effective: {}'.format(stock_data.symbol, stock_data.debt_to_equity_effective)
-            return_value = False
-
-        if not build_csv_db_only and (stock_data.eqg_factor_effective is None or stock_data.eqg_factor_effective < eqg_min):
-            if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} eqg_factor_effective: {}'.format(stock_data.symbol, stock_data.eqg_factor_effective)
-            return_value = False
-
-        if not build_csv_db_only and (stock_data.rqg_factor_effective is None or stock_data.rqg_factor_effective < rqg_min):
-            if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} rqg_factor_effective: {}'.format(stock_data.symbol, stock_data.rqg_factor_effective)
-            return_value = False
-
-        if not build_csv_db_only and stock_data.price_to_earnings_to_growth_ratio is None:
-            if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} price_to_earnings_to_growth_ratio: {}'.format(stock_data.symbol, stock_data.price_to_earnings_to_growth_ratio)
-            return_value = False
-
-        if build_csv_db_only:
             # The PEG Ratio is equal to (share_price / earnings_per_share) / (earnings_per_share_growth_ratio [% units])
             if 'pegRatio' in info:
                 stock_data.price_to_earnings_to_growth_ratio = info['pegRatio']
@@ -2524,6 +2531,9 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
                     elif (row_index-2) % num_threads == 18: csv_db_data18.append(row)
                     elif (row_index-2) % num_threads == 19: csv_db_data19.append(row)
                     row_index += 1
+
+    symbols0 = symbols1 = symbols2 = symbols3 = symbols4 = symbols5 = symbols6 = symbols7 = symbols8 = symbols9 = symbols10 = symbols11 = symbols12 = symbols13 = symbols14 = symbols15 = symbols16 = symbols17 = symbols18 = symbols19 = None
+    thread0  = thread1  = thread2  = thread3  = thread4  = thread5  = thread6  = thread7  = thread8  = thread9  = thread10  = thread11  = thread12  = thread13  = thread14  = thread15  = thread16  = thread17  = thread18  = thread19  = None
 
     if num_threads >=  1: symbols0  = symbols[ 0:][::num_threads] #  0,    num_threads,    2*num_threads,    3*num_threads, ...
     if num_threads >=  2: symbols1  = symbols[ 1:][::num_threads] #  1,  1+num_threads,  2+2*num_threads,  2+3*num_threads, ...

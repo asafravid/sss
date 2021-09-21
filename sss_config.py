@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.44 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.45 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -19,6 +19,8 @@
 #    along with this program.  If not, see <https://www.gnu.org/licenses/>.
 #
 #############################################################################
+
+PROFILE = False
 
 ALL_COUNTRY_SYMBOLS_OFF = 0
 ALL_COUNTRY_SYMBOLS_US  = 1  # Nasdaq
@@ -56,7 +58,7 @@ new_run_custom = 'Results/Custom/20210917-201728_Bdb_nRes312_Custom'
 new_run_tase   = 'Results/Tase/20210915-100103_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes333'
 new_run_nsr    = 'Results/Nsr/20210912-133814_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes889'
 new_run_all    = 'Results/All/20210912-092015_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes3409'
-new_run_six    = 'Results/Six/20210920-101404_S_Bdb_nRes30'
+new_run_six    = 'Results/Six/20210920-174034_S_Bdb_nRes30'
 new_run_st     = 'Results/St/20210915-023602_St_Bdb_nRes130'
 
 # TODO: ASAFR: Why is normalized AGIO giving a Good low value?? this is deceiving! Check this
