@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.51 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.53 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -117,14 +117,14 @@ NEGATIVE_ALTMAN_Z_FACTOR                     = 0.00001
 #              1. The rarety (statistically comapred to all the stocks in scan) - proportionaly to it (the rarest the case - the more boost)
 #              2. The ascent (slope) of the increase and the positive value -> the higher - the more boost
 #              3. Add similar boosters for other annual and quarterly weighted-averaged parameters
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE                = 2.25   # Provide a "bonus" for companies whose profit margins have increased continuously annually
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE             = 1.75   # Provide a "bonus" for companies whose profit margins have increased continuously quarterly
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_POSITIVE                = 2.5    # Provide a "bonus" for companies whose profit margins have been continuously positive annually
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_POSITIVE             = 2.5    # Provide a "bonus" for companies whose profit margins have been continuously positive quarterly
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_EARNINGS    = 2.75   # Provide a "bonus" for companies whose earnings       have been continuously increasing annually
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_REVENUE     = 2.25   # Provide a "bonus" for companies whose revenue        has  been continuously increasing annually
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_EARNINGS = 2.75   # Provide a "bonus" for companies whose earnings       have been continuously increasing quarterly
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_REVENUE  = 2.5    # Provide a "bonus" for companies whose revenue        has  been continuously increasing quarterly
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE                = 2.75   # Provide a "bonus" for companies whose profit margins have increased continuously annually
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE             = 2.25   # Provide a "bonus" for companies whose profit margins have increased continuously quarterly
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_POSITIVE                = 2.75   # Provide a "bonus" for companies whose profit margins have been continuously positive annually
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_POSITIVE             = 2.75   # Provide a "bonus" for companies whose profit margins have been continuously positive quarterly
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_EARNINGS    = 3.25   # Provide a "bonus" for companies whose earnings       have been continuously increasing annually
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_REVENUE     = 2.75   # Provide a "bonus" for companies whose revenue        has  been continuously increasing annually
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_EARNINGS = 3.25   # Provide a "bonus" for companies whose earnings       have been continuously increasing quarterly
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_REVENUE  = 2.75   # Provide a "bonus" for companies whose revenue        has  been continuously increasing quarterly
 PROFIT_MARGIN_DUPLICATION_FACTOR                                  = 8.0    # When copying profit margin (if either quarterized/annualized/profit_margin is missing) - devide by this factor
 NEGATIVE_CFO_FACTOR                                               = 10000.0   #
 NEGATIVE_PEG_RATIO_FACTOR                                         = 100000.0
@@ -1168,9 +1168,31 @@ def calculate_altman_z_score_factor(stock_data):
     elif         stock_data.altman_z_score_factor <= 0:    stock_data.altman_z_score_factor   = NEGATIVE_ALTMAN_Z_FACTOR    # a very low value -> Much less attractive
 
 
-def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list, sectors_filter_out, countries_list, countries_filter_out, build_csv_db, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, db_filename):
+def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out, countries_list, countries_filter_out, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, db_filename):
+    return_value = True
+    if research_mode:
+        if   stock_data.previous_close < 1.0:                                                                                                                         return_value = False  # Avoid Penny Stocks
+        elif (not research_mode_max_ev and stock_data.enterprise_value < enterprise_value_millions_usd_limit * 1000000) or \
+             (    research_mode_max_ev and stock_data.enterprise_value > enterprise_value_millions_usd_limit * 1000000):                                              return_value = False
+        elif stock_data.held_percent_insiders            < pi_limit:                                                                                                  return_value = False
+        elif stock_data.evr_effective                    <= 0                     or stock_data.evr_effective             > enterprise_value_to_revenue_limit:        return_value = False
+        elif stock_data.effective_ev_to_ebitda           <= 0:                                                                                                        return_value = False
+        elif stock_data.effective_price_to_earnings      <= 0:                                                                                                        return_value = False
+        elif stock_data.trailing_12months_price_to_sales <= 0:                                                                                                        return_value = False
+        elif stock_data.price_to_book                    <= 0:                                                                                                        return_value = False
+        elif stock_data.pe_effective                     <= 0                     or stock_data.pe_effective              >  price_to_earnings_limit:                 return_value = False
+        elif stock_data.effective_profit_margin          <  profit_margin_limit:                                                                                      return_value = False
+        elif stock_data.ev_to_cfo_ratio_effective        >  ev_to_cfo_ratio_limit or stock_data.ev_to_cfo_ratio_effective <= 0:                                       return_value = False
+        elif stock_data.debt_to_equity_effective         >  debt_to_equity_limit  or stock_data.debt_to_equity_effective  <= 0:                                       return_value = False
+        elif stock_data.eqg_factor_effective             <  eqg_min:                                                                                                  return_value = False
+        elif stock_data.rqg_factor_effective             <  rqg_min:                                                                                                  return_value = False
+        elif not tase_mode and SKIP_5LETTER_Y_STOCK_LISTINGS and stock_data.symbol[-1] == 'Y' and len(stock_data.symbol) == 5 and '.' not in stock_data.symbol and \
+                '-' not in stock_data.symbol and '$' not in stock_data.symbol:                                                                                        return_value = False  # Checkout http://www.nasdaqtrader.com/trader.aspx?id=symboldirdefs for all symbol definitions (for instance - `$` in stock names, 5-letter stocks ending with `Y`)
+
+        return return_value
+
     try:
-        return_value = True
+
         info                     = {}
         earnings_quarterly       = {}
         earnings_yearly          = {}
@@ -1180,892 +1202,821 @@ def process_info(symbol, stock_data, build_csv_db_only, tase_mode, sectors_list,
         cash_flows_quarterly     = {}
         financials_yearly        = {}
         financials_quarterly     = {}
-        if build_csv_db:
-            try:
-                info                                   = symbol.get_info()
-                cash_flows_yearly                      = symbol.get_cashflow(     as_dict=True, freq="yearly")
-                cash_flows_quarterly                   = symbol.get_cashflow(     as_dict=True, freq="quarterly")
-                balance_sheets_yearly                  = symbol.get_balance_sheet(as_dict=True, freq="yearly")
-                balance_sheets_quarterly               = symbol.get_balance_sheet(as_dict=True, freq="quarterly")
-                earnings_yearly                        = symbol.get_earnings(     as_dict=True, freq="yearly")
-                earnings_quarterly                     = symbol.get_earnings(     as_dict=True, freq="quarterly")
+        # TODO: ASAFR: Here: id no previous_close, use market_high, low regular, or anything possible to avoid none!
+        try:
+            info                                   = symbol.get_info()
+            cash_flows_yearly                      = symbol.get_cashflow(     as_dict=True, freq="yearly")
+            cash_flows_quarterly                   = symbol.get_cashflow(     as_dict=True, freq="quarterly")
+            balance_sheets_yearly                  = symbol.get_balance_sheet(as_dict=True, freq="yearly")
+            balance_sheets_quarterly               = symbol.get_balance_sheet(as_dict=True, freq="quarterly")
+            earnings_yearly                        = symbol.get_earnings(     as_dict=True, freq="yearly")
+            earnings_quarterly                     = symbol.get_earnings(     as_dict=True, freq="quarterly")
 
-                if   earnings_yearly    != None: stock_data.financial_currency = earnings_yearly[   'financialCurrency']
-                elif earnings_quarterly != None: stock_data.financial_currency = earnings_quarterly['financialCurrency']
+            if   earnings_yearly    != None: stock_data.financial_currency = earnings_yearly[   'financialCurrency']
+            elif earnings_quarterly != None: stock_data.financial_currency = earnings_quarterly['financialCurrency']
 
-                stock_data.summary_currency = info['currency'] if 'currency' in info else stock_data.financial_currency  # Used for market_cap and enterprise_value conversions
+            stock_data.summary_currency = info['currency'] if 'currency' in info else stock_data.financial_currency  # Used for market_cap and enterprise_value conversions
 
-                # Currency Conversion Rules, per yfinance Data Display Methods:
-                #
-                # +--------------------+-------------------+-------------------+
-                # |       Mode         | earnings_ Exist   | earnings_ Missing |
-                # +====================+===================+===================+
-                # | All/Custom/Nsr     |                   |                   |
-                # +--------------------| financialCurrency | info.currency     |
-                # | TASE (<symbol>.TA) |                   |                   |
-                # +--------------------+-------------------+-------------------+
+            # Currency Conversion Rules, per yfinance Data Display Methods:
+            #
+            # +--------------------+-------------------+-------------------+
+            # |       Mode         | earnings_ Exist   | earnings_ Missing |
+            # +====================+===================+===================+
+            # | All/Custom/Nsr     |                   |                   |
+            # +--------------------| financialCurrency | info.currency     |
+            # | TASE (<symbol>.TA) |                   |                   |
+            # +--------------------+-------------------+-------------------+
 
-                if stock_data.summary_currency == 'ILA':  # Sometimes (in TASE mode) in info['currency'] ILA may show instead of ILS so just substitute
-                    stock_data.summary_currency = 'ILS'
-                log_id = 0
-                if VERBOSE_LOGS: print("[{} {}]".format(__name__, 1))
-                if currency_conversion_tool:
-                    if VERBOSE_LOGS: print("[{} {}]".format(__name__, 2))
-                    stock_data.financial_currency_conversion_rate_mult_to_usd = round(1.0/currency_conversion_tool[stock_data.financial_currency], NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
-                    stock_data.summary_currency_conversion_rate_mult_to_usd   = round(1.0/currency_conversion_tool[stock_data.summary_currency],   NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
-                elif currency_conversion_tool_alternative:
-                    try:
-                        stock_data.financial_currency_conversion_rate_mult_to_usd = round(currency_conversion_tool_alternative.convert(1.0, stock_data.financial_currency, 'USD'), NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
-                        stock_data.summary_currency_conversion_rate_mult_to_usd   = round(currency_conversion_tool_alternative.convert(1.0, stock_data.summary_currency,   'USD'), NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
-                    except Exception as e:
-                        stock_data.financial_currency_conversion_rate_mult_to_usd = round(1.0 / currency_conversion_tool_manual[stock_data.financial_currency], NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
-                        stock_data.summary_currency_conversion_rate_mult_to_usd   = round(1.0 / currency_conversion_tool_manual[stock_data.summary_currency],   NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
-                else:
+            if stock_data.summary_currency == 'ILA':  # Sometimes (in TASE mode) in info['currency'] ILA may show instead of ILS so just substitute
+                stock_data.summary_currency = 'ILS'
+            log_id = 0
+            if VERBOSE_LOGS: print("[{} {}]".format(__name__, 1))
+            if currency_conversion_tool:
+                if VERBOSE_LOGS: print("[{} {}]".format(__name__, 2))
+                stock_data.financial_currency_conversion_rate_mult_to_usd = round(1.0/currency_conversion_tool[stock_data.financial_currency], NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
+                stock_data.summary_currency_conversion_rate_mult_to_usd   = round(1.0/currency_conversion_tool[stock_data.summary_currency],   NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
+            elif currency_conversion_tool_alternative:
+                try:
+                    stock_data.financial_currency_conversion_rate_mult_to_usd = round(currency_conversion_tool_alternative.convert(1.0, stock_data.financial_currency, 'USD'), NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
+                    stock_data.summary_currency_conversion_rate_mult_to_usd   = round(currency_conversion_tool_alternative.convert(1.0, stock_data.summary_currency,   'USD'), NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
+                except Exception as e:
                     stock_data.financial_currency_conversion_rate_mult_to_usd = round(1.0 / currency_conversion_tool_manual[stock_data.financial_currency], NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
                     stock_data.summary_currency_conversion_rate_mult_to_usd   = round(1.0 / currency_conversion_tool_manual[stock_data.summary_currency],   NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
-
-                financials_yearly                           = symbol.get_financials(as_dict=True, freq="yearly")
-                financials_quarterly                        = symbol.get_financials(as_dict=True, freq="quarterly")
-                # institutional_holders                = symbol.get_institutional_holders(as_dict=True)
-                # sustainability                       = symbol.get_sustainability(as_dict=True)
-                # major_holders                        = symbol.get_major_holders(as_dict=True)
-                # mutualfund_holders                   = symbol.get_mutualfund_holders(as_dict=True)
-            except Exception as e:
-                if not research_mode: print("              Exception in {} symbol.get_info(): {}".format(stock_data.symbol, e))
-                pass
-
-            if 'shortName' in info: stock_data.short_name = info['shortName']
-            else:                   stock_data.short_name = 'None'
-
-            # Balance sheets are listed from newest to oldest, so for the weights, must reverse the dictionary:
-            stock_data.annualized_total_ratio          = calculate_weighted_ratio_from_dict(balance_sheets_yearly,    'annualized_total_ratio',          'Total Assets',         'Total Liab',                BALANCE_SHEETS_WEIGHTS, stock_data, 0, True)
-            stock_data.annualized_other_current_ratio  = calculate_weighted_ratio_from_dict(balance_sheets_yearly,    'annualized_other_current_ratio',  'Other Current Assets', 'Other Current Liab',        BALANCE_SHEETS_WEIGHTS, stock_data, 0, True)
-            stock_data.annualized_other_ratio          = calculate_weighted_ratio_from_dict(balance_sheets_yearly,    'annualized_other_ratio',          'Other Assets',         'Other Liab',                BALANCE_SHEETS_WEIGHTS, stock_data, 0, True)
-            stock_data.annualized_total_current_ratio  = calculate_weighted_ratio_from_dict(balance_sheets_yearly,    'annualized_total_current_ratio',  'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data, 0, True)
-
-            stock_data.quarterized_total_ratio         = calculate_weighted_ratio_from_dict(balance_sheets_quarterly, 'quarterized_total_ratio',         'Total Assets',         'Total Liab',                BALANCE_SHEETS_WEIGHTS, stock_data, 0, True)
-            stock_data.quarterized_other_current_ratio = calculate_weighted_ratio_from_dict(balance_sheets_quarterly, 'quarterized_other_current_ratio', 'Other Current Assets', 'Other Current Liab',        BALANCE_SHEETS_WEIGHTS, stock_data, 0, True)
-            stock_data.quarterized_other_ratio         = calculate_weighted_ratio_from_dict(balance_sheets_quarterly, 'quarterized_other_ratio',         'Other Assets',         'Other Liab',                BALANCE_SHEETS_WEIGHTS, stock_data, 0, True)
-            stock_data.quarterized_total_current_ratio = calculate_weighted_ratio_from_dict(balance_sheets_quarterly, 'quarterized_total_current_ratio', 'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data, 0, True)
-
-            stock_data.annualized_working_capital      = calculate_weighted_diff_from_dict( balance_sheets_yearly,    'annualized_working_capital',      'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data, 0, True)
-            stock_data.quarterized_working_capital     = calculate_weighted_diff_from_dict( balance_sheets_quarterly, 'quarterized_working_capital',     'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data, 0, True)
-
-            stock_data.annualized_total_liabilities    = calculate_weighted_stock_data_on_dict(balance_sheets_yearly,    'annualized_total_liabilities',  'Total Liab', BALANCE_SHEETS_WEIGHTS, stock_data, True)
-            stock_data.quarterized_total_liabilities   = calculate_weighted_stock_data_on_dict(balance_sheets_quarterly, 'quarterized_total_liabilities', 'Total Liab', BALANCE_SHEETS_WEIGHTS, stock_data, True)
-
-            if stock_data.annualized_total_ratio          == 0.0: stock_data.annualized_total_ratio          = stock_data.quarterized_total_ratio        *QUARTERLY_YEARLY_MISSING_FACTOR
-            if stock_data.quarterized_total_ratio         == 0.0: stock_data.quarterized_total_ratio         = stock_data.annualized_total_ratio         *QUARTERLY_YEARLY_MISSING_FACTOR
-            if stock_data.annualized_other_current_ratio  == 0.0: stock_data.annualized_other_current_ratio  = stock_data.quarterized_other_current_ratio*QUARTERLY_YEARLY_MISSING_FACTOR
-            if stock_data.quarterized_other_current_ratio == 0.0: stock_data.quarterized_other_current_ratio = stock_data.annualized_other_current_ratio *QUARTERLY_YEARLY_MISSING_FACTOR
-            if stock_data.annualized_other_ratio          == 0.0: stock_data.annualized_other_ratio          = stock_data.quarterized_other_ratio        *QUARTERLY_YEARLY_MISSING_FACTOR
-            if stock_data.quarterized_other_ratio         == 0.0: stock_data.quarterized_other_ratio         = stock_data.annualized_other_ratio         *QUARTERLY_YEARLY_MISSING_FACTOR
-            if stock_data.annualized_total_current_ratio  == 0.0: stock_data.annualized_total_current_ratio  = stock_data.quarterized_total_current_ratio*QUARTERLY_YEARLY_MISSING_FACTOR
-            if stock_data.quarterized_total_current_ratio == 0.0: stock_data.quarterized_total_current_ratio = stock_data.annualized_total_current_ratio *QUARTERLY_YEARLY_MISSING_FACTOR
-
-            if stock_data.annualized_working_capital      == 0.0: stock_data.annualized_working_capital  = stock_data.quarterized_working_capital*QUARTERLY_YEARLY_MISSING_FACTOR
-            if stock_data.quarterized_working_capital     == 0.0: stock_data.quarterized_working_capital = stock_data.annualized_working_capital *QUARTERLY_YEARLY_MISSING_FACTOR
-
-            if stock_data.annualized_total_liabilities    is None and stock_data.quarterized_total_liabilities != None: stock_data.annualized_total_liabilities  = stock_data.quarterized_total_liabilities*QUARTERLY_YEARLY_MISSING_FACTOR
-            if stock_data.quarterized_total_liabilities   is None and stock_data.annualized_total_liabilities  != None: stock_data.quarterized_total_liabilities = stock_data.annualized_total_liabilities *QUARTERLY_YEARLY_MISSING_FACTOR
-
-            if VERBOSE_LOGS: print("[{} {}]".format(__name__, 3))
-
-            # The correct methos is the TTM only: avoid (quareterly+annual)/2 - Keep it Simple -> Apply to all calculations
-            # TODO: ASAFR: In the next stage - add the other current and other ratio to a sum of the ratios Investigate prior
-            stock_data.total_ratio_effective         = RATIO_DAMPER+(stock_data.quarterized_total_ratio        ) # Prefer TTM only
-            stock_data.other_current_ratio_effective = RATIO_DAMPER+(stock_data.quarterized_other_current_ratio) # Prefer TTM only
-            stock_data.other_ratio_effective         = RATIO_DAMPER+(stock_data.quarterized_other_ratio        ) # Prefer TTM only
-            stock_data.total_current_ratio_effective = RATIO_DAMPER+(stock_data.quarterized_total_current_ratio) # Prefer TTM only
-            stock_data.effective_current_ratio       = (stock_data.total_ratio_effective + stock_data.total_current_ratio_effective) / 2.0  # TODO: ASAFR: In the next stage - add the other and current other ratios - more information -> more completeness
-
-            stock_data.effective_working_capital     = (stock_data.quarterized_working_capital) # Prefer TTM only
-
-            if stock_data.quarterized_total_liabilities != None:
-                stock_data.effective_total_liabilities = (stock_data.quarterized_total_liabilities) # Prefer TTM only
-
-            # TODO: ASAFR: Add Other Current Liab / Other Stockholder Equity
-            # Balance Sheets are listed from newest to olders, so for proper weight: Reverse required
-            stock_data.annualized_debt_to_equity  = calculate_weighted_ratio_from_dict(balance_sheets_yearly,    'annualized_debt_to_equity',  'Total Liab', 'Total Stockholder Equity', BALANCE_SHEETS_WEIGHTS, stock_data, None, True)
-            stock_data.quarterized_debt_to_equity = calculate_weighted_ratio_from_dict(balance_sheets_quarterly, 'quarterized_debt_to_equity', 'Total Liab', 'Total Stockholder Equity', BALANCE_SHEETS_WEIGHTS, stock_data, None, True)
-
-            if stock_data.annualized_debt_to_equity is None and stock_data.quarterized_debt_to_equity is None:
-                stock_data.annualized_debt_to_equity = stock_data.quarterized_debt_to_equity = 1000.0*debt_to_equity_limit
             else:
-                if   stock_data.annualized_debt_to_equity is None and stock_data.quarterized_debt_to_equity != None:
-                    stock_data.annualized_debt_to_equity = stock_data.quarterized_debt_to_equity*QUARTERLY_YEARLY_MISSING_FACTOR
-                elif stock_data.annualized_debt_to_equity != None and stock_data.quarterized_debt_to_equity is None:
-                    stock_data.quarterized_debt_to_equity = stock_data.annualized_debt_to_equity * QUARTERLY_YEARLY_MISSING_FACTOR
+                stock_data.financial_currency_conversion_rate_mult_to_usd = round(1.0 / currency_conversion_tool_manual[stock_data.financial_currency], NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
+                stock_data.summary_currency_conversion_rate_mult_to_usd   = round(1.0 / currency_conversion_tool_manual[stock_data.summary_currency],   NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
 
-                stock_data.debt_to_equity_effective = (stock_data.quarterized_debt_to_equity)  # Prefer TTM only
+            financials_yearly                           = symbol.get_financials(as_dict=True, freq="yearly")
+            financials_quarterly                        = symbol.get_financials(as_dict=True, freq="quarterly")
+            # institutional_holders                = symbol.get_institutional_holders(as_dict=True)
+            # sustainability                       = symbol.get_sustainability(as_dict=True)
+            # major_holders                        = symbol.get_major_holders(as_dict=True)
+            # mutualfund_holders                   = symbol.get_mutualfund_holders(as_dict=True)
+        except Exception as e:
+            if not research_mode: print("              Exception in {} symbol.get_info(): {}".format(stock_data.symbol, e))
+            pass
 
-                if stock_data.debt_to_equity_effective < 0.0:
-                    stock_data.debt_to_equity_effective_used = (1.0-stock_data.debt_to_equity_effective * NEGATIVE_DEBT_TO_EQUITY_FACTOR)  # (https://www.investopedia.com/terms/d/debtequityratio.asp#:~:text=What%20does%20it%20mean%20for,has%20more%20liabilities%20than%20assets.) What does it mean for debt to equity to be negative? If a company has a negative D/E ratio, this means that the company has negative shareholder equity. In other words, it means that the company has more liabilities than assets
-                else:
-                    stock_data.debt_to_equity_effective_used = DEBT_TO_EQUITY_MIN_BASE + math.sqrt(stock_data.debt_to_equity_effective)
+        if 'shortName' in info: stock_data.short_name = info['shortName']
+        else:                   stock_data.short_name = 'None'
 
-            # Cash Flows are listed from newest to oldest, so reverse required for weights:
-            stock_data.annualized_cash_flow_from_operating_activities  = calculate_weighted_stock_data_on_dict(cash_flows_yearly,    'cash_flows_yearly',    'Total Cash From Operating Activities', CASH_FLOW_WEIGHTS, stock_data, True)
-            stock_data.quarterized_cash_flow_from_operating_activities = calculate_weighted_stock_data_on_dict(cash_flows_quarterly, 'cash_flows_quarterly', 'Total Cash From Operating Activities', NO_WEIGHTS,        stock_data, True, True)
+        # Balance sheets are listed from newest to oldest, so for the weights, must reverse the dictionary:
+        stock_data.annualized_total_ratio          = calculate_weighted_ratio_from_dict(balance_sheets_yearly,    'annualized_total_ratio',          'Total Assets',         'Total Liab',                BALANCE_SHEETS_WEIGHTS, stock_data, 0, True)
+        stock_data.annualized_other_current_ratio  = calculate_weighted_ratio_from_dict(balance_sheets_yearly,    'annualized_other_current_ratio',  'Other Current Assets', 'Other Current Liab',        BALANCE_SHEETS_WEIGHTS, stock_data, 0, True)
+        stock_data.annualized_other_ratio          = calculate_weighted_ratio_from_dict(balance_sheets_yearly,    'annualized_other_ratio',          'Other Assets',         'Other Liab',                BALANCE_SHEETS_WEIGHTS, stock_data, 0, True)
+        stock_data.annualized_total_current_ratio  = calculate_weighted_ratio_from_dict(balance_sheets_yearly,    'annualized_total_current_ratio',  'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data, 0, True)
 
-            # Balance Sheets are listed from newest to oldest, so reverse required for weights:
-            stock_data.annualized_total_assets      = calculate_weighted_stock_data_on_dict(balance_sheets_yearly,    'balance_sheets_yearly',    'Total Assets', BALANCE_SHEETS_WEIGHTS, stock_data, True)
-            stock_data.quarterized_total_assets     = calculate_weighted_stock_data_on_dict(balance_sheets_quarterly, 'balance_sheets_quarterly', 'Total Assets', BALANCE_SHEETS_WEIGHTS, stock_data, True)
+        stock_data.quarterized_total_ratio         = calculate_weighted_ratio_from_dict(balance_sheets_quarterly, 'quarterized_total_ratio',         'Total Assets',         'Total Liab',                BALANCE_SHEETS_WEIGHTS, stock_data, 0, True)
+        stock_data.quarterized_other_current_ratio = calculate_weighted_ratio_from_dict(balance_sheets_quarterly, 'quarterized_other_current_ratio', 'Other Current Assets', 'Other Current Liab',        BALANCE_SHEETS_WEIGHTS, stock_data, 0, True)
+        stock_data.quarterized_other_ratio         = calculate_weighted_ratio_from_dict(balance_sheets_quarterly, 'quarterized_other_ratio',         'Other Assets',         'Other Liab',                BALANCE_SHEETS_WEIGHTS, stock_data, 0, True)
+        stock_data.quarterized_total_current_ratio = calculate_weighted_ratio_from_dict(balance_sheets_quarterly, 'quarterized_total_current_ratio', 'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data, 0, True)
 
-            # Balance Sheets are listed from newest to oldest, so reverse required for weights:
-            stock_data.annualized_total_stockholder_equity  = calculate_weighted_stock_data_on_dict(balance_sheets_yearly,    'balance_sheets_yearly',    'Total Stockholder Equity', BALANCE_SHEETS_WEIGHTS, stock_data, True)
-            stock_data.quarterized_total_stockholder_equity = calculate_weighted_stock_data_on_dict(balance_sheets_quarterly, 'balance_sheets_quarterly', 'Total Stockholder Equity', BALANCE_SHEETS_WEIGHTS, stock_data, True)
+        stock_data.annualized_working_capital      = calculate_weighted_diff_from_dict( balance_sheets_yearly,    'annualized_working_capital',      'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data, 0, True)
+        stock_data.quarterized_working_capital     = calculate_weighted_diff_from_dict( balance_sheets_quarterly, 'quarterized_working_capital',     'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data, 0, True)
 
-            # Balance Sheets are listed from newest to oldest, so reverse required for weights:
-            stock_data.annualized_retained_earnings  = calculate_weighted_stock_data_on_dict(balance_sheets_yearly,    'balance_sheets_yearly',    'Retained Earnings', BALANCE_SHEETS_WEIGHTS, stock_data, True)
-            stock_data.quarterized_retained_earnings = calculate_weighted_stock_data_on_dict(balance_sheets_quarterly, 'balance_sheets_yearly',    'Retained Earnings', NO_WEIGHTS,             stock_data, True, True)
+        stock_data.annualized_total_liabilities    = calculate_weighted_stock_data_on_dict(balance_sheets_yearly,    'annualized_total_liabilities',  'Total Liab', BALANCE_SHEETS_WEIGHTS, stock_data, True)
+        stock_data.quarterized_total_liabilities   = calculate_weighted_stock_data_on_dict(balance_sheets_quarterly, 'quarterized_total_liabilities', 'Total Liab', BALANCE_SHEETS_WEIGHTS, stock_data, True)
 
-            if stock_data.short_name is     None:                       stock_data.short_name = 'None'
-            # if stock_data.short_name != None and not research_mode: print('              {:35}:'.format(stock_data.short_name))
+        if stock_data.annualized_total_ratio          == 0.0: stock_data.annualized_total_ratio          = stock_data.quarterized_total_ratio        *QUARTERLY_YEARLY_MISSING_FACTOR
+        if stock_data.quarterized_total_ratio         == 0.0: stock_data.quarterized_total_ratio         = stock_data.annualized_total_ratio         *QUARTERLY_YEARLY_MISSING_FACTOR
+        if stock_data.annualized_other_current_ratio  == 0.0: stock_data.annualized_other_current_ratio  = stock_data.quarterized_other_current_ratio*QUARTERLY_YEARLY_MISSING_FACTOR
+        if stock_data.quarterized_other_current_ratio == 0.0: stock_data.quarterized_other_current_ratio = stock_data.annualized_other_current_ratio *QUARTERLY_YEARLY_MISSING_FACTOR
+        if stock_data.annualized_other_ratio          == 0.0: stock_data.annualized_other_ratio          = stock_data.quarterized_other_ratio        *QUARTERLY_YEARLY_MISSING_FACTOR
+        if stock_data.quarterized_other_ratio         == 0.0: stock_data.quarterized_other_ratio         = stock_data.annualized_other_ratio         *QUARTERLY_YEARLY_MISSING_FACTOR
+        if stock_data.annualized_total_current_ratio  == 0.0: stock_data.annualized_total_current_ratio  = stock_data.quarterized_total_current_ratio*QUARTERLY_YEARLY_MISSING_FACTOR
+        if stock_data.quarterized_total_current_ratio == 0.0: stock_data.quarterized_total_current_ratio = stock_data.annualized_total_current_ratio *QUARTERLY_YEARLY_MISSING_FACTOR
 
-            if 'quoteType' in info: stock_data.quote_type = info['quoteType']
-            if not check_quote_type(stock_data, research_mode):     return_value = False
+        if stock_data.annualized_working_capital      == 0.0: stock_data.annualized_working_capital  = stock_data.quarterized_working_capital*QUARTERLY_YEARLY_MISSING_FACTOR
+        if stock_data.quarterized_working_capital     == 0.0: stock_data.quarterized_working_capital = stock_data.annualized_working_capital *QUARTERLY_YEARLY_MISSING_FACTOR
 
-            if 'sector'  in info:    stock_data.sector = info['sector']
-            if sectors_filter_out:
-                if     check_sector(stock_data, sectors_list):    return_value = False
+        if stock_data.annualized_total_liabilities    is None and stock_data.quarterized_total_liabilities != None: stock_data.annualized_total_liabilities  = stock_data.quarterized_total_liabilities*QUARTERLY_YEARLY_MISSING_FACTOR
+        if stock_data.quarterized_total_liabilities   is None and stock_data.annualized_total_liabilities  != None: stock_data.quarterized_total_liabilities = stock_data.annualized_total_liabilities *QUARTERLY_YEARLY_MISSING_FACTOR
+
+        if VERBOSE_LOGS: print("[{} {}]".format(__name__, 3))
+
+        # The correct methos is the TTM only: avoid (quareterly+annual)/2 - Keep it Simple -> Apply to all calculations
+        # TODO: ASAFR: In the next stage - add the other current and other ratio to a sum of the ratios Investigate prior
+        stock_data.total_ratio_effective         = RATIO_DAMPER+(stock_data.quarterized_total_ratio        ) # Prefer TTM only
+        stock_data.other_current_ratio_effective = RATIO_DAMPER+(stock_data.quarterized_other_current_ratio) # Prefer TTM only
+        stock_data.other_ratio_effective         = RATIO_DAMPER+(stock_data.quarterized_other_ratio        ) # Prefer TTM only
+        stock_data.total_current_ratio_effective = RATIO_DAMPER+(stock_data.quarterized_total_current_ratio) # Prefer TTM only
+        stock_data.effective_current_ratio       = (stock_data.total_ratio_effective + stock_data.total_current_ratio_effective) / 2.0  # TODO: ASAFR: In the next stage - add the other and current other ratios - more information -> more completeness
+
+        stock_data.effective_working_capital     = (stock_data.quarterized_working_capital) # Prefer TTM only
+
+        if stock_data.quarterized_total_liabilities != None:
+            stock_data.effective_total_liabilities = (stock_data.quarterized_total_liabilities) # Prefer TTM only
+
+        # TODO: ASAFR: Add Other Current Liab / Other Stockholder Equity
+        # Balance Sheets are listed from newest to olders, so for proper weight: Reverse required
+        stock_data.annualized_debt_to_equity  = calculate_weighted_ratio_from_dict(balance_sheets_yearly,    'annualized_debt_to_equity',  'Total Liab', 'Total Stockholder Equity', BALANCE_SHEETS_WEIGHTS, stock_data, None, True)
+        stock_data.quarterized_debt_to_equity = calculate_weighted_ratio_from_dict(balance_sheets_quarterly, 'quarterized_debt_to_equity', 'Total Liab', 'Total Stockholder Equity', BALANCE_SHEETS_WEIGHTS, stock_data, None, True)
+
+        if stock_data.annualized_debt_to_equity is None and stock_data.quarterized_debt_to_equity is None:
+            stock_data.annualized_debt_to_equity = stock_data.quarterized_debt_to_equity = 1000.0*debt_to_equity_limit
+        else:
+            if   stock_data.annualized_debt_to_equity is None and stock_data.quarterized_debt_to_equity != None:
+                stock_data.annualized_debt_to_equity = stock_data.quarterized_debt_to_equity*QUARTERLY_YEARLY_MISSING_FACTOR
+            elif stock_data.annualized_debt_to_equity != None and stock_data.quarterized_debt_to_equity is None:
+                stock_data.quarterized_debt_to_equity = stock_data.annualized_debt_to_equity * QUARTERLY_YEARLY_MISSING_FACTOR
+
+            stock_data.debt_to_equity_effective = (stock_data.quarterized_debt_to_equity)  # Prefer TTM only
+
+            if stock_data.debt_to_equity_effective < 0.0:
+                stock_data.debt_to_equity_effective_used = (1.0-stock_data.debt_to_equity_effective * NEGATIVE_DEBT_TO_EQUITY_FACTOR)  # (https://www.investopedia.com/terms/d/debtequityratio.asp#:~:text=What%20does%20it%20mean%20for,has%20more%20liabilities%20than%20assets.) What does it mean for debt to equity to be negative? If a company has a negative D/E ratio, this means that the company has negative shareholder equity. In other words, it means that the company has more liabilities than assets
             else:
-                if not check_sector(stock_data, sectors_list):    return_value = False
+                stock_data.debt_to_equity_effective_used = DEBT_TO_EQUITY_MIN_BASE + math.sqrt(stock_data.debt_to_equity_effective)
 
-            if 'country' in info:    stock_data.country = info['country']
-            if len(countries_list):
-                if countries_filter_out:
-                    if     check_country(stock_data, countries_list): return_value = False
-                else:
-                    if not check_country(stock_data, countries_list): return_value = False
+        # Cash Flows are listed from newest to oldest, so reverse required for weights:
+        stock_data.annualized_cash_flow_from_operating_activities  = calculate_weighted_stock_data_on_dict(cash_flows_yearly,    'cash_flows_yearly',    'Total Cash From Operating Activities', CASH_FLOW_WEIGHTS, stock_data, True)
+        stock_data.quarterized_cash_flow_from_operating_activities = calculate_weighted_stock_data_on_dict(cash_flows_quarterly, 'cash_flows_quarterly', 'Total Cash From Operating Activities', NO_WEIGHTS,        stock_data, True, True)
 
-            if 'fullTimeEmployees' in info:      stock_data.employees = info['fullTimeEmployees']
-            else:                                stock_data.employees = NUM_EMPLOYEES_UNKNOWN
-            if stock_data.employees is None: stock_data.employees = NUM_EMPLOYEES_UNKNOWN
+        # Balance Sheets are listed from newest to oldest, so reverse required for weights:
+        stock_data.annualized_total_assets      = calculate_weighted_stock_data_on_dict(balance_sheets_yearly,    'balance_sheets_yearly',    'Total Assets', BALANCE_SHEETS_WEIGHTS, stock_data, True)
+        stock_data.quarterized_total_assets     = calculate_weighted_stock_data_on_dict(balance_sheets_quarterly, 'balance_sheets_quarterly', 'Total Assets', BALANCE_SHEETS_WEIGHTS, stock_data, True)
 
-            # Oldest is the lower index
-            if earnings_yearly != None and 'Revenue' in earnings_yearly and 'Earnings' in earnings_yearly:
-                len_revenue_list  = len(earnings_yearly['Revenue'])
-                len_earnings_list = len(earnings_yearly['Earnings'])
-                if len_earnings_list == len_revenue_list:
-                    weight_index              = 0
-                    used_weights              = 0
-                    earnings_to_revenues_list = []
-                    weights_sum               = 0
-                    last_ratio                = None
-                    last_earnings             = None
-                    last_revenue              = None
-                    boost_cont_inc_ratio      = True # Will be set to True if there is a continuous increase in the profit margin
-                    boost_cont_inc_pos        = True # Will be set to True if there is a continuous positive in the profit margin
-                    boost_cont_inc_earnings   = True # Will be set to True if there is a continuous increase in the earnings
-                    boost_cont_inc_revenue    = True # Will be set to True if there is a continuous increase in the revenue
-                    try:
-                        if VERBOSE_LOGS: print("[{} {}]".format(__name__, 4))
+        # Balance Sheets are listed from newest to oldest, so reverse required for weights:
+        stock_data.annualized_total_stockholder_equity  = calculate_weighted_stock_data_on_dict(balance_sheets_yearly,    'balance_sheets_yearly',    'Total Stockholder Equity', BALANCE_SHEETS_WEIGHTS, stock_data, True)
+        stock_data.quarterized_total_stockholder_equity = calculate_weighted_stock_data_on_dict(balance_sheets_quarterly, 'balance_sheets_quarterly', 'Total Stockholder Equity', BALANCE_SHEETS_WEIGHTS, stock_data, True)
 
-                        for key in earnings_yearly['Revenue']:
-                            if float(earnings_yearly['Revenue'][key]) > 0:
-                                earnings_to_revenues_list.append((float(earnings_yearly['Earnings'][key])/float(earnings_yearly['Revenue'][key]))*PROFIT_MARGIN_YEARLY_WEIGHTS[weight_index])
-                                weights_sum  += PROFIT_MARGIN_YEARLY_WEIGHTS[weight_index]
-                                used_weights += 1
-                                current_ratio = float(earnings_yearly['Earnings'][key])/float(earnings_yearly['Revenue'][key])
-                                if used_weights > 1:
-                                    boost_cont_inc_ratio    = True if boost_cont_inc_ratio    and current_ratio                    > last_ratio                    else False
-                                    boost_cont_inc_pos      = True if boost_cont_inc_pos      and current_ratio                    > 0          and last_ratio > 0 else False
-                                    boost_cont_inc_earnings = True if boost_cont_inc_earnings and float(earnings_yearly['Earnings'][key]) > last_earnings                 else False
-                                    boost_cont_inc_revenue  = True if boost_cont_inc_revenue  and float(earnings_yearly['Revenue' ][key]) > last_revenue                  else False
-                                last_ratio    = current_ratio
-                                last_earnings = float(earnings_yearly['Earnings'][key])
-                                last_revenue  = float(earnings_yearly['Revenue' ][key])
-                            weight_index += 1
-                        if weights_sum > 0:
-                            stock_data.annualized_profit_margin        = sum(earnings_to_revenues_list)/weights_sum
-                            if stock_data.annualized_profit_margin > 0:
-                                stock_data.annualized_profit_margin_boost  = 1.0 if not boost_cont_inc_ratio    or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE
-                                stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_inc_pos      or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_POSITIVE
-                                stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_inc_earnings or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_EARNINGS
-                                stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_inc_revenue  or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_REVENUE
-                                stock_data.annualized_profit_margin       *= stock_data.annualized_profit_margin_boost
-                    except Exception as e:
-                        print("Exception in {} annualized_profit_margin: {}".format(stock_data.symbol, e))
-                        stock_data.annualized_profit_margin = None
-                        pass
-            # TODO: ASAFR: This below can be duplicated for usage of total_revenue and net_income. Analyze and implement as/if required:
-            if earnings_quarterly != None and 'Revenue' in earnings_quarterly and 'Earnings' in earnings_quarterly:
-                len_revenue_list  = len(earnings_quarterly['Revenue'])
-                len_earnings_list = len(earnings_quarterly['Earnings'])
-                if len_earnings_list == len_revenue_list:
-                    weight_index              = 0
-                    used_weights              = 0
-                    earnings_to_revenues_list = []
-                    weights_sum               = 0
-                    last_ratio                = None
-                    last_earnings             = None
-                    last_revenue              = None
-                    boost_cont_inc_ratio      = True # Will be set to True if there is a continuous increase in the profit   margin  TODO: ASAFR: Do the same boosting for cash flows ev_to_cfo
-                    boost_cont_inc_pos        = True # Will be set to True if there is a continuous positive in the profit   margin
-                    boost_cont_inc_earnings   = True # Will be set to True if there is a continuous increase in the earnings
-                    boost_cont_inc_revenue    = True # Will be set to True if there is a continuous increase in the revenue
-                    try:
-                        if VERBOSE_LOGS: print("[{} {}]".format(__name__, 5))
+        # Balance Sheets are listed from newest to oldest, so reverse required for weights:
+        stock_data.annualized_retained_earnings  = calculate_weighted_stock_data_on_dict(balance_sheets_yearly,    'balance_sheets_yearly',    'Retained Earnings', BALANCE_SHEETS_WEIGHTS, stock_data, True)
+        stock_data.quarterized_retained_earnings = calculate_weighted_stock_data_on_dict(balance_sheets_quarterly, 'balance_sheets_yearly',    'Retained Earnings', NO_WEIGHTS,             stock_data, True, True)
 
-                        for key in earnings_quarterly['Revenue']:
-                            if float(earnings_quarterly['Revenue'][key]) > 0:
-                                earnings_to_revenues_list.append((float(earnings_quarterly['Earnings'][key])/float(earnings_quarterly['Revenue'][key]))*PROFIT_MARGIN_QUARTERLY_WEIGHTS[weight_index])
-                                weights_sum  += PROFIT_MARGIN_QUARTERLY_WEIGHTS[weight_index]
-                                used_weights += 1
-                                current_ratio = float(earnings_quarterly['Earnings'][key])/float(earnings_quarterly['Revenue'][key])
-                                if used_weights > 1:
-                                    boost_cont_inc_ratio    = True if boost_cont_inc_ratio    and current_ratio                              > last_ratio                    else False
-                                    boost_cont_inc_pos      = True if boost_cont_inc_pos      and current_ratio                              > 0          and last_ratio > 0 else False
-                                    boost_cont_inc_earnings = True if boost_cont_inc_earnings and float(earnings_quarterly['Earnings'][key]) > last_earnings                 else False
-                                    boost_cont_inc_revenue  = True if boost_cont_inc_revenue  and float(earnings_quarterly['Revenue' ][key]) > last_revenue                  else False
-                                last_ratio    = current_ratio
-                                last_earnings = float(earnings_quarterly['Earnings'][key])
-                                last_revenue  = float(earnings_quarterly['Revenue' ][key])
-                            weight_index += 1
-                        if weights_sum > 0:
-                            stock_data.quarterized_profit_margin            = sum(earnings_to_revenues_list)/weights_sum
-                            if stock_data.quarterized_profit_margin > 0:
-                                stock_data.quarterized_profit_margin_boost  = 1.0 if not boost_cont_inc_ratio    or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE
-                                stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_inc_pos      or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_POSITIVE
-                                stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_inc_earnings or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_EARNINGS
-                                stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_inc_revenue  or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_REVENUE
-                                stock_data.quarterized_profit_margin       *= stock_data.quarterized_profit_margin_boost
-                    except Exception as e:
-                        print("Exception in {} quarterized_profit_margin: {}".format(stock_data.symbol, e))
-                        stock_data.quarterized_profit_margin = None
-                        pass
+        if stock_data.short_name is     None:                       stock_data.short_name = 'None'
+        # if stock_data.short_name != None and not research_mode: print('              {:35}:'.format(stock_data.short_name))
 
-            # Earnings are ordered from oldest to newest so no reversing required for weights:
-            if earnings_yearly != None and 'Revenue' in earnings_yearly: stock_data.annualized_revenue = calculate_weighted_stock_data_on_dict(earnings_yearly['Revenue'],    'earnings_yearly[Revenue]', None,            REVENUES_WEIGHTS, stock_data, False)
-            else:                                                        stock_data.annualized_revenue = None
+        if 'quoteType' in info: stock_data.quote_type = info['quoteType']
+        if not check_quote_type(stock_data, research_mode):     return_value = False
 
-            # TODO: ASAFR: Add a calculation of net_income_to_total_revenue_list
-            # Financials are ordered newest to oldest so reversing is required for weights:
-            stock_data.annualized_total_revenue = calculate_weighted_stock_data_on_dict(financials_yearly,             'financials_yearly',        'Total Revenue', REVENUES_WEIGHTS, stock_data, True)
+        if 'sector'  in info:    stock_data.sector = info['sector']
+        if sectors_filter_out:
+            if     check_sector(stock_data, sectors_list):    return_value = False
+        else:
+            if not check_sector(stock_data, sectors_list):    return_value = False
 
-            if earnings_yearly != None and 'Earnings' in earnings_yearly:
-                weight_index      = 0
-                earnings_list     = []
-                qeg_list          = []
-                weights_sum       = 0
-                qeg_weights_sum   = 0
-                previous_earnings = None
-                for key in earnings_yearly['Earnings']:
-                    earnings_list.append((float(earnings_yearly['Earnings'][key])) * EARNINGS_WEIGHTS[weight_index])
-                    weights_sum  += EARNINGS_WEIGHTS[weight_index]
-                    if weight_index > 0:
-                        current_earnings = earnings_yearly['Earnings'][key]
-                        if float(previous_earnings) != 0.0 and float(current_earnings) != 0.0: # (this-prev)/(abs(this)+abs(prev))
-                            value_to_append = calculate_current_vs_previous_change_ratio(current_earnings, previous_earnings)
-                            qeg_list.append(value_to_append*EARNINGS_WEIGHTS[weight_index-1])
+        if 'country' in info:    stock_data.country = info['country']
+        if len(countries_list):
+            if countries_filter_out:
+                if     check_country(stock_data, countries_list): return_value = False
+            else:
+                if not check_country(stock_data, countries_list): return_value = False
+
+        if 'fullTimeEmployees' in info:      stock_data.employees = info['fullTimeEmployees']
+        else:                                stock_data.employees = NUM_EMPLOYEES_UNKNOWN
+        if stock_data.employees is None: stock_data.employees = NUM_EMPLOYEES_UNKNOWN
+
+        # Oldest is the lower index
+        if earnings_yearly != None and 'Revenue' in earnings_yearly and 'Earnings' in earnings_yearly:
+            len_revenue_list  = len(earnings_yearly['Revenue'])
+            len_earnings_list = len(earnings_yearly['Earnings'])
+            if len_earnings_list == len_revenue_list:
+                weight_index              = 0
+                used_weights              = 0
+                earnings_to_revenues_list = []
+                weights_sum               = 0
+                last_ratio                = None
+                last_earnings             = None
+                last_revenue              = None
+                boost_cont_inc_ratio      = True # Will be set to True if there is a continuous increase in the profit margin
+                boost_cont_inc_pos        = True # Will be set to True if there is a continuous positive in the profit margin
+                boost_cont_inc_earnings   = True # Will be set to True if there is a continuous increase in the earnings
+                boost_cont_inc_revenue    = True # Will be set to True if there is a continuous increase in the revenue
+                try:
+                    if VERBOSE_LOGS: print("[{} {}]".format(__name__, 4))
+
+                    for key in earnings_yearly['Revenue']:
+                        if float(earnings_yearly['Revenue'][key]) > 0:
+                            earnings_to_revenues_list.append((float(earnings_yearly['Earnings'][key])/float(earnings_yearly['Revenue'][key]))*PROFIT_MARGIN_YEARLY_WEIGHTS[weight_index])
+                            weights_sum  += PROFIT_MARGIN_YEARLY_WEIGHTS[weight_index]
+                            used_weights += 1
+                            current_ratio = float(earnings_yearly['Earnings'][key])/float(earnings_yearly['Revenue'][key])
+                            if used_weights > 1:
+                                boost_cont_inc_ratio    = True if boost_cont_inc_ratio    and current_ratio                    > last_ratio                    else False
+                                boost_cont_inc_pos      = True if boost_cont_inc_pos      and current_ratio                    > 0          and last_ratio > 0 else False
+                                boost_cont_inc_earnings = True if boost_cont_inc_earnings and float(earnings_yearly['Earnings'][key]) > last_earnings                 else False
+                                boost_cont_inc_revenue  = True if boost_cont_inc_revenue  and float(earnings_yearly['Revenue' ][key]) > last_revenue                  else False
+                            last_ratio    = current_ratio
+                            last_earnings = float(earnings_yearly['Earnings'][key])
+                            last_revenue  = float(earnings_yearly['Revenue' ][key])
+                        weight_index += 1
+                    if weights_sum > 0:
+                        stock_data.annualized_profit_margin        = sum(earnings_to_revenues_list)/weights_sum
+                        if stock_data.annualized_profit_margin > 0:
+                            stock_data.annualized_profit_margin_boost  = 1.0 if not boost_cont_inc_ratio    or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE
+                            stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_inc_pos      or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_POSITIVE
+                            stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_inc_earnings or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_EARNINGS
+                            stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_inc_revenue  or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_REVENUE
+                            stock_data.annualized_profit_margin       *= stock_data.annualized_profit_margin_boost
+                except Exception as e:
+                    print("Exception in {} annualized_profit_margin: {}".format(stock_data.symbol, e))
+                    stock_data.annualized_profit_margin = None
+                    pass
+        # TODO: ASAFR: This below can be duplicated for usage of total_revenue and net_income. Analyze and implement as/if required:
+        if earnings_quarterly != None and 'Revenue' in earnings_quarterly and 'Earnings' in earnings_quarterly:
+            len_revenue_list  = len(earnings_quarterly['Revenue'])
+            len_earnings_list = len(earnings_quarterly['Earnings'])
+            if len_earnings_list == len_revenue_list:
+                weight_index              = 0
+                used_weights              = 0
+                earnings_to_revenues_list = []
+                weights_sum               = 0
+                last_ratio                = None
+                last_earnings             = None
+                last_revenue              = None
+                boost_cont_inc_ratio      = True # Will be set to True if there is a continuous increase in the profit   margin  TODO: ASAFR: Do the same boosting for cash flows ev_to_cfo
+                boost_cont_inc_pos        = True # Will be set to True if there is a continuous positive in the profit   margin
+                boost_cont_inc_earnings   = True # Will be set to True if there is a continuous increase in the earnings
+                boost_cont_inc_revenue    = True # Will be set to True if there is a continuous increase in the revenue
+                try:
+                    if VERBOSE_LOGS: print("[{} {}]".format(__name__, 5))
+
+                    for key in earnings_quarterly['Revenue']:
+                        if float(earnings_quarterly['Revenue'][key]) > 0:
+                            earnings_to_revenues_list.append((float(earnings_quarterly['Earnings'][key])/float(earnings_quarterly['Revenue'][key]))*PROFIT_MARGIN_QUARTERLY_WEIGHTS[weight_index])
+                            weights_sum  += PROFIT_MARGIN_QUARTERLY_WEIGHTS[weight_index]
+                            used_weights += 1
+                            current_ratio = float(earnings_quarterly['Earnings'][key])/float(earnings_quarterly['Revenue'][key])
+                            if used_weights > 1:
+                                boost_cont_inc_ratio    = True if boost_cont_inc_ratio    and current_ratio                              > last_ratio                    else False
+                                boost_cont_inc_pos      = True if boost_cont_inc_pos      and current_ratio                              > 0          and last_ratio > 0 else False
+                                boost_cont_inc_earnings = True if boost_cont_inc_earnings and float(earnings_quarterly['Earnings'][key]) > last_earnings                 else False
+                                boost_cont_inc_revenue  = True if boost_cont_inc_revenue  and float(earnings_quarterly['Revenue' ][key]) > last_revenue                  else False
+                            last_ratio    = current_ratio
+                            last_earnings = float(earnings_quarterly['Earnings'][key])
+                            last_revenue  = float(earnings_quarterly['Revenue' ][key])
+                        weight_index += 1
+                    if weights_sum > 0:
+                        stock_data.quarterized_profit_margin            = sum(earnings_to_revenues_list)/weights_sum
+                        if stock_data.quarterized_profit_margin > 0:
+                            stock_data.quarterized_profit_margin_boost  = 1.0 if not boost_cont_inc_ratio    or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE
+                            stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_inc_pos      or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_POSITIVE
+                            stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_inc_earnings or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_EARNINGS
+                            stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_inc_revenue  or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_REVENUE
+                            stock_data.quarterized_profit_margin       *= stock_data.quarterized_profit_margin_boost
+                except Exception as e:
+                    print("Exception in {} quarterized_profit_margin: {}".format(stock_data.symbol, e))
+                    stock_data.quarterized_profit_margin = None
+                    pass
+
+        # Earnings are ordered from oldest to newest so no reversing required for weights:
+        if earnings_yearly != None and 'Revenue' in earnings_yearly: stock_data.annualized_revenue = calculate_weighted_stock_data_on_dict(earnings_yearly['Revenue'],    'earnings_yearly[Revenue]', None,            REVENUES_WEIGHTS, stock_data, False)
+        else:                                                        stock_data.annualized_revenue = None
+
+        # TODO: ASAFR: Add a calculation of net_income_to_total_revenue_list
+        # Financials are ordered newest to oldest so reversing is required for weights:
+        stock_data.annualized_total_revenue = calculate_weighted_stock_data_on_dict(financials_yearly,             'financials_yearly',        'Total Revenue', REVENUES_WEIGHTS, stock_data, True)
+
+        if earnings_yearly != None and 'Earnings' in earnings_yearly:
+            weight_index      = 0
+            earnings_list     = []
+            qeg_list          = []
+            weights_sum       = 0
+            qeg_weights_sum   = 0
+            previous_earnings = None
+            for key in earnings_yearly['Earnings']:
+                earnings_list.append((float(earnings_yearly['Earnings'][key])) * EARNINGS_WEIGHTS[weight_index])
+                weights_sum  += EARNINGS_WEIGHTS[weight_index]
+                if weight_index > 0:
+                    current_earnings = earnings_yearly['Earnings'][key]
+                    if float(previous_earnings) != 0.0 and float(current_earnings) != 0.0: # (this-prev)/(abs(this)+abs(prev))
+                        value_to_append = calculate_current_vs_previous_change_ratio(current_earnings, previous_earnings)
+                        qeg_list.append(value_to_append*EARNINGS_WEIGHTS[weight_index-1])
+                    else:
+                        qeg_list.append(0.0) # No change
+                    qeg_weights_sum += EARNINGS_WEIGHTS[weight_index-1]
+                previous_earnings = earnings_yearly['Earnings'][key]
+                weight_index     += 1
+            if VERBOSE_LOGS: print("[{} {}]".format(__name__, 6))
+
+            stock_data.annualized_earnings = stock_data.financial_currency_conversion_rate_mult_to_usd*sum(earnings_list) / weights_sum  # Multiplying by the factor to get the valu in USD.
+            if len(qeg_list):
+                stock_data.eqg_yoy         = sum(qeg_list) / qeg_weights_sum
+            else:
+                stock_data.eqg_yoy         = None
+        else:
+            stock_data.eqg_yoy             = None
+            stock_data.annualized_earnings = None
+
+        if earnings_yearly != None and 'Revenue' in earnings_yearly:
+            weight_index      = 0
+            qrg_list          = []
+            qrg_weights_sum   = 0
+            previous_revenue = None
+            for key in earnings_yearly['Revenue']:
+                if weight_index > 0:
+                    current_revenue = earnings_yearly['Revenue'][key]
+                    if float(previous_revenue) != 0.0 and float(current_revenue) != 0.0: # (this-prev)/(abs(this)+abs(prev))
+                        value_to_append = calculate_current_vs_previous_change_ratio(current_revenue, previous_revenue)
+                        qrg_list.append(value_to_append*REVENUES_WEIGHTS[weight_index-1])
+                    else:
+                        qrg_list.append(0.0) # No change
+                    qrg_weights_sum += REVENUES_WEIGHTS[weight_index-1]
+                previous_revenue = earnings_yearly['Revenue'][key]
+                weight_index     += 1
+            if len(qrg_list):
+                if VERBOSE_LOGS: print("[{} {}]".format(__name__, 7))
+
+                stock_data.rqg_yoy = sum(qrg_list) / qrg_weights_sum
+            else:
+                stock_data.rqg_yoy = None
+        else:
+            stock_data.rqg_yoy     = None
+
+        # Net Income Quarterly Growth Year-Over-Year Calculation:
+        if financials_yearly != None and len(financials_yearly):
+            qnig_weight_index = 0
+            qtrg_weight_index = 0
+            net_income_list = []
+            qnig_list = []
+            qtrg_list = [] # Quarterly Total Revenue Growth
+            weights_sum = 0
+            qnig_weights_sum = 0
+            qtrg_weights_sum = 0
+            previous_net_income = None
+            previous_total_revenue = None
+            if VERBOSE_LOGS: print("[{} {}]".format(__name__, 8))
+
+            for key in reversed(list(financials_yearly)):  # 1st will be oldest
+                if 'Net Income' in financials_yearly[key]:
+                    net_income_list.append((float(financials_yearly[key]['Net Income'])) * EARNINGS_WEIGHTS[qnig_weight_index])
+                    weights_sum += EARNINGS_WEIGHTS[qnig_weight_index]
+                    if qnig_weight_index > 0:
+                        current_net_income = financials_yearly[key]['Net Income']
+                        if float(previous_net_income) != 0.0 and float(current_net_income) != 0.0:  # (this-prev)/(abs(this)+abs(prev))
+                            value_to_append = calculate_current_vs_previous_change_ratio(current_net_income, previous_net_income)
+                            qnig_list.append(value_to_append * EARNINGS_WEIGHTS[qnig_weight_index - 1])
                         else:
-                            qeg_list.append(0.0) # No change
-                        qeg_weights_sum += EARNINGS_WEIGHTS[weight_index-1]
-                    previous_earnings = earnings_yearly['Earnings'][key]
-                    weight_index     += 1
-                if VERBOSE_LOGS: print("[{} {}]".format(__name__, 6))
-
-                stock_data.annualized_earnings = stock_data.financial_currency_conversion_rate_mult_to_usd*sum(earnings_list) / weights_sum  # Multiplying by the factor to get the valu in USD.
-                if len(qeg_list):
-                    stock_data.eqg_yoy         = sum(qeg_list) / qeg_weights_sum
-                else:
-                    stock_data.eqg_yoy         = None
-            else:
-                stock_data.eqg_yoy             = None
-                stock_data.annualized_earnings = None
-
-            if earnings_yearly != None and 'Revenue' in earnings_yearly:
-                weight_index      = 0
-                qrg_list          = []
-                qrg_weights_sum   = 0
-                previous_revenue = None
-                for key in earnings_yearly['Revenue']:
-                    if weight_index > 0:
-                        current_revenue = earnings_yearly['Revenue'][key]
-                        if float(previous_revenue) != 0.0 and float(current_revenue) != 0.0: # (this-prev)/(abs(this)+abs(prev))
-                            value_to_append = calculate_current_vs_previous_change_ratio(current_revenue, previous_revenue)
-                            qrg_list.append(value_to_append*REVENUES_WEIGHTS[weight_index-1])
+                            qnig_list.append(0.0)  # No change
+                        qnig_weights_sum += EARNINGS_WEIGHTS[qnig_weight_index - 1]
+                    previous_net_income = financials_yearly[key]['Net Income']
+                    qnig_weight_index += 1
+                if 'Total Revenue' in financials_yearly[key]:
+                    if qtrg_weight_index > 0:
+                        current_total_revenue = financials_yearly[key]['Total Revenue']
+                        if float(previous_total_revenue) != 0.0 and float(current_total_revenue) != 0.0:  # (this-prev)/(abs(this)+abs(prev))
+                            value_to_append = calculate_current_vs_previous_change_ratio(current_total_revenue, previous_total_revenue)
+                            qtrg_list.append(value_to_append * REVENUES_WEIGHTS[qtrg_weight_index - 1])
                         else:
-                            qrg_list.append(0.0) # No change
-                        qrg_weights_sum += REVENUES_WEIGHTS[weight_index-1]
-                    previous_revenue = earnings_yearly['Revenue'][key]
-                    weight_index     += 1
-                if len(qrg_list):
-                    if VERBOSE_LOGS: print("[{} {}]".format(__name__, 7))
+                            qtrg_list.append(0.0)  # No change
+                        qtrg_weights_sum += REVENUES_WEIGHTS[qtrg_weight_index - 1]
+                    previous_total_revenue = financials_yearly[key]['Total Revenue']
+                    qtrg_weight_index += 1
+            if len(net_income_list):
+                if VERBOSE_LOGS: print("[{} {}]".format(__name__, 9))
 
-                    stock_data.rqg_yoy = sum(qrg_list) / qrg_weights_sum
-                else:
-                    stock_data.rqg_yoy = None
+                stock_data.annualized_net_income = stock_data.financial_currency_conversion_rate_mult_to_usd * sum(net_income_list) / weights_sum  # Multiplying by the factor to get the valu in USD.
             else:
-                stock_data.rqg_yoy     = None
-
-            # Net Income Quarterly Growth Year-Over-Year Calculation:
-            if financials_yearly != None and len(financials_yearly):
-                qnig_weight_index = 0
-                qtrg_weight_index = 0
-                net_income_list = []
-                qnig_list = []
-                qtrg_list = [] # Quarterly Total Revenue Growth
-                weights_sum = 0
-                qnig_weights_sum = 0
-                qtrg_weights_sum = 0
-                previous_net_income = None
-                previous_total_revenue = None
-                if VERBOSE_LOGS: print("[{} {}]".format(__name__, 8))
-
-                for key in reversed(list(financials_yearly)):  # 1st will be oldest
-                    if 'Net Income' in financials_yearly[key]:
-                        net_income_list.append((float(financials_yearly[key]['Net Income'])) * EARNINGS_WEIGHTS[qnig_weight_index])
-                        weights_sum += EARNINGS_WEIGHTS[qnig_weight_index]
-                        if qnig_weight_index > 0:
-                            current_net_income = financials_yearly[key]['Net Income']
-                            if float(previous_net_income) != 0.0 and float(current_net_income) != 0.0:  # (this-prev)/(abs(this)+abs(prev))
-                                value_to_append = calculate_current_vs_previous_change_ratio(current_net_income, previous_net_income)
-                                qnig_list.append(value_to_append * EARNINGS_WEIGHTS[qnig_weight_index - 1])
-                            else:
-                                qnig_list.append(0.0)  # No change
-                            qnig_weights_sum += EARNINGS_WEIGHTS[qnig_weight_index - 1]
-                        previous_net_income = financials_yearly[key]['Net Income']
-                        qnig_weight_index += 1
-                    if 'Total Revenue' in financials_yearly[key]:
-                        if qtrg_weight_index > 0:
-                            current_total_revenue = financials_yearly[key]['Total Revenue']
-                            if float(previous_total_revenue) != 0.0 and float(current_total_revenue) != 0.0:  # (this-prev)/(abs(this)+abs(prev))
-                                value_to_append = calculate_current_vs_previous_change_ratio(current_total_revenue, previous_total_revenue)
-                                qtrg_list.append(value_to_append * REVENUES_WEIGHTS[qtrg_weight_index - 1])
-                            else:
-                                qtrg_list.append(0.0)  # No change
-                            qtrg_weights_sum += REVENUES_WEIGHTS[qtrg_weight_index - 1]
-                        previous_total_revenue = financials_yearly[key]['Total Revenue']
-                        qtrg_weight_index += 1
-                if len(net_income_list):
-                    if VERBOSE_LOGS: print("[{} {}]".format(__name__, 9))
-
-                    stock_data.annualized_net_income = stock_data.financial_currency_conversion_rate_mult_to_usd * sum(net_income_list) / weights_sum  # Multiplying by the factor to get the valu in USD.
-                else:
-                    stock_data.annualized_net_income = None
-                if VERBOSE_LOGS: print("[{} {}]".format(__name__, 10))
-
-                if len(qnig_list):
-                    stock_data.niqg_yoy = sum(qnig_list) / qnig_weights_sum
-                else:
-                    stock_data.niqg_yoy = None
-                if len(qtrg_list):
-                    stock_data.trqg_yoy = sum(qtrg_list) / qtrg_weights_sum
-                else:
-                    stock_data.trqg_yoy = None
-            else:
-                stock_data.niqg_yoy              = None
-                stock_data.trqg_yoy              = None
                 stock_data.annualized_net_income = None
+            if VERBOSE_LOGS: print("[{} {}]".format(__name__, 10))
 
-            # Earnings are ordered from oldest to newest so no reversing required for weights:
-            if earnings_quarterly != None and 'Revenue' in earnings_quarterly: stock_data.quarterized_revenue = calculate_weighted_stock_data_on_dict(earnings_quarterly['Revenue'],   'earnings_quarterly[Revenue]',   None,            NO_WEIGHTS, stock_data, False, True)
-            else:                                                              stock_data.quarterized_revenue = None
-
-            # Financials are ordered newest to oldest so reversing is required for weights:
-            stock_data.quarterized_total_revenue = calculate_weighted_stock_data_on_dict(financials_quarterly,            'financials_quarterly',          'Total Revenue', NO_WEIGHTS,       stock_data, True, True)
-
-            # Earnings are ordered from oldest to newest so no reversing required for weights:
-            if earnings_quarterly != None and 'Earnings' in earnings_quarterly: stock_data.quarterized_earnings = calculate_weighted_stock_data_on_dict(earnings_quarterly['Earnings'],  'earnings_quarterly[Earnings]',  None,            NO_WEIGHTS, stock_data, False, True)
-            else:                                                               stock_data.quarterized_earnings = None
-
-            # TODO: ASAFR: Add a calculation of net_income_to_total_revenue_list
-            # Financials are ordered newest to oldest so reversing is required for weights:
-            stock_data.quarterized_net_income    = calculate_weighted_stock_data_on_dict(financials_quarterly,            'financials_quarterly',          'Net Income',    NO_WEIGHTS, stock_data, True, True)
-
-            # At this stage, use the Total Revenue and Net Income as backups for revenues and earnings. TODO: ASAFR: Later on run comparisons and take them into account as well!
-            if   stock_data.annualized_net_income  is None and stock_data.quarterized_net_income is None: stock_data.effective_net_income = None
-            elif stock_data.annualized_net_income  is None and stock_data.quarterized_net_income != None: stock_data.effective_net_income = stock_data.quarterized_net_income
-            elif stock_data.quarterized_net_income is None and stock_data.annualized_net_income  != None: stock_data.effective_net_income = stock_data.annualized_net_income
-            else                                                                                        : stock_data.effective_net_income = (stock_data.quarterized_net_income) # Prefer TTM only
-
-            if   stock_data.annualized_total_revenue   is None and stock_data.quarterized_total_revenue  is None: stock_data.effective_total_revenue  = None
-            elif stock_data.annualized_total_revenue   is None and stock_data.quarterized_total_revenue  != None: stock_data.effective_total_revenue  = stock_data.quarterized_total_revenue
-            elif stock_data.quarterized_total_revenue  is None and stock_data.annualized_total_revenue   != None: stock_data.effective_total_revenue  = stock_data.annualized_total_revenue
-            else                                                                                                : stock_data.effective_total_revenue  = (stock_data.quarterized_total_revenue ) # Prefer TTM only
-
-            if   stock_data.annualized_earnings  is None: stock_data.annualized_earnings  = stock_data.annualized_net_income
-            if   stock_data.quarterized_earnings is None: stock_data.quarterized_earnings = stock_data.quarterized_net_income
-
-            if   stock_data.annualized_earnings  is None and stock_data.quarterized_earnings is None: stock_data.effective_earnings = stock_data.effective_net_income
-            elif stock_data.annualized_earnings  is None and stock_data.quarterized_earnings != None: stock_data.effective_earnings = stock_data.quarterized_earnings
-            elif stock_data.quarterized_earnings is None and stock_data.annualized_earnings  != None: stock_data.effective_earnings = stock_data.annualized_earnings
-            else                                                                                    : stock_data.effective_earnings = (stock_data.quarterized_earnings) # Prefer TTM only
-
-            if   stock_data.annualized_revenue   is None: stock_data.annualized_revenue   = stock_data.annualized_total_revenue
-            if   stock_data.quarterized_revenue  is None: stock_data.quarterized_revenue  = stock_data.quarterized_total_revenue
-
-            if   stock_data.annualized_revenue   is None and stock_data.quarterized_revenue  is None: stock_data.effective_revenue  = stock_data.effective_total_revenue
-            elif stock_data.annualized_revenue   is None and stock_data.quarterized_revenue  != None: stock_data.effective_revenue  = stock_data.quarterized_revenue
-            elif stock_data.quarterized_revenue  is None and stock_data.annualized_revenue   != None: stock_data.effective_revenue  = stock_data.annualized_revenue
-            else                                                                                    : stock_data.effective_revenue  = (stock_data.quarterized_revenue ) # Prefer TTM only
-
-            if 'country' in info:                stock_data.country = info['country']
-            else:                                stock_data.country = 'Unknown'
-            if stock_data.country is None: stock_data.country       = 'Unknown'
-
-            if 'profitMargins' in info:          stock_data.profit_margin = info['profitMargins']
-            else:                                stock_data.profit_margin = None
-
-            if 'heldPercentInstitutions' in info:                                                         stock_data.held_percent_institutions = info['heldPercentInstitutions']
-            else:                                                                                         stock_data.held_percent_institutions = PERCENT_HELD_INSTITUTIONS_LOW
-            if stock_data.held_percent_institutions is None or stock_data.held_percent_institutions == 0: stock_data.held_percent_institutions = PERCENT_HELD_INSTITUTIONS_LOW
-
-            if 'heldPercentInsiders' in info:                                                             stock_data.held_percent_insiders     = info['heldPercentInsiders']
-            else:                                                                                         stock_data.held_percent_insiders     = PERCENT_HELD_INSIDERS_UNKNOWN
-            if stock_data.held_percent_insiders     is None or stock_data.held_percent_insiders == 0:     stock_data.held_percent_insiders     = PERCENT_HELD_INSIDERS_UNKNOWN
-
-            if 'enterpriseToRevenue' in info:
-                stock_data.enterprise_value_to_revenue = info['enterpriseToRevenue']
-                if stock_data.enterprise_value_to_revenue != None: stock_data.enterprise_value_to_revenue *= stock_data.summary_currency_conversion_rate_mult_to_usd # https://www.investopedia.com/terms/e/ev-revenue-multiple.asp
+            if len(qnig_list):
+                stock_data.niqg_yoy = sum(qnig_list) / qnig_weights_sum
             else:
-                stock_data.enterprise_value_to_revenue = None # Mark as None, so as to try and calculate manually. TODO: ASAFR: Do the same to the Price and to the Earnings and the Price/Earnings (Also to sales if possible)
-            if isinstance(stock_data.enterprise_value_to_revenue,str): stock_data.enterprise_value_to_revenue = None # Mark as None, so as to try and calculate manually.
-
-            if 'marketCap' in info and info['marketCap'] != None:
-                stock_data.market_cap = info['marketCap']*stock_data.summary_currency_conversion_rate_mult_to_usd
+                stock_data.niqg_yoy = None
+            if len(qtrg_list):
+                stock_data.trqg_yoy = sum(qtrg_list) / qtrg_weights_sum
             else:
-                stock_data.market_cap = None
+                stock_data.trqg_yoy = None
+        else:
+            stock_data.niqg_yoy              = None
+            stock_data.trqg_yoy              = None
+            stock_data.annualized_net_income = None
 
-            if 'enterpriseValue' in info and info['enterpriseValue'] != None: stock_data.enterprise_value = info['enterpriseValue']*stock_data.summary_currency_conversion_rate_mult_to_usd
-            if market_cap_included:
-                if stock_data.enterprise_value is None or stock_data.enterprise_value <= 0:
-                    if   'marketCap' in info and info['marketCap'] != None:
-                        stock_data.enterprise_value = int(info['marketCap']*stock_data.summary_currency_conversion_rate_mult_to_usd)
-                elif stock_data.market_cap is None or stock_data.market_cap <= 0:
-                    stock_data.market_cap = stock_data.enterprise_value
+        # Earnings are ordered from oldest to newest so no reversing required for weights:
+        if earnings_quarterly != None and 'Revenue' in earnings_quarterly: stock_data.quarterized_revenue = calculate_weighted_stock_data_on_dict(earnings_quarterly['Revenue'],   'earnings_quarterly[Revenue]',   None,            NO_WEIGHTS, stock_data, False, True)
+        else:                                                              stock_data.quarterized_revenue = None
 
-            # in order to calculate eibtd, take ebit from finantials and add deprecations from cash_flows to it:
-            # Financials and Cash Flows are ordered newest to oldest so reversing is required for weights:
-            stock_data.quarterized_ebitd = calculate_weighted_sum_from_2_dicts(financials_quarterly, 'financials_quarterly', 'Ebit', cash_flows_quarterly, 'cash_flows_quarterly', 'Depreciation', NO_WEIGHTS,       stock_data, 0, True, True, True)
-            stock_data.annualized_ebitd  = calculate_weighted_sum_from_2_dicts(financials_yearly,    'financials_yearly',    'Ebit', cash_flows_yearly,    'cash_flows_yearly',    'Depreciation', EARNINGS_WEIGHTS, stock_data, 0, True, True)
-            stock_data.ebitd             = (stock_data.quarterized_ebitd) # Prefer TTM only
+        # Financials are ordered newest to oldest so reversing is required for weights:
+        stock_data.quarterized_total_revenue = calculate_weighted_stock_data_on_dict(financials_quarterly,            'financials_quarterly',          'Total Revenue', NO_WEIGHTS,       stock_data, True, True)
 
-            # TODO: ASAFR: 1. ebit (within financials) can be used instead of simply taking the earnings
-            #              1.1. is ebit available for all/most TASE stocks? ebitd
-            #              1.2. There is a similar field (same value different name) besides ebit - see if it is always the same? Low priority
-            #              1.3. If enterpriseToEbitda is available (for most stocks it is? Check), then EBITDA = EV/enterpriseToEbitda
-            #              1.3.1. But if EV is negative for some stocks... then Market Capital might be used...
-            #              1.4. Suggestion: take average such that EBITDA = (EV/enterpriseToEbitda + CalculatedEbitFromFinancialsAndCashFlows)/2
-            if 'enterpriseToEbitda' in info:
-                stock_data.enterprise_value_to_ebitda = info['enterpriseToEbitda']
-                if stock_data.enterprise_value_to_ebitda != None:
-                    stock_data.enterprise_value_to_ebitda *= stock_data.summary_currency_conversion_rate_mult_to_usd  # The lower the better: https://www.investopedia.com/ask/answers/072715/what-considered-healthy-evebitda.asp
+        # Earnings are ordered from oldest to newest so no reversing required for weights:
+        if earnings_quarterly != None and 'Earnings' in earnings_quarterly: stock_data.quarterized_earnings = calculate_weighted_stock_data_on_dict(earnings_quarterly['Earnings'],  'earnings_quarterly[Earnings]',  None,            NO_WEIGHTS, stock_data, False, True)
+        else:                                                               stock_data.quarterized_earnings = None
 
-                    # Calculate ebitda from enterprise_value_to_ebitda:
-                    if VERBOSE_LOGS: print("[{} {}]".format(__name__, 11))
+        # TODO: ASAFR: Add a calculation of net_income_to_total_revenue_list
+        # Financials are ordered newest to oldest so reversing is required for weights:
+        stock_data.quarterized_net_income    = calculate_weighted_stock_data_on_dict(financials_quarterly,            'financials_quarterly',          'Net Income',    NO_WEIGHTS, stock_data, True, True)
 
-                    if stock_data.enterprise_value_to_ebitda != 0: stock_data.ebitda = (stock_data.enterprise_value/stock_data.enterprise_value_to_ebitda + stock_data.ebitd)/2
-            else:
-                if stock_data.ebitd != 0:
-                    if VERBOSE_LOGS: print("[{} {}]".format(__name__, 12))
+        # At this stage, use the Total Revenue and Net Income as backups for revenues and earnings. TODO: ASAFR: Later on run comparisons and take them into account as well!
+        if   stock_data.annualized_net_income  is None and stock_data.quarterized_net_income is None: stock_data.effective_net_income = None
+        elif stock_data.annualized_net_income  is None and stock_data.quarterized_net_income != None: stock_data.effective_net_income = stock_data.quarterized_net_income
+        elif stock_data.quarterized_net_income is None and stock_data.annualized_net_income  != None: stock_data.effective_net_income = stock_data.annualized_net_income
+        else                                                                                        : stock_data.effective_net_income = (stock_data.quarterized_net_income) # Prefer TTM only
 
-                    stock_data.enterprise_value_to_ebitda = stock_data.enterprise_value/stock_data.ebitd
+        if   stock_data.annualized_total_revenue   is None and stock_data.quarterized_total_revenue  is None: stock_data.effective_total_revenue  = None
+        elif stock_data.annualized_total_revenue   is None and stock_data.quarterized_total_revenue  != None: stock_data.effective_total_revenue  = stock_data.quarterized_total_revenue
+        elif stock_data.quarterized_total_revenue  is None and stock_data.annualized_total_revenue   != None: stock_data.effective_total_revenue  = stock_data.annualized_total_revenue
+        else                                                                                                : stock_data.effective_total_revenue  = (stock_data.quarterized_total_revenue ) # Prefer TTM only
 
+        if   stock_data.annualized_earnings  is None: stock_data.annualized_earnings  = stock_data.annualized_net_income
+        if   stock_data.quarterized_earnings is None: stock_data.quarterized_earnings = stock_data.quarterized_net_income
+
+        if   stock_data.annualized_earnings  is None and stock_data.quarterized_earnings is None: stock_data.effective_earnings = stock_data.effective_net_income
+        elif stock_data.annualized_earnings  is None and stock_data.quarterized_earnings != None: stock_data.effective_earnings = stock_data.quarterized_earnings
+        elif stock_data.quarterized_earnings is None and stock_data.annualized_earnings  != None: stock_data.effective_earnings = stock_data.annualized_earnings
+        else                                                                                    : stock_data.effective_earnings = (stock_data.quarterized_earnings) # Prefer TTM only
+
+        if   stock_data.annualized_revenue   is None: stock_data.annualized_revenue   = stock_data.annualized_total_revenue
+        if   stock_data.quarterized_revenue  is None: stock_data.quarterized_revenue  = stock_data.quarterized_total_revenue
+
+        if   stock_data.annualized_revenue   is None and stock_data.quarterized_revenue  is None: stock_data.effective_revenue  = stock_data.effective_total_revenue
+        elif stock_data.annualized_revenue   is None and stock_data.quarterized_revenue  != None: stock_data.effective_revenue  = stock_data.quarterized_revenue
+        elif stock_data.quarterized_revenue  is None and stock_data.annualized_revenue   != None: stock_data.effective_revenue  = stock_data.annualized_revenue
+        else                                                                                    : stock_data.effective_revenue  = (stock_data.quarterized_revenue ) # Prefer TTM only
+
+        if 'country' in info:                stock_data.country = info['country']
+        else:                                stock_data.country = 'Unknown'
+        if stock_data.country is None: stock_data.country       = 'Unknown'
+
+        if 'profitMargins' in info:          stock_data.profit_margin = info['profitMargins']
+        else:                                stock_data.profit_margin = None
+
+        if 'heldPercentInstitutions' in info:                                                         stock_data.held_percent_institutions = info['heldPercentInstitutions']
+        else:                                                                                         stock_data.held_percent_institutions = PERCENT_HELD_INSTITUTIONS_LOW
+        if stock_data.held_percent_institutions is None or stock_data.held_percent_institutions == 0: stock_data.held_percent_institutions = PERCENT_HELD_INSTITUTIONS_LOW
+
+        if 'heldPercentInsiders' in info:                                                             stock_data.held_percent_insiders     = info['heldPercentInsiders']
+        else:                                                                                         stock_data.held_percent_insiders     = PERCENT_HELD_INSIDERS_UNKNOWN
+        if stock_data.held_percent_insiders     is None or stock_data.held_percent_insiders == 0:     stock_data.held_percent_insiders     = PERCENT_HELD_INSIDERS_UNKNOWN
+
+        if 'enterpriseToRevenue' in info:
+            stock_data.enterprise_value_to_revenue = info['enterpriseToRevenue']
+            if stock_data.enterprise_value_to_revenue != None: stock_data.enterprise_value_to_revenue *= stock_data.summary_currency_conversion_rate_mult_to_usd # https://www.investopedia.com/terms/e/ev-revenue-multiple.asp
+        else:
+            stock_data.enterprise_value_to_revenue = None # Mark as None, so as to try and calculate manually. TODO: ASAFR: Do the same to the Price and to the Earnings and the Price/Earnings (Also to sales if possible)
+        if isinstance(stock_data.enterprise_value_to_revenue,str): stock_data.enterprise_value_to_revenue = None # Mark as None, so as to try and calculate manually.
+
+        if 'marketCap' in info and info['marketCap'] != None:
+            stock_data.market_cap = info['marketCap']*stock_data.summary_currency_conversion_rate_mult_to_usd
+        else:
+            stock_data.market_cap = None
+
+        if 'enterpriseValue' in info and info['enterpriseValue'] != None: stock_data.enterprise_value = info['enterpriseValue']*stock_data.summary_currency_conversion_rate_mult_to_usd
+        if market_cap_included:
+            if stock_data.enterprise_value is None or stock_data.enterprise_value <= 0:
+                if   'marketCap' in info and info['marketCap'] != None:
+                    stock_data.enterprise_value = int(info['marketCap']*stock_data.summary_currency_conversion_rate_mult_to_usd)
+            elif stock_data.market_cap is None or stock_data.market_cap <= 0:
+                stock_data.market_cap = stock_data.enterprise_value
+
+        # in order to calculate eibtd, take ebit from finantials and add deprecations from cash_flows to it:
+        # Financials and Cash Flows are ordered newest to oldest so reversing is required for weights:
+        stock_data.quarterized_ebitd = calculate_weighted_sum_from_2_dicts(financials_quarterly, 'financials_quarterly', 'Ebit', cash_flows_quarterly, 'cash_flows_quarterly', 'Depreciation', NO_WEIGHTS,       stock_data, 0, True, True, True)
+        stock_data.annualized_ebitd  = calculate_weighted_sum_from_2_dicts(financials_yearly,    'financials_yearly',    'Ebit', cash_flows_yearly,    'cash_flows_yearly',    'Depreciation', EARNINGS_WEIGHTS, stock_data, 0, True, True)
+        stock_data.ebitd             = (stock_data.quarterized_ebitd) # Prefer TTM only
+
+        # TODO: ASAFR: 1. ebit (within financials) can be used instead of simply taking the earnings
+        #              1.1. is ebit available for all/most TASE stocks? ebitd
+        #              1.2. There is a similar field (same value different name) besides ebit - see if it is always the same? Low priority
+        #              1.3. If enterpriseToEbitda is available (for most stocks it is? Check), then EBITDA = EV/enterpriseToEbitda
+        #              1.3.1. But if EV is negative for some stocks... then Market Capital might be used...
+        #              1.4. Suggestion: take average such that EBITDA = (EV/enterpriseToEbitda + CalculatedEbitFromFinancialsAndCashFlows)/2
+        if 'enterpriseToEbitda' in info:
+            stock_data.enterprise_value_to_ebitda = info['enterpriseToEbitda']
             if stock_data.enterprise_value_to_ebitda != None:
-                if VERBOSE_LOGS: print("[{} {}]".format(__name__, 13))
+                stock_data.enterprise_value_to_ebitda *= stock_data.summary_currency_conversion_rate_mult_to_usd  # The lower the better: https://www.investopedia.com/ask/answers/072715/what-considered-healthy-evebitda.asp
 
-                stock_data.effective_ev_to_ebitda = (stock_data.enterprise_value_to_ebitda + stock_data.enterprise_value/stock_data.ebitda if stock_data.ebitda != 0 else stock_data.enterprise_value_to_ebitda)/2
+                # Calculate ebitda from enterprise_value_to_ebitda:
+                if VERBOSE_LOGS: print("[{} {}]".format(__name__, 11))
+
+                if stock_data.enterprise_value_to_ebitda != 0: stock_data.ebitda = (stock_data.enterprise_value/stock_data.enterprise_value_to_ebitda + stock_data.ebitd)/2
+        else:
+            if stock_data.ebitd != 0:
+                if VERBOSE_LOGS: print("[{} {}]".format(__name__, 12))
+
+                stock_data.enterprise_value_to_ebitda = stock_data.enterprise_value/stock_data.ebitd
+
+        if stock_data.enterprise_value_to_ebitda != None:
+            if VERBOSE_LOGS: print("[{} {}]".format(__name__, 13))
+
+            stock_data.effective_ev_to_ebitda = (stock_data.enterprise_value_to_ebitda + stock_data.enterprise_value/stock_data.ebitda if stock_data.ebitda != 0 else stock_data.enterprise_value_to_ebitda)/2
+        else:
+            stock_data.effective_ev_to_ebitda = EV_TO_EBITDA_MAX_UNKNOWN
+
+        if VERBOSE_LOGS: print("[{} {}]".format(__name__, 14))
+
+        if 'trailingPE' in info:
+            stock_data.trailing_price_to_earnings  = info['trailingPE']  # https://www.investopedia.com/terms/t/trailingpe.asp
+            if tase_mode and stock_data.trailing_price_to_earnings != None:
+                stock_data.trailing_price_to_earnings /= 100.0  # In TLV stocks, yfinance multiplies trailingPE by a factor of 100, so compensate
+                stock_data.trailing_price_to_earnings *= stock_data.summary_currency_conversion_rate_mult_to_usd # Additionally, in TLV stocks this ratio is mistakenly calculated using PriceInNis/EarningsInUSD -> so Compensate
+        elif stock_data.effective_earnings != None and stock_data.effective_earnings != 0:
+            stock_data.trailing_price_to_earnings  = stock_data.market_cap / stock_data.effective_earnings # Calculate manually.
+        if isinstance(stock_data.trailing_price_to_earnings,str):  stock_data.trailing_price_to_earnings  = None # Mark as None, so as to try and calculate manually.
+
+        if VERBOSE_LOGS: print("[{} {}]".format(__name__, 15))
+
+        if 'forwardPE' in info:
+            stock_data.forward_price_to_earnings  = info['forwardPE']  # https://www.investopedia.com/terms/t/trailingpe.asp
+            if tase_mode and stock_data.forward_price_to_earnings != None:
+                stock_data.forward_price_to_earnings /= 100.0 # In TLV stocks, yfinance multiplies forwardPE by a factor of 100, so compensate
+                stock_data.forward_price_to_earnings *= stock_data.summary_currency_conversion_rate_mult_to_usd # Additionally, in TLV stocks this ratio is mistakenly calculated using PriceInNis/EarningsInUSD -> so Compensate
+        else:  stock_data.forward_price_to_earnings  = None # Mark as None, so as to try and calculate manually. TODO: ASAFR: Calcualte using the forward_eps?
+
+        if   stock_data.trailing_price_to_earnings is None and stock_data.forward_price_to_earnings  is None: stock_data.effective_price_to_earnings = None
+        elif stock_data.forward_price_to_earnings  is None and stock_data.trailing_price_to_earnings != None: stock_data.forward_price_to_earnings   = stock_data.trailing_price_to_earnings
+        elif stock_data.trailing_price_to_earnings is None and stock_data.forward_price_to_earnings  != None: stock_data.trailing_price_to_earnings  = stock_data.forward_price_to_earnings
+
+        # Handle Negative Values of P/E: Negative P/E handling (TODO: ASAFR: Research this, maybe a smiling parabola is preferred, or some different less harsh function than 1/-x, like some damper n/[e+X])
+        # Sources: https://www.investopedia.com/ask/answers/05/negativeeps.asp
+        if VERBOSE_LOGS: print("[{} {}]".format(__name__, 16))
+
+        if stock_data.trailing_price_to_earnings != None:
+            if   stock_data.trailing_price_to_earnings  < 0: stock_data.trailing_price_to_earnings = -NEGATIVE_EARNINGS_FACTOR/stock_data.trailing_price_to_earnings
+            elif stock_data.trailing_price_to_earnings == 0: stock_data.trailing_price_to_earnings =  NEGATIVE_EARNINGS_FACTOR
+        if stock_data.forward_price_to_earnings  != None:
+            if   stock_data.forward_price_to_earnings   < 0: stock_data.forward_price_to_earnings  = -NEGATIVE_EARNINGS_FACTOR/stock_data.forward_price_to_earnings
+            elif stock_data.forward_price_to_earnings  == 0: stock_data.forward_price_to_earnings  =  NEGATIVE_EARNINGS_FACTOR
+
+        # Calculate the weighted average of the forward and trailing P/E:
+        stock_data.effective_price_to_earnings = (stock_data.trailing_price_to_earnings*TRAILING_PRICE_TO_EARNINGS_WEIGHT+stock_data.forward_price_to_earnings*FORWARD_PRICE_TO_EARNINGS_WEIGHT)
+
+        if 'forwardEps'                                 in info: stock_data.forward_eps                       = info['forwardEps']
+        else:                                                    stock_data.forward_eps                       = None
+        if isinstance(stock_data.forward_eps,str):               stock_data.forward_eps                       = None
+
+        if 'trailingEps'                                in info: stock_data.trailing_eps                      = info['trailingEps']
+        else:                                                    stock_data.trailing_eps                      = None
+        if isinstance(stock_data.trailing_eps,str):              stock_data.trailing_eps                      = None
+
+        if 'previousClose'                              in info: stock_data.previous_close                    = info['previousClose']
+        else:                                                    stock_data.previous_close                    = None
+        if isinstance(stock_data.previous_close,str):            stock_data.previous_close                    = None
+
+        if '52WeekChange'         in info: stock_data.fifty_two_week_change   = info['52WeekChange']
+        if 'fiftyTwoWeekLow'      in info: stock_data.fifty_two_week_low      = info['fiftyTwoWeekLow']
+        if 'fiftyTwoWeekHigh'     in info: stock_data.fifty_two_week_high     = info['fiftyTwoWeekHigh']
+        if 'twoHundredDayAverage' in info: stock_data.two_hundred_day_average = info['twoHundredDayAverage']
+
+        if stock_data.fifty_two_week_change                                                        is None: stock_data.fifty_two_week_change   = stock_data.previous_close
+        if stock_data.fifty_two_week_low                                                           is None: stock_data.fifty_two_week_low      = stock_data.previous_close
+        if stock_data.fifty_two_week_high                                                          is None: stock_data.fifty_two_week_high     = stock_data.previous_close
+        if stock_data.two_hundred_day_average                                                      is None: stock_data.two_hundred_day_average = stock_data.previous_close
+        if stock_data.previous_close != None and stock_data.previous_close < stock_data.fifty_two_week_low: stock_data.previous_close          = stock_data.fifty_two_week_low
+
+        if VERBOSE_LOGS: print("[{} {}]".format(__name__, 17))
+
+        if stock_data.two_hundred_day_average > 0.0: stock_data.previous_close_percentage_from_200d_ma  = 100.0 * ((stock_data.previous_close - stock_data.two_hundred_day_average) / stock_data.two_hundred_day_average)
+        if stock_data.fifty_two_week_low      > 0.0: stock_data.previous_close_percentage_from_52w_low  = 100.0 * ((stock_data.previous_close - stock_data.fifty_two_week_low     ) / stock_data.fifty_two_week_low     )
+        if stock_data.fifty_two_week_high     > 0.0: stock_data.previous_close_percentage_from_52w_high = 100.0 * ((stock_data.previous_close - stock_data.fifty_two_week_high    ) / stock_data.fifty_two_week_high    )
+        if stock_data.fifty_two_week_low      > 0.0 and stock_data.fifty_two_week_high > 0.0 and stock_data.previous_close > 0.0:
+            if stock_data.fifty_two_week_high == stock_data.fifty_two_week_low or stock_data.previous_close == 0:  # TODO: ASAFR: Take these values from nasdaq_traded.csv when they are not available temporarily on yfinance
+                stock_data.dist_from_low_factor = 1.0  # When there is no range or no previous_close_data, leave as neutral
             else:
-                stock_data.effective_ev_to_ebitda = EV_TO_EBITDA_MAX_UNKNOWN
+                stock_data.dist_from_low_factor = (stock_data.previous_close - stock_data.fifty_two_week_low)/(0.5*(stock_data.fifty_two_week_high-stock_data.fifty_two_week_low))
+            stock_data.eff_dist_from_low_factor = (DIST_FROM_LOW_FACTOR_DAMPER + stock_data.dist_from_low_factor) if stock_data.dist_from_low_factor < 1.0 else (stock_data.dist_from_low_factor**DIST_FROM_LOW_FACTOR_HIGHER_THAN_ONE_POWER)
 
-            if VERBOSE_LOGS: print("[{} {}]".format(__name__, 14))
+        if VERBOSE_LOGS: print("[{} {}]".format(__name__, 18))
 
-            if 'trailingPE' in info:
-                stock_data.trailing_price_to_earnings  = info['trailingPE']  # https://www.investopedia.com/terms/t/trailingpe.asp
-                if tase_mode and stock_data.trailing_price_to_earnings != None:
-                    stock_data.trailing_price_to_earnings /= 100.0  # In TLV stocks, yfinance multiplies trailingPE by a factor of 100, so compensate
-                    stock_data.trailing_price_to_earnings *= stock_data.summary_currency_conversion_rate_mult_to_usd # Additionally, in TLV stocks this ratio is mistakenly calculated using PriceInNis/EarningsInUSD -> so Compensate
-            elif stock_data.effective_earnings != None and stock_data.effective_earnings != 0:
-                stock_data.trailing_price_to_earnings  = stock_data.market_cap / stock_data.effective_earnings # Calculate manually.
-            if isinstance(stock_data.trailing_price_to_earnings,str):  stock_data.trailing_price_to_earnings  = None # Mark as None, so as to try and calculate manually.
+        if stock_data.trailing_eps != None and stock_data.previous_close != None and stock_data.previous_close > 0:
+            stock_data.trailing_eps_percentage = stock_data.trailing_eps / stock_data.previous_close
 
-            if VERBOSE_LOGS: print("[{} {}]".format(__name__, 15))
+        if VERBOSE_LOGS: print("[{} {}]".format(__name__, 19))
 
-            if 'forwardPE' in info:
-                stock_data.forward_price_to_earnings  = info['forwardPE']  # https://www.investopedia.com/terms/t/trailingpe.asp
-                if tase_mode and stock_data.forward_price_to_earnings != None:
-                    stock_data.forward_price_to_earnings /= 100.0 # In TLV stocks, yfinance multiplies forwardPE by a factor of 100, so compensate
-                    stock_data.forward_price_to_earnings *= stock_data.summary_currency_conversion_rate_mult_to_usd # Additionally, in TLV stocks this ratio is mistakenly calculated using PriceInNis/EarningsInUSD -> so Compensate
-            else:  stock_data.forward_price_to_earnings  = None # Mark as None, so as to try and calculate manually. TODO: ASAFR: Calcualte using the forward_eps?
+        if 'priceToBook'                                in info:
+            stock_data.price_to_book = info['priceToBook']
+            if tase_mode and stock_data.price_to_book != None: # yfinance mistakenly multiplies value by 100 and doesn't convert price to USD, so compenate:
+                stock_data.price_to_book /= 100
+                stock_data.price_to_book *= stock_data.summary_currency_conversion_rate_mult_to_usd
+        else:
+            stock_data.price_to_book      = None # Mark as None, so as to try and calculate manually.
+        if isinstance(stock_data.price_to_book,str): stock_data.price_to_book = None # Mark as None, so as to try and calculate manually.
+        if stock_data.price_to_book is None:
+            stock_data.price_to_book = PRICE_TO_BOOK_UNKNOWN * (10 if tase_mode else 1) # TODO: ASAFR: Until calculated manually, do not allow N/A in price2book to ruin the whole value, just set a very unatractive one, and let the rest of the parameters cope
 
-            if   stock_data.trailing_price_to_earnings is None and stock_data.forward_price_to_earnings  is None: stock_data.effective_price_to_earnings = None
-            elif stock_data.forward_price_to_earnings  is None and stock_data.trailing_price_to_earnings != None: stock_data.forward_price_to_earnings   = stock_data.trailing_price_to_earnings
-            elif stock_data.trailing_price_to_earnings is None and stock_data.forward_price_to_earnings  != None: stock_data.trailing_price_to_earnings  = stock_data.forward_price_to_earnings
+        # Value is a ratio, such that when multiplied by 100, yields percentage (%) units:
+        if 'earningsQuarterlyGrowth'                    in info: stock_data.eqg         = info['earningsQuarterlyGrowth']
+        else:                                                    stock_data.eqg         = None
 
-            # Handle Negative Values of P/E: Negative P/E handling (TODO: ASAFR: Research this, maybe a smiling parabola is preferred, or some different less harsh function than 1/-x, like some damper n/[e+X])
-            # Sources: https://www.investopedia.com/ask/answers/05/negativeeps.asp
-            if VERBOSE_LOGS: print("[{} {}]".format(__name__, 16))
+        # Value is a ratio, such that when multiplied by 100, yields percentage (%) units:
+        if 'revenueGrowth'                     in info: stock_data.rqg         = info['revenueGrowth']
+        else:                                           stock_data.rqg         = None
 
-            if stock_data.trailing_price_to_earnings != None:
-                if   stock_data.trailing_price_to_earnings  < 0: stock_data.trailing_price_to_earnings = -NEGATIVE_EARNINGS_FACTOR/stock_data.trailing_price_to_earnings
-                elif stock_data.trailing_price_to_earnings == 0: stock_data.trailing_price_to_earnings =  NEGATIVE_EARNINGS_FACTOR
-            if stock_data.forward_price_to_earnings  != None:
-                if   stock_data.forward_price_to_earnings   < 0: stock_data.forward_price_to_earnings  = -NEGATIVE_EARNINGS_FACTOR/stock_data.forward_price_to_earnings
-                elif stock_data.forward_price_to_earnings  == 0: stock_data.forward_price_to_earnings  =  NEGATIVE_EARNINGS_FACTOR
+        # TODO: ASAFR: Currently use the niqg_yoy and trqg_yoy as a simple backup. Later on - compare and add to calculations...
+        if stock_data.eqg_yoy is None: stock_data.eqg_yoy = stock_data.niqg_yoy
+        if stock_data.rqg_yoy is None: stock_data.rqg_yoy = stock_data.trqg_yoy
 
-            # Calculate the weighted average of the forward and trailing P/E:
-            stock_data.effective_price_to_earnings = (stock_data.trailing_price_to_earnings*TRAILING_PRICE_TO_EARNINGS_WEIGHT+stock_data.forward_price_to_earnings*FORWARD_PRICE_TO_EARNINGS_WEIGHT)
+        # Now use above backup as required: TODO: ASAFR: One may use the yoy as direct backup... analyze this...
+        if   stock_data.eqg is None and stock_data.eqg_yoy != None: stock_data.eqg     = stock_data.eqg_yoy
+        elif stock_data.eqg != None and stock_data.eqg_yoy is None: stock_data.eqg_yoy = stock_data.eqg
+        elif stock_data.eqg is None and stock_data.eqg_yoy is None: stock_data.eqg_yoy = stock_data.eqg = EQG_UNKNOWN
 
-            if 'forwardEps'                                 in info: stock_data.forward_eps                       = info['forwardEps']
-            else:                                                    stock_data.forward_eps                       = None
-            if isinstance(stock_data.forward_eps,str):               stock_data.forward_eps                       = None
+        if   stock_data.rqg is None and stock_data.rqg_yoy != None: stock_data.rqg     = stock_data.rqg_yoy
+        elif stock_data.rqg != None and stock_data.rqg_yoy is None: stock_data.rqg_yoy = stock_data.rqg
+        elif stock_data.rqg is None and stock_data.rqg_yoy is None: stock_data.rqg_yoy = stock_data.rqg = RQG_UNKNOWN
 
-            if 'trailingEps'                                in info: stock_data.trailing_eps                      = info['trailingEps']
-            else:                                                    stock_data.trailing_eps                      = None
-            if isinstance(stock_data.trailing_eps,str):              stock_data.trailing_eps                      = None
+        stock_data.eqg_effective = EQG_WEIGHT_VS_YOY*stock_data.eqg + (1.0-EQG_WEIGHT_VS_YOY)*stock_data.eqg_yoy
+        stock_data.rqg_effective = RQG_WEIGHT_VS_YOY*stock_data.rqg + (1.0-RQG_WEIGHT_VS_YOY)*stock_data.rqg_yoy
 
-            if 'previousClose'                              in info: stock_data.previous_close                    = info['previousClose']
-            else:                                                    stock_data.previous_close                    = None
-            if isinstance(stock_data.previous_close,str):            stock_data.previous_close                    = None
+        if stock_data.eqg_effective > 0:
+            stock_data.eqg_factor_effective = (EQG_DAMPER + EQG_POSITIVE_FACTOR * math.sqrt(stock_data.eqg_effective))
+        else:
+            stock_data.eqg_factor_effective = (EQG_DAMPER + stock_data.eqg_effective/EQG_POSITIVE_FACTOR)
 
-            if '52WeekChange'         in info: stock_data.fifty_two_week_change   = info['52WeekChange']
-            if 'fiftyTwoWeekLow'      in info: stock_data.fifty_two_week_low      = info['fiftyTwoWeekLow']
-            if 'fiftyTwoWeekHigh'     in info: stock_data.fifty_two_week_high     = info['fiftyTwoWeekHigh']
-            if 'twoHundredDayAverage' in info: stock_data.two_hundred_day_average = info['twoHundredDayAverage']
+        if stock_data.rqg_effective >= 0:
+            stock_data.rqg_factor_effective = (RQG_DAMPER + RQG_POSITIVE_FACTOR * math.sqrt(stock_data.rqg_effective))
+        else:
+            stock_data.rqg_factor_effective = (RQG_DAMPER + stock_data.rqg_effective/RQG_POSITIVE_FACTOR)
 
-            if stock_data.fifty_two_week_change                                                        is None: stock_data.fifty_two_week_change   = stock_data.previous_close
-            if stock_data.fifty_two_week_low                                                           is None: stock_data.fifty_two_week_low      = stock_data.previous_close
-            if stock_data.fifty_two_week_high                                                          is None: stock_data.fifty_two_week_high     = stock_data.previous_close
-            if stock_data.two_hundred_day_average                                                      is None: stock_data.two_hundred_day_average = stock_data.previous_close
-            if stock_data.previous_close != None and stock_data.previous_close < stock_data.fifty_two_week_low: stock_data.previous_close          = stock_data.fifty_two_week_low
+        if 'sharesOutstanding'                          in info: stock_data.shares_outstanding                = info['sharesOutstanding']
+        else:                                                    stock_data.shares_outstanding                = SHARES_OUTSTANDING_UNKNOWN
+        if stock_data.shares_outstanding is None or stock_data.shares_outstanding == 0:
+            stock_data.shares_outstanding = SHARES_OUTSTANDING_UNKNOWN
 
-            if VERBOSE_LOGS: print("[{} {}]".format(__name__, 17))
+        if 'netIncomeToCommon' in info: stock_data.net_income_to_common_shareholders = info['netIncomeToCommon']
+        else:                           stock_data.net_income_to_common_shareholders = None # TODO: ASAFR: It may be possible to calculate this manually
 
-            if stock_data.two_hundred_day_average > 0.0: stock_data.previous_close_percentage_from_200d_ma  = 100.0 * ((stock_data.previous_close - stock_data.two_hundred_day_average) / stock_data.two_hundred_day_average)
-            if stock_data.fifty_two_week_low      > 0.0: stock_data.previous_close_percentage_from_52w_low  = 100.0 * ((stock_data.previous_close - stock_data.fifty_two_week_low     ) / stock_data.fifty_two_week_low     )
-            if stock_data.fifty_two_week_high     > 0.0: stock_data.previous_close_percentage_from_52w_high = 100.0 * ((stock_data.previous_close - stock_data.fifty_two_week_high    ) / stock_data.fifty_two_week_high    )
-            if stock_data.fifty_two_week_low      > 0.0 and stock_data.fifty_two_week_high > 0.0 and stock_data.previous_close > 0.0:
-                if stock_data.fifty_two_week_high == stock_data.fifty_two_week_low or stock_data.previous_close == 0:  # TODO: ASAFR: Take these values from nasdaq_traded.csv when they are not available temporarily on yfinance
-                    stock_data.dist_from_low_factor = 1.0  # When there is no range or no previous_close_data, leave as neutral
+        if VERBOSE_LOGS: print("[{} {}]".format(__name__, 20))
+
+        # if no effective_ev_to_ebitda, use earnings.
+        if (stock_data.effective_ev_to_ebitda is None or stock_data.effective_ev_to_ebitda < 0) and stock_data.enterprise_value != None and stock_data.enterprise_value != 0 and stock_data.effective_earnings != None and stock_data.effective_earnings != 0:
+            stock_data.effective_ev_to_ebitda = float(stock_data.enterprise_value) / stock_data.effective_earnings  #  effective_earnings is already in USD
+
+        if stock_data.effective_ev_to_ebitda != None:
+            if   stock_data.effective_ev_to_ebitda  < 0: stock_data.effective_ev_to_ebitda = -NEGATIVE_EARNINGS_FACTOR/stock_data.effective_ev_to_ebitda
+            elif stock_data.effective_ev_to_ebitda == 0: stock_data.effective_ev_to_ebitda =  NEGATIVE_EARNINGS_FACTOR
+
+        if stock_data.annualized_total_assets is None and stock_data.quarterized_total_assets is None:
+            stock_data.effective_total_assets = None
+        elif stock_data.annualized_total_assets is None and stock_data.quarterized_total_assets != None:
+            stock_data.annualized_total_assets = stock_data.quarterized_total_assets*QUARTERLY_YEARLY_MISSING_FACTOR
+        elif stock_data.annualized_total_assets != None and stock_data.quarterized_total_assets is None:
+            stock_data.quarterized_total_assets = stock_data.annualized_total_assets*QUARTERLY_YEARLY_MISSING_FACTOR
+
+        if stock_data.quarterized_total_assets != None:
+            stock_data.effective_total_assets = (stock_data.quarterized_total_assets) # Prefer TTM only
+
+        if stock_data.annualized_total_stockholder_equity is None and stock_data.quarterized_total_stockholder_equity is None:
+            stock_data.effective_total_stockholder_equity = None
+        elif stock_data.annualized_total_stockholder_equity is None and stock_data.quarterized_total_stockholder_equity != None:
+            stock_data.annualized_total_stockholder_equity = stock_data.quarterized_total_stockholder_equity*QUARTERLY_YEARLY_MISSING_FACTOR
+        elif stock_data.annualized_total_stockholder_equity != None and stock_data.quarterized_total_stockholder_equity is None:
+            stock_data.quarterized_total_stockholder_equity = stock_data.annualized_total_stockholder_equity*QUARTERLY_YEARLY_MISSING_FACTOR
+
+        if stock_data.quarterized_total_stockholder_equity != None:
+            stock_data.effective_total_stockholder_equity = (stock_data.quarterized_total_stockholder_equity) # Prefer TTM only
+
+        if stock_data.annualized_retained_earnings is None and stock_data.quarterized_retained_earnings is None:
+            stock_data.effective_retained_earnings = None
+        elif stock_data.annualized_retained_earnings is None and stock_data.quarterized_retained_earnings != None:
+            stock_data.annualized_retained_earnings = stock_data.quarterized_retained_earnings*QUARTERLY_YEARLY_MISSING_FACTOR
+        elif stock_data.annualized_retained_earnings != None and stock_data.quarterized_retained_earnings is None:
+            stock_data.quarterized_retained_earnings = stock_data.annualized_retained_earnings*QUARTERLY_YEARLY_MISSING_FACTOR
+
+        if stock_data.quarterized_retained_earnings != None:
+            stock_data.effective_retained_earnings = (stock_data.quarterized_retained_earnings) # Prefer TTM only
+
+        if stock_data.effective_total_assets != None and stock_data.effective_total_assets > 0 and stock_data.effective_net_income != None:
+            stock_data.calculated_roa = ROA_DAMPER + stock_data.effective_net_income/stock_data.effective_total_assets
+        if stock_data.calculated_roa != None and 0 < stock_data.calculated_roa < ROA_DAMPER:
+            stock_data.calculated_roa /= 1000
+        elif stock_data.calculated_roa != None and stock_data.calculated_roa <= 0:
+            stock_data.calculated_roa = ROA_NEG_FACTOR
+
+        if stock_data.effective_total_stockholder_equity != None and stock_data.effective_total_stockholder_equity > 0 and stock_data.effective_net_income != None:
+            stock_data.calculated_roe = ROE_DAMPER + stock_data.effective_net_income/stock_data.effective_total_stockholder_equity
+        if stock_data.calculated_roe != None and 0 < stock_data.calculated_roe < ROE_DAMPER:
+            stock_data.calculated_roe /= 1000
+        elif stock_data.calculated_roe != None and stock_data.calculated_roe <= 0:
+            stock_data.calculated_roe = ROE_NEG_FACTOR
+
+        if stock_data.annualized_cash_flow_from_operating_activities is None and stock_data.quarterized_cash_flow_from_operating_activities is None:
+            if stock_data.effective_earnings != None:
+                stock_data.annualized_cash_flow_from_operating_activities = stock_data.quarterized_cash_flow_from_operating_activities = stock_data.effective_earnings
+        elif stock_data.annualized_cash_flow_from_operating_activities is None and stock_data.quarterized_cash_flow_from_operating_activities != None:
+            if stock_data.quarterized_cash_flow_from_operating_activities >= 0:
+                stock_data.annualized_cash_flow_from_operating_activities = stock_data.quarterized_cash_flow_from_operating_activities*QUARTERLY_YEARLY_MISSING_FACTOR
+            else:
+                stock_data.annualized_cash_flow_from_operating_activities = stock_data.quarterized_cash_flow_from_operating_activities/QUARTERLY_YEARLY_MISSING_FACTOR
+        elif stock_data.annualized_cash_flow_from_operating_activities != None and stock_data.quarterized_cash_flow_from_operating_activities is None:
+            if stock_data.annualized_cash_flow_from_operating_activities >= 0:
+                stock_data.quarterized_cash_flow_from_operating_activities = stock_data.annualized_cash_flow_from_operating_activities*QUARTERLY_YEARLY_MISSING_FACTOR
+            else:
+                stock_data.quarterized_cash_flow_from_operating_activities = stock_data.annualized_cash_flow_from_operating_activities/QUARTERLY_YEARLY_MISSING_FACTOR
+
+
+        if stock_data.annualized_cash_flow_from_operating_activities != None:
+            if stock_data.annualized_cash_flow_from_operating_activities >= 0:
+                if stock_data.enterprise_value == 0 or stock_data.annualized_cash_flow_from_operating_activities == 0: # When 0, it means either EV is 0 (strange!) or a very very good cash flow (strange as well)
+                    stock_data.annualized_ev_to_cfo_ratio = ev_to_cfo_ratio_limit * 1000  # Set a very high value to make stock unatractive
                 else:
-                    stock_data.dist_from_low_factor = (stock_data.previous_close - stock_data.fifty_two_week_low)/(0.5*(stock_data.fifty_two_week_high-stock_data.fifty_two_week_low))
-                stock_data.eff_dist_from_low_factor = (DIST_FROM_LOW_FACTOR_DAMPER + stock_data.dist_from_low_factor) if stock_data.dist_from_low_factor < 1.0 else (stock_data.dist_from_low_factor**DIST_FROM_LOW_FACTOR_HIGHER_THAN_ONE_POWER)
-
-            if VERBOSE_LOGS: print("[{} {}]".format(__name__, 18))
-
-            if stock_data.trailing_eps != None and stock_data.previous_close != None and stock_data.previous_close > 0:
-                stock_data.trailing_eps_percentage = stock_data.trailing_eps / stock_data.previous_close
-
-            if VERBOSE_LOGS: print("[{} {}]".format(__name__, 19))
-
-            if 'priceToBook'                                in info:
-                stock_data.price_to_book = info['priceToBook']
-                if tase_mode and stock_data.price_to_book != None: # yfinance mistakenly multiplies value by 100 and doesn't convert price to USD, so compenate:
-                    stock_data.price_to_book /= 100
-                    stock_data.price_to_book *= stock_data.summary_currency_conversion_rate_mult_to_usd
-            else:
-                stock_data.price_to_book      = None # Mark as None, so as to try and calculate manually.
-            if isinstance(stock_data.price_to_book,str): stock_data.price_to_book = None # Mark as None, so as to try and calculate manually.
-            if stock_data.price_to_book is None:
-                stock_data.price_to_book = PRICE_TO_BOOK_UNKNOWN * (10 if tase_mode else 1) # TODO: ASAFR: Until calculated manually, do not allow N/A in price2book to ruin the whole value, just set a very unatractive one, and let the rest of the parameters cope
-
-            # Value is a ratio, such that when multiplied by 100, yields percentage (%) units:
-            if 'earningsQuarterlyGrowth'                    in info: stock_data.eqg         = info['earningsQuarterlyGrowth']
-            else:                                                    stock_data.eqg         = None
-
-            # Value is a ratio, such that when multiplied by 100, yields percentage (%) units:
-            if 'revenueGrowth'                     in info: stock_data.rqg         = info['revenueGrowth']
-            else:                                           stock_data.rqg         = None
-
-            # TODO: ASAFR: Currently use the niqg_yoy and trqg_yoy as a simple backup. Later on - compare and add to calculations...
-            if stock_data.eqg_yoy is None: stock_data.eqg_yoy = stock_data.niqg_yoy
-            if stock_data.rqg_yoy is None: stock_data.rqg_yoy = stock_data.trqg_yoy
-
-            # Now use above backup as required: TODO: ASAFR: One may use the yoy as direct backup... analyze this...
-            if   stock_data.eqg is None and stock_data.eqg_yoy != None: stock_data.eqg     = stock_data.eqg_yoy
-            elif stock_data.eqg != None and stock_data.eqg_yoy is None: stock_data.eqg_yoy = stock_data.eqg
-            elif stock_data.eqg is None and stock_data.eqg_yoy is None: stock_data.eqg_yoy = stock_data.eqg = EQG_UNKNOWN
-
-            if   stock_data.rqg is None and stock_data.rqg_yoy != None: stock_data.rqg     = stock_data.rqg_yoy
-            elif stock_data.rqg != None and stock_data.rqg_yoy is None: stock_data.rqg_yoy = stock_data.rqg
-            elif stock_data.rqg is None and stock_data.rqg_yoy is None: stock_data.rqg_yoy = stock_data.rqg = RQG_UNKNOWN
-
-            stock_data.eqg_effective = EQG_WEIGHT_VS_YOY*stock_data.eqg + (1.0-EQG_WEIGHT_VS_YOY)*stock_data.eqg_yoy
-            stock_data.rqg_effective = RQG_WEIGHT_VS_YOY*stock_data.rqg + (1.0-RQG_WEIGHT_VS_YOY)*stock_data.rqg_yoy
-
-            if stock_data.eqg_effective > 0:
-                stock_data.eqg_factor_effective = (EQG_DAMPER + EQG_POSITIVE_FACTOR * math.sqrt(stock_data.eqg_effective))
-            else:
-                stock_data.eqg_factor_effective = (EQG_DAMPER + stock_data.eqg_effective/EQG_POSITIVE_FACTOR)
-
-            if stock_data.rqg_effective >= 0:
-                stock_data.rqg_factor_effective = (RQG_DAMPER + RQG_POSITIVE_FACTOR * math.sqrt(stock_data.rqg_effective))
-            else:
-                stock_data.rqg_factor_effective = (RQG_DAMPER + stock_data.rqg_effective/RQG_POSITIVE_FACTOR)
-
-            if 'sharesOutstanding'                          in info: stock_data.shares_outstanding                = info['sharesOutstanding']
-            else:                                                    stock_data.shares_outstanding                = SHARES_OUTSTANDING_UNKNOWN
-            if stock_data.shares_outstanding is None or stock_data.shares_outstanding == 0:
-                stock_data.shares_outstanding = SHARES_OUTSTANDING_UNKNOWN
-
-            if 'netIncomeToCommon' in info: stock_data.net_income_to_common_shareholders = info['netIncomeToCommon']
-            else:                           stock_data.net_income_to_common_shareholders = None # TODO: ASAFR: It may be possible to calculate this manually
-
-            if VERBOSE_LOGS: print("[{} {}]".format(__name__, 20))
-
-            # if no effective_ev_to_ebitda, use earnings.
-            if (stock_data.effective_ev_to_ebitda is None or stock_data.effective_ev_to_ebitda < 0) and stock_data.enterprise_value != None and stock_data.enterprise_value != 0 and stock_data.effective_earnings != None and stock_data.effective_earnings != 0:
-                stock_data.effective_ev_to_ebitda = float(stock_data.enterprise_value) / stock_data.effective_earnings  #  effective_earnings is already in USD
-
-            if stock_data.effective_ev_to_ebitda != None:
-                if   stock_data.effective_ev_to_ebitda  < 0: stock_data.effective_ev_to_ebitda = -NEGATIVE_EARNINGS_FACTOR/stock_data.effective_ev_to_ebitda
-                elif stock_data.effective_ev_to_ebitda == 0: stock_data.effective_ev_to_ebitda =  NEGATIVE_EARNINGS_FACTOR
-
-            if stock_data.annualized_total_assets is None and stock_data.quarterized_total_assets is None:
-                stock_data.effective_total_assets = None
-            elif stock_data.annualized_total_assets is None and stock_data.quarterized_total_assets != None:
-                stock_data.annualized_total_assets = stock_data.quarterized_total_assets*QUARTERLY_YEARLY_MISSING_FACTOR
-            elif stock_data.annualized_total_assets != None and stock_data.quarterized_total_assets is None:
-                stock_data.quarterized_total_assets = stock_data.annualized_total_assets*QUARTERLY_YEARLY_MISSING_FACTOR
-
-            if stock_data.quarterized_total_assets != None:
-                stock_data.effective_total_assets = (stock_data.quarterized_total_assets) # Prefer TTM only
-
-            if stock_data.annualized_total_stockholder_equity is None and stock_data.quarterized_total_stockholder_equity is None:
-                stock_data.effective_total_stockholder_equity = None
-            elif stock_data.annualized_total_stockholder_equity is None and stock_data.quarterized_total_stockholder_equity != None:
-                stock_data.annualized_total_stockholder_equity = stock_data.quarterized_total_stockholder_equity*QUARTERLY_YEARLY_MISSING_FACTOR
-            elif stock_data.annualized_total_stockholder_equity != None and stock_data.quarterized_total_stockholder_equity is None:
-                stock_data.quarterized_total_stockholder_equity = stock_data.annualized_total_stockholder_equity*QUARTERLY_YEARLY_MISSING_FACTOR
-
-            if stock_data.quarterized_total_stockholder_equity != None:
-                stock_data.effective_total_stockholder_equity = (stock_data.quarterized_total_stockholder_equity) # Prefer TTM only
-
-            if stock_data.annualized_retained_earnings is None and stock_data.quarterized_retained_earnings is None:
-                stock_data.effective_retained_earnings = None
-            elif stock_data.annualized_retained_earnings is None and stock_data.quarterized_retained_earnings != None:
-                stock_data.annualized_retained_earnings = stock_data.quarterized_retained_earnings*QUARTERLY_YEARLY_MISSING_FACTOR
-            elif stock_data.annualized_retained_earnings != None and stock_data.quarterized_retained_earnings is None:
-                stock_data.quarterized_retained_earnings = stock_data.annualized_retained_earnings*QUARTERLY_YEARLY_MISSING_FACTOR
-
-            if stock_data.quarterized_retained_earnings != None:
-                stock_data.effective_retained_earnings = (stock_data.quarterized_retained_earnings) # Prefer TTM only
-
-            if stock_data.effective_total_assets != None and stock_data.effective_total_assets > 0 and stock_data.effective_net_income != None:
-                stock_data.calculated_roa = ROA_DAMPER + stock_data.effective_net_income/stock_data.effective_total_assets
-            if stock_data.calculated_roa != None and 0 < stock_data.calculated_roa < ROA_DAMPER:
-                stock_data.calculated_roa /= 1000
-            elif stock_data.calculated_roa != None and stock_data.calculated_roa <= 0:
-                stock_data.calculated_roa = ROA_NEG_FACTOR
-
-            if stock_data.effective_total_stockholder_equity != None and stock_data.effective_total_stockholder_equity > 0 and stock_data.effective_net_income != None:
-                stock_data.calculated_roe = ROE_DAMPER + stock_data.effective_net_income/stock_data.effective_total_stockholder_equity
-            if stock_data.calculated_roe != None and 0 < stock_data.calculated_roe < ROE_DAMPER:
-                stock_data.calculated_roe /= 1000
-            elif stock_data.calculated_roe != None and stock_data.calculated_roe <= 0:
-                stock_data.calculated_roe = ROE_NEG_FACTOR
-
-            if stock_data.annualized_cash_flow_from_operating_activities is None and stock_data.quarterized_cash_flow_from_operating_activities is None:
-                if stock_data.effective_earnings != None:
-                    stock_data.annualized_cash_flow_from_operating_activities = stock_data.quarterized_cash_flow_from_operating_activities = stock_data.effective_earnings
-            elif stock_data.annualized_cash_flow_from_operating_activities is None and stock_data.quarterized_cash_flow_from_operating_activities != None:
-                if stock_data.quarterized_cash_flow_from_operating_activities >= 0:
-                    stock_data.annualized_cash_flow_from_operating_activities = stock_data.quarterized_cash_flow_from_operating_activities*QUARTERLY_YEARLY_MISSING_FACTOR
+                    stock_data.annualized_ev_to_cfo_ratio = float(stock_data.enterprise_value)/stock_data.annualized_cash_flow_from_operating_activities  # annualized_cash_flow_from_operating_activities has been converted to USD earlier
+            else:  # stock_data.annualized_cash_flow_from_operating_activities < 0
+                stock_data.annualized_ev_to_cfo_ratio = -NEGATIVE_CFO_FACTOR/(float(stock_data.enterprise_value)/stock_data.annualized_cash_flow_from_operating_activities)
+        else:
+            stock_data.annualized_ev_to_cfo_ratio = ev_to_cfo_ratio_limit * 1000
+        if VERBOSE_LOGS: print("[{} {}]".format(__name__, 101))
+        if stock_data.quarterized_cash_flow_from_operating_activities != None:
+            if stock_data.quarterized_cash_flow_from_operating_activities >= 0:
+                if stock_data.enterprise_value == 0 or stock_data.quarterized_cash_flow_from_operating_activities == 0: # When 0, it means either EV is 0 (strange!) or a very very good cash flow (strange as well)
+                    stock_data.quarterized_ev_to_cfo_ratio = ev_to_cfo_ratio_limit * 1000  # Set a very high value to make stock unatractive
                 else:
-                    stock_data.annualized_cash_flow_from_operating_activities = stock_data.quarterized_cash_flow_from_operating_activities/QUARTERLY_YEARLY_MISSING_FACTOR
-            elif stock_data.annualized_cash_flow_from_operating_activities != None and stock_data.quarterized_cash_flow_from_operating_activities is None:
-                if stock_data.annualized_cash_flow_from_operating_activities >= 0:
-                    stock_data.quarterized_cash_flow_from_operating_activities = stock_data.annualized_cash_flow_from_operating_activities*QUARTERLY_YEARLY_MISSING_FACTOR
-                else:
-                    stock_data.quarterized_cash_flow_from_operating_activities = stock_data.annualized_cash_flow_from_operating_activities/QUARTERLY_YEARLY_MISSING_FACTOR
+                    stock_data.quarterized_ev_to_cfo_ratio = float(stock_data.enterprise_value)/stock_data.quarterized_cash_flow_from_operating_activities  # quarterized_cash_flow_from_operating_activities has been converted to USD earlier
+            else:  # stock_data.quarterized_cash_flow_from_operating_activities < 0
+                stock_data.quarterized_ev_to_cfo_ratio = -NEGATIVE_CFO_FACTOR*(float(stock_data.enterprise_value)/stock_data.quarterized_cash_flow_from_operating_activities)
+        else:
+            stock_data.quarterized_ev_to_cfo_ratio = ev_to_cfo_ratio_limit * 1000
 
-
-            if stock_data.annualized_cash_flow_from_operating_activities != None:
-                if stock_data.annualized_cash_flow_from_operating_activities >= 0:
-                    if stock_data.enterprise_value == 0 or stock_data.annualized_cash_flow_from_operating_activities == 0: # When 0, it means either EV is 0 (strange!) or a very very good cash flow (strange as well)
-                        stock_data.annualized_ev_to_cfo_ratio = ev_to_cfo_ratio_limit * 1000  # Set a very high value to make stock unatractive
-                    else:
-                        stock_data.annualized_ev_to_cfo_ratio = float(stock_data.enterprise_value)/stock_data.annualized_cash_flow_from_operating_activities  # annualized_cash_flow_from_operating_activities has been converted to USD earlier
-                else:  # stock_data.annualized_cash_flow_from_operating_activities < 0
-                    stock_data.annualized_ev_to_cfo_ratio = -NEGATIVE_CFO_FACTOR/(float(stock_data.enterprise_value)/stock_data.annualized_cash_flow_from_operating_activities)
+        # Seems value is calculated relatively similarly in dual (TASE, NASDAQ) stocks so no compensation required
+        stock_data.ev_to_cfo_ratio_effective = (stock_data.quarterized_ev_to_cfo_ratio) # Prefer TTM only
+        if VERBOSE_LOGS: print("[{} {}]".format(__name__, 200))
+        if 'priceToSalesTrailing12Months' in info and info['priceToSalesTrailing12Months'] != None:
+            stock_data.trailing_12months_price_to_sales = info['priceToSalesTrailing12Months'] # https://www.investopedia.com/articles/fundamental/03/032603.asp#:~:text=The%20price%2Dto%2Dsales%20ratio%20(Price%2FSales%20or,the%20more%20attractive%20the%20investment.
+            if isinstance(stock_data.trailing_12months_price_to_sales, str):  stock_data.trailing_12months_price_to_sales = None
+            if tase_mode and stock_data.trailing_12months_price_to_sales != None: stock_data.trailing_12months_price_to_sales *= (stock_data.summary_currency_conversion_rate_mult_to_usd/100) # Wrongly calculated by yfinance for TASE
+        else:
+            if stock_data.effective_revenue != None and stock_data.effective_revenue > 0 and stock_data.market_cap != None and stock_data.market_cap > 0:
+                stock_data.trailing_12months_price_to_sales  = stock_data.market_cap / stock_data.effective_revenue  # effective_revenue and_market_cap are already in USD (converted earlier)
+            elif stock_data.ev_to_cfo_ratio_effective != None:
+                stock_data.trailing_12months_price_to_sales  = stock_data.ev_to_cfo_ratio_effective
             else:
-                stock_data.annualized_ev_to_cfo_ratio = ev_to_cfo_ratio_limit * 1000
-            if VERBOSE_LOGS: print("[{} {}]".format(__name__, 101))
-            if stock_data.quarterized_cash_flow_from_operating_activities != None:
-                if stock_data.quarterized_cash_flow_from_operating_activities >= 0:
-                    if stock_data.enterprise_value == 0 or stock_data.quarterized_cash_flow_from_operating_activities == 0: # When 0, it means either EV is 0 (strange!) or a very very good cash flow (strange as well)
-                        stock_data.quarterized_ev_to_cfo_ratio = ev_to_cfo_ratio_limit * 1000  # Set a very high value to make stock unatractive
-                    else:
-                        stock_data.quarterized_ev_to_cfo_ratio = float(stock_data.enterprise_value)/stock_data.quarterized_cash_flow_from_operating_activities  # quarterized_cash_flow_from_operating_activities has been converted to USD earlier
-                else:  # stock_data.quarterized_cash_flow_from_operating_activities < 0
-                    stock_data.quarterized_ev_to_cfo_ratio = -NEGATIVE_CFO_FACTOR*(float(stock_data.enterprise_value)/stock_data.quarterized_cash_flow_from_operating_activities)
+                stock_data.trailing_12months_price_to_sales  = None # Mark as None, so as to try and calculate manually.
+        if isinstance(stock_data.trailing_12months_price_to_sales,str):  stock_data.trailing_12months_price_to_sales  = None # Mark as None, so as to try and calculate manually.
+
+        calculate_altman_z_score_factor(stock_data)
+
+        if (stock_data.enterprise_value_to_revenue != None and stock_data.enterprise_value_to_revenue <= 0 or stock_data.enterprise_value_to_revenue is None) and stock_data.effective_revenue != None and stock_data.effective_revenue > 0:
+            stock_data.evr_effective = stock_data.enterprise_value/stock_data.effective_revenue
+        else:
+            stock_data.evr_effective = stock_data.enterprise_value_to_revenue
+
+        if stock_data.effective_price_to_earnings != None:
+            if stock_data.sector in favor_sectors:
+                index = favor_sectors.index(stock_data.sector)
+                stock_data.pe_effective = stock_data.effective_price_to_earnings / float(favor_sectors_by[index])  # ** 2
             else:
-                stock_data.quarterized_ev_to_cfo_ratio = ev_to_cfo_ratio_limit * 1000
+                stock_data.pe_effective = stock_data.effective_price_to_earnings
 
-            # Seems value is calculated relatively similarly in dual (TASE, NASDAQ) stocks so no compensation required
-            stock_data.ev_to_cfo_ratio_effective = (stock_data.quarterized_ev_to_cfo_ratio) # Prefer TTM only
-            if VERBOSE_LOGS: print("[{} {}]".format(__name__, 200))
-            if 'priceToSalesTrailing12Months' in info and info['priceToSalesTrailing12Months'] != None:
-                stock_data.trailing_12months_price_to_sales = info['priceToSalesTrailing12Months'] # https://www.investopedia.com/articles/fundamental/03/032603.asp#:~:text=The%20price%2Dto%2Dsales%20ratio%20(Price%2FSales%20or,the%20more%20attractive%20the%20investment.
-                if isinstance(stock_data.trailing_12months_price_to_sales, str):  stock_data.trailing_12months_price_to_sales = None
-                if tase_mode and stock_data.trailing_12months_price_to_sales != None: stock_data.trailing_12months_price_to_sales *= (stock_data.summary_currency_conversion_rate_mult_to_usd/100) # Wrongly calculated by yfinance for TASE
+            if   stock_data.profit_margin            is None and stock_data.annualized_profit_margin is None and stock_data.quarterized_profit_margin is None:
+                stock_data.profit_margin             = stock_data.annualized_profit_margin  = stock_data.quarterized_profit_margin = PROFIT_MARGIN_UNKNOWN
+            elif stock_data.profit_margin            is None and stock_data.annualized_profit_margin is None                                                 :
+                 stock_data.profit_margin            = stock_data.annualized_profit_margin  = stock_data.quarterized_profit_margin/PROFIT_MARGIN_DUPLICATION_FACTOR
+            elif stock_data.annualized_profit_margin is None and stock_data.quarterized_profit_margin is None:
+                 stock_data.annualized_profit_margin = stock_data.quarterized_profit_margin = stock_data.profit_margin/PROFIT_MARGIN_DUPLICATION_FACTOR
+            elif stock_data.profit_margin            is None and stock_data.quarterized_profit_margin is None:
+                 stock_data.profit_margin            = stock_data.quarterized_profit_margin = stock_data.annualized_profit_margin/PROFIT_MARGIN_DUPLICATION_FACTOR
+            elif stock_data.profit_margin             is None: stock_data.profit_margin             = (stock_data.annualized_profit_margin+stock_data.quarterized_profit_margin)/(2*PROFIT_MARGIN_DUPLICATION_FACTOR)
+            elif stock_data.annualized_profit_margin  is None: stock_data.annualized_profit_margin  = stock_data.profit_margin/PROFIT_MARGIN_DUPLICATION_FACTOR
+            elif stock_data.quarterized_profit_margin is None: stock_data.quarterized_profit_margin = stock_data.profit_margin/PROFIT_MARGIN_DUPLICATION_FACTOR
+
+            sorted_pms = sorted([stock_data.profit_margin, stock_data.annualized_profit_margin, stock_data.quarterized_profit_margin])
+            weighted_average_pm = weighted_average(sorted_pms, PROFIT_MARGIN_WEIGHTS[:len(sorted_pms)]) # Higher weight to the higher profit margin when averaging out
+            stock_data.effective_profit_margin = PROFIT_MARGIN_DAMPER + weighted_average_pm
+
+        # The PEG Ratio is equal to (share_price / earnings_per_share) / (earnings_per_share_growth_ratio [% units])
+        if 'pegRatio' in info:
+            stock_data.price_to_earnings_to_growth_ratio = info['pegRatio']
+        else:
+            stock_data.price_to_earnings_to_growth_ratio = PEG_UNKNOWN
+
+        if VERBOSE_LOGS: print("[{} {}]".format(__name__, 500))
+        if stock_data.price_to_earnings_to_growth_ratio is None or stock_data.price_to_earnings_to_growth_ratio == PEG_UNKNOWN:
+            if stock_data.eqg_effective != 0 and stock_data.effective_price_to_earnings > 0:
+                stock_data.price_to_earnings_to_growth_ratio = stock_data.effective_price_to_earnings / stock_data.eqg_effective
             else:
-                if stock_data.effective_revenue != None and stock_data.effective_revenue > 0 and stock_data.market_cap != None and stock_data.market_cap > 0:
-                    stock_data.trailing_12months_price_to_sales  = stock_data.market_cap / stock_data.effective_revenue  # effective_revenue and_market_cap are already in USD (converted earlier)
-                elif stock_data.ev_to_cfo_ratio_effective != None:
-                    stock_data.trailing_12months_price_to_sales  = stock_data.ev_to_cfo_ratio_effective
-                else:
-                    stock_data.trailing_12months_price_to_sales  = None # Mark as None, so as to try and calculate manually.
-            if isinstance(stock_data.trailing_12months_price_to_sales,str):  stock_data.trailing_12months_price_to_sales  = None # Mark as None, so as to try and calculate manually.
+                stock_data.price_to_earnings_to_growth_ratio = stock_data.effective_price_to_earnings * PEG_UNKNOWN # At this stage effective_price_to_earnings is always positive so this code will not be reached
+        if VERBOSE_LOGS: print("[{} {}]".format(__name__, 600))
+        if   stock_data.price_to_earnings_to_growth_ratio > 0: stock_data.effective_peg_ratio =  stock_data.price_to_earnings_to_growth_ratio
+        elif stock_data.price_to_earnings_to_growth_ratio < 0: stock_data.effective_peg_ratio = -NEGATIVE_PEG_RATIO_FACTOR/stock_data.price_to_earnings_to_growth_ratio
+        else                                                 : stock_data.effective_peg_ratio =  1.0  # Something must be wrong, so take a neutral value of 1.0
 
-            calculate_altman_z_score_factor(stock_data)
+        if return_value: sss_core_equation_value_set(stock_data)
+        else:            stock_data.sss_value = BAD_SSS
 
-        # TODO: ASAFR: Here: id no previous_close, use market_high, low regular, or anything possible to avoid none!
-        if not build_csv_db_only:
-            # Checkout http://www.nasdaqtrader.com/trader.aspx?id=symboldirdefs for all symbol definitions (for instance - `$` in stock names, 5-letter stocks ending with `Y`)
-            if not tase_mode and SKIP_5LETTER_Y_STOCK_LISTINGS and stock_data.symbol[-1] == 'Y' and len(stock_data.symbol) == 5 and '.' not in stock_data.symbol and '-' not in stock_data.symbol and '$' not in stock_data.symbol:
-                if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} 5 letter stock listing'.format(stock_data.symbol)
-                return_value = False
+        stock_data.last_dividend_0 = 0; stock_data.last_dividend_1 = 0
+        stock_data.last_dividend_2 = 0; stock_data.last_dividend_3 = 0
 
-            if (stock_data.previous_close is None or stock_data.previous_close < 1.0): # Avoid Penny Stocks
-                if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} previous_close: {}'.format(stock_data.symbol, stock_data.previous_close)
-                return_value = False
+        try:  # It is important to note that: 1. latest value is in index 0. 2. For the actual value in USD, need to translate the date of the dividend to the value of share at that time, because the dividends[] are pare share
+            dividends = symbol.get_dividends()
+            if len(dividends) > 0:
+                last_4_dividends = dividends[-1:]
+                stock_data.last_dividend_0 = last_4_dividends[-1] # Latest
+            if len(dividends) > 1:
+                last_4_dividends = dividends[-2:]
+                stock_data.last_dividend_1 = last_4_dividends[-2] # One before latest
+            if len(dividends) > 2:
+                last_4_dividends = dividends[-3:]
+                stock_data.last_dividend_2 = last_4_dividends[-3] # 2 before latest, etc
+            if len(dividends) > 3:
+                last_4_dividends = dividends[-4:]
+                stock_data.last_dividend_3 = last_4_dividends[-4]
 
-            if (stock_data.enterprise_value is None or (not research_mode_max_ev and stock_data.enterprise_value < enterprise_value_millions_usd_limit*1000000) or (research_mode_max_ev and stock_data.enterprise_value > enterprise_value_millions_usd_limit*1000000)):
-                if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} enterprise_value: {}'.format(stock_data.symbol, stock_data.enterprise_value)
-                return_value = False
+        except Exception as e:
+            # if not research_mode: print("Exception in symbol.dividends: {}".format(e))
+            pass
 
-            if (stock_data.held_percent_insiders is None or stock_data.held_percent_insiders < pi_limit):
-                if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} held_percent_insiders: {}'.format(stock_data.symbol, stock_data.held_percent_insiders)
-                return_value = False
+        round_and_avoid_none_values(stock_data)
 
-            if (stock_data.evr_effective is None or stock_data.evr_effective <= 0 or stock_data.evr_effective > enterprise_value_to_revenue_limit):
-                if return_value and (not research_mode or VERBOSE_LOGS):
-                    stock_data.skip_reason = 'Skipping {} enterprise_value_to_revenue: {}'.format(stock_data.symbol, stock_data.evr_effective)
-                return_value = False
-
-            if (stock_data.effective_ev_to_ebitda is None or stock_data.effective_ev_to_ebitda <= 0):
-                if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} effective_ev_to_ebitda: {}'.format(stock_data.symbol, stock_data.effective_ev_to_ebitda)
-                return_value = False
-
-            if (stock_data.effective_price_to_earnings is None or stock_data.effective_price_to_earnings <= 0):
-                if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} effective_price_to_earnings: {}'.format(stock_data.symbol, stock_data.effective_price_to_earnings)
-                return_value = False
-
-            if (stock_data.trailing_12months_price_to_sales is None or stock_data.trailing_12months_price_to_sales <= 0):
-                if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} trailing_12months_price_to_sales: {}'.format(stock_data.symbol, stock_data.trailing_12months_price_to_sales)
-                return_value = False
-
-            if (stock_data.price_to_book is None or stock_data.price_to_book <= 0):
-                if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} price_to_book: {}'.format(stock_data.symbol, stock_data.price_to_book)
-                return_value = False
-
-            if (stock_data.pe_effective is None or stock_data.pe_effective <= 0 or stock_data.pe_effective > price_to_earnings_limit):
-                if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} pe_effective: {}'.format(stock_data.symbol, stock_data.pe_effective)
-                return_value = False
-
-            if stock_data.effective_profit_margin < profit_margin_limit:
-                if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} effective_profit_margin: {}'.format(stock_data.symbol, stock_data.effective_profit_margin)
-                return_value = False
-
-            if (stock_data.ev_to_cfo_ratio_effective is None  or stock_data.ev_to_cfo_ratio_effective > ev_to_cfo_ratio_limit or stock_data.ev_to_cfo_ratio_effective <= 0):
-                if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} ev_to_cfo_ratio_effective: {}'.format(stock_data.symbol, stock_data.ev_to_cfo_ratio_effective)
-                return_value = False
-
-            if (stock_data.debt_to_equity_effective is None  or stock_data.debt_to_equity_effective > debt_to_equity_limit or stock_data.debt_to_equity_effective <= 0):
-                if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} debt_to_equity_effective: {}'.format(stock_data.symbol, stock_data.debt_to_equity_effective)
-                return_value = False
-
-            if (stock_data.eqg_factor_effective is None or stock_data.eqg_factor_effective < eqg_min):
-                if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} eqg_factor_effective: {}'.format(stock_data.symbol, stock_data.eqg_factor_effective)
-                return_value = False
-
-            if (stock_data.rqg_factor_effective is None or stock_data.rqg_factor_effective < rqg_min):
-                if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} rqg_factor_effective: {}'.format(stock_data.symbol, stock_data.rqg_factor_effective)
-                return_value = False
-
-            if stock_data.price_to_earnings_to_growth_ratio is None:
-                if return_value and (not research_mode or VERBOSE_LOGS): stock_data.skip_reason = 'Skipping {} price_to_earnings_to_growth_ratio: {}'.format(stock_data.symbol, stock_data.price_to_earnings_to_growth_ratio)
-                return_value = False
-
-        if build_csv_db_only:
-            if (stock_data.enterprise_value_to_revenue != None and stock_data.enterprise_value_to_revenue <= 0 or stock_data.enterprise_value_to_revenue is None) and stock_data.effective_revenue != None and stock_data.effective_revenue > 0:
-                stock_data.evr_effective = stock_data.enterprise_value/stock_data.effective_revenue
-            else:
-                stock_data.evr_effective = stock_data.enterprise_value_to_revenue
-
-            if stock_data.effective_price_to_earnings != None:
-                if stock_data.sector in favor_sectors:
-                    index = favor_sectors.index(stock_data.sector)
-                    stock_data.pe_effective = stock_data.effective_price_to_earnings / float(favor_sectors_by[index])  # ** 2
-                else:
-                    stock_data.pe_effective = stock_data.effective_price_to_earnings
-
-                if   stock_data.profit_margin            is None and stock_data.annualized_profit_margin is None and stock_data.quarterized_profit_margin is None:
-                    stock_data.profit_margin             = stock_data.annualized_profit_margin  = stock_data.quarterized_profit_margin = PROFIT_MARGIN_UNKNOWN
-                elif stock_data.profit_margin            is None and stock_data.annualized_profit_margin is None                                                 :
-                     stock_data.profit_margin            = stock_data.annualized_profit_margin  = stock_data.quarterized_profit_margin/PROFIT_MARGIN_DUPLICATION_FACTOR
-                elif stock_data.annualized_profit_margin is None and stock_data.quarterized_profit_margin is None:
-                     stock_data.annualized_profit_margin = stock_data.quarterized_profit_margin = stock_data.profit_margin/PROFIT_MARGIN_DUPLICATION_FACTOR
-                elif stock_data.profit_margin            is None and stock_data.quarterized_profit_margin is None:
-                     stock_data.profit_margin            = stock_data.quarterized_profit_margin = stock_data.annualized_profit_margin/PROFIT_MARGIN_DUPLICATION_FACTOR
-                elif stock_data.profit_margin             is None: stock_data.profit_margin             = (stock_data.annualized_profit_margin+stock_data.quarterized_profit_margin)/(2*PROFIT_MARGIN_DUPLICATION_FACTOR)
-                elif stock_data.annualized_profit_margin  is None: stock_data.annualized_profit_margin  = stock_data.profit_margin/PROFIT_MARGIN_DUPLICATION_FACTOR
-                elif stock_data.quarterized_profit_margin is None: stock_data.quarterized_profit_margin = stock_data.profit_margin/PROFIT_MARGIN_DUPLICATION_FACTOR
-
-                sorted_pms = sorted([stock_data.profit_margin, stock_data.annualized_profit_margin, stock_data.quarterized_profit_margin])
-                weighted_average_pm = weighted_average(sorted_pms, PROFIT_MARGIN_WEIGHTS[:len(sorted_pms)]) # Higher weight to the higher profit margin when averaging out
-                stock_data.effective_profit_margin = PROFIT_MARGIN_DAMPER + weighted_average_pm
-            
-            # The PEG Ratio is equal to (share_price / earnings_per_share) / (earnings_per_share_growth_ratio [% units])
-            if 'pegRatio' in info:
-                stock_data.price_to_earnings_to_growth_ratio = info['pegRatio']
-            else:
-                stock_data.price_to_earnings_to_growth_ratio = PEG_UNKNOWN
-
-            if VERBOSE_LOGS: print("[{} {}]".format(__name__, 500))
-            if stock_data.price_to_earnings_to_growth_ratio is None or stock_data.price_to_earnings_to_growth_ratio == PEG_UNKNOWN:
-                if stock_data.eqg_effective != 0 and stock_data.effective_price_to_earnings > 0:
-                    stock_data.price_to_earnings_to_growth_ratio = stock_data.effective_price_to_earnings / stock_data.eqg_effective
-                else:
-                    stock_data.price_to_earnings_to_growth_ratio = stock_data.effective_price_to_earnings * PEG_UNKNOWN # At this stage effective_price_to_earnings is always positive so this code will not be reached
-            if VERBOSE_LOGS: print("[{} {}]".format(__name__, 600))
-            if   stock_data.price_to_earnings_to_growth_ratio > 0: stock_data.effective_peg_ratio =  stock_data.price_to_earnings_to_growth_ratio
-            elif stock_data.price_to_earnings_to_growth_ratio < 0: stock_data.effective_peg_ratio = -NEGATIVE_PEG_RATIO_FACTOR/stock_data.price_to_earnings_to_growth_ratio
-            else                                                 : stock_data.effective_peg_ratio =  1.0  # Something must be wrong, so take a neutral value of 1.0
-
-        if build_csv_db:
-            if return_value: sss_core_equation_value_set(stock_data)
-            else:            stock_data.sss_value = BAD_SSS
-
-            stock_data.last_dividend_0 = 0; stock_data.last_dividend_1 = 0
-            stock_data.last_dividend_2 = 0; stock_data.last_dividend_3 = 0
-
-            try:  # It is important to note that: 1. latest value is in index 0. 2. For the actual value in USD, need to translate the date of the dividend to the value of share at that time, because the dividends[] are pare share
-                dividends = symbol.get_dividends()
-                if len(dividends) > 0:
-                    last_4_dividends = dividends[-1:]
-                    stock_data.last_dividend_0 = last_4_dividends[-1] # Latest
-                if len(dividends) > 1:
-                    last_4_dividends = dividends[-2:]
-                    stock_data.last_dividend_1 = last_4_dividends[-2] # One before latest
-                if len(dividends) > 2:
-                    last_4_dividends = dividends[-3:]
-                    stock_data.last_dividend_2 = last_4_dividends[-3] # 2 before latest, etc
-                if len(dividends) > 3:
-                    last_4_dividends = dividends[-4:]
-                    stock_data.last_dividend_3 = last_4_dividends[-4]
-
-            except Exception as e:
-                # if not research_mode: print("Exception in symbol.dividends: {}".format(e))
-                pass
-
-            round_and_avoid_none_values(stock_data)
-
-        if not research_mode:
-            if return_value:
-                print('{:20}, ({:10}, {:10}), sss_value: {:.3e}, evr_effective: {:.3e}, trailing_12months_price_to_sales: {:.3e}, pe_effective: {:.3e}, effective_ev_to_ebitda: {:.3e}, effective_profit_margin: {:.3e}, held_percent_insiders: {:.3e}, price_to_book: {:.3e}, enterprise_value: {:.3e}, market_cap: {:.3e}, eqg_factor_effective: {:.3e}, rqg_factor_effective: {:.3e}, effective_peg_ratio: {:.3e}, ev_to_cfo_ratio_effective: {:.3e}, debt_to_equity_effective_used: {:.3e}, financial_currency: {:4}, summary_currency: {:4}, financial_currency_conversion_rate_mult_to_usd: {:.3e}, summary_currency_conversion_rate_mult_to_usd: {:.3e}, skip_reason: {}'.format(
-                        stock_data.short_name[0:19],
-                     stock_data.sector[0:9],
-                            stock_data.country[0:9],
-                                   stock_data.sss_value,stock_data.evr_effective,stock_data.trailing_12months_price_to_sales,stock_data.pe_effective,
-                                                                                                                                             stock_data.effective_ev_to_ebitda,stock_data.effective_profit_margin,stock_data.held_percent_insiders,stock_data.price_to_book,stock_data.enterprise_value,
-                                                                                                                                                                                                                                                                                              stock_data.market_cap,stock_data.eqg_factor_effective,stock_data.rqg_factor_effective,stock_data.effective_peg_ratio,stock_data.ev_to_cfo_ratio_effective, stock_data.debt_to_equity_effective_used, stock_data.financial_currency, stock_data.summary_currency, stock_data.financial_currency_conversion_rate_mult_to_usd, stock_data.summary_currency_conversion_rate_mult_to_usd, stock_data.skip_reason))
-            else:
-                print('Skipped - skip_reason: {}'.format(stock_data.skip_reason))
+        if return_value:
+            print('{:20}, ({:10}, {:10}), sss_value: {:.3e}, evr_effective: {:.3e}, trailing_12months_price_to_sales: {:.3e}, pe_effective: {:.3e}, effective_ev_to_ebitda: {:.3e}, effective_profit_margin: {:.3e}, held_percent_insiders: {:.3e}, price_to_book: {:.3e}, enterprise_value: {:.3e}, market_cap: {:.3e}, eqg_factor_effective: {:.3e}, rqg_factor_effective: {:.3e}, effective_peg_ratio: {:.3e}, ev_to_cfo_ratio_effective: {:.3e}, debt_to_equity_effective_used: {:.3e}, financial_currency: {:4}, summary_currency: {:4}, financial_currency_conversion_rate_mult_to_usd: {:.3e}, summary_currency_conversion_rate_mult_to_usd: {:.3e}, skip_reason: {}'.format(
+                    stock_data.short_name[0:19],
+                 stock_data.sector[0:9],
+                        stock_data.country[0:9],
+                               stock_data.sss_value,stock_data.evr_effective,stock_data.trailing_12months_price_to_sales,stock_data.pe_effective,
+                                                                                                                                         stock_data.effective_ev_to_ebitda,stock_data.effective_profit_margin,stock_data.held_percent_insiders,stock_data.price_to_book,stock_data.enterprise_value,
+                                                                                                                                                                                                                                                                                          stock_data.market_cap,stock_data.eqg_factor_effective,stock_data.rqg_factor_effective,stock_data.effective_peg_ratio,stock_data.ev_to_cfo_ratio_effective, stock_data.debt_to_equity_effective_used, stock_data.financial_currency, stock_data.summary_currency, stock_data.financial_currency_conversion_rate_mult_to_usd, stock_data.summary_currency_conversion_rate_mult_to_usd, stock_data.skip_reason))
+        else:
+            print('Skipped - skip_reason: {}'.format(stock_data.skip_reason))
         if not return_value and (not research_mode or VERBOSE_LOGS): print('                            ' + stock_data.skip_reason)
 
         return return_value
@@ -2124,9 +2075,9 @@ def get_stock_data_normalized_from_db_row_compact(row, stock_symbol):
     return StockDataNormalized(symbol=stock_symbol, short_name=row[g_name_index_n], sector=row[g_sector_index_n], country=row[g_country_index_n], sss_value=float(row[g_sss_value_index_n]), sss_value_normalized=float(row[g_sss_value_normalized_index_n]), evr_effective=float(row[g_evr_effective_index_n]), evr_effective_normalized=float(row[g_evr_effective_normalized_index_n]), effective_price_to_earnings=float(row[g_effective_price_to_earnings_index_n]), trailing_12months_price_to_sales=float(row[g_trailing_12months_price_to_sales_index_n]), trailing_12months_price_to_sales_normalized=float(row[g_trailing_12months_price_to_sales_normalized_index_n]), pe_effective=float(row[g_pe_effective_index_n]), pe_effective_normalized=float(row[g_pe_effective_normalized_index_n]), effective_ev_to_ebitda=float(row[g_effective_ev_to_ebitda_index_n]), effective_ev_to_ebitda_normalized=float(row[g_effective_ev_to_ebitda_normalized_index_n]), effective_profit_margin=float(row[g_effective_profit_margin_index_n]), effective_profit_margin_normalized=float(row[g_effective_profit_margin_normalized_index_n]), held_percent_insiders=float(row[g_held_percent_insiders_index_n]), held_percent_insiders_normalized=float(row[g_held_percent_insiders_normalized_index_n]), previous_close=float(row[g_previous_close_index_n]), price_to_book=float(row[g_price_to_book_index_n]), price_to_book_normalized=float(row[g_price_to_book_normalized_index_n]), enterprise_value=int(float(row[g_enterprise_value_index_n])), eqg_factor_effective=float(row[g_eqg_factor_effective_index_n]), eqg_factor_effective_normalized=float(row[g_eqg_factor_effective_normalized_index_n]), rqg_factor_effective=float(row[g_rqg_factor_effective_index_n]), rqg_factor_effective_normalized=float(row[g_rqg_factor_effective_normalized_index_n]), effective_peg_ratio=float(row[g_effective_peg_ratio_index_n]), effective_peg_ratio_normalized=float(row[g_effective_peg_ratio_normalized_index_n]), ev_to_cfo_ratio_effective=float(row[g_ev_to_cfo_ratio_effective_index_n]), ev_to_cfo_ratio_effective_normalized=float(row[g_ev_to_cfo_ratio_effective_normalized_index_n]), debt_to_equity_effective=float(row[g_debt_to_equity_effective_index_n]), debt_to_equity_effective_used=float(row[g_debt_to_equity_effective_used_index_n]), debt_to_equity_effective_used_normalized=float(row[g_debt_to_equity_effective_used_normalized_index_n]), eff_dist_from_low_factor=float(row[g_eff_dist_from_low_factor_index_n]), eff_dist_from_low_factor_normalized=float(row[g_eff_dist_from_low_factor_normalized_index_n]), total_ratio_effective=float(row[g_total_ratio_effective_index_n]), total_current_ratio_effective=float(row[g_total_current_ratio_effective_index_n]), effective_current_ratio=float(row[g_effective_current_ratio_index_n]), effective_current_ratio_normalized=float(row[g_effective_current_ratio_normalized_index_n]), calculated_roa=float(row[g_calculated_roa_index_n]), calculated_roa_normalized=float(row[g_calculated_roa_normalized_index_n]), calculated_roe=float(row[g_calculated_roe_index_n]), calculated_roe_normalized=float(row[g_calculated_roe_normalized_index_n]), altman_z_score_factor=float(row[g_altman_z_score_factor_index_n]), altman_z_score_factor_normalized=float(row[g_altman_z_score_factor_normalized_index_n]))
 
 
-def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thread_id, build_csv_db_only, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, diff_rows, db_filename):
+def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thread_id, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, diff_rows, db_filename):
     iteration = 0
-    if build_csv_db:
+    if not research_mode:
         elapsed_time_start_sec = time.time()
         for symb in symbols:
             iteration += 1
@@ -2148,7 +2099,7 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
                     if read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_ST and '.ST' not in symb: symb = symb.replace('.S.DX', '.ST')
                     symbol = yf.Ticker(symb)
             stock_data = StockData(symbol=symb)
-            process_info_result = process_info(symbol=symbol, stock_data=stock_data, build_csv_db_only=build_csv_db_only, tase_mode=tase_mode, sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, build_csv_db=build_csv_db, profit_margin_limit=profit_margin_limit, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, debt_to_equity_limit=debt_to_equity_limit, pi_limit=pi_limit, enterprise_value_millions_usd_limit=enterprise_value_millions_usd_limit, research_mode_max_ev=research_mode_max_ev, eqg_min=eqg_min, rqg_min=rqg_min, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, market_cap_included=market_cap_included, research_mode=research_mode, currency_conversion_tool=currency_conversion_tool, currency_conversion_tool_alternative=currency_conversion_tool_alternative, currency_conversion_tool_manual=currency_conversion_tool_manual, reference_db=reference_db, reference_db_title_row=reference_db_title_row, db_filename=None)
+            process_info_result = process_info(symbol=symbol, stock_data=stock_data, tase_mode=tase_mode, sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, profit_margin_limit=profit_margin_limit, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, debt_to_equity_limit=debt_to_equity_limit, pi_limit=pi_limit, enterprise_value_millions_usd_limit=enterprise_value_millions_usd_limit, research_mode_max_ev=research_mode_max_ev, eqg_min=eqg_min, rqg_min=rqg_min, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, market_cap_included=market_cap_included, research_mode=research_mode, currency_conversion_tool=currency_conversion_tool, currency_conversion_tool_alternative=currency_conversion_tool_alternative, currency_conversion_tool_manual=currency_conversion_tool_manual, reference_db=reference_db, reference_db_title_row=reference_db_title_row, db_filename=None)
             if   tase_mode                                                      and 'TLV:' not in stock_data.symbol: stock_data.symbol = 'TLV:' + stock_data.symbol.replace('.TA', '').replace('.', '-')
             elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_SIX and 'SWX:' not in stock_data.symbol: stock_data.symbol = 'SWX:' + stock_data.symbol.replace('.SW', '').replace('.', '-')
             elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_ST  and 'STO:' not in stock_data.symbol: stock_data.symbol = 'STO:' + stock_data.symbol.replace('.ST', '').replace('.', '-')
@@ -2218,7 +2169,7 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
                     else:
                         row[fix_row_index] = 0
             stock_data = get_stock_data_normalized_from_db_row_compact(row, symbol) if "normalized" in db_filename else get_stock_data_from_db_row_compact(row, symbol)
-            if not process_info(symbol=symbol, stock_data=stock_data, build_csv_db_only=build_csv_db_only, tase_mode=tase_mode, sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, build_csv_db=build_csv_db, profit_margin_limit=profit_margin_limit, pi_limit=pi_limit, enterprise_value_millions_usd_limit=enterprise_value_millions_usd_limit, research_mode_max_ev=research_mode_max_ev, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, debt_to_equity_limit=debt_to_equity_limit, eqg_min=eqg_min, rqg_min=rqg_min, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, market_cap_included=market_cap_included, research_mode=research_mode, currency_conversion_tool=currency_conversion_tool, currency_conversion_tool_alternative=currency_conversion_tool_alternative, currency_conversion_tool_manual=currency_conversion_tool_manual, reference_db=reference_db, reference_db_title_row=reference_db_title_row, db_filename=db_filename):
+            if not process_info(symbol=symbol, stock_data=stock_data, tase_mode=tase_mode, sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, profit_margin_limit=profit_margin_limit, pi_limit=pi_limit, enterprise_value_millions_usd_limit=enterprise_value_millions_usd_limit, research_mode_max_ev=research_mode_max_ev, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, debt_to_equity_limit=debt_to_equity_limit, eqg_min=eqg_min, rqg_min=rqg_min, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, market_cap_included=market_cap_included, research_mode=research_mode, currency_conversion_tool=currency_conversion_tool, currency_conversion_tool_alternative=currency_conversion_tool_alternative, currency_conversion_tool_manual=currency_conversion_tool_manual, reference_db=reference_db, reference_db_title_row=reference_db_title_row, db_filename=db_filename):
                 if research_mode: continue
 
             if   tase_mode                                                      and 'TLV:' not in stock_data.symbol: stock_data.symbol = 'TLV:' + stock_data.symbol.replace('.TA',   '').replace('.','-')
@@ -2244,7 +2195,7 @@ def download_ftp_files(filenames_list, ftp_path):
 
 # reference_run : Used for identifying anomalies in which some symbol information is completely different from last run. It can be different but only in new quartely reports
 #                 It is sometimes observed that stocks information is wrongly fetched. Is such cases, the last run's reference point shall be used, with a forgetting factor
-def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, countries_filter_out,build_csv_db_only, build_csv_db, csv_db_path, db_filename, read_all_country_symbols, tase_mode, num_threads, market_cap_included, research_mode, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, generate_result_folders=1, appearance_counter_dict_sss={}, appearance_counter_min=25, appearance_counter_max=35, custom_portfolio=[], num_results_list=[], num_results_list_index=0):
+def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, countries_filter_out, csv_db_path, db_filename, read_all_country_symbols, tase_mode, num_threads, market_cap_included, research_mode, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, generate_result_folders=1, appearance_counter_dict_sss={}, appearance_counter_min=25, appearance_counter_max=35, custom_portfolio=[], num_results_list=[], num_results_list_index=0):
     # https://en.wikipedia.org/wiki/ISO_4217
     currency_filename = 'Indices/currencies.json'
     with open(currency_filename, 'r') as file:
@@ -2256,12 +2207,12 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
     currency_conversion_tool_alternative = None
     if not research_mode:
         try:
-            currency_conversion_tool = CurrencyRates().get_rates('USD') if build_csv_db else None
+            currency_conversion_tool = CurrencyRates().get_rates('USD') if not research_mode else None
         except Exception as e:
             pass
     
         try:
-            currency_conversion_tool_alternative = CurrencyConverter() if build_csv_db else None
+            currency_conversion_tool_alternative = CurrencyConverter() if not research_mode else None
         except Exception as e:
             pass
     
@@ -2289,9 +2240,9 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
                     row_index += 1
 
     # Working Mode:
-    relaxed_access                     = (num_threads-1)/10.0                                       if build_csv_db else 0  # In seconds
-    interval_threads                   = 4 +     1*tase_mode -    (1 if read_all_country_symbols else 0)  if build_csv_db else 0
-    interval_secs_to_avoid_http_errors = num_threads*(num_threads - 1*tase_mode + num_threads*read_all_country_symbols) if build_csv_db else 0  # Every interval_threads, a INTERVALS_TO_AVOID_HTTP_ERRORS sec sleep will take place
+    relaxed_access                     = (num_threads-1)/10.0                                                           if not research_mode else 0  # In seconds
+    interval_threads                   = 4 +     1*tase_mode -    (1 if read_all_country_symbols else 0)                if not research_mode else 0
+    interval_secs_to_avoid_http_errors = num_threads*(num_threads - 1*tase_mode + num_threads*read_all_country_symbols) if not research_mode else 0  # Every interval_threads, a INTERVALS_TO_AVOID_HTTP_ERRORS sec sleep will take place
 
     # Working Parameters:
     eqg_min = EQG_UNKNOWN     # The earnings can decrease but there is still a requirement that price_to_earnings_to_growth_ratio > 0. TODO: ASAFR: Add to multi-dimension
@@ -2308,7 +2259,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
     stocks_list_tase        = []
 
 
-    if not tase_mode and not research_mode and build_csv_db and read_all_country_symbols not in [sss_config.ALL_COUNTRY_SYMBOLS_SIX, sss_config.ALL_COUNTRY_SYMBOLS_ST]:
+    if not tase_mode and not research_mode and read_all_country_symbols not in [sss_config.ALL_COUNTRY_SYMBOLS_SIX, sss_config.ALL_COUNTRY_SYMBOLS_ST]:
         payload            = pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies') # There are 2 tables on the Wikipedia page, get the first table
         first_table        = payload[0]
         second_table       = payload[1]
@@ -2373,7 +2324,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
         symbols_tase     = []  # symbols_tase       = ['ALD.TA', 'ABIL.TA', 'ACCL.TA', 'ADGR.TA', 'ADKA.TA', 'ARDM.TA', 'AFHL.TA', 'AFPR.TA', 'AFID.TA', 'AFRE.TA', 'AICS.TA', 'ARPT.TA', 'ALBA.TA', 'ALMD.TA', 'ALLT.TA', 'AMDA.L.TA', 'ALMA.TA', 'ALGS.TA', 'ALHE.TA', 'ALRPR.TA', 'ASPF.TA', 'AMAN.TA', 'AMRK.TA', 'AMOT.TA', 'ANLT.TA', 'ANGL.TA', 'APIO.M.TA', 'APLP.TA', 'ARD.TA', 'ARAD.TA', 'ARAN.TA', 'ARNA.TA', 'ARKO.TA', 'ARYT.TA', 'ASHO.TA', 'ASHG.TA', 'ASPR.TA', 'ASGR.TA', 'ATRY.TA', 'AUDC.TA', 'AUGN.TA', 'AURA.TA', 'SHVA.TA', 'AVER.TA', 'AVGL.TA', 'AVIA.TA', 'AVIV.TA', 'AVLN.TA', 'AVRT.TA', 'AYAL.TA', 'AZRM.TA', 'AZRG.TA', 'BCOM.TA', 'BYAR.TA', 'BBYL.TA', 'BRAN.TA', 'BVC.TA', 'BYSD.TA', 'ORL.TA', 'BSEN.TA', 'BEZQ.TA', 'BGI-M.TA', 'BIG.TA', 'BIOV.TA', 'BOLT.TA', 'BLRX.TA', 'PHGE.TA', 'BIRM.TA', 'BLSR.TA', 'BOTI.TA', 'BONS.TA', 'BCNV.TA', 'BWAY.TA', 'BRAM.TA', 'BRND.TA', 'BNRG.TA', 'BRIL.TA', 'BRMG.TA', 'CISY.TA', 'CAMT.TA', 'CANF.TA', 'CSURE.TA', 'CNMD.TA', 'CNZN.TA', 'CPTP.TA', 'CRSO.TA', 'CRMT.TA', 'CAST.TA', 'CEL.TA', 'CHAM.TA', 'CHR.TA', 'CMCT.TA', 'CMCTP.TA', 'CTPL5.TA', 'CTPL1.TA', 'CLBV.TA', 'CBI.TA', 'CLIS.TA', 'CFX.TA', 'CDEV.TA', 'CGEN.TA', 'CMDR.TA', 'DNA.TA', 'DANH.TA', 'DANE.TA', 'DCMA.TA', 'DLRL.TA', 'DLEA.TA', 'DEDR.L.TA', 'DLEKG.TA', 'DELT.TA', 'DIMRI.TA', 'DIFI.TA', 'DSCT.TA', 'DISI.TA', 'DRAL.TA', 'DORL.TA', 'DRSL.TA', 'DUNI.TA', 'EMCO.TA', 'EDRL.TA', 'ELAL.TA', 'EMITF.TA', 'EMTC.TA', 'ESLT.TA', 'ELCO.TA', 'ELDAV.TA', 'ELTR.TA', 'ECP.TA', 'ELCRE.TA', 'ELWS.TA', 'ELLO.TA', 'ELMR.TA', 'ELRN.TA', 'ELSPC.TA', 'EMDV.TA', 'ENDY.TA', 'ENOG.TA', 'ENRG.TA', 'ENLT.TA', 'ENLV.TA', 'EQTL.TA', 'EFNC.TA', 'EVGN.TA', 'EXPO.TA', 'FNTS.TA', 'FTAL.TA', 'FIBI.TA', 'FIBIH.TA', 'FGAS.TA', 'FBRT.TA', 'FRSX.TA', 'FORTY.TA', 'FOX.TA', 'FRSM.TA', 'FRDN.TA', 'GOSS.TA', 'GFC-L.TA', 'GPGB.TA', 'GADS.TA', 'GSFI.TA', 'GAON.TA', 'GAGR.TA', 'GZT.TA', 'GNRS.TA', 'GIBUI.TA', 'GILT.TA', 'GNGR.TA', 'GIVO.L.TA', 'GIX.TA', 'GLTC.TA', 'GLEX.L.TA', 'GKL.TA', 'GLRS.TA', 'GODM-M.TA', 'GLPL.TA', 'GOLD.TA', 'GOHO.TA', 'GOLF.TA', 'HDST.TA', 'HAP.TA', 'HGG.TA', 'HAIN.TA', 'HMAM.TA', 'MSBI.TA', 'HAMAT.TA', 'HAML.TA', 'HNMR.TA', 'HARL.TA', 'HLAN.TA', 'HRON.TA', 'HOD.TA', 'HLMS.TA', 'IBI.TA', 'IBITEC.F.TA', 'ICB.TA', 'ICCM.TA', 'ICL.TA', 'IDIN.TA', 'IES.TA', 'IFF.TA', 'ILDR.TA', 'ILX.TA', 'IMCO.TA', 'INBR.TA', 'INFR.TA', 'INRM.TA', 'INTL.TA', 'ININ.TA', 'INCR.TA', 'INTR.TA', 'IGLD-M.TA', 'ISCD.TA', 'ISCN.TA', 'ILCO.TA', 'ISOP.L.TA', 'ISHI.TA', 'ISRA.L.TA', 'ISRS.TA', 'ISRO.TA', 'ISTA.TA', 'ITMR.TA', 'JBNK.TA', 'KDST.TA', 'KAFR.TA', 'KMDA.TA', 'KRNV-L.TA', 'KARE.TA', 'KRDI.TA', 'KEN.TA', 'KRUR.TA', 'KTOV.TA', 'KLIL.TA', 'KMNK-M.TA', 'KNFM.TA', 'LHIS.TA', 'LAHAV.TA', 'ILDC.TA', 'LPHL.L.TA', 'LAPD.TA', 'LDER.TA', 'LSCO.TA', 'LUMI.TA', 'LEOF.TA', 'LEVI.TA', 'LVPR.TA', 'LBTL.TA', 'LCTX.TA', 'LPSN.TA', 'LODZ.TA', 'LUDN.TA', 'LUZN.TA', 'LZNR.TA', 'MGIC.TA', 'MLTM.TA', 'MMAN.TA', 'MSLA.TA', 'MTMY.TA', 'MTRX.TA', 'MAXO.TA', 'MTRN.TA', 'MEAT.TA', 'MDGS.TA', 'MDPR.TA', 'MDTR.TA', 'MDVI.TA', 'MGOR.TA', 'MEDN.TA', 'MTDS.TA', 'MLSR.TA', 'MNIN.TA', 'MNRT.TA', 'MMHD.TA', 'CMER.TA', 'MRHL.TA', 'MSKE.TA', 'MGRT.TA', 'MCRNT.TA', 'MGDL.TA', 'MIFT.TA', 'MNGN.TA', 'MNRV.TA', 'MLD.TA', 'MSHR.TA', 'MVNE.TA', 'MISH.TA', 'MZTF.TA', 'MBMX-M.TA', 'MDIN.L.TA', 'MRIN.TA', 'MYSZ.TA', 'MYDS.TA', 'NFTA.TA', 'NVPT.L.TA', 'NAWI.TA', 'NTGR.TA', 'NTO.TA', 'NTML.TA', 'NERZ-M.TA', 'NXTG.TA', 'NXTM.TA', 'NXGN-M.TA', 'NICE.TA', 'NISA.TA', 'NSTR.TA', 'NVMI.TA', 'NVLG.TA', 'ORTC.TA', 'ONE.TA', 'OPAL.TA', 'OPCE.TA', 'OPK.TA', 'OBAS.TA', 'ORAD.TA', 'ORMP.TA', 'ORBI.TA', 'ORIN.TA', 'ORA.TA', 'ORON.TA', 'OVRS.TA', 'PCBT.TA', 'PLTF.TA', 'PLRM.TA', 'PNAX.TA', 'PTNR.TA', 'PAYT.TA', 'PZOL.TA', 'PEN.TA', 'PFLT.TA', 'PERI.TA', 'PRGO.TA', 'PTCH.TA', 'PTX.TA', 'PMCN.TA', 'PHOE.TA', 'PLSN.TA', 'PLCR.TA', 'PPIL-M.TA', 'PLAZ-L.TA', 'PSTI.TA', 'POLI.TA', 'PIU.TA', 'POLY.TA', 'PWFL.TA', 'PRSK.TA', 'PRTC.TA', 'PTBL.TA', 'PLX.TA', 'QLTU.TA', 'QNCO.TA', 'RLCO.TA', 'RMN.TA', 'RMLI.TA', 'RANI.TA', 'RPAC.TA', 'RATI.L.TA', 'RTPT.L.TA', 'RAVD.TA', 'RVL.TA', 'RIT1.TA', 'AZRT.TA', 'REKA.TA', 'RIMO.TA', 'ROBO.TA', 'RTEN.L.TA', 'ROTS.TA', 'RSEL.TA', 'SRAC.TA', 'SFET.TA', 'SANO1.TA', 'SPNS.TA', 'SRFT.TA', 'STCM.TA', 'SAVR.TA', 'SHNP.TA', 'SCOP.TA', 'SEMG.TA', 'SLARL.TA', 'SHGR.TA', 'SALG.TA', 'SHAN.TA', 'SPEN.TA', 'SEFA.TA', 'SMNIN.TA', 'SKBN.TA', 'SHOM.TA', 'SAE.TA', 'SKLN.TA', 'SLGN.TA', 'SMTO.TA', 'SCC.TA', 'SPRG.TA', 'SPNTC.TA', 'STG.TA', 'STRS.TA', 'SMT.TA', 'SNFL.TA', 'SNCM.TA', 'SPGE.TA', 'SNEL.TA', 'TDGN-L.TA', 'TDRN.TA', 'TALD.TA', 'TMRP.TA', 'TASE.TA', 'TATT.TA', 'TAYA.TA', 'TNPV.TA', 'TEDE.TA', 'TFRLF.TA', 'TLRD.TA', 'TLSY.TA', 'TUZA.TA', 'TEVA.TA', 'TIGBUR.TA', 'TKUN.TA', 'TTAM.TA', 'TGTR.TA', 'TOPS.TA', 'TSEM.TA', 'TREN.TA', 'UNCR.TA', 'UNCT.L.TA', 'UNIT.TA', 'UNVO.TA', 'UTRN.TA', 'VCTR.TA', 'VILR.TA', 'VISN.TA', 'VTLC-M.TA', 'VTNA.TA', 'VNTZ-M.TA', 'WSMK.TA', 'WTS.TA', 'WILC.TA', 'WLFD.TA', 'XENA.TA', 'XTLB.TA', 'YAAC.TA', 'YBOX.TA', 'YHNF.TA', 'ZNKL.TA', 'ZMH.TA', 'ZUR.TA']
         stocks_list_tase = []  # https://info.tase.co.il/eng/MarketData/Stocks/MarketData/Pages/MarketData.aspx
 
-    if tase_mode and not research_mode and build_csv_db:
+    if tase_mode and not research_mode:
         try:
             sss_indices.update_tase_indices()
         except Exception as e:
@@ -2397,7 +2348,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
     # ftp.nasdaqtrader.com/SymbolDirectory/nasdaqlisted.txt
     # ftp.nasdaqtrader.com/SymbolDirectory/otherlisted.txt
     # ftp.nasdaqtrader.com/SymbolDirectory/nasdaqtraded.txt
-    if not research_mode and build_csv_db:
+    if not research_mode:
         symbols_united_states               = []
         symbols_six                         = []
         symbols_st                          = []
@@ -2482,17 +2433,17 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
 
         symbols = symbols_snp500 + symbols_snp500_download + symbols_nasdaq100 + symbols_nasdaq_100_csv + symbols_russel1000 + symbols_russel1000_csv + symbols_united_states + symbols_six + symbols_st
 
-    if not research_mode and tase_mode and build_csv_db:
+    if not research_mode and tase_mode:
         symbols = symbols_tase + stocks_list_tase
 
-    if not research_mode and build_csv_db: symbols = sorted(list(set(symbols)))
+    if not research_mode: symbols = sorted(list(set(symbols)))
 
     # Temporary to test and debug: DEBUG MODE
     # =======================================
     if len(custom_portfolio):
         symbols = custom_portfolio
 
-    if not research_mode: print('\n{} Symbols for SSS to Scan (Using {} threads): {}\n'.format(len(symbols), num_threads, symbols))
+    if not research_mode: print('\n{} Symbols for SSS to Scan (Using {} thread{}): {}\n'.format(len(symbols), num_threads, 's' if num_threads == 1 else '', symbols))
 
     csv_db_data   = [];	rows   = []; rows_no_div   = []; rows_only_div   = []; rows_diff   = []
     csv_db_data0  = []; rows0  = []; rows0_no_div  = []; rows0_only_div  = []; rows0_diff  = []; csv_db_data1  = []; rows1  = []; rows1_no_div  = []; rows1_only_div  = []; rows1_diff  = []
@@ -2506,7 +2457,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
     csv_db_data16 = []; rows16 = []; rows16_no_div = []; rows16_only_div = []; rows16_diff = []; csv_db_data17 = []; rows17 = []; rows17_no_div = []; rows17_only_div = []; rows17_diff = []
     csv_db_data18 = []; rows18 = []; rows18_no_div = []; rows18_only_div = []; rows18_diff = []; csv_db_data19 = []; rows19 = []; rows19_no_div = []; rows19_only_div = []; rows19_diff = []
 
-    if build_csv_db == 0: # if DB is already present, read from it and prepare input to threads
+    if research_mode: # if DB is already present, read from it and prepare input to threads
         symbols = []
         csv_db_filename = csv_db_path+'/'+db_filename
         num_title_rows = 1 if "normalized" in db_filename else 2
@@ -2566,86 +2517,86 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
     if num_threads >= 20: symbols19 = symbols[19:][::num_threads] # 19, 19+num_threads, 20+2*num_threads, 20+3*num_threads, ...
 
     if num_threads ==  1:
-        process_symbols(                                symbols0,  csv_db_data0,  rows0,  rows0_no_div,  rows0_only_div,   0, build_csv_db_only, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows0_diff, db_filename)
+        process_symbols(                                symbols0,  csv_db_data0,  rows0,  rows0_no_div,  rows0_only_div,   0, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows0_diff, db_filename)
     elif num_threads >= 1:
         check_interval(0, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread0  = Thread(target=process_symbols, args=(symbols0,  csv_db_data0,  rows0,  rows0_no_div,  rows0_only_div,   0, build_csv_db_only, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows0_diff, db_filename))
+        thread0  = Thread(target=process_symbols, args=(symbols0,  csv_db_data0,  rows0,  rows0_no_div,  rows0_only_div,   0, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows0_diff, db_filename))
         thread0.start()
     if num_threads >=  2:
         check_interval(1, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread1  = Thread(target=process_symbols, args=(symbols1,  csv_db_data1,  rows1,  rows1_no_div,  rows1_only_div,   1, build_csv_db_only, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows1_diff, db_filename))
+        thread1  = Thread(target=process_symbols, args=(symbols1,  csv_db_data1,  rows1,  rows1_no_div,  rows1_only_div,   1, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows1_diff, db_filename))
         thread1.start()
     if num_threads >=  3:
         check_interval(2, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread2  = Thread(target=process_symbols, args=(symbols2,  csv_db_data2,  rows2,  rows2_no_div,  rows2_only_div,   2, build_csv_db_only, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows2_diff, db_filename))
+        thread2  = Thread(target=process_symbols, args=(symbols2,  csv_db_data2,  rows2,  rows2_no_div,  rows2_only_div,   2, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows2_diff, db_filename))
         thread2.start()
     if num_threads >=  4:
         check_interval(3, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread3  = Thread(target=process_symbols, args=(symbols3,  csv_db_data3,  rows3,  rows3_no_div,  rows3_only_div,   3, build_csv_db_only, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows3_diff, db_filename))
+        thread3  = Thread(target=process_symbols, args=(symbols3,  csv_db_data3,  rows3,  rows3_no_div,  rows3_only_div,   3, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows3_diff, db_filename))
         thread3.start()
     if num_threads >=  5:
         check_interval(4, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread4  = Thread(target=process_symbols, args=(symbols4,  csv_db_data4,  rows4,  rows4_no_div,  rows4_only_div,   4, build_csv_db_only, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows4_diff, db_filename))
+        thread4  = Thread(target=process_symbols, args=(symbols4,  csv_db_data4,  rows4,  rows4_no_div,  rows4_only_div,   4, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows4_diff, db_filename))
         thread4.start()
     if num_threads >=  6:
         check_interval(5, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread5  = Thread(target=process_symbols, args=(symbols5,  csv_db_data5,  rows5,  rows5_no_div,  rows5_only_div,   5, build_csv_db_only, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows5_diff, db_filename))
+        thread5  = Thread(target=process_symbols, args=(symbols5,  csv_db_data5,  rows5,  rows5_no_div,  rows5_only_div,   5, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows5_diff, db_filename))
         thread5.start()
     if num_threads >=  7:
         check_interval(6, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread6  = Thread(target=process_symbols, args=(symbols6,  csv_db_data6,  rows6,  rows6_no_div,  rows6_only_div,   6, build_csv_db_only, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows6_diff, db_filename))
+        thread6  = Thread(target=process_symbols, args=(symbols6,  csv_db_data6,  rows6,  rows6_no_div,  rows6_only_div,   6, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows6_diff, db_filename))
         thread6.start()
     if num_threads >=  8:
         check_interval(7, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread7  = Thread(target=process_symbols, args=(symbols7,  csv_db_data7,  rows7,  rows7_no_div,  rows7_only_div,   7, build_csv_db_only, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows7_diff, db_filename))
+        thread7  = Thread(target=process_symbols, args=(symbols7,  csv_db_data7,  rows7,  rows7_no_div,  rows7_only_div,   7, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows7_diff, db_filename))
         thread7.start()
     if num_threads >=  9:
         check_interval(8, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread8  = Thread(target=process_symbols, args=(symbols8,  csv_db_data8,  rows8,  rows8_no_div,  rows8_only_div,   8, build_csv_db_only, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows8_diff, db_filename))
+        thread8  = Thread(target=process_symbols, args=(symbols8,  csv_db_data8,  rows8,  rows8_no_div,  rows8_only_div,   8, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows8_diff, db_filename))
         thread8.start()
     if num_threads >= 10:
         check_interval(9, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread9  = Thread(target=process_symbols, args=(symbols9,  csv_db_data9,  rows9,  rows9_no_div,  rows9_only_div,   9, build_csv_db_only, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows9_diff, db_filename))
+        thread9  = Thread(target=process_symbols, args=(symbols9,  csv_db_data9,  rows9,  rows9_no_div,  rows9_only_div,   9, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows9_diff, db_filename))
         thread9.start()
     if num_threads >= 11:
         check_interval(10, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread10 = Thread(target=process_symbols, args=(symbols10, csv_db_data10, rows10, rows10_no_div, rows10_only_div, 10, build_csv_db_only, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows10_diff, db_filename))
+        thread10 = Thread(target=process_symbols, args=(symbols10, csv_db_data10, rows10, rows10_no_div, rows10_only_div, 10, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows10_diff, db_filename))
         thread10.start()
     if num_threads >= 12:
         check_interval(11, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread11 = Thread(target=process_symbols, args=(symbols11, csv_db_data11, rows11, rows11_no_div, rows11_only_div, 11, build_csv_db_only, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows11_diff, db_filename))
+        thread11 = Thread(target=process_symbols, args=(symbols11, csv_db_data11, rows11, rows11_no_div, rows11_only_div, 11, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows11_diff, db_filename))
         thread11.start()
     if num_threads >= 13:
         check_interval(12, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread12 = Thread(target=process_symbols, args=(symbols12, csv_db_data12, rows12, rows12_no_div, rows12_only_div, 12, build_csv_db_only, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows12_diff, db_filename))
+        thread12 = Thread(target=process_symbols, args=(symbols12, csv_db_data12, rows12, rows12_no_div, rows12_only_div, 12, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows12_diff, db_filename))
         thread12.start()
     if num_threads >= 14:
         check_interval(13, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread13 = Thread(target=process_symbols, args=(symbols13, csv_db_data13, rows13, rows13_no_div, rows13_only_div, 13, build_csv_db_only, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows13_diff, db_filename))
+        thread13 = Thread(target=process_symbols, args=(symbols13, csv_db_data13, rows13, rows13_no_div, rows13_only_div, 13, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows13_diff, db_filename))
         thread13.start()
     if num_threads >= 15:
         check_interval(14, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread14 = Thread(target=process_symbols, args=(symbols14, csv_db_data14, rows14, rows14_no_div, rows14_only_div, 14, build_csv_db_only, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows14_diff, db_filename))
+        thread14 = Thread(target=process_symbols, args=(symbols14, csv_db_data14, rows14, rows14_no_div, rows14_only_div, 14, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows14_diff, db_filename))
         thread14.start()
     if num_threads >= 16:
         check_interval(15, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread15 = Thread(target=process_symbols, args=(symbols15, csv_db_data15, rows15, rows15_no_div, rows15_only_div, 15, build_csv_db_only, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows15_diff, db_filename))
+        thread15 = Thread(target=process_symbols, args=(symbols15, csv_db_data15, rows15, rows15_no_div, rows15_only_div, 15, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows15_diff, db_filename))
         thread15.start()
     if num_threads >= 17:
         check_interval(16, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread16 = Thread(target=process_symbols, args=(symbols16, csv_db_data16, rows16, rows16_no_div, rows16_only_div, 16, build_csv_db_only, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows16_diff, db_filename))
+        thread16 = Thread(target=process_symbols, args=(symbols16, csv_db_data16, rows16, rows16_no_div, rows16_only_div, 16, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows16_diff, db_filename))
         thread16.start()
     if num_threads >= 18:
         check_interval(17, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread17 = Thread(target=process_symbols, args=(symbols17, csv_db_data17, rows17, rows17_no_div, rows17_only_div, 17, build_csv_db_only, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows17_diff, db_filename))
+        thread17 = Thread(target=process_symbols, args=(symbols17, csv_db_data17, rows17, rows17_no_div, rows17_only_div, 17, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows17_diff, db_filename))
         thread17.start()
     if num_threads >= 19:
         check_interval(18, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread18 = Thread(target=process_symbols, args=(symbols18, csv_db_data18, rows18, rows18_no_div, rows18_only_div, 18, build_csv_db_only, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows18_diff, db_filename))
+        thread18 = Thread(target=process_symbols, args=(symbols18, csv_db_data18, rows18, rows18_no_div, rows18_only_div, 18, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows18_diff, db_filename))
         thread18.start()
     if num_threads >= 20:
         check_interval(19, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread19 = Thread(target=process_symbols, args=(symbols19, csv_db_data19, rows19, rows19_no_div, rows19_only_div, 19, build_csv_db_only, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, build_csv_db, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows19_diff, db_filename))
+        thread19 = Thread(target=process_symbols, args=(symbols19, csv_db_data19, rows19, rows19_no_div, rows19_only_div, 19, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows19_diff, db_filename))
         thread19.start()
 
     if num_threads == 1:
@@ -2729,7 +2680,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
         csv_db_str            = ""
         custom_portfolio_str  = ""
         num_results_str       = "_nRes{}".format(len(compact_rows))
-        build_csv_db_only_str = ""
+        build_csv_db_str      = ""
         if tase_mode:         tase_str       = "_Tase"
 
         if len(sectors_list):
@@ -2754,11 +2705,10 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
         elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_SIX: all_str  = '_S'
         elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_ST:  all_str  = '_St'
 
-        if build_csv_db == 0:                csv_db_str            = '_DBR'
-        if build_csv_db_only:                build_csv_db_only_str = '_Bdb'
-        if len(custom_portfolio):            custom_portfolio_str  = '_Custom'
+        if not research_mode:     build_csv_db_str     = '_Bdb'
+        if len(custom_portfolio): custom_portfolio_str = '_Custom'
 
-        date_and_time = time.strftime("Results/{}/%Y%m%d-%H%M%S{}{}{}{}{}{}{}{}".format(mode_str, tase_str, sectors_str.replace(' ','').replace('a','').replace('e','').replace('i','').replace('o','').replace('u',''), countries_str, all_str, csv_db_str, build_csv_db_only_str, num_results_str, custom_portfolio_str))
+        date_and_time = time.strftime("Results/{}/%Y%m%d-%H%M%S{}{}{}{}{}{}{}{}".format(mode_str, tase_str, sectors_str.replace(' ','').replace('a','').replace('e','').replace('i','').replace('o','').replace('u',''), countries_str, all_str, csv_db_str, build_csv_db_str, num_results_str, custom_portfolio_str))
         print('\n[DV] Scan Results placed in {}'.format(date_and_time))
 
         filenames_list = sss_filenames.create_filenames_list(date_and_time)

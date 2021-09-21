@@ -20,7 +20,7 @@
 #
 #############################################################################
 
-PROFILE = True
+PROFILE = False
 
 ALL_COUNTRY_SYMBOLS_OFF = 0
 ALL_COUNTRY_SYMBOLS_US  = 1  # Nasdaq
@@ -34,7 +34,7 @@ run_nsr              = False   # NASDAQ100+S&P500+RUSSEL1000
 run_all              = True   # All Nasdaq Stocks
 run_six              = False    # All Swiss Stocks
 run_st               = False    # All (Stockholm) Swedish Stocks
-research_mode        = True    # Research Mode
+research_mode        = False    # Research Mode
 aggregate_only       = False
 research_mode_max_ev = False   # @JustLearning's suggestion in Telegram: Multi-Dimensional Scan by Max EV Limit rather than Min EV Limit
 
