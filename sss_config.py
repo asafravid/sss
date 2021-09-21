@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.49 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.50 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -20,7 +20,7 @@
 #
 #############################################################################
 
-PROFILE = False
+PROFILE = True
 
 ALL_COUNTRY_SYMBOLS_OFF = 0
 ALL_COUNTRY_SYMBOLS_US  = 1  # Nasdaq
