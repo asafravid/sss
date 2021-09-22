@@ -35,7 +35,7 @@ import cProfile
 DB_FILENAMES = ['sss_engine.csv', 'sss_engine_normalized.csv']  # 'db.csv' -> but faster with 9so hence use) sss_engine.csv
 
 # TODO: ASAFR: 1. read_csv in pandas, and then .describe() and .quantiles() will provide mean, std and percentiles for all the columns (sss_engine.csv and/or db.csv)
-PDF_NUM_ENTRIES_IN_REPORT       = 42
+PDF_NUM_ENTRIES_IN_REPORT       = 49
 RESEARCH_MODE_MIN_ENTRIES_LIMIT = 7
 
 SCAN_MODE_TASE   = 0  # Tel Aviv Stock Exchange

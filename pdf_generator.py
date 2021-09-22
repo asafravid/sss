@@ -31,7 +31,7 @@ import numpy as np
 
 
 def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, diff_list, tase_mode, db_filename):
-    title_for_figures = data_time_str + ' ' + (title[::-1] if tase_mode else title) + ']כתב ויתור: תוצאות הסריקה אינן המלצה בשום צורה, אלא אך ורק בסיס למחקר.['[::-1]
+    title_for_figures = data_time_str + ' ' + (title[::-1] if tase_mode else title) + ' ' + ']כתב ויתור: תוצאות הסריקה אינן המלצה בשום צורה, אלא אך ורק בסיס למחקר.['[::-1]
 
     # Read CSV file:
     csv_rows = []
@@ -48,11 +48,11 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
     # Access DejaVuSansCondensed.ttf on the machine. This font supports practically all languages.
     # Install it via https://fonts2u.com/dejavu-sans-condensed.font
     pdf.add_font('DejaVu', '', 'DejaVuSansCondensed.ttf', uni=True)
-    pdf.set_font('DejaVu', '', 6)
+    pdf.set_font('DejaVu', '', 5)
 
     # pdf.set_font("Arial", size=8, style='B')
     pdf.set_text_color(0, 0, 200)  # blue
-    pdf.cell(200, 5, txt=title_for_figures, ln=1, align="C")  # http://fpdf.org/en/doc/cell.htm
+    pdf.cell(200, 3, txt=title_for_figures, ln=1, align="C")  # http://fpdf.org/en/doc/cell.htm
 
     names       = []
     appearances = []
@@ -154,8 +154,8 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
              "<p>This Scanner is Open Source. fork() here: <A HREF=""http://bit.ly/OpenSourceStockScanner"">http://bit.ly/OpenSourceStockScanner</A></p>" \
              "<p>Lectures: <A HREF=""https://bit.ly/ZoomLectureMultiDimScan"">https://bit.ly/ZoomLectureMultiDimScan</A>, <A HREF=""http://bit.ly/SssLecture"">http://bit.ly/SssLecture</A></p>" \
              "<p>One-Pagers: <A HREF=""http://bit.ly/SssCoreEquation"">http://bit.ly/SssCoreEquation</A>, <A HREF=""http://bit.ly/MultiDimensionalScan"">http://bit.ly/MultiDimensionalScan</A></p>" \
-             "<p>Disclaimer: Scan Results are not recommendations! They only represent a basis for Research and Analysis.</p>" \
-             "<p><img src=""{}"" width=""600"" height=""250""></p>".format(csv_filename+"_fig.png")
+             "<p>Disclaimer: Scan Results are not recommendations! They only provide a basis for Research and Analysis.</p>" \
+             "<p><img src=""{}"" width=""630"" height=""230""></p>".format(csv_filename+"_fig.png")
         pdf.write_html(text=html)
 
     if csv_db_path is not None:
