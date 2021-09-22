@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.40 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.51 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -56,16 +56,18 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
 
     names       = []
     appearances = []
+    diffs       = []
     for row_index, row in enumerate(csv_rows):
         if row_index > limit_num_rows: break
         if row_index > 0:  # row 0 is title
             names.append(row[1][0:28])
             appearances.append(float(row[5]))
+            diffs.append(int(diff_list[row_index].replace('new+','').replace('new','0')))
         if row_index == 0:
             if tase_mode: # overrwrite to hebrew
                 row = ['סימבול'[::-1],'שם החברה'[::-1],'ענף'[::-1],'ערך'[::-1],'סגירה'[::-1],'ציון'[::-1]]
             else:
-                row = ['Symbol', 'Name', 'Sector', 'Value', 'Close', 'Grade']
+                row = ['Symbol', 'Name', 'Sector', 'Value', 'Close', 'Rank']
         for col_index, col in enumerate(row):
             w_diff                =0
             if   col_index == 0: w=16 # Symbol
@@ -74,7 +76,7 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
             elif col_index == 3: w=40 # Value
             elif col_index == 4: w=15 # Close
             elif col_index == 5:
-                w                = 18 # Grade
+                w                = 18 # Rank
                 w_diff           = 5  # Diff
 
             if col_index < len(row)-1:
@@ -83,7 +85,7 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
             else:
                 # last col is added with the diff col:
                 pdf.set_text_color(0, 0, 200 if row_index == 0 else 0)  # blue for title and black otherwise
-                pdf.cell(w=w, h=3, txt=col.replace('appearance_counter','Grade'), border=1, ln=0, align="C" if row_index == 0 else "L")
+                pdf.cell(w=w, h=3, txt=col.replace('appearance_counter','Rank'), border=1, ln=0, align="C" if row_index == 0 else "L")
                 if w_diff:
                     if diff_list is not None and row_index < len(diff_list):
                         if row_index == 0:
@@ -102,14 +104,17 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
     pdf.cell(200, 3, txt='', ln=1, align="L")
     fig, ax = plt.subplots(figsize=(15, 10))
     y_pos = np.arange(len(names))
+    width = 0.5
 
-    ax.barh(y_pos, appearances, align='center')
+    ax.barh(y_pos,       appearances, width, color='blue',   align='center', label='ציון'[::-1]  if tase_mode else 'Rank')
+    ax.barh(y_pos+width, diffs,       width, color='orange', align='center', label='שינוי'[::-1] if tase_mode else 'Change')
     ax.set_yticks(y_pos)
     ax.tick_params(axis='y', labelsize=8)
     ax.set_yticklabels(names)
     ax.invert_yaxis()  # labels read top-to-bottom
-    ax.set_xlabel('ציון'[::-1] if tase_mode else 'Rank')
+    ax.set_xlabel('ציון,שינוי'[::-1] if tase_mode else 'Rank,Change')
     ax.set_title(title_for_figures, color='blue')
+    ax.legend()
 
     # plt.show()
     plt.savefig(csv_filename+"_fig.png")
