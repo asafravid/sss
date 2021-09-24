@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.51 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.52 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -25,7 +25,7 @@ PROFILE = False
 ALL_COUNTRY_SYMBOLS_OFF = 0
 ALL_COUNTRY_SYMBOLS_US  = 1  # Nasdaq
 ALL_COUNTRY_SYMBOLS_SIX = 2  # Swiss Stock Exchange
-ALL_COUNTRY_SYMBOLS_ST  = 3  # Swrdish (Stockholm) Stock Exchange
+ALL_COUNTRY_SYMBOLS_ST  = 3  # Swedish (Stockholm) Stock Exchange
 
 run_custom_tase      = False   # Custom Portfolio
 run_custom           = False
@@ -48,14 +48,14 @@ automatic_results_folder_selection = False
 # After 1st ever Run: Recommended to use reference (filter and damper)
 # The research mode shall run on new_run as input (new_run >= reference_run) where > means newer
 reference_run_custom = 'Results/Custom/20210909-154648_Bdb_nRes309_Custom'
-reference_run_tase   = 'Results/Tase/20210910-074459_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes332'
+reference_run_tase   = 'Results/Tase/20210924-100244_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes332'
 reference_run_nsr    = 'Results/Nsr/20210912-133814_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes889'
 reference_run_all    = 'Results/All/20210912-092015_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes3409'
 reference_run_six    = 'Results/Six/20210919-072727_S_Bdb_nRes30'
 reference_run_st     = 'Results/St/20210915-023602_St_Bdb_nRes130'
 
 new_run_custom = 'Results/Custom/20210917-201728_Bdb_nRes312_Custom'
-new_run_tase   = 'Results/Tase/20210915-100103_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes333'
+new_run_tase   = 'Results/Tase/20210924-114333_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes328'
 new_run_nsr    = 'Results/Nsr/20210912-133814_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes889'
 new_run_all    = 'Results/All/20210922-102955_Tchnlgy3.0_FnnclSrvcs0.75_A_Bdb_nRes3449'
 new_run_six    = 'Results/Six/20210920-174034_S_Bdb_nRes30'

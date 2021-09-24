@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.53 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.54 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -23,8 +23,6 @@
 
 # TODO: ASAFR:  0. Auto-Update Nasdaq (NSR) Indices as done with TASE
 #               0.1. Add All Swiss   Stocks to A dedicated scan: https://www.six-group.com/en/products-services/the-swiss-stock-exchange/market-data/shares/closing-prices.html, https://www.six-group.com/fqs/closing.csv?select=ShortName,ISIN,ValorSymbol,ValorNumber,ClosingPrice,DailyHighPrice,DailyLowPrice,LatestTradeDate,PreviousClosingPrice,OpeningPrice,OnMarketVolume,OffBookVolume,SwissAtMidVolume,TotalVolume,TradingBaseCurrency,YearlyHighDate,YearlyHighPrice,YearlyLowDate,YearlyLowPrice,FirstTradingDate,LastTradingDate,Exchange,SecTypeCode,GeographicalAreaCode,Tminus1Volume,VWAP60Price&where=ProductLine=BC&orderby=ShortName&page=1&pagesize=9999999
-#               0.2. Run a profiler on the research_mode to try and make it faster (and thus ready for more dimensions!)
-#               0.2.1. Native profiler: https://docs.python.org/3/library/profile.html
 #               1.0. https://en.wikipedia.org/wiki/Piotroski_F-score
 #               1.2. https://en.wikipedia.org/wiki/Magic_formula_investing
 #               1.3. https://www.oldschoolvalue.com/investing-strategy/backtest-graham-nnwc-ncav-screen/
@@ -2195,7 +2193,7 @@ def download_ftp_files(filenames_list, ftp_path):
 
 # reference_run : Used for identifying anomalies in which some symbol information is completely different from last run. It can be different but only in new quartely reports
 #                 It is sometimes observed that stocks information is wrongly fetched. Is such cases, the last run's reference point shall be used, with a forgetting factor
-def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, countries_filter_out, csv_db_path, db_filename, read_all_country_symbols, tase_mode, num_threads, market_cap_included, research_mode, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, generate_result_folders=1, appearance_counter_dict_sss={}, appearance_counter_min=25, appearance_counter_max=35, custom_portfolio=[], num_results_list=[], num_results_list_index=0):
+def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, countries_filter_out, csv_db_path, db_filename, read_all_country_symbols, tase_mode, num_threads, market_cap_included, research_mode, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, appearance_counter_dict_sss={}, appearance_counter_min=25, appearance_counter_max=35, custom_portfolio=[], num_results_list=[], num_results_list_index=0):
     # https://en.wikipedia.org/wiki/ISO_4217
     currency_filename = 'Indices/currencies.json'
     with open(currency_filename, 'r') as file:
@@ -2646,22 +2644,6 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
         sorted_list_sss_no_div       = sorted(compact_rows_no_div,   key=lambda row_no_div:   row_no_div[  g_sss_value_normalized_index_n if "normalized" in db_filename else g_sss_value_index],  reverse=False)  # Sort by sss_value     -> The lower  - the more attractive
         sorted_list_sss_only_div     = sorted(compact_rows_only_div, key=lambda row_only_div: row_only_div[g_sss_value_normalized_index_n if "normalized" in db_filename else g_sss_value_index],  reverse=False)  # Sort by sss_value     -> The lower  - the more attractive
         sorted_list_diff             = sorted(rows_diff,             key=lambda row_diff:     row_diff[    g_symbol_index_n               if "normalized" in db_filename else g_symbol_index   ],  reverse=False)  # Sort by symbol
-    else:
-        sorted_list_sss = compact_rows = rows
-
-    if research_mode: # Update the appearance counter
-        list_len_sss = len(sorted_list_sss)
-        if appearance_counter_min <= list_len_sss   <= appearance_counter_max:
-            for index, row in enumerate(sorted_list_sss):
-                # Debug mode:
-                # if 'ISRA-L' in row[g_symbol_index]:
-                #     print('ISRA-L - index is {}'.format(index))
-                if "normalized" in db_filename:
-                    appearance_counter_dict_sss[(row[g_symbol_index_n], row[g_name_index_n], row[g_sector_index_n], row[g_sss_value_normalized_index_n], row[g_previous_close_index_n])] = appearance_counter_dict_sss[(row[g_symbol_index_n], row[g_name_index_n], row[g_sector_index_n], row[g_sss_value_normalized_index_n], row[g_previous_close_index_n])] + math.sqrt(float(list_len_sss - index)) / float(list_len_sss)
-                else:
-                    appearance_counter_dict_sss[(row[g_symbol_index],   row[g_name_index],   row[g_sector_index],   row[g_sss_value_index],              row[g_previous_close_index])]   = appearance_counter_dict_sss[(row[g_symbol_index],   row[g_name_index],   row[g_sector_index],   row[g_sss_value_index],              row[g_previous_close_index])]   + math.sqrt(float(list_len_sss - index)) / float(list_len_sss)
-
-    if generate_result_folders:
         sorted_lists_list = [
             sorted_list_db,
             sorted_list_sss,
@@ -2723,6 +2705,21 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
                 writer.writerows(sorted_lists_list[index])
 
         sss_post_processing.process_engine_csv(date_and_time)
+    else:
+        sorted_list_sss = compact_rows = rows
+
+        # Update the appearance counter:
+        list_len_sss = len(sorted_list_sss)
+        if appearance_counter_min <= list_len_sss   <= appearance_counter_max:
+            for index, row in enumerate(sorted_list_sss):
+                # Debug mode:
+                # if 'ISRA-L' in row[g_symbol_index]:
+                #     print('ISRA-L - index is {}'.format(index))
+                if "normalized" in db_filename:
+                    appearance_counter_dict_sss[(row[g_symbol_index_n], row[g_name_index_n], row[g_sector_index_n], row[g_sss_value_normalized_index_n], row[g_previous_close_index_n])] = appearance_counter_dict_sss[(row[g_symbol_index_n], row[g_name_index_n], row[g_sector_index_n], row[g_sss_value_normalized_index_n], row[g_previous_close_index_n])] + math.sqrt(float(list_len_sss - index)) / float(list_len_sss)
+                else:
+                    appearance_counter_dict_sss[(row[g_symbol_index],   row[g_name_index],   row[g_sector_index],   row[g_sss_value_index],              row[g_previous_close_index])]   = appearance_counter_dict_sss[(row[g_symbol_index],   row[g_name_index],   row[g_sector_index],   row[g_sss_value_index],              row[g_previous_close_index])]   + math.sqrt(float(list_len_sss - index)) / float(list_len_sss)
+
 
     if num_results_list != None and num_results_list_index < len(num_results_list): num_results_list[num_results_list_index] = len(compact_rows)
     return len(compact_rows)

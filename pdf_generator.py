@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.51 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.52 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -48,7 +48,7 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
     # Access DejaVuSansCondensed.ttf on the machine. This font supports practically all languages.
     # Install it via https://fonts2u.com/dejavu-sans-condensed.font
     pdf.add_font('DejaVu', '', 'DejaVuSansCondensed.ttf', uni=True)
-    pdf.set_font('DejaVu', '', 5)
+    pdf.set_font('DejaVu', '', 6)
 
     # pdf.set_font("Arial", size=8, style='B')
     pdf.set_text_color(0, 0, 200)  # blue
