@@ -37,3 +37,13 @@ def update_tase_indices():
     f = open('Indices/Data_TASE.csv','w')
     f.write(data_tase_no_extra_lines)
     f.close()
+
+    url_tase_dual_indices = 'https://info.tase.co.il/_layouts/Tase/ManagementPages/Export.aspx?sn=none&action=2&SubAction=0&dualTab=1&GridId=32&CurGuid={85603D39-703A-4619-97D9-CE9F16E27615}&ExportType=3'
+    req       = http.request('GET', url_tase_dual_indices, headers=headers)
+    data_tase = req.data.decode('utf-8')
+    data_tase_no_extra_lines = "\n".join(data_tase.splitlines())
+    f = open('Indices/Data_Duals_TASE.csv','w')
+    f.write(data_tase_no_extra_lines)
+    f.close()
+
+

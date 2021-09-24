@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.54 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.55 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -409,6 +409,7 @@ class StockDataNormalized:
     altman_z_score_factor_normalized:               float = 0.0
     skip_reason:                                    str   = 'None'
 
+g_symbols_tase_duals = []
 
 g_header_row = ["Symbol", "Name", "Sector", "Country", "sss_value", "annualized_revenue", "annualized_earnings", "annualized_retained_earnings", "quarterized_revenue", "quarterized_earnings", "quarterized_retained_earnings", "effective_earnings", "effective_retained_earnings", "effective_revenue", "annualized_total_revenue", "annualized_net_income", "quarterized_total_revenue", "quarterized_net_income", "effective_net_income", "effective_total_revenue", "enterprise_value_to_revenue", "evr_effective", "trailing_price_to_earnings", "forward_price_to_earnings", "effective_price_to_earnings", "trailing_12months_price_to_sales", "pe_effective", "enterprise_value_to_ebitda", "effective_ev_to_ebitda", "ebitda", "quarterized_ebitd", "annualized_ebitd", "ebitd", "profit_margin", "annualized_profit_margin", "annualized_profit_margin_boost", "quarterized_profit_margin", "quarterized_profit_margin_boost", "effective_profit_margin", "held_percent_institutions", "held_percent_insiders", "forward_eps", "trailing_eps", "previous_close", "trailing_eps_percentage","price_to_book", "shares_outstanding", "net_income_to_common_shareholders", "nitcsh_to_shares_outstanding", "employees", "enterprise_value", "market_cap", "nitcsh_to_num_employees", "eqg", "rqg", "eqg_yoy", "rqg_yoy", "niqg_yoy", "trqg_yoy", "eqg_effective", "eqg_factor_effective", "rqg_effective", "rqg_factor_effective", "price_to_earnings_to_growth_ratio", "effective_peg_ratio", "annualized_cash_flow_from_operating_activities", "quarterized_cash_flow_from_operating_activities", "annualized_ev_to_cfo_ratio", "quarterized_ev_to_cfo_ratio", "ev_to_cfo_ratio_effective", "annualized_debt_to_equity", "quarterized_debt_to_equity", "debt_to_equity_effective", "debt_to_equity_effective_used", "financial_currency", "summary_currency", "financial_currency_conversion_rate_mult_to_usd", "summary_currency_conversion_rate_mult_to_usd", "last_dividend_0", "last_dividend_1", "last_dividend_2", "last_dividend_3", "fifty_two_week_change", "fifty_two_week_low", "fifty_two_week_high", "two_hundred_day_average", "previous_close_percentage_from_200d_ma", "previous_close_percentage_from_52w_low", "previous_close_percentage_from_52w_high", "dist_from_low_factor", "eff_dist_from_low_factor", "annualized_total_ratio", "quarterized_total_ratio", "annualized_other_current_ratio", "quarterized_other_current_ratio", "annualized_other_ratio", "quarterized_other_ratio", "annualized_total_current_ratio", "quarterized_total_current_ratio", "total_ratio_effective", "other_current_ratio_effective", "other_ratio_effective", "total_current_ratio_effective", "effective_current_ratio", "annualized_total_assets", "quarterized_total_assets", "effective_total_assets", "annualized_total_stockholder_equity", "quarterized_total_stockholder_equity", "effective_total_stockholder_equity", "calculated_roa", "calculated_roe", "annualized_working_capital", "quarterized_working_capital", "effective_working_capital", "annualized_total_liabilities", "quarterized_total_liabilities", "effective_total_liabilities", "altman_z_score_factor", "skip_reason" ]
 g_symbol_index                                          = g_header_row.index("Symbol")
@@ -1773,9 +1774,10 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
 
         if 'priceToBook'                                in info:
             stock_data.price_to_book = info['priceToBook']
-            if tase_mode and stock_data.price_to_book != None: # yfinance mistakenly multiplies value by 100 and doesn't convert price to USD, so compenate:
+            if tase_mode and stock_data.price_to_book != None: # yfinance mistakenly multiplies value by 100 
                 stock_data.price_to_book /= 100
-                stock_data.price_to_book *= stock_data.summary_currency_conversion_rate_mult_to_usd
+                if stock_data.symbol in g_symbols_tase_duals:  # TODO: ASAFR: Do research and add this condition to all relevant cases in other fundamental parameters
+                    stock_data.price_to_book *= stock_data.summary_currency_conversion_rate_mult_to_usd  # This is required only for the dual-listed companies on TASE and NASDAQ - for some reason
         else:
             stock_data.price_to_book      = None # Mark as None, so as to try and calculate manually.
         if isinstance(stock_data.price_to_book,str): stock_data.price_to_book = None # Mark as None, so as to try and calculate manually.
@@ -2098,9 +2100,9 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
                     symbol = yf.Ticker(symb)
             stock_data = StockData(symbol=symb)
             process_info_result = process_info(symbol=symbol, stock_data=stock_data, tase_mode=tase_mode, sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, profit_margin_limit=profit_margin_limit, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, debt_to_equity_limit=debt_to_equity_limit, pi_limit=pi_limit, enterprise_value_millions_usd_limit=enterprise_value_millions_usd_limit, research_mode_max_ev=research_mode_max_ev, eqg_min=eqg_min, rqg_min=rqg_min, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, market_cap_included=market_cap_included, research_mode=research_mode, currency_conversion_tool=currency_conversion_tool, currency_conversion_tool_alternative=currency_conversion_tool_alternative, currency_conversion_tool_manual=currency_conversion_tool_manual, reference_db=reference_db, reference_db_title_row=reference_db_title_row, db_filename=None)
-            if   tase_mode                                                      and 'TLV:' not in stock_data.symbol: stock_data.symbol = 'TLV:' + stock_data.symbol.replace('.TA', '').replace('.', '-')
-            elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_SIX and 'SWX:' not in stock_data.symbol: stock_data.symbol = 'SWX:' + stock_data.symbol.replace('.SW', '').replace('.', '-')
-            elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_ST  and 'STO:' not in stock_data.symbol: stock_data.symbol = 'STO:' + stock_data.symbol.replace('.ST', '').replace('.', '-')
+            if   tase_mode                                                      and 'TLV:' not in stock_data.symbol: stock_data.symbol = 'TLV:' + stock_data.symbol.replace('.TA', '')  # .replace('.', '-')
+            elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_SIX and 'SWX:' not in stock_data.symbol: stock_data.symbol = 'SWX:' + stock_data.symbol.replace('.SW', '')  # .replace('.', '-')
+            elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_ST  and 'STO:' not in stock_data.symbol: stock_data.symbol = 'STO:' + stock_data.symbol.replace('.ST', '')  # .replace('.', '-')
 
             row_to_append = get_db_row_from_stock_data(stock_data)
             # Find symbol in reference_db:
@@ -2169,10 +2171,6 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
             stock_data = get_stock_data_normalized_from_db_row_compact(row, symbol) if "normalized" in db_filename else get_stock_data_from_db_row_compact(row, symbol)
             if not process_info(symbol=symbol, stock_data=stock_data, tase_mode=tase_mode, sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, profit_margin_limit=profit_margin_limit, pi_limit=pi_limit, enterprise_value_millions_usd_limit=enterprise_value_millions_usd_limit, research_mode_max_ev=research_mode_max_ev, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, debt_to_equity_limit=debt_to_equity_limit, eqg_min=eqg_min, rqg_min=rqg_min, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, market_cap_included=market_cap_included, research_mode=research_mode, currency_conversion_tool=currency_conversion_tool, currency_conversion_tool_alternative=currency_conversion_tool_alternative, currency_conversion_tool_manual=currency_conversion_tool_manual, reference_db=reference_db, reference_db_title_row=reference_db_title_row, db_filename=db_filename):
                 if research_mode: continue
-
-            if   tase_mode                                                      and 'TLV:' not in stock_data.symbol: stock_data.symbol = 'TLV:' + stock_data.symbol.replace('.TA',   '').replace('.','-')
-            elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_SIX and 'SWX:' not in stock_data.symbol: stock_data.symbol = 'SWX:' + stock_data.symbol.replace('.SW',   '').replace('.','-')
-            elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_ST  and 'STO:' not in stock_data.symbol: stock_data.symbol = 'STO:' + stock_data.symbol.replace('.S.DX', '').replace('.','-')
 
             dividends_sum = stock_data.last_dividend_0 + stock_data.last_dividend_1 + stock_data.last_dividend_2 + stock_data.last_dividend_3
 
@@ -2327,8 +2325,8 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
             sss_indices.update_tase_indices()
         except Exception as e:
             print("Error updating Indices/Data_TASE.csv: {}".format(e))
-        tase_filenames_list = ['Indices/Data_TASE.csv']
 
+        tase_filenames_list = ['Indices/Data_TASE.csv']
         for filename in tase_filenames_list:
             with open(filename, mode='r', newline='') as engine:
                 reader = csv.reader(engine, delimiter=',')
@@ -2339,6 +2337,19 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
                         continue
                     else:
                         symbols_tase.append(row[1].replace('.','-')+'.TA')
+                        row_index += 1
+
+        tase_filenames_list = ['Indices/Data_Duals_TASE.csv']
+        for filename in tase_filenames_list:
+            with open(filename, mode='r', newline='') as engine:
+                reader = csv.reader(engine, delimiter=',')
+                row_index = 0
+                for row in reader:
+                    if row_index <= 3:
+                        row_index += 1
+                        continue
+                    else:
+                        g_symbols_tase_duals.append(row[1].replace('.','-')+'.TA')
                         row_index += 1
 
     # All nasdaq and others: ftp://ftp.nasdaqtrader.com/symboldirectory/ -> Downloaded automatically
