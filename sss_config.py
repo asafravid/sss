@@ -55,7 +55,7 @@ reference_run_six    = 'Results/Six/20210919-072727_S_Bdb_nRes30'
 reference_run_st     = 'Results/St/20210915-023602_St_Bdb_nRes130'
 
 new_run_custom = 'Results/Custom/20210917-201728_Bdb_nRes312_Custom'
-new_run_tase   = 'Results/Tase/20210924-171838_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes329'
+new_run_tase   = 'Results/Tase/20210924-185449_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes328'
 new_run_nsr    = 'Results/Nsr/20210912-133814_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes889'
 new_run_all    = 'Results/All/20210922-102955_Tchnlgy3.0_FnnclSrvcs0.75_A_Bdb_nRes3449'
 new_run_six    = 'Results/Six/20210920-174034_S_Bdb_nRes30'

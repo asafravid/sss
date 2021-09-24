@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.55 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.56 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -1698,7 +1698,8 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
             stock_data.trailing_price_to_earnings  = info['trailingPE']  # https://www.investopedia.com/terms/t/trailingpe.asp
             if tase_mode and stock_data.trailing_price_to_earnings != None:
                 stock_data.trailing_price_to_earnings /= 100.0  # In TLV stocks, yfinance multiplies trailingPE by a factor of 100, so compensate
-                stock_data.trailing_price_to_earnings *= stock_data.summary_currency_conversion_rate_mult_to_usd # Additionally, in TLV stocks this ratio is mistakenly calculated using PriceInNis/EarningsInUSD -> so Compensate
+                if stock_data.symbol in g_symbols_tase_duals:  # TODO: ASAFR: Do research and add this condition to all relevant cases in other fundamental parameters
+                    stock_data.trailing_price_to_earnings *= stock_data.summary_currency_conversion_rate_mult_to_usd # Additionally, in TLV DUAL stocks this ratio is mistakenly calculated using PriceInNis/EarningsInUSD -> so Compensate
         elif stock_data.effective_earnings != None and stock_data.effective_earnings != 0:
             stock_data.trailing_price_to_earnings  = stock_data.market_cap / stock_data.effective_earnings # Calculate manually.
         if isinstance(stock_data.trailing_price_to_earnings,str):  stock_data.trailing_price_to_earnings  = None # Mark as None, so as to try and calculate manually.
@@ -1709,7 +1710,8 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
             stock_data.forward_price_to_earnings  = info['forwardPE']  # https://www.investopedia.com/terms/t/trailingpe.asp
             if tase_mode and stock_data.forward_price_to_earnings != None:
                 stock_data.forward_price_to_earnings /= 100.0 # In TLV stocks, yfinance multiplies forwardPE by a factor of 100, so compensate
-                stock_data.forward_price_to_earnings *= stock_data.summary_currency_conversion_rate_mult_to_usd # Additionally, in TLV stocks this ratio is mistakenly calculated using PriceInNis/EarningsInUSD -> so Compensate
+                if stock_data.symbol in g_symbols_tase_duals:  # TODO: ASAFR: Do research and add this condition to all relevant cases in other fundamental parameters
+                    stock_data.forward_price_to_earnings *= stock_data.summary_currency_conversion_rate_mult_to_usd # Additionally, in DUAL TLV stocks this ratio is mistakenly calculated using PriceInNis/EarningsInUSD -> so Compensate
         else:  stock_data.forward_price_to_earnings  = None # Mark as None, so as to try and calculate manually. TODO: ASAFR: Calcualte using the forward_eps?
 
         if   stock_data.trailing_price_to_earnings is None and stock_data.forward_price_to_earnings  is None: stock_data.effective_price_to_earnings = None
