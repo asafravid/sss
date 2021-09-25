@@ -183,97 +183,6 @@ def prepare_appearance_counters_dictionaries(csv_db_path, db_filename, appearanc
             pass
 
 
-# |dim3 [ev 1,10,50,100,500]| = 5, |rows [evr 5,50]| = 2, |cols [pm 3,10,25,45]| = 4
-#
-# Contents are the number of results, per ev,evr,pm:
-#  evr/pm    3 10 25 45                       ev pm 3 10 25 45
-#  5       [[9, 8, 7, 6],                     1,    9, 8, 7, 6                   |cols' = 1+|cols||
-# 50        [5, 4, 3, 2]],                    1,    5, 4, 3, 2                       pm 3 10 25 45
-#                                                                                  1,   9, 8, 7, 6
-#  5       [[!, @, #, $],                     10,   !, @, #, $                     1,   5, 4, 3, 2
-# 50        [%, ^, &, *]],                    10,   %, ^, &, *                     10,  !, @, #, $
-#                                          \                                  \    10,  %, ^, &, *
-#  5       [[u, v, w, x],     ==============\ 50,   u, v, w, x   ==============\   50,  u, v, w, x |rows'=|dim3|*|rows||
-# 50        [q, r, s, t]],    ==============/ 50,   q, r, s, t   ==============/   50,  q, r, s, t
-#                                          /                                  /    100, a, b, c, d
-#  5       [[a, b, c, d],                     100,  a, b, c, d                     100, e, f, g, h
-# 50        [e, f, g, h]],                    100,  e, f, g, h                     500, i, j, k, l
-#                                                                                  500, m, n, o, p
-#  5       [[i, j, k, l],                     500,  i, j, k, l
-# 50        [m, n, o, p]]                     500,  m, n, o, p
-#
-def combine_multi_dim_to_table_3d(multi_dim, dim3, rows,cols):
-    len_new_rows = len(dim3)*len(rows)
-    len_new_cols = 1+len(cols)
-    combined_rows_cols = np.zeros( (len_new_rows, len_new_cols), dtype=int )
-    for new_row in range(len_new_rows):
-        for new_col in range(len_new_cols):
-            if new_col == 0:
-                combined_rows_cols[new_row][new_col] = dim3[int(new_row/len(rows))]
-            else:
-                combined_rows_cols[new_row][new_col] = multi_dim[int(new_row/len(rows))][new_row%len(rows)][new_col-1]
-    return combined_rows_cols
-
-
-# now introduce the 4th dim:  |dim4 [evm a,b]| = 2, |dim3 [pe 1,10,50]| = 3, |rows| = 4, |cols| = 5
-# ==========================
-#
-#  evm: a
-#
-#  |cols' = 1+|cols||
-#
-#     1,  20.,  19.,  18.,  17.,  16.
-#     1,  15.,  14.,  13.,  12.,  11.                                              |cols''| = 1+|cols'|
-#     1,  10.,   9.,   8.,   7.,   6.
-#     1,   5.,   4.,   3.,   2.,   1.                                       a,  1,  20.,  19.,  18.,  17.,  16.
-#    10, 120., 119., 118., 117., 116.                                    \  a,  1,  15.,  14.,  13.,  12.,  11.
-#    10, 115., 114., 113., 112., 111.                       ==============\ a,  1,  10.,   9.,   8.,   7.,   6.
-#    10, 110., 109., 108., 107., 106. |rows'=|dim3|*|rows|| ==============/ a,  1,   5.,   4.,   3.,   2.,   1.
-#    10, 105., 104., 103., 102., 101.                                    /  a, 10, 120., 119., 118., 117., 116.
-#    50,   a.,   b.,   c.,   d.,   e.                                       a, 10, 115., 114., 113., 112., 111.
-#    50,   f.,   g.,   h.,   i.,   j.                                       a, 10, 110., 109., 108., 107., 106.
-#    50,   k.,   l.,   m.,   n.,   o.                                       a, 10, 105., 104., 103., 102., 101.
-#    50,   p.,   q.,   r.,   s.,   t.                                       a, 50,   a.,   b.,   c.,   d.,   e.
-#                                                                           a, 50,   f.,   g.,   h.,   i.,   j.
-#                                                                           a, 50,   k.,   l.,   m.,   n.,   o.      |rows''=|dim4|*|rows'||
-#  evm: b                                                                   a, 50,   p.,   q.,   r.,   s.,   t.
-#                                                                           b,  1,  20_,  19_,  18_,  17_,  16_
-#  |cols' = 1+|cols||                                                       b,  1,  15_,  14_,  13_,  12_,  11_
-#                                                                           b,  1,  10_,   9_,   8_,   7_,   6_
-#                                                                           b,  1,   5_,   4_,   3_,   2_,   1_
-#     1,  20_,  19_,  18_,  17_,  16_                                       b, 10, 120_, 119_, 118_, 117_, 116_
-#     1,  15_,  14_,  13_,  12_,  11_                                       b, 10, 115_, 114_, 113_, 112_, 111_
-#     1,  10_,   9_,   8_,   7_,   6_                                    \  b, 10, 110_, 109_, 108_, 107_, 106_
-#     1,   5_,   4_,   3_,   2_,   1_                       ==============\ b, 10, 105_, 104_, 103_, 102_, 101_
-#    10, 120_, 119_, 118_, 117_, 116_ |rows'=|dim3|*|rows|| ==============/ b, 50,   a_,   b_,   c_,   d_,   e_
-#    10, 115_, 114_, 113_, 112_, 111_                                    /  b, 50,   f_,   g_,   h_,   i_,   j_
-#    10, 110_, 109_, 108_, 107_, 106_                                       b, 50,   k_,   l_,   m_,   n_,   o_
-#    10, 105_, 104_, 103_, 102_, 101_                                       b, 50,   p_,   q_,   r_,   s_,   t_
-#    50,   a_,   b_,   c_,   d_,   e_
-#    50,   f_,   g_,   h_,   i_,   j_
-#    50,   k_,   l_,   m_,   n_,   o_
-#    50,   p_,   q_,   r_,   s_,   t_
-def combine_multi_dim_to_table_4d(multi_dim, dim4, dim3, rows,cols):
-    # dim3
-    len_new_rows = len(dim3)*len(rows)
-    len_new_cols = 1+len(cols)
-
-    # Now 4th Dim:
-    len_new4_rows = len(dim4)*len_new_rows
-    len_new4_cols = 1+len_new_cols
-    combined4_rows_cols = np.zeros( (len_new4_rows, len_new4_cols), dtype=float )
-    for new_row in range(len_new4_rows):
-        for new_col in range(len_new4_cols):
-            if   new_col == 0:  # dim4
-                combined4_rows_cols[new_row][new_col] =      dim4[int(new_row/len_new_rows)]
-            elif new_col == 1:  # dim3
-                combined4_rows_cols[new_row][new_col] =                                 dim3[(int(new_row/len(rows))) % len(dim3)] # dim2 (rows)
-            else:  #                                             evm                        pe                                    evr                pm
-                combined4_rows_cols[new_row][new_col] = multi_dim[int(new_row/len_new_rows)][(int(new_row/len(rows))) % len(dim3)][new_row%len(rows)][new_col-2]
-
-    return combined4_rows_cols
-
-
 # now introduce the 5th dim:  |dim5 [pi %, %`]| = 2, |dim4 [evm a,b]| = 2, |dim3 [pe 1,10,50]| = 3, |dim2_rows [evr x,y]| = 2, |dim1_cols [num results for 3 pm values]| = 3
 # ==========================
 #
@@ -368,9 +277,10 @@ def combine_multi_dim_to_table_5d(multi_dim_data, dim5, dim4, dim3, dim2_rows, d
     return combined5_rows_cols
 
 
-# TODO: ASAFR: 1. Must add the EQG to the multi-dimensional scan - the TH is now -50% but it must be scanned
-#              2. Like the EQG - see other places where there are filterings out (around that area in sss.py) and handle properly - EV/CFO and D/E
-#              3. Move to Pandas in CSV readings!
+# TODO: ASAFR: 1. Add Price-to-Book to the Multidimentional Scan
+#              2. Must add the EQG to the multi-dimensional scan - the TH is now -50% but it must be scanned
+#              3. Like the EQG - see other places where there are filterings out (around that area in sss.py) and handle properly - EV/CFO and D/E
+#              4. Move to Pandas in CSV readings!
 def research_db(sectors_list, sectors_filter_out, countries_list, countries_filter_out, pi_range, research_mode_max_ev, ev_millions_range, evr_range, pe_range, pm_range, csv_db_path, db_filename, read_all_country_symbols, scan_mode, appearance_counter_min, appearance_counter_max, favor_sectors, favor_sectors_by,
                 newer_path, older_path, db_exists_in_both_folders, diff_only_result, movement_threshold, res_length):
     if scan_mode == SCAN_MODE_TASE:

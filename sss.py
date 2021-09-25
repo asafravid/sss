@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.56 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.57 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -2096,13 +2096,13 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
                 symbol = yf.Ticker(symb)
             else:
                 if read_all_country_symbols not in [sss_config.ALL_COUNTRY_SYMBOLS_SIX, sss_config.ALL_COUNTRY_SYMBOLS_ST]:
-                    symbol = yf.Ticker(symb.replace('.','-'))  # TODO: ASFAR: Sometimes the '.' Is needed, especially for non-US companies. See for instance 5205.kl. In this case the parameter is also case-sensitive! -> https://github.com/pydata/pandas-datareader/issues/810#issuecomment-789684354
+                    symbol = yf.Ticker(symb.replace('.U','-UN').replace('.W','-WT').replace('.','-'))  # TODO: ASFAR: Sometimes the '.' Is needed, especially for non-US companies. See for instance 5205.kl. In this case the parameter is also case-sensitive! -> https://github.com/pydata/pandas-datareader/issues/810#issuecomment-789684354
                 else:
                     if read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_ST and '.ST' not in symb: symb = symb.replace('.S.DX', '.ST')
                     symbol = yf.Ticker(symb)
             stock_data = StockData(symbol=symb)
             process_info_result = process_info(symbol=symbol, stock_data=stock_data, tase_mode=tase_mode, sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, profit_margin_limit=profit_margin_limit, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, debt_to_equity_limit=debt_to_equity_limit, pi_limit=pi_limit, enterprise_value_millions_usd_limit=enterprise_value_millions_usd_limit, research_mode_max_ev=research_mode_max_ev, eqg_min=eqg_min, rqg_min=rqg_min, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, market_cap_included=market_cap_included, research_mode=research_mode, currency_conversion_tool=currency_conversion_tool, currency_conversion_tool_alternative=currency_conversion_tool_alternative, currency_conversion_tool_manual=currency_conversion_tool_manual, reference_db=reference_db, reference_db_title_row=reference_db_title_row, db_filename=None)
-            if   tase_mode                                                      and 'TLV:' not in stock_data.symbol: stock_data.symbol = 'TLV:' + stock_data.symbol.replace('.TA', '')  # .replace('.', '-')
+            if   tase_mode                                                      and 'TLV:' not in stock_data.symbol: stock_data.symbol = 'TLV:' + stock_data.symbol.replace('.TA', '').replace('-', '.')
             elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_SIX and 'SWX:' not in stock_data.symbol: stock_data.symbol = 'SWX:' + stock_data.symbol.replace('.SW', '')  # .replace('.', '-')
             elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_ST  and 'STO:' not in stock_data.symbol: stock_data.symbol = 'STO:' + stock_data.symbol.replace('.ST', '')  # .replace('.', '-')
 
@@ -2452,7 +2452,13 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
     # Temporary to test and debug: DEBUG MODE
     # =======================================
     if len(custom_portfolio):
-        symbols = custom_portfolio
+        symbols = []
+        if tase_mode:
+            for symbol in custom_portfolio:
+                symbols.append(symbol.replace('.', '-') + '.TA')
+        else:
+            symbols = custom_portfolio
+
 
     if not research_mode: print('\n{} Symbols for SSS to Scan (Using {} thread{}): {}\n'.format(len(symbols), num_threads, 's' if num_threads == 1 else '', symbols))
 
