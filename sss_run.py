@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.46 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.47 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -277,11 +277,75 @@ def combine_multi_dim_to_table_5d(multi_dim_data, dim5, dim4, dim3, dim2_rows, d
     return combined5_rows_cols
 
 
-# TODO: ASAFR: 1. Add Price-to-Book to the Multidimentional Scan
-#              2. Must add the EQG to the multi-dimensional scan - the TH is now -50% but it must be scanned
-#              3. Like the EQG - see other places where there are filterings out (around that area in sss.py) and handle properly - EV/CFO and D/E
-#              4. Move to Pandas in CSV readings!
-def research_db(sectors_list, sectors_filter_out, countries_list, countries_filter_out, pi_range, research_mode_max_ev, ev_millions_range, evr_range, pe_range, pm_range, csv_db_path, db_filename, read_all_country_symbols, scan_mode, appearance_counter_min, appearance_counter_max, favor_sectors, favor_sectors_by,
+#                                                 pb    pi    evm   pe    evr        pm
+#                                 6dim data       range range range range range      range
+def combine_multi_dim_to_table_6d(multi_dim_data, dim6, dim5, dim4, dim3, dim2_rows, dim1_cols):
+    # dim1
+    dim1_combined_num_rows = 1                                #                                               1 row for dim 1 (pm range)
+    dim1_combined_num_cols = len(dim1_cols)                   #                                               pm range
+
+    # dim2
+    dim2_combined_num_rows = len(dim2_rows)                   #                                   evr range
+    dim2_combined_num_cols = 1+dim1_combined_num_cols         #                                   evr index + pm range
+
+    # dim3
+    dim3_combined_num_rows = len(dim3)*dim2_combined_num_rows #                        pe range * evr range
+    dim3_combined_num_cols = 1+dim2_combined_num_cols         #                        pe index + evr index + pm range
+
+    # dim4:
+    dim4_combined_num_rows = len(dim4)*dim3_combined_num_rows #            evm range * pe range * evr range
+    dim4_combined_num_cols = 1+dim3_combined_num_cols         #            evm index + pe index + evr index + pm range
+
+    # dim5:
+    dim5_combined_num_rows = len(dim5)*dim4_combined_num_rows # pi range * evm range * pe range * evr range
+    dim5_combined_num_cols = 1+dim4_combined_num_cols         # pi index + evm index + pe index + evr index + pm range
+
+    # dim6:
+    dim6_combined_num_rows = len(dim6)*dim5_combined_num_rows # pb range * pi range * evm range * pe range * evr range
+    dim6_combined_num_cols = 1+dim5_combined_num_cols         # pb index + pi index + evm index + pe index + evr index + pm range
+
+    combined6_rows_cols = np.zeros( (dim6_combined_num_rows, dim6_combined_num_cols), dtype=float )
+    for row in range(dim6_combined_num_rows):
+        for col in range(dim6_combined_num_cols):
+            if sss.VERBOSE_LOGS: print('[combine_multi_dim_to_table_6d] row = {}, col = {}'.format(row,col))
+            if   col == 0:
+                dim6_index = (int(row / dim5_combined_num_rows)) % len(dim6)
+                if sss.VERBOSE_LOGS: print('[combine_multi_dim_to_table_6d] Access dim6[{}]'.format(dim6_index))
+                combined6_rows_cols[row][col] = dim6[dim6_index] # dim6 - pb
+            elif col == 1:
+                dim5_index = (int(row / dim4_combined_num_rows)) % len(dim5)
+                if sss.VERBOSE_LOGS: print('[combine_multi_dim_to_table_6d] Access dim5[{}]'.format(dim5_index))
+                combined6_rows_cols[row][col] = dim5[dim5_index] # dim5 - pi
+            elif col == 2:
+                dim4_index = (int(row / dim3_combined_num_rows)) % len(dim4)
+                if sss.VERBOSE_LOGS: print('[combine_multi_dim_to_table_6d] Access dim4[{}]'.format(dim4_index))
+                combined6_rows_cols[row][col] = dim4[dim4_index] # dim4 - evm
+            elif col == 3:
+                dim3_index = (int(row / dim2_combined_num_rows)) % len(dim3)
+                if sss.VERBOSE_LOGS: print('[combine_multi_dim_to_table_6d] Access dim3[{}]'.format(dim3_index))
+                combined6_rows_cols[row][col] = dim3[dim3_index] # dim3 - pe
+            elif col == 4:
+                dim2_index = (int(row / dim1_combined_num_rows)) % len(dim2_rows)
+                if sss.VERBOSE_LOGS: print('[combine_multi_dim_to_table_6d] Access dim2_rows[{}]'.format(dim2_index))
+                combined6_rows_cols[row][col] = dim2_rows[dim2_index] # dim2 - evr
+            #                                                             pi                              evm                             pe                              evr                      pm
+            else:
+                dim6_index = int(row / dim5_combined_num_rows) % len(dim6)      # Increase after every dim5_combined_num_rows rows, and cyclic on dim6
+                dim5_index = int(row / dim4_combined_num_rows) % len(dim5)      # Increase after every dim4_combined_num_rows rows, and cyclic on dim5
+                dim4_index = int(row / dim3_combined_num_rows) % len(dim4)      # Increase after every dim3_combined_num_rows rows, and cyclic on dim4
+                dim3_index = int(row / dim2_combined_num_rows) % len(dim3)      # Increase after every dim2_combined_num_rows rows, and cyclic on dim3
+                dim2_index = row                               % len(dim2_rows) # Increase after every           row,  and cyclic on dim2
+                dim1_index = col - 5                                            # Increase after every           col,  and offset of -5 dims
+                if sss.VERBOSE_LOGS: print('[combine_multi_dim_to_table_6d] Access multi_dim_data[{}][{}][{}][{}][{}][{}]'.format(dim6_index,dim5_index,dim4_index,dim3_index,dim2_index,dim1_index))
+                combined6_rows_cols[row][col] = multi_dim_data[dim6_index][dim5_index][dim4_index][dim3_index][dim2_index][dim1_index]  # dim2+dim1
+
+    return combined6_rows_cols
+
+
+# TODO: ASAFR: 1. Must add the EQG to the multi-dimensional scan - the TH is now -50% but it must be scanned
+#              2. Like the EQG - see other places where there are filterings out (around that area in sss.py) and handle properly - EV/CFO and D/E
+#              3. Move to Pandas in CSV readings!
+def research_db(sectors_list, sectors_filter_out, countries_list, countries_filter_out, pb_range, pi_range, research_mode_max_ev, ev_millions_range, evr_range, pe_range, pm_range, csv_db_path, db_filename, read_all_country_symbols, scan_mode, appearance_counter_min, appearance_counter_max, favor_sectors, favor_sectors_by,
                 newer_path, older_path, db_exists_in_both_folders, diff_only_result, movement_threshold, res_length):
     if scan_mode == SCAN_MODE_TASE:
         tase_mode = 1
@@ -293,61 +357,64 @@ def research_db(sectors_list, sectors_filter_out, countries_list, countries_filt
 
     appearance_counter_dict_sss   = {}
     prepare_appearance_counters_dictionaries(csv_db_path, db_filename, appearance_counter_dict_sss)
+    pb_range_len          = len(pb_range)
     pi_range_len          = len(pi_range)
     ev_millions_range_len = len(ev_millions_range)
     pe_range_len          = len(pe_range)
     evr_range_len         = len(evr_range)
     pm_range_len          = len(pm_range)
-    research_num_results_multi_dim_data = np.zeros( (pi_range_len, ev_millions_range_len, pe_range_len, evr_range_len, pm_range_len), dtype=int )
+    research_num_results_multi_dim_data = np.zeros( (pb_range_len, pi_range_len, ev_millions_range_len, pe_range_len, evr_range_len, pm_range_len), dtype=int )
     elapsed_time_start_sec = time.time()
     iteration              = 0
-    estimated_iterations_left = pi_range_len*ev_millions_range_len*pe_range_len*evr_range_len*pm_range_len
-    for pi_index, pi_limit                                       in enumerate(pi_range):
-        for ev_millions_index, ev_millions_limit                 in enumerate(ev_millions_range):
-            for pe_index, price_to_earnings_limit                in enumerate(pe_range):
-                for evr_index, enterprise_value_to_revenue_limit in enumerate(evr_range):
-                    for pm_index, profit_margin_limit            in enumerate(pm_range):  # TODO: ASAFR: Below 1. Ambiguity of parameters - narrow down. 2. Some magic numbers on ev_to_cfo_ration etc 100.0 and 1000.0 - make order and defines/constants/multi_dim here
-                        num_results_for_pi_ev_pe_evr_and_pm = sss.sss_run(reference_run=[], sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, csv_db_path=csv_db_path, db_filename=db_filename, read_all_country_symbols=read_all_country_symbols, tase_mode=tase_mode, num_threads=1, market_cap_included=1, research_mode=1, profit_margin_limit=float(profit_margin_limit)/100.0, pi_limit=pi_limit, enterprise_value_millions_usd_limit=ev_millions_limit, research_mode_max_ev=research_mode_max_ev, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, appearance_counter_dict_sss=appearance_counter_dict_sss, appearance_counter_min=appearance_counter_min, appearance_counter_max=appearance_counter_max)
-                        if num_results_for_pi_ev_pe_evr_and_pm < appearance_counter_min:
-                            estimated_iterations_left -= (pm_range_len-pm_index)
-                            iteration                 += (pm_range_len-pm_index)
-                            break  # Already lower than appearance_counter_min results. With higher profit margin limit there will always be less results -> save running time by breaking
-                        research_num_results_multi_dim_data[pi_index][ev_millions_index][pe_index][evr_index][pm_index] = int(num_results_for_pi_ev_pe_evr_and_pm)
+    estimated_iterations_left = pb_range_len*pi_range_len*ev_millions_range_len*pe_range_len*evr_range_len*pm_range_len
+    for pb_index, pb_limit                                           in enumerate(pb_range):
+        for pi_index, pi_limit                                       in enumerate(pi_range):
+            for ev_millions_index, ev_millions_limit                 in enumerate(ev_millions_range):
+                for pe_index, price_to_earnings_limit                in enumerate(pe_range):
+                    for evr_index, enterprise_value_to_revenue_limit in enumerate(evr_range):
+                        for pm_index, profit_margin_limit            in enumerate(pm_range):  # TODO: ASAFR: Below 1. Ambiguity of parameters - narrow down. 2. Some magic numbers on ev_to_cfo_ration etc 100.0 and 1000.0 - make order and defines/constants/multi_dim here
+                            num_results_for_pb_pi_ev_pe_evr_and_pm = sss.sss_run(reference_run=[], sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, csv_db_path=csv_db_path, db_filename=db_filename, read_all_country_symbols=read_all_country_symbols, tase_mode=tase_mode, num_threads=1, market_cap_included=1, research_mode=1, profit_margin_limit=float(profit_margin_limit)/100.0, pb_limit=pb_limit, pi_limit=pi_limit, enterprise_value_millions_usd_limit=ev_millions_limit, research_mode_max_ev=research_mode_max_ev, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, appearance_counter_dict_sss=appearance_counter_dict_sss, appearance_counter_min=appearance_counter_min, appearance_counter_max=appearance_counter_max)
+                            if num_results_for_pb_pi_ev_pe_evr_and_pm < appearance_counter_min:
+                                estimated_iterations_left -= (pm_range_len-pm_index)
+                                iteration                 += (pm_range_len-pm_index)
+                                break  # Already lower than appearance_counter_min results. With higher profit margin limit there will always be less results -> save running time by breaking
+                            research_num_results_multi_dim_data[pb_index][pi_index][ev_millions_index][pe_index][evr_index][pm_index] = int(num_results_for_pb_pi_ev_pe_evr_and_pm)
 
-                        estimated_iterations_left -= 1
-                        iteration                 += 1
-                        elapsed_time_sample_sec   = time.time()
-                        elapsed_time_sec          = round(elapsed_time_sample_sec - elapsed_time_start_sec, 0)
-                        average_sec_per_iteration = round(elapsed_time_sec / iteration, int(sss.NUM_ROUND_DECIMALS / 3))
-                        percentage_complete       = round(100 * iteration / (estimated_iterations_left+iteration), int(sss.NUM_ROUND_DECIMALS / 3))
-                        estimated_time_left_sec   = int(round(average_sec_per_iteration*estimated_iterations_left, 0))
-                        print('time [sec] total/avg/%/left {:3.0f}/{:1.2f}/{:2.2f}/{:5} : pi {:6} | evm {:6} | pe {:8} | evr {:8} | pm {:7}% -> num_results = {}'.format(elapsed_time_sec, average_sec_per_iteration, percentage_complete, estimated_time_left_sec, pi_limit, ev_millions_limit, price_to_earnings_limit, enterprise_value_to_revenue_limit, profit_margin_limit, num_results_for_pi_ev_pe_evr_and_pm))
+                            estimated_iterations_left -= 1
+                            iteration                 += 1
+                            elapsed_time_sample_sec   = time.time()
+                            elapsed_time_sec          = round(elapsed_time_sample_sec - elapsed_time_start_sec, 0)
+                            average_sec_per_iteration = round(elapsed_time_sec / iteration, int(sss.NUM_ROUND_DECIMALS / 3))
+                            percentage_complete       = round(100 * iteration / (estimated_iterations_left+iteration), int(sss.NUM_ROUND_DECIMALS / 3))
+                            estimated_time_left_sec   = int(round(average_sec_per_iteration*estimated_iterations_left, 0))
+                            print('time [sec] total/avg/%/left {:3.0f}/{:1.2f}/{:2.2f}/{:5} : pb {:6} | pi {:6} | evm {:6} | pe {:8} | evr {:8} | pm {:7}% -> num_results = {}'.format(elapsed_time_sec, average_sec_per_iteration, percentage_complete, estimated_time_left_sec, pb_limit, pi_limit, ev_millions_limit, price_to_earnings_limit, enterprise_value_to_revenue_limit, profit_margin_limit, num_results_for_pb_pi_ev_pe_evr_and_pm))
     results_filename    = 'results_without_labels_{}'.format(db_filename)
 
-    mesh_combined = combine_multi_dim_to_table_5d(multi_dim_data=research_num_results_multi_dim_data, dim5=pi_range, dim4=ev_millions_range, dim3=pe_range, dim2_rows=evr_range, dim1_cols=pm_range)
+    mesh_combined = combine_multi_dim_to_table_6d(multi_dim_data=research_num_results_multi_dim_data, dim6=pb_range, dim5=pi_range, dim4=ev_millions_range, dim3=pe_range, dim2_rows=evr_range, dim1_cols=pm_range)
 
     np.savetxt(csv_db_path+'/'+results_filename,  mesh_combined, fmt='%f', delimiter=',')
-    title_row = pm_range             # column 4 and onwards
-    title_row.insert(0, 'evr / pm')  # column 3
-    title_row.insert(0, 'pe')        # column 2
-    title_row.insert(0, 'ev')        # column 1
-    title_row.insert(0, 'pi')        # column 0
-    pi_ev_pe_evr_rows_pm_cols_filenames_list = [csv_db_path+'/'+results_filename]
+    title_row = pm_range             # column 5 and onwards
+    title_row.insert(0, 'evr / pm')  # column 4
+    title_row.insert(0, 'pe')        # column 3
+    title_row.insert(0, 'ev')        # column 2
+    title_row.insert(0, 'pi')        # column 1
+    title_row.insert(0, 'pb')        # column 0
+    pb_pi_ev_pe_evr_rows_pm_cols_filenames_list = [csv_db_path+'/'+results_filename]
     # Read Results, and add row and col axis:
-    for filename in pi_ev_pe_evr_rows_pm_cols_filenames_list:
-        pi_ev_pe_evr_rows_pm_cols = [title_row]
+    for filename in pb_pi_ev_pe_evr_rows_pm_cols_filenames_list:
+        pb_pi_ev_pe_evr_rows_pm_cols = [title_row]
         with open(filename, mode='r', newline='') as engine:
             reader = csv.reader(engine, delimiter=',')
             row_index = 0  # Title
             for row in reader:
-                pi_ev_pe_evr_rows_pm_cols.append(row)
+                pb_pi_ev_pe_evr_rows_pm_cols.append(row)
                 row_index += 1
-    for index in range(len(pi_ev_pe_evr_rows_pm_cols_filenames_list)):
-        row_col_csv_filename = pi_ev_pe_evr_rows_pm_cols_filenames_list[index].replace('.csv','_with_labels.csv')
+    for index in range(len(pb_pi_ev_pe_evr_rows_pm_cols_filenames_list)):
+        row_col_csv_filename = pb_pi_ev_pe_evr_rows_pm_cols_filenames_list[index].replace('.csv','_with_labels.csv')
         os.makedirs(os.path.dirname(row_col_csv_filename), exist_ok=True)
         with open(row_col_csv_filename, mode='w', newline='') as engine:
             writer = csv.writer(engine)
-            writer.writerows(pi_ev_pe_evr_rows_pm_cols)
+            writer.writerows(pb_pi_ev_pe_evr_rows_pm_cols)
 
     sorted_appearance_counter_dict_sss          = {k: v for k, v in sorted(appearance_counter_dict_sss.items(),   key=lambda item: item[1], reverse=True)}
     result_sorted_appearance_counter_dict_sss   = {k: v for k, v in sorted_appearance_counter_dict_sss.items()    if v > 0.0}
@@ -447,17 +514,18 @@ def execute():
     new_run_st     = path_setting_dict['new_run_st']
 
     if not research_mode:   # Run Build DB Only:
-        if run_custom_tase: sss.sss_run(reference_run=reference_run_tase,   sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, csv_db_path='None', db_filename='None', read_all_country_symbols=sss_config.ALL_COUNTRY_SYMBOLS_OFF, tase_mode=1, num_threads=1, market_cap_included=1, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, pi_limit=0, enterprise_value_millions_usd_limit=5, research_mode_max_ev=False, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=[],                                   favor_sectors_by=[],         custom_portfolio=sss_config.custom_portfolio_tase)
-        if run_custom:      sss.sss_run(reference_run=reference_run_custom, sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, csv_db_path='None', db_filename='None', read_all_country_symbols=sss_config.ALL_COUNTRY_SYMBOLS_OFF, tase_mode=0, num_threads=1, market_cap_included=1, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, pi_limit=0, enterprise_value_millions_usd_limit=5, research_mode_max_ev=False, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=[],                                   favor_sectors_by=[],         custom_portfolio=sss_config.custom_portfolio)
-        if run_tase:        sss.sss_run(reference_run=reference_run_tase,   sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, csv_db_path='None', db_filename='None', read_all_country_symbols=sss_config.ALL_COUNTRY_SYMBOLS_OFF, tase_mode=1, num_threads=1, market_cap_included=1, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, pi_limit=0, enterprise_value_millions_usd_limit=1, research_mode_max_ev=False, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=['Technology', 'Real Estate'       ], favor_sectors_by=[3.0,  1.0],)
-        if run_nsr:         sss.sss_run(reference_run=reference_run_nsr,    sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, csv_db_path='None', db_filename='None', read_all_country_symbols=sss_config.ALL_COUNTRY_SYMBOLS_OFF, tase_mode=0, num_threads=1, market_cap_included=1, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, pi_limit=0, enterprise_value_millions_usd_limit=5, research_mode_max_ev=False, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[3.0,  0.75])
-        if run_all:         sss.sss_run(reference_run=reference_run_all,    sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, csv_db_path='None', db_filename='None', read_all_country_symbols=sss_config.ALL_COUNTRY_SYMBOLS_US,  tase_mode=0, num_threads=1, market_cap_included=1, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, pi_limit=0, enterprise_value_millions_usd_limit=5, research_mode_max_ev=False, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[3.0,  0.75])
-        if run_six:         sss.sss_run(reference_run=reference_run_six,    sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, csv_db_path='None', db_filename='None', read_all_country_symbols=sss_config.ALL_COUNTRY_SYMBOLS_SIX, tase_mode=0, num_threads=1, market_cap_included=1, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, pi_limit=0, enterprise_value_millions_usd_limit=5, research_mode_max_ev=False, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=[],                                   favor_sectors_by=[],         )
-        if run_st:          sss.sss_run(reference_run=reference_run_st,     sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, csv_db_path='None', db_filename='None', read_all_country_symbols=sss_config.ALL_COUNTRY_SYMBOLS_ST,  tase_mode=0, num_threads=1, market_cap_included=1, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, pi_limit=0, enterprise_value_millions_usd_limit=5, research_mode_max_ev=False, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=[],                                   favor_sectors_by=[],         )
+        if run_custom_tase: sss.sss_run(reference_run=reference_run_tase,   sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, csv_db_path='None', db_filename='None', read_all_country_symbols=sss_config.ALL_COUNTRY_SYMBOLS_OFF, tase_mode=1, num_threads=1, market_cap_included=1, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, pb_limit=0, pi_limit=0, enterprise_value_millions_usd_limit=5, research_mode_max_ev=False, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=[],                                   favor_sectors_by=[],         custom_portfolio=sss_config.custom_portfolio_tase)
+        if run_custom:      sss.sss_run(reference_run=reference_run_custom, sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, csv_db_path='None', db_filename='None', read_all_country_symbols=sss_config.ALL_COUNTRY_SYMBOLS_OFF, tase_mode=0, num_threads=1, market_cap_included=1, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, pb_limit=0, pi_limit=0, enterprise_value_millions_usd_limit=5, research_mode_max_ev=False, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=[],                                   favor_sectors_by=[],         custom_portfolio=sss_config.custom_portfolio)
+        if run_tase:        sss.sss_run(reference_run=reference_run_tase,   sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, csv_db_path='None', db_filename='None', read_all_country_symbols=sss_config.ALL_COUNTRY_SYMBOLS_OFF, tase_mode=1, num_threads=1, market_cap_included=1, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, pb_limit=0, pi_limit=0, enterprise_value_millions_usd_limit=1, research_mode_max_ev=False, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=['Technology', 'Real Estate'       ], favor_sectors_by=[3.0,  1.0],)
+        if run_nsr:         sss.sss_run(reference_run=reference_run_nsr,    sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, csv_db_path='None', db_filename='None', read_all_country_symbols=sss_config.ALL_COUNTRY_SYMBOLS_OFF, tase_mode=0, num_threads=1, market_cap_included=1, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, pb_limit=0, pi_limit=0, enterprise_value_millions_usd_limit=5, research_mode_max_ev=False, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[3.0,  0.75])
+        if run_all:         sss.sss_run(reference_run=reference_run_all,    sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, csv_db_path='None', db_filename='None', read_all_country_symbols=sss_config.ALL_COUNTRY_SYMBOLS_US,  tase_mode=0, num_threads=1, market_cap_included=1, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, pb_limit=0, pi_limit=0, enterprise_value_millions_usd_limit=5, research_mode_max_ev=False, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[3.0,  0.75])
+        if run_six:         sss.sss_run(reference_run=reference_run_six,    sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, csv_db_path='None', db_filename='None', read_all_country_symbols=sss_config.ALL_COUNTRY_SYMBOLS_SIX, tase_mode=0, num_threads=1, market_cap_included=1, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, pb_limit=0, pi_limit=0, enterprise_value_millions_usd_limit=5, research_mode_max_ev=False, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=[],                                   favor_sectors_by=[],         )
+        if run_st:          sss.sss_run(reference_run=reference_run_st,     sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, csv_db_path='None', db_filename='None', read_all_country_symbols=sss_config.ALL_COUNTRY_SYMBOLS_ST,  tase_mode=0, num_threads=1, market_cap_included=1, research_mode=0, profit_margin_limit=0.0001, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, pb_limit=0, pi_limit=0, enterprise_value_millions_usd_limit=5, research_mode_max_ev=False, price_to_earnings_limit=10e9, enterprise_value_to_revenue_limit=10e9, favor_sectors=[],                                   favor_sectors_by=[],         )
     else:                   # Research Mode:
         if run_tase:
             if not sss_config.aggregate_only:
                 for db_filename in DB_FILENAMES:
+                    pb_range_tase          = get_range(csv_db_path=new_run_tase, db_filename=db_filename, column_name='price_to_book',           num_sections=5, reverse=1, pop_1st_percentile_range=False)  # TODO: ASAFR: Revisit this - perhaps no popping required for non-TASE as well?
                     pi_range_tase          = get_range(csv_db_path=new_run_tase, db_filename=db_filename, column_name='held_percent_insiders',   num_sections=3, reverse=0, pop_1st_percentile_range=False)
                     ev_range_tase          = get_range(csv_db_path=new_run_tase, db_filename=db_filename, column_name='enterprise_value',        num_sections=4, reverse=0, pop_1st_percentile_range=False)
                     pe_range_tase          = get_range(csv_db_path=new_run_tase, db_filename=db_filename, column_name='pe_effective',            num_sections=5, reverse=1, pop_1st_percentile_range=False)
@@ -467,13 +535,14 @@ def execute():
                     ev_millions_range_tase = [int(  ev/1000000                       ) for ev in ev_range_tase       ]
                     pm_range_tase          = [round(pm*100,    sss.NUM_ROUND_DECIMALS) for pm in pm_ratios_range_tase]
 
-                    research_db(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, pi_range=pi_range_tase, research_mode_max_ev=research_mode_max_ev, ev_millions_range=ev_millions_range_tase, pe_range=pe_range_tase, evr_range=evr_range_tase, pm_range=pm_range_tase,   csv_db_path=new_run_tase, db_filename=db_filename,   read_all_country_symbols=sss_config.ALL_COUNTRY_SYMBOLS_OFF, scan_mode=SCAN_MODE_TASE, appearance_counter_min=RESEARCH_MODE_MIN_ENTRIES_LIMIT, appearance_counter_max=1000, favor_sectors=['Technology', 'Real Estate'], favor_sectors_by=[3.0, 1.0],
+                    research_db(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, pb_range=pb_range_tase, pi_range=pi_range_tase, research_mode_max_ev=research_mode_max_ev, ev_millions_range=ev_millions_range_tase, pe_range=pe_range_tase, evr_range=evr_range_tase, pm_range=pm_range_tase,   csv_db_path=new_run_tase, db_filename=db_filename,   read_all_country_symbols=sss_config.ALL_COUNTRY_SYMBOLS_OFF, scan_mode=SCAN_MODE_TASE, appearance_counter_min=RESEARCH_MODE_MIN_ENTRIES_LIMIT, appearance_counter_max=1000, favor_sectors=['Technology', 'Real Estate'], favor_sectors_by=[3.0, 1.0],
                                 newer_path=new_run_tase, older_path=reference_run_tase, db_exists_in_both_folders=1, diff_only_result=1, movement_threshold=0, res_length=400)
             aggregate_results(newer_path=new_run_tase, older_path=reference_run_tase, res_length=400, scan_mode=SCAN_MODE_TASE)
 
         if run_nsr:
             if not sss_config.aggregate_only:
                 for db_filename in DB_FILENAMES:
+                    pb_range_nsr          = get_range(csv_db_path=new_run_nsr, db_filename=db_filename, column_name='price_to_book',           num_sections=6, reverse=1)
                     pi_range_nsr          = get_range(csv_db_path=new_run_nsr, db_filename=db_filename, column_name='held_percent_insiders',   num_sections=4, reverse=0)
                     ev_range_nsr          = get_range(csv_db_path=new_run_nsr, db_filename=db_filename, column_name='enterprise_value',        num_sections=5, reverse=0)
                     pe_range_nsr          = get_range(csv_db_path=new_run_nsr, db_filename=db_filename, column_name='pe_effective',            num_sections=6, reverse=1)
@@ -483,13 +552,14 @@ def execute():
                     ev_millions_range_nsr = [int(  ev/1000000                       ) for ev in ev_range_nsr       ]
                     pm_range_nsr          = [round(pm*100,    sss.NUM_ROUND_DECIMALS) for pm in pm_ratios_range_nsr]
 
-                    research_db(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, pi_range=pi_range_nsr, research_mode_max_ev=research_mode_max_ev, ev_millions_range=ev_millions_range_nsr, pe_range=pe_range_nsr, evr_range=evr_range_nsr, pm_range=pm_range_nsr,  csv_db_path=new_run_nsr, db_filename=db_filename,   read_all_country_symbols=sss_config.ALL_COUNTRY_SYMBOLS_OFF, scan_mode=SCAN_MODE_NSR, appearance_counter_min=RESEARCH_MODE_MIN_ENTRIES_LIMIT, appearance_counter_max=5000, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[3.5, 0.75],
+                    research_db(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, pb_range=pb_range_nsr, pi_range=pi_range_nsr, research_mode_max_ev=research_mode_max_ev, ev_millions_range=ev_millions_range_nsr, pe_range=pe_range_nsr, evr_range=evr_range_nsr, pm_range=pm_range_nsr,  csv_db_path=new_run_nsr, db_filename=db_filename,   read_all_country_symbols=sss_config.ALL_COUNTRY_SYMBOLS_OFF, scan_mode=SCAN_MODE_NSR, appearance_counter_min=RESEARCH_MODE_MIN_ENTRIES_LIMIT, appearance_counter_max=5000, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[3.5, 0.75],
                                 newer_path=new_run_nsr, older_path=reference_run_nsr, db_exists_in_both_folders=1, diff_only_result=1, movement_threshold=0, res_length=800)
             aggregate_results(newer_path=new_run_nsr, older_path=reference_run_nsr, res_length=800, scan_mode=SCAN_MODE_NSR)
 
         if run_all:
             if not sss_config.aggregate_only:
                 for db_filename in DB_FILENAMES:
+                    pb_range_all          = get_range(csv_db_path=new_run_all, db_filename=db_filename, column_name='price_to_book',            num_sections=7, reverse=1)
                     pi_range_all          = get_range(csv_db_path=new_run_all, db_filename=db_filename, column_name='held_percent_insiders',    num_sections=5, reverse=0)
                     ev_range_all          = get_range(csv_db_path=new_run_all, db_filename=db_filename, column_name='enterprise_value',         num_sections=6, reverse=0)
                     pe_range_all          = get_range(csv_db_path=new_run_all, db_filename=db_filename, column_name='pe_effective',             num_sections=7, reverse=1)
@@ -499,13 +569,14 @@ def execute():
                     ev_millions_range_all = [int(  ev/1000000                       ) for ev in ev_range_all       ]
                     pm_range_all          = [round(pm*100,    sss.NUM_ROUND_DECIMALS) for pm in pm_ratios_range_all]
 
-                    research_db(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, pi_range=pi_range_all, research_mode_max_ev=research_mode_max_ev, ev_millions_range=ev_millions_range_all, pe_range=pe_range_all, evr_range=evr_range_all, pm_range=pm_range_all, csv_db_path=new_run_all, db_filename=db_filename, read_all_country_symbols=sss_config.ALL_COUNTRY_SYMBOLS_US, scan_mode=SCAN_MODE_ALL, appearance_counter_min=RESEARCH_MODE_MIN_ENTRIES_LIMIT, appearance_counter_max=50000, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[3.5, 0.75],
+                    research_db(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, pb_range=pb_range_all, pi_range=pi_range_all, research_mode_max_ev=research_mode_max_ev, ev_millions_range=ev_millions_range_all, pe_range=pe_range_all, evr_range=evr_range_all, pm_range=pm_range_all, csv_db_path=new_run_all, db_filename=db_filename, read_all_country_symbols=sss_config.ALL_COUNTRY_SYMBOLS_US, scan_mode=SCAN_MODE_ALL, appearance_counter_min=RESEARCH_MODE_MIN_ENTRIES_LIMIT, appearance_counter_max=50000, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[3.5, 0.75],
                                 newer_path=new_run_all, older_path=reference_run_all, db_exists_in_both_folders=1, diff_only_result=1, movement_threshold=0, res_length=1000)
             aggregate_results(newer_path=new_run_all, older_path=reference_run_all, res_length=1000, scan_mode=SCAN_MODE_ALL)
 
         if run_six:
             if not sss_config.aggregate_only:
                 for db_filename in DB_FILENAMES:
+                    pb_range_six          = get_range(csv_db_path=new_run_six, db_filename=db_filename, column_name='price_to_book',            num_sections=3, reverse=1)
                     pi_range_six          = get_range(csv_db_path=new_run_six, db_filename=db_filename, column_name='held_percent_insiders',    num_sections=2, reverse=0)
                     ev_range_six          = get_range(csv_db_path=new_run_six, db_filename=db_filename, column_name='enterprise_value',         num_sections=2, reverse=0)
                     pe_range_six          = get_range(csv_db_path=new_run_six, db_filename=db_filename, column_name='pe_effective',             num_sections=3, reverse=1)
@@ -515,13 +586,14 @@ def execute():
                     ev_millions_range_six = [int(  ev/1000000                       ) for ev in ev_range_six       ]
                     pm_range_six          = [round(pm*100,    sss.NUM_ROUND_DECIMALS) for pm in pm_ratios_range_six]
 
-                    research_db(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, pi_range=pi_range_six, research_mode_max_ev=research_mode_max_ev, ev_millions_range=ev_millions_range_six, pe_range=pe_range_six, evr_range=evr_range_six, pm_range=pm_range_six, csv_db_path=new_run_six, db_filename=db_filename, read_all_country_symbols=sss_config.ALL_COUNTRY_SYMBOLS_SIX, scan_mode=SCAN_MODE_SIX, appearance_counter_min=RESEARCH_MODE_MIN_ENTRIES_LIMIT/2, appearance_counter_max=50000, favor_sectors=[], favor_sectors_by=[],
+                    research_db(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, pb_range=pb_range_six, pi_range=pi_range_six, research_mode_max_ev=research_mode_max_ev, ev_millions_range=ev_millions_range_six, pe_range=pe_range_six, evr_range=evr_range_six, pm_range=pm_range_six, csv_db_path=new_run_six, db_filename=db_filename, read_all_country_symbols=sss_config.ALL_COUNTRY_SYMBOLS_SIX, scan_mode=SCAN_MODE_SIX, appearance_counter_min=RESEARCH_MODE_MIN_ENTRIES_LIMIT/2, appearance_counter_max=50000, favor_sectors=[], favor_sectors_by=[],
                                 newer_path=new_run_six, older_path=reference_run_six, db_exists_in_both_folders=1, diff_only_result=1, movement_threshold=0, res_length=1000)
             aggregate_results(newer_path=new_run_six, older_path=reference_run_six, res_length=1000, scan_mode=SCAN_MODE_SIX)
 
         if run_st:
             if not sss_config.aggregate_only:
                 for db_filename in DB_FILENAMES:
+                    pb_range_st          = get_range(csv_db_path=new_run_st, db_filename=db_filename, column_name='price_to_book',            num_sections=3, reverse=1)
                     pi_range_st          = get_range(csv_db_path=new_run_st, db_filename=db_filename, column_name='held_percent_insiders',    num_sections=3, reverse=0)
                     ev_range_st          = get_range(csv_db_path=new_run_st, db_filename=db_filename, column_name='enterprise_value',         num_sections=3, reverse=0)
                     pe_range_st          = get_range(csv_db_path=new_run_st, db_filename=db_filename, column_name='pe_effective',             num_sections=3, reverse=1)
@@ -531,13 +603,14 @@ def execute():
                     ev_millions_range_st = [int(  ev/1000000                       ) for ev in ev_range_st       ]
                     pm_range_st          = [round(pm*100,    sss.NUM_ROUND_DECIMALS) for pm in pm_ratios_range_st]
 
-                    research_db(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, pi_range=pi_range_st, research_mode_max_ev=research_mode_max_ev, ev_millions_range=ev_millions_range_st, pe_range=pe_range_st, evr_range=evr_range_st, pm_range=pm_range_st, csv_db_path=new_run_st, db_filename=db_filename, read_all_country_symbols=sss_config.ALL_COUNTRY_SYMBOLS_ST, scan_mode=SCAN_MODE_ST, appearance_counter_min=RESEARCH_MODE_MIN_ENTRIES_LIMIT, appearance_counter_max=50000, favor_sectors=[], favor_sectors_by=[],
+                    research_db(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, pb_range=pb_range_st, pi_range=pi_range_st, research_mode_max_ev=research_mode_max_ev, ev_millions_range=ev_millions_range_st, pe_range=pe_range_st, evr_range=evr_range_st, pm_range=pm_range_st, csv_db_path=new_run_st, db_filename=db_filename, read_all_country_symbols=sss_config.ALL_COUNTRY_SYMBOLS_ST, scan_mode=SCAN_MODE_ST, appearance_counter_min=RESEARCH_MODE_MIN_ENTRIES_LIMIT, appearance_counter_max=50000, favor_sectors=[], favor_sectors_by=[],
                                 newer_path=new_run_st, older_path=reference_run_st, db_exists_in_both_folders=1, diff_only_result=1, movement_threshold=0, res_length=1000)
             aggregate_results(newer_path=new_run_st, older_path=reference_run_st, res_length=1000, scan_mode=SCAN_MODE_ST)
 
         if run_custom:
             if not sss_config.aggregate_only:
                 for db_filename in DB_FILENAMES:
+                    pb_range_custom          = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='price_to_book',            num_sections=4, reverse=1)
                     pi_range_custom          = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='held_percent_insiders',    num_sections=3, reverse=0)
                     ev_range_custom          = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='enterprise_value',         num_sections=3, reverse=0)
                     pe_range_custom          = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='pe_effective',             num_sections=4, reverse=1)
@@ -547,7 +620,7 @@ def execute():
                     ev_millions_range_custom = [int(  ev/1000000                       ) for ev in ev_range_custom       ]
                     pm_range_custom          = [round(pm*100,    sss.NUM_ROUND_DECIMALS) for pm in pm_ratios_range_custom]
 
-                    research_db(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, pi_range=pi_range_custom, research_mode_max_ev=research_mode_max_ev, ev_millions_range=ev_millions_range_custom, pe_range=pe_range_custom, evr_range=evr_range_custom, pm_range=pm_range_custom, csv_db_path=new_run_custom, db_filename=db_filename, read_all_country_symbols=sss_config.ALL_COUNTRY_SYMBOLS_US, scan_mode=SCAN_MODE_CUSTOM, appearance_counter_min=RESEARCH_MODE_MIN_ENTRIES_LIMIT, appearance_counter_max=50000, favor_sectors=[], favor_sectors_by=[],
+                    research_db(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, pb_range=pb_range_custom, pi_range=pi_range_custom, research_mode_max_ev=research_mode_max_ev, ev_millions_range=ev_millions_range_custom, pe_range=pe_range_custom, evr_range=evr_range_custom, pm_range=pm_range_custom, csv_db_path=new_run_custom, db_filename=db_filename, read_all_country_symbols=sss_config.ALL_COUNTRY_SYMBOLS_US, scan_mode=SCAN_MODE_CUSTOM, appearance_counter_min=RESEARCH_MODE_MIN_ENTRIES_LIMIT, appearance_counter_max=50000, favor_sectors=[], favor_sectors_by=[],
                                 newer_path=new_run_custom, older_path=reference_run_custom, db_exists_in_both_folders=1, diff_only_result=1, movement_threshold=0, res_length=1000)
             aggregate_results(newer_path=new_run_custom, older_path=reference_run_custom, res_length=1000, scan_mode=SCAN_MODE_CUSTOM)
 
