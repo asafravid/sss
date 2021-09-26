@@ -49,15 +49,15 @@ automatic_results_folder_selection = False
 # The research mode shall run on new_run as input (new_run >= reference_run) where > means newer
 reference_run_custom = 'Results/Custom/20210909-154648_Bdb_nRes309_Custom'
 reference_run_tase   = 'Results/Tase/20210924-100244_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes332'
-reference_run_nsr    = 'Results/Nsr/20210912-133814_Tchnlgy3.0_FnnclSrvcs0.5_Bdb_nRes889'
-reference_run_all    = 'Results/All/20210912-092015_Tchnlgy3.0_FnnclSrvcs0.5_A_Bdb_nRes3409'
+reference_run_nsr    = 'Results/Nsr/20210926-093332_Tchnlgy3.0_FnnclSrvcs0.75_Bdb_nRes898'
+reference_run_all    = 'Results/All/20210926-043839_Tchnlgy3.0_FnnclSrvcs0.75_A_Bdb_nRes3441'
 reference_run_six    = 'Results/Six/20210919-072727_S_Bdb_nRes30'
 reference_run_st     = 'Results/St/20210915-023602_St_Bdb_nRes130'
 
 new_run_custom = 'Results/Custom/20210917-201728_Bdb_nRes312_Custom'
 new_run_tase   = 'Results/Tase/20210924-100244_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes332'
 new_run_nsr    = 'Results/Nsr/20210926-093332_Tchnlgy3.0_FnnclSrvcs0.75_Bdb_nRes898'
-new_run_all    = 'Results/All/20210922-102955_Tchnlgy3.0_FnnclSrvcs0.75_A_Bdb_nRes3449'
+new_run_all    = 'Results/All/20210926-043839_Tchnlgy3.0_FnnclSrvcs0.75_A_Bdb_nRes3441'
 new_run_six    = 'Results/Six/20210920-174034_S_Bdb_nRes30'
 new_run_st     = 'Results/St/20210915-023602_St_Bdb_nRes130'
 
