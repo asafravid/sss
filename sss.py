@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.57 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.58 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -142,6 +142,7 @@ EV_TO_EBITDA_MAX_UNKNOWN = 100000
 # TODO: ASAFR: (https://www.gurufocus.com/letter.php)
 #              1. Add Free Cash Flow
 #              2. Lower Market Cap - Give more weight (in multi-dimensional scan)
+#              3. Start adjusting the normalized sss_value flow - those companies which are "deceiving" -> fix according to them
 
 @dataclass
 class StockData:

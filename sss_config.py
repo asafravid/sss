@@ -29,8 +29,8 @@ ALL_COUNTRY_SYMBOLS_ST  = 3  # Swedish (Stockholm) Stock Exchange
 
 run_custom_tase      = False   # Custom Portfolio
 run_custom           = False
-run_tase             = False    # Tel Aviv Stock Exchange
-run_nsr              = True   # NASDAQ100+S&P500+RUSSEL1000
+run_tase             = True    # Tel Aviv Stock Exchange
+run_nsr              = False   # NASDAQ100+S&P500+RUSSEL1000
 run_all              = False   # All Nasdaq Stocks
 run_six              = False    # All Swiss Stocks
 run_st               = False    # All (Stockholm) Swedish Stocks
@@ -48,14 +48,14 @@ automatic_results_folder_selection = False
 # After 1st ever Run: Recommended to use reference (filter and damper)
 # The research mode shall run on new_run as input (new_run >= reference_run) where > means newer
 reference_run_custom = 'Results/Custom/20210909-154648_Bdb_nRes309_Custom'
-reference_run_tase   = 'Results/Tase/20210924-100244_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes332'
+reference_run_tase   = 'Results/Tase/20211001-103934_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes335'
 reference_run_nsr    = 'Results/Nsr/20210926-093332_Tchnlgy3.0_FnnclSrvcs0.75_Bdb_nRes898'
 reference_run_all    = 'Results/All/20210926-043839_Tchnlgy3.0_FnnclSrvcs0.75_A_Bdb_nRes3441'
 reference_run_six    = 'Results/Six/20210919-072727_S_Bdb_nRes30'
 reference_run_st     = 'Results/St/20210915-023602_St_Bdb_nRes130'
 
 new_run_custom = 'Results/Custom/20210917-201728_Bdb_nRes312_Custom'
-new_run_tase   = 'Results/Tase/20210924-100244_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes332'
+new_run_tase   = 'Results/Tase/20211001-103934_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes335'
 new_run_nsr    = 'Results/Nsr/20210926-093332_Tchnlgy3.0_FnnclSrvcs0.75_Bdb_nRes898'
 new_run_all    = 'Results/All/20210926-043839_Tchnlgy3.0_FnnclSrvcs0.75_A_Bdb_nRes3441'
 new_run_six    = 'Results/Six/20210920-174034_S_Bdb_nRes30'
