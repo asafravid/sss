@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.47 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.48 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -35,6 +35,7 @@ import cProfile
 DB_FILENAMES = ['sss_engine.csv', 'sss_engine_normalized.csv']  # 'db.csv' -> but faster with 9so hence use) sss_engine.csv
 
 # TODO: ASAFR: 1. read_csv in pandas, and then .describe() and .quantiles() will provide mean, std and percentiles for all the columns (sss_engine.csv and/or db.csv)
+#              2. Calculate the angle (dericative) of the Profit margin change over years and quarters and apply a bonus relative to the slope
 PDF_NUM_ENTRIES_IN_REPORT       = 49
 RESEARCH_MODE_MIN_ENTRIES_LIMIT = 7
 
