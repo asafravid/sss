@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.58 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.59 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -120,9 +120,9 @@ PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE             = 2.25   # Pro
 PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_POSITIVE                = 2.75   # Provide a "bonus" for companies whose profit margins have been continuously positive annually
 PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_POSITIVE             = 2.75   # Provide a "bonus" for companies whose profit margins have been continuously positive quarterly
 PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_EARNINGS    = 3.25   # Provide a "bonus" for companies whose earnings       have been continuously increasing annually
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_REVENUE     = 2.75   # Provide a "bonus" for companies whose revenue        has  been continuously increasing annually
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_REVENUE     = 7.77   # Provide a "bonus" for companies whose revenue        has  been continuously increasing annually - TODO: ASAFR: This is a very good indicator for stock value growth
 PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_EARNINGS = 3.25   # Provide a "bonus" for companies whose earnings       have been continuously increasing quarterly
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_REVENUE  = 2.75   # Provide a "bonus" for companies whose revenue        has  been continuously increasing quarterly
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_REVENUE  = 9.99   # Provide a "bonus" for companies whose revenue        has  been continuously increasing quarterly - TODO: ASAFR: This is a very good indicator for stock value growth
 PROFIT_MARGIN_DUPLICATION_FACTOR                                  = 8.0    # When copying profit margin (if either quarterized/annualized/profit_margin is missing) - devide by this factor
 NEGATIVE_CFO_FACTOR                                               = 10000.0   #
 NEGATIVE_PEG_RATIO_FACTOR                                         = 100000.0
