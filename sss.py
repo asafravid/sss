@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.59 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.60 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -1408,6 +1408,13 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                             stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_inc_earnings or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_EARNINGS
                             stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_inc_revenue  or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_REVENUE
                             stock_data.annualized_profit_margin       *= stock_data.annualized_profit_margin_boost
+                        elif stock_data.annualized_profit_margin < 0:
+                            stock_data.annualized_profit_margin_boost  = 1.0 if not boost_cont_inc_ratio    or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE
+                            stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_inc_pos      or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_POSITIVE
+                            stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_inc_earnings or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_EARNINGS
+                            stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_inc_revenue  or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_REVENUE
+                            stock_data.annualized_profit_margin       /= stock_data.annualized_profit_margin_boost
+
                 except Exception as e:
                     print("Exception in {} annualized_profit_margin: {}".format(stock_data.symbol, e))
                     stock_data.annualized_profit_margin = None
@@ -1833,7 +1840,7 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
         if VERBOSE_LOGS: print("[{} {}]".format(__name__, 20))
 
         # if no effective_ev_to_ebitda, use earnings.
-        if (stock_data.effective_ev_to_ebitda is None or stock_data.effective_ev_to_ebitda < 0) and stock_data.enterprise_value != None and stock_data.enterprise_value != 0 and stock_data.effective_earnings != None and stock_data.effective_earnings != 0:
+        if stock_data.effective_ev_to_ebitda is None and stock_data.enterprise_value != None and stock_data.enterprise_value != 0 and stock_data.effective_earnings != None and stock_data.effective_earnings != 0:
             stock_data.effective_ev_to_ebitda = float(stock_data.enterprise_value) / stock_data.effective_earnings  #  effective_earnings is already in USD
 
         if stock_data.effective_ev_to_ebitda != None:
