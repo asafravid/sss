@@ -1952,7 +1952,7 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                 stock_data.pe_effective = stock_data.effective_price_to_earnings
 
             if   stock_data.profit_margin            is None and stock_data.annualized_profit_margin is None and stock_data.quarterized_profit_margin is None:
-                stock_data.profit_margin             = stock_data.annualized_profit_margin  = stock_data.quarterized_profit_margin = PROFIT_MARGIN_UNKNOWN
+                 stock_data.profit_margin            = stock_data.annualized_profit_margin  = stock_data.quarterized_profit_margin = PROFIT_MARGIN_UNKNOWN
             elif stock_data.profit_margin            is None and stock_data.annualized_profit_margin is None                                                 :
                  stock_data.profit_margin            = stock_data.annualized_profit_margin  = stock_data.quarterized_profit_margin/PROFIT_MARGIN_DUPLICATION_FACTOR
             elif stock_data.annualized_profit_margin is None and stock_data.quarterized_profit_margin is None:
