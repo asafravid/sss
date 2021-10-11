@@ -70,6 +70,7 @@ BLL,Ball Corp
 BMY,Bristol-Myers Squibb Company
 BR,Broadridge Financial Solutions Llc
 BRK.B,Berkshire Hathaway Cl B
+BRO,Brown & Brown
 BSX,Boston Scientific Corp
 BWA,Borgwarner Inc
 BXP,Boston Properties
@@ -83,6 +84,7 @@ CBOE,CBOE Global Markets Inc
 CBRE,CBRE Group Inc
 CCI,Crown Castle International Corp
 CCL,Carnival Corp
+CDAY,Ceridian Hcm Holding Inc
 CDNS,Cadence Design Sys
 CDW,CDW Corp
 CE,Celanese Corp
@@ -105,7 +107,6 @@ CMS,Cms Energy Corp
 CNC,Centene Corp
 CNP,Centerpoint Energy Inc
 COF,Capital One Financial Corp
-COG,Cabot Oil & Gas Corp
 COO,Cooper Companies
 COP,Conocophillips
 COST,Costco Wholesale
@@ -319,9 +320,9 @@ MSCI,MSCI Inc
 MSFT,Microsoft Corp
 MSI,Motorola Solutions
 MTB,M&T Bank Corp
+MTCH,Match Group Inc
 MTD,Mettler-Toledo International
 MU,Micron Technology
-MXIM,Maxim Integrated
 NCLH,Norwegian Cruise Ord
 NDAQ,Nasdaq Inc
 NEE,Nextera Energy
@@ -332,7 +333,6 @@ NKE,Nike Inc
 NLOK,Nortonlifelock Inc
 NLSN,Nielsen Holdings Plc
 NOC,Northrop Grumman Corp
-NOV,Nov Inc
 NOW,Servicenow Inc
 NRG,NRG Energy
 NSC,Norfolk Southern Corp
@@ -378,7 +378,6 @@ PNW,Pinnacle West Capital Corp
 POOL,Pool Corp
 PPG,PPG Industries
 PPL,PPL Corp
-PRGO,Perrigo Company
 PRU,Prudential Financial Inc
 PSA,Public Storage
 PSX,Phillips 66
@@ -431,6 +430,7 @@ T,AT&T Inc
 TAP,Molson Coors Brewing Company
 TDG,Transdigm Group Inc
 TDY,Teledyne Technologies Inc
+TECH,Bio-Techne Cp
 TEL,Te Connectivity Ltd
 TER,Teradyne Inc
 TFC,Truist Financial Corp
@@ -459,7 +459,6 @@ UDR,United Dominion Realty Trust
 UHS,Universal Health Services
 ULTA,Ulta Beauty Inc
 UNH,Unitedhealth Group Inc
-UNM,Unumprovident Corp
 UNP,Union Pacific Corp
 UPS,United Parcel Service
 URI,United Rentals

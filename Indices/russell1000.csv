@@ -71,7 +71,6 @@ APD,Air Products and Chemicals
 APH,Amphenol Corp
 APO,Apollo Global Management Llc C
 APTV,Aptiv Plc
-ARD,Ardagh Group S.A.
 ARE,Alexandria Real Estate Equities
 ARES,Ares Management LP
 ARMK,Aramark Holdings Corp
@@ -103,6 +102,7 @@ BA,Boeing Company
 BAC,Bank of America Corp
 BAH,Booz Allen Hamilton Holding Corp
 BAX,Baxter International Inc
+BBWI,Bath & Body Works Inc
 BBY,Best Buy Company
 BC,Brunswick Corp
 BDX,Becton Dickinson and Company
@@ -201,10 +201,10 @@ CMI,Cummins Inc
 CMS,Cms Energy Corp
 CNA,Cna Financial Corp
 CNC,Centene Corp
+CNM,Core & Main Inc Cl A
 CNP,Centerpoint Energy Inc
 CNXC,Concentrix Corp
 COF,Capital One Financial Corp
-COG,Cabot Oil & Gas Corp
 COHR,Coherent Inc
 COLD,Americold Realty Trust
 COLM,Columbia Sprtswr
@@ -222,7 +222,6 @@ CPRI,Capri Holdings Ltd
 CPRT,Copart Inc
 CPT,Camden Property Trust
 CR,Crane Company
-CREE,Cree Inc
 CRI,Carter's Inc
 CRL,Charles River Laboratories Intl
 CRM,Salesforce.com Inc
@@ -345,11 +344,11 @@ FCX,Freeport-Mcmoran Inc
 FDS,Factset Research Systems Inc
 FDX,Fedex Corp
 FE,Firstenergy Corp
-FEYE,Fireeye Inc
 FFIV,F5 Networks Inc
 FHB,First Hawaiian Inc
 FHN,First Horizon Corp
 FICO,Fair Isaac and Company
+FIGS,Figs Inc Cl A
 FIS,Fidelity National Information Services
 FISV,Fiserv Inc
 FITB,Fifth Third Bancorp
@@ -402,12 +401,12 @@ GPC,Genuine Parts Company
 GPK,Graphic Packaging Holding Company
 GPN,Global Payments Inc
 GPS,Gap Inc
-GRA,W.R. Grace & Company
 GRMN,Garmin Ltd
 GS,Goldman Sachs Group
 GTES,Gates Industrial Corp Plc
 GWRE,Guidewire Software Inc
 GWW,W.W. Grainger
+GXO,Gxo Logistics Inc
 H,Hyatt Hotels Corp
 HAIN,Hain Celestial Group
 HAL,Halliburton Company
@@ -522,7 +521,7 @@ LBRDA,Liberty Broadbd A
 LBRDK,Liberty Broadbd C
 LDOS,Leidos Holdings Inc
 LEA,Lear Corp
-LECO,Lincoln Elec Hld
+LECO,Lincoln Elec Holdings
 LEG,Leggett & Platt Inc
 LEN,Lennar Corp
 LEN.B,Lennar Corp Cl B
@@ -531,7 +530,7 @@ LFUS,Littelfuse Inc
 LH,Laboratory Corp of America Holdings
 LHX,L3Harris Technologies Inc
 LII,Lennox International
-LITE,Lumentum Hld
+LITE,Lumentum Holdings
 LKQ,LKQ Corp
 LLY,Eli Lilly and Company
 LMND,Lemonade Inc
@@ -541,7 +540,7 @@ LNG,Cheniere Energy
 LNT,Alliant Energy Corp
 LOPE,Grand Canyon Educati
 LOW,Lowe's Companies
-LPLA,Lpl Financial Hld
+LPLA,Lpl Financial Holdings
 LPX,Louisiana-Pacific Corp
 LRCX,Lam Research Corp
 LSI,Life Storage
@@ -556,6 +555,7 @@ LW,Lamb Weston Holdings Inc
 LYB,Lyondellbasell Industries NV
 LYFT,Lyft Inc Cl A
 LYV,Live Nation Entertainment
+LZ,Legalzoom.com Inc
 MA,Mastercard Inc
 MAA,Mid-America Apartment Communities
 MAN,Manpower Inc
@@ -569,6 +569,7 @@ MCFE,Mcafee Corp Cl A
 MCHP,Microchip Technology
 MCK,Mckesson Corp
 MCO,Moody's Corp
+MCW,Mister Car Wash Inc
 MCY,Mercury General Corp
 MDB,Mongodb Inc Cl A
 MDLA,Medallia Inc
@@ -616,7 +617,6 @@ MTG,Mgic Investment Corp
 MTN,Vail Resorts
 MTZ,Mastec Inc
 MU,Micron Technology
-MXIM,Maxim Integrated
 NABL,N-Able Inc
 NATI,Natl Instruments Cor
 NBIX,Neurocrine Bioscienc
@@ -697,7 +697,8 @@ PB,Prosperity Bancshares
 PBCT,People's United Finl
 PCAR,Paccar Inc
 PCG,Pacific Gas & Electric Company
-PCTY,Paylocity Hld Corp
+PCOR,Procore Technologies Inc
+PCTY,Paylocity Holdings Corp
 PEAK,Healthpeak Properties Inc
 PEG,Public Service Enterprise Group Inc
 PEGA,Pegasystems Inc
@@ -706,7 +707,6 @@ PENN,Penn Natl Gaming Inc
 PEP,Pepsico Inc
 PFE,Pfizer Inc
 PFG,Principal Financial Group Inc
-PFPT,Proofpoint Inc
 PG,Procter & Gamble Company
 PGR,Progressive Corp
 PH,Parker-Hannifin Corp
@@ -747,6 +747,7 @@ PTON,Peloton Interactive Inc
 PVH,Phillips-Van Heusen Corp
 PWR,Quanta Services
 PXD,Pioneer Natural Resources Company
+PYCR,Paycor Hcm Inc
 PYPL,Paypal Holdings
 QCOM,Qualcomm Inc
 QDEL,Quidel Cp
@@ -756,7 +757,6 @@ QRVO,Qorvo Inc
 QS,Quantumscape Corp
 R,Ryder System
 RARE,Ultragenyx Pharmaceu
-RBC,Regal-Beloit Corp
 RCL,Royal Caribbean Cruises Ltd
 RE,Everest Re Group
 REG,Regency Centers Corp
@@ -953,6 +953,7 @@ VRSN,Verisign Inc
 VRT,Vertiv Holdings Llc.
 VRTX,Vertex Pharmaceutic
 VSAT,Viasat Inc
+VSCO,Victorias Secret & CO
 VST,Vistra Energy Corp
 VTR,Ventas Inc
 VTRS,Viatris Inc
@@ -996,6 +997,5 @@ WWE,World Wrestling Entertainment
 WY,Weyerhaeuser Company
 WYNN,Wynn Resorts Ltd
 X,United States Steel Corp
-XEC,Cimarex Energy Company
 XEL,XCEL Energy Inc
 XLNX,Xilinx Inc
