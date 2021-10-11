@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.61 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.62 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -2170,7 +2170,7 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
                                         min_val = max_val = float(row_to_append[index])
                                     diff = abs(max_val-min_val)
                                     # TODO: ASAFR: 52-week change is not really working and not really needed - fix or eliminate
-                                    indices_list_to_ignore_changes_in = [g_sss_value_index, g_financial_currency_index, g_summary_currency_index] # [g_fifty_two_week_change_index, g_sss_value_index, g_two_hundred_day_average_index, g_previous_close_percentage_from_200d_ma_index]
+                                    indices_list_to_ignore_changes_in = [g_sss_value_index, g_financial_currency_index, g_summary_currency_index, g_quarterized_profit_margin_boost_index, g_annualized_profit_margin_boost_index] # [g_fifty_two_week_change_index, g_sss_value_index, g_two_hundred_day_average_index, g_previous_close_percentage_from_200d_ma_index]
                                     if diff > abs(max_val)*REFERENCE_DB_MAX_VALUE_DIFF_FACTOR_THRESHOLD and index not in indices_list_to_ignore_changes_in:
                                         if 0.0 < float(reference_db[symbol_index_in_reference_db][g_sss_value_index]) < float(row_to_append[g_sss_value_index]):
                                             found_differences = True
