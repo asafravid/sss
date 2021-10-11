@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.52 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.53 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -30,11 +30,11 @@ ALL_COUNTRY_SYMBOLS_ST  = 3  # Swedish (Stockholm) Stock Exchange
 run_custom_tase      = False   # Custom Portfolio
 run_custom           = False
 run_tase             = False    # Tel Aviv Stock Exchange
-run_nsr              = False   # NASDAQ100+S&P500+RUSSEL1000
-run_all              = True   # All Nasdaq Stocks
+run_nsr              = True   # NASDAQ100+S&P500+RUSSEL1000
+run_all              = False   # All Nasdaq Stocks
 run_six              = False    # All Swiss Stocks
 run_st               = False    # All (Stockholm) Swedish Stocks
-research_mode        = True     # Research Mode
+research_mode        = False     # Research Mode
 aggregate_only       = False
 research_mode_max_ev = False   # @JustLearning's suggestion in Telegram: Multi-Dimensional Scan by Max EV Limit rather than Min EV Limit
 

@@ -115,14 +115,20 @@ NEGATIVE_ALTMAN_Z_FACTOR                     = 0.00001
 #              1. The rarety (statistically comapred to all the stocks in scan) - proportionaly to it (the rarest the case - the more boost)
 #              2. The ascent (slope) of the increase and the positive value -> the higher - the more boost
 #              3. Add similar boosters for other annual and quarterly weighted-averaged parameters
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE                = 2.75   # Provide a "bonus" for companies whose profit margins have increased continuously annually
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE                = 3.75   # Provide a "bonus" for companies whose profit margins have increased continuously annually
 PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE             = 2.25   # Provide a "bonus" for companies whose profit margins have increased continuously quarterly
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_POSITIVE                = 2.75   # Provide a "bonus" for companies whose profit margins have been continuously positive annually
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_POSITIVE                = 4.75   # Provide a "bonus" for companies whose profit margins have been continuously positive annually
 PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_POSITIVE             = 2.75   # Provide a "bonus" for companies whose profit margins have been continuously positive quarterly
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_EARNINGS    = 3.25   # Provide a "bonus" for companies whose earnings       have been continuously increasing annually
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_EARNINGS    = 4.25   # Provide a "bonus" for companies whose earnings       have been continuously increasing annually
 PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_REVENUE     = 7.77   # Provide a "bonus" for companies whose revenue        has  been continuously increasing annually - TODO: ASAFR: This is a very good indicator for stock value growth
 PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_EARNINGS = 3.25   # Provide a "bonus" for companies whose earnings       have been continuously increasing quarterly
 PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_REVENUE  = 9.99   # Provide a "bonus" for companies whose revenue        has  been continuously increasing quarterly - TODO: ASAFR: This is a very good indicator for stock value growth
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_DECREASE                = 0.1    # Provide a "bonus" for companies whose profit margins have decreased continuously annually
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_DECREASE             = 0.1    # Provide a "bonus" for companies whose profit margins have decreased continuously quarterly
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_DECREASE_IN_EARNINGS    = 0.1    # Provide a "bonus" for companies whose earnings       have been continuously decreasing annually
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_DECREASE_IN_REVENUE     = 0.1    # Provide a "bonus" for companies whose revenue        has  been continuously decreasing annually - TODO: ASAFR: This is a very good indicator for stock value growth
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_DECREASE_IN_EARNINGS = 0.1    # Provide a "bonus" for companies whose earnings       have been continuously decreasing quarterly
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_DECREASE_IN_REVENUE  = 0.1    # Provide a "bonus" for companies whose revenue        has  been continuously decreasing quarterly - TODO: ASAFR: This is a very good indicator for stock value growth
 PROFIT_MARGIN_DUPLICATION_FACTOR                                  = 8.0    # When copying profit margin (if either quarterized/annualized/profit_margin is missing) - devide by this factor
 NEGATIVE_CFO_FACTOR                                               = 10000.0   #
 NEGATIVE_PEG_RATIO_FACTOR                                         = 100000.0
@@ -1431,10 +1437,13 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                 last_ratio                = None
                 last_earnings             = None
                 last_revenue              = None
-                boost_cont_inc_ratio      = True # Will be set to True if there is a continuous increase in the profit   margin  TODO: ASAFR: Do the same boosting for cash flows ev_to_cfo
-                boost_cont_inc_pos        = True # Will be set to True if there is a continuous positive in the profit   margin
-                boost_cont_inc_earnings   = True # Will be set to True if there is a continuous increase in the earnings
-                boost_cont_inc_revenue    = True # Will be set to True if there is a continuous increase in the revenue
+                boost_cont_inc_ratio      = True # Will be set to (Final Value of) True if there is a continuous increase in the profit   margin  TODO: ASAFR: Do the same boosting for cash flows ev_to_cfo
+                boost_cont_inc_pos        = True # Will be set to (Final Value of) True if there is a continuous positive in the profit   margin
+                boost_cont_inc_earnings   = True # Will be set to (Final Value of) True if there is a continuous increase in the earnings
+                boost_cont_inc_revenue    = True # Will be set to (Final Value of) True if there is a continuous increase in the revenue
+                boost_cont_dec_ratio      = True # Will be set to (Final Value of) True if there is a continuous increase in the profit   margin  TODO: ASAFR: Do the same boosting for cash flows ev_to_cfo
+                boost_cont_dec_earnings   = True # Will be set to (Final Value of) True if there is a continuous increase in the earnings
+                boost_cont_dec_revenue    = True # Will be set to (Final Value of) True if there is a continuous increase in the revenue
                 try:
                     if VERBOSE_LOGS: print("[{} {}]".format(__name__, 5))
 
@@ -1449,6 +1458,9 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                                 boost_cont_inc_pos      = True if boost_cont_inc_pos      and current_ratio                              > 0          and last_ratio > 0 else False
                                 boost_cont_inc_earnings = True if boost_cont_inc_earnings and float(earnings_quarterly['Earnings'][key]) > last_earnings                 else False
                                 boost_cont_inc_revenue  = True if boost_cont_inc_revenue  and float(earnings_quarterly['Revenue' ][key]) > last_revenue                  else False
+                                boost_cont_dec_ratio    = True if boost_cont_dec_ratio    and current_ratio                              < last_ratio                    else False
+                                boost_cont_dec_earnings = True if boost_cont_dec_earnings and float(earnings_quarterly['Earnings'][key]) < last_earnings                 else False
+                                boost_cont_dec_revenue  = True if boost_cont_dec_revenue  and float(earnings_quarterly['Revenue'][key])  < last_revenue                  else False
                             last_ratio    = current_ratio
                             last_earnings = float(earnings_quarterly['Earnings'][key])
                             last_revenue  = float(earnings_quarterly['Revenue' ][key])
@@ -1460,6 +1472,9 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                             stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_inc_pos      or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_POSITIVE
                             stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_inc_earnings or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_EARNINGS
                             stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_inc_revenue  or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_REVENUE
+                            stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_dec_ratio    or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_DECREASE
+                            stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_dec_earnings or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_DECREASE_IN_EARNINGS
+                            stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_dec_revenue  or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_DECREASE_IN_REVENUE
                             stock_data.quarterized_profit_margin       *= stock_data.quarterized_profit_margin_boost
                 except Exception as e:
                     print("Exception in {} quarterized_profit_margin: {}".format(stock_data.symbol, e))
@@ -2259,8 +2274,6 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
     symbols                 = []
     symbols_tase            = []
     symbols_snp500          = []
-    symbols_snp500_download = []
-    symbols_nasdaq100       = []
     symbols_nasdaq_100_csv  = []
     symbols_russel1000      = []
     symbols_russel1000_csv  = []
@@ -2273,8 +2286,6 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
         second_table       = payload[1]
         df                 = first_table
         symbols_snp500     = df['Symbol'].values.tolist()
-        symbols_nasdaq100  = ['ATVI', 'ADBE', 'AMD', 'ALXN', 'ALGN', 'GOOG', 'GOOGL', 'AMZN', 'AMGN', 'ADI', 'ANSS', 'AAPL', 'AMAT', 'ASML', 'ADSK', 'ADP', 'BIDU', 'BIIB', 'BMRN', 'BKNG', 'AVGO', 'CDNS', 'CDW', 'CERN', 'CHTR', 'CHKP', 'CTAS', 'CSCO', 'CTXS', 'CTSH', 'CMCSA', 'CPRT', 'COST', 'CSX', 'DXCM', 'DOCU', 'DLTR', 'EBAY', 'EA', 'EXC', 'EXPE', 'FB', 'FAST', 'FISV', 'FOX', 'FOXA', 'GILD', 'IDXX', 'ILMN', 'INCY', 'INTC', 'INTU', 'ISRG', 'JD', 'KLAC', 'LRCX', 'LBTYA', 'LBTYK', 'LULU', 'MAR', 'MXIM', 'MELI', 'MCHP', 'MU', 'MSFT', 'MRNA', 'MDLZ', 'MNST', 'NTES', 'NFLX', 'NVDA', 'NXPI', 'ORLY', 'PCAR', 'PAYX', 'PYPL', 'PEP', 'PDD', 'QCOM', 'REGN', 'ROST', 'SGEN', 'SIRI', 'SWKS', 'SPLK', 'SBUX', 'SNPS', 'TMUS', 'TTWO', 'TSLA', 'TXN', 'KHC', 'TCOM', 'ULTA', 'VRSN', 'VRSK', 'VRTX', 'WBA', 'WDC', 'WDAY', 'XEL', 'XLNX', 'ZM']
-        symbols_russel1000 = ['TWOU', 'MMM', 'ABT', 'ABBV', 'ABMD', 'ACHC', 'ACN', 'ATVI', 'AYI', 'ADNT', 'ADBE', 'ADT', 'AAP', 'AMD', 'ACM', 'AES', 'AMG', 'AFL', 'AGCO', 'A', 'AGIO', 'AGNC', 'AL', 'APD', 'AKAM', 'ALK', 'ALB', 'AA', 'ARE', 'ALXN', 'ALGN', 'ALKS', 'Y', 'ALLE', 'AGN', 'ADS', 'LNT', 'ALSN', 'ALL', 'ALLY', 'ALNY', 'GOOGL', 'GOOG', 'MO', 'AMZN', 'AMCX', 'DOX', 'UHAL', 'AEE', 'AAL', 'ACC', 'AEP', 'AXP', 'AFG', 'AMH', 'AIG', 'ANAT', 'AMT', 'AWK', 'AMP', 'ABC', 'AME', 'AMGN', 'APH', 'ADI', 'NLY', 'ANSS', 'AR', 'ANTM', 'AON', 'APA', 'AIV', 'APY', 'APLE', 'AAPL', 'AMAT', 'ATR', 'APTV', 'WTR', 'ARMK', 'ACGL', 'ADM', 'ARNC', 'ARD', 'ANET', 'AWI', 'ARW', 'ASH', 'AZPN', 'ASB', 'AIZ', 'AGO', 'T', 'ATH', 'TEAM', 'ATO', 'ADSK', 'ADP', 'AN', 'AZO', 'AVB', 'AGR', 'AVY', 'AVT', 'EQH', 'AXTA', 'AXS', 'BKR', 'BLL', 'BAC', 'BOH', 'BK', 'OZK', 'BKU', 'BAX', 'BDX', 'WRB', 'BRK.B', 'BERY', 'BBY', 'BYND', 'BGCP', 'BIIB', 'BMRN', 'BIO', 'TECH', 'BKI', 'BLK', 'HRB', 'BLUE', 'BA', 'BOKF', 'BKNG', 'BAH', 'BWA', 'BSX', 'BDN', 'BFAM', 'BHF', 'BMY', 'BRX', 'AVGO', 'BR', 'BPYU', 'BRO', 'BFA', 'BFB', 'BRKR', 'BC', 'BG', 'BURL', 'BWXT', 'CHRW', 'CABO', 'CBT', 'COG', 'CACI', 'CDNS', 'CZR', 'CPT', 'CPB', 'CMD', 'COF', 'CAH', 'CSL', 'KMX', 'CCL', 'CRI', 'CASY', 'CTLT', 'CAT', 'CBOE', 'CBRE', 'CBS', 'CDK', 'CDW', 'CE', 'CELG', 'CNC', 'CDEV', 'CNP', 'CTL', 'CDAY', 'BXP', 'CF', 'CRL', 'CHTR', 'CHE', 'LNG', 'CHK', 'CVX', 'CIM', 'CMG', 'CHH', 'CB', 'CHD', 'CI', 'XEC', 'CINF', 'CNK', 'CTAS', 'CSCO', 'CIT', 'C', 'CFG', 'CTXS', 'CLH', 'CLX', 'CME', 'CMS', 'CNA', 'CNX', 'KO', 'CGNX', 'CTSH', 'COHR', 'CFX', 'CL', 'CLNY', 'CXP', 'COLM', 'CMCSA', 'CMA', 'CBSH', 'COMM', 'CAG', 'CXO', 'CNDT', 'COP', 'ED', 'STZ', 'CERN', 'CPA', 'CPRT', 'CLGX', 'COR', 'GLW', 'OFC', 'CSGP', 'COST', 'COTY', 'CR', 'CACC', 'CCI', 'CCK', 'CSX', 'CUBE', 'CFR', 'CMI', 'CW', 'CVS', 'CY', 'CONE', 'DHI', 'DHR', 'DRI', 'DVA', 'SITC', 'DE', 'DELL', 'DAL', 'XRAY', 'DVN', 'DXCM', 'FANG', 'DKS', 'DLR', 'DFS', 'DISCA', 'DISCK', 'DISH', 'DIS', 'DHC', 'DOCU', 'DLB', 'DG', 'DLTR', 'D', 'DPZ', 'CLR', 'COO', 'DEI', 'DOV', 'DD', 'DPS', 'DTE', 'DUK', 'DRE', 'DNB', 'DNKN', 'DXC', 'ETFC', 'EXP', 'EWBC', 'EMN', 'ETN', 'EV', 'EBAY', 'SATS', 'ECL', 'EIX', 'EW', 'EA', 'EMR', 'ESRT', 'EHC', 'EGN', 'ENR', 'ETR', 'EVHC', 'EOG', 'EPAM', 'EPR', 'EQT', 'EFX', 'EQIX', 'EQC', 'ELS', 'EQR', 'ERIE', 'ESS', 'EL', 'EEFT', 'EVBG', 'EVR', 'RE', 'EVRG', 'ES', 'UFS', 'DCI', 'EXPE', 'EXPD', 'STAY', 'EXR', 'XOG', 'XOM', 'FFIV', 'FB', 'FDS', 'FICO', 'FAST', 'FRT', 'FDX', 'FIS', 'FITB', 'FEYE', 'FAF', 'FCNCA', 'FDC', 'FHB', 'FHN', 'FRC', 'FSLR', 'FE', 'FISV', 'FLT', 'FLIR', 'FND', 'FLO', 'FLS', 'FLR', 'FMC', 'FNB', 'FNF', 'FL', 'F', 'FTNT', 'FTV', 'FBHS', 'FOXA', 'FOX', 'BEN', 'FCX', 'AJG', 'GLPI', 'GPS', 'EXAS', 'EXEL', 'EXC', 'GTES', 'GLIBA', 'GD', 'GE', 'GIS', 'GM', 'GWR', 'G', 'GNTX', 'GPC', 'GILD', 'GPN', 'GL', 'GDDY', 'GS', 'GT', 'GRA', 'GGG', 'EAF', 'GHC', 'GWW', 'LOPE', 'GPK', 'GRUB', 'GWRE', 'HAIN', 'HAL', 'HBI', 'THG', 'HOG', 'HIG', 'HAS', 'HE', 'HCA', 'HDS', 'HTA', 'PEAK', 'HEI.A', 'HEI', 'HP', 'JKHY', 'HLF', 'HSY', 'HES', 'GDI', 'GRMN', 'IT', 'HGV', 'HLT', 'HFC', 'HOLX', 'HD', 'HON', 'HRL', 'HST', 'HHC', 'HPQ', 'HUBB', 'HPP', 'HUM', 'HBAN', 'HII', 'HUN', 'H', 'IAC', 'ICUI', 'IEX', 'IDXX', 'INFO', 'ITW', 'ILMN', 'INCY', 'IR', 'INGR', 'PODD', 'IART', 'INTC', 'IBKR', 'ICE', 'IGT', 'IP', 'IPG', 'IBM', 'IFF', 'INTU', 'ISRG', 'IVZ', 'INVH', 'IONS', 'IPGP', 'IQV', 'HPE', 'HXL', 'HIW', 'HRC', 'JAZZ', 'JBHT', 'JBGS', 'JEF', 'JBLU', 'JNJ', 'JCI', 'JLL', 'JPM', 'JNPR', 'KSU', 'KAR', 'K', 'KEY', 'KEYS', 'KRC', 'KMB', 'KIM', 'KMI', 'KEX', 'KLAC', 'KNX', 'KSS', 'KOS', 'KR', 'LB', 'LHX', 'LH', 'LRCX', 'LAMR', 'LW', 'LSTR', 'LVS', 'LAZ', 'LEA', 'LM', 'LEG', 'LDOS', 'LEN', 'LEN.B', 'LII', 'LBRDA', 'LBRDK', 'FWONA', 'IRM', 'ITT', 'JBL', 'JEC', 'LLY', 'LECO', 'LNC', 'LGF.A', 'LGF.B', 'LFUS', 'LYV', 'LKQ', 'LMT', 'L', 'LOGM', 'LOW', 'LPLA', 'LULU', 'LYFT', 'LYB', 'MTB', 'MAC', 'MIC', 'M', 'MSG', 'MANH', 'MAN', 'MRO', 'MPC', 'MKL', 'MKTX', 'MAR', 'MMC', 'MLM', 'MRVL', 'MAS', 'MASI', 'MA', 'MTCH', 'MAT', 'MXIM', 'MKC', 'MCD', 'MCK', 'MDU', 'MPW', 'MD', 'MDT', 'MRK', 'FWONK', 'LPT', 'LSXMA', 'LSXMK', 'LSI', 'CPRI', 'MIK', 'MCHP', 'MU', 'MSFT', 'MAA', 'MIDD', 'MKSI', 'MHK', 'MOH', 'TAP', 'MDLZ', 'MPWR', 'MNST', 'MCO', 'MS', 'MORN', 'MOS', 'MSI', 'MSM', 'MSCI', 'MUR', 'MYL', 'NBR', 'NDAQ', 'NFG', 'NATI', 'NOV', 'NNN', 'NAVI', 'NCR', 'NKTR', 'NTAP', 'NFLX', 'NBIX', 'NRZ', 'NYCB', 'NWL', 'NEU', 'NEM', 'NWSA', 'NWS', 'MCY', 'MET', 'MTD', 'MFA', 'MGM', 'JWN', 'NSC', 'NTRS', 'NOC', 'NLOK', 'NCLH', 'NRG', 'NUS', 'NUAN', 'NUE', 'NTNX', 'NVT', 'NVDA', 'NVR', 'NXPI', 'ORLY', 'OXY', 'OGE', 'OKTA', 'ODFL', 'ORI', 'OLN', 'OHI', 'OMC', 'ON', 'OMF', 'OKE', 'ORCL', 'OSK', 'OUT', 'OC', 'OI', 'PCAR', 'PKG', 'PACW', 'PANW', 'PGRE', 'PK', 'PH', 'PE', 'PTEN', 'PAYX', 'PAYC', 'PYPL', 'NEE', 'NLSN', 'NKE', 'NI', 'NBL', 'NDSN', 'PEP', 'PKI', 'PRGO', 'PFE', 'PCG', 'PM', 'PSX', 'PPC', 'PNFP', 'PF', 'PNW', 'PXD', 'ESI', 'PNC', 'PII', 'POOL', 'BPOP', 'POST', 'PPG', 'PPL', 'PRAH', 'PINC', 'TROW', 'PFG', 'PG', 'PGR', 'PLD', 'PFPT', 'PB', 'PRU', 'PTC', 'PSA', 'PEG', 'PHM', 'PSTG', 'PVH', 'QGEN', 'QRVO', 'QCOM', 'PWR', 'PBF', 'PEGA', 'PAG', 'PNR', 'PEN', 'PBCT', 'RLGY', 'RP', 'O', 'RBC', 'REG', 'REGN', 'RF', 'RGA', 'RS', 'RNR', 'RSG', 'RMD', 'RPAI', 'RNG', 'RHI', 'ROK', 'ROL', 'ROP', 'ROST', 'RCL', 'RGLD', 'RES', 'RPM', 'RSPP', 'R', 'SPGI', 'SABR', 'SAGE', 'CRM', 'SC', 'SRPT', 'SBAC', 'HSIC', 'SLB', 'SNDR', 'SCHW', 'SMG', 'SEB', 'SEE', 'DGX', 'QRTEA', 'RL', 'RRC', 'RJF', 'RYN', 'RTN', 'NOW', 'SVC', 'SHW', 'SBNY', 'SLGN', 'SPG', 'SIRI', 'SIX', 'SKX', 'SWKS', 'SLG', 'SLM', 'SM', 'AOS', 'SJM', 'SNA', 'SON', 'SO', 'SCCO', 'LUV', 'SPB', 'SPR', 'SRC', 'SPLK', 'S', 'SFM', 'SQ', 'SSNC', 'SWK', 'SBUX', 'STWD', 'STT', 'STLD', 'SRCL', 'STE', 'STL', 'STOR', 'SYK', 'SUI', 'STI', 'SIVB', 'SWCH', 'SGEN', 'SEIC', 'SRE', 'ST', 'SCI', 'SERV', 'TPR', 'TRGP', 'TGT', 'TCO', 'TCF', 'AMTD', 'TDY', 'TFX', 'TDS', 'TPX', 'TDC', 'TER', 'TEX', 'TSRO', 'TSLA', 'TCBI', 'TXN', 'TXT', 'TFSL', 'CC', 'KHC', 'WEN', 'TMO', 'THO', 'TIF', 'TKR', 'TJX', 'TOL', 'TTC', 'TSCO', 'TDG', 'RIG', 'TRU', 'TRV', 'THS', 'TPCO', 'TRMB', 'TRN', 'TRIP', 'SYF', 'SNPS', 'SNV', 'SYY', 'DATA', 'TTWO', 'TMUS', 'TFC', 'UBER', 'UGI', 'ULTA', 'ULTI', 'UMPQ', 'UAA', 'UA', 'UNP', 'UAL', 'UPS', 'URI', 'USM', 'X', 'UTX', 'UTHR', 'UNH', 'UNIT', 'UNVR', 'OLED', 'UHS', 'UNM', 'URBN', 'USB', 'USFD', 'VFC', 'MTN', 'VLO', 'VMI', 'VVV', 'VAR', 'VVC', 'VEEV', 'VTR', 'VER', 'VRSN', 'VRSK', 'VZ', 'VSM', 'VRTX', 'VIAC', 'TWLO', 'TWTR', 'TWO', 'TYL', 'TSN', 'USG', 'UI', 'UDR', 'VMC', 'WPC', 'WBC', 'WAB', 'WBA', 'WMT', 'WM', 'WAT', 'WSO', 'W', 'WFTLF', 'WBS', 'WEC', 'WRI', 'WBT', 'WCG', 'WFC', 'WELL', 'WCC', 'WST', 'WAL', 'WDC', 'WU', 'WLK', 'WRK', 'WEX', 'WY', 'WHR', 'WTM', 'WLL', 'JW.A', 'WMB', 'WSM', 'WLTW', 'WTFC', 'WDAY', 'WP', 'WPX', 'WYND', 'WH', 'VIAB', 'VICI', 'VIRT', 'V', 'VC', 'VST', 'VMW', 'VNO', 'VOYA', 'ZAYO', 'ZBRA', 'ZEN', 'ZG', 'Z', 'ZBH', 'ZION', 'ZTS', 'ZNGA', 'WYNN', 'XEL', 'XRX', 'XLNX', 'XPO', 'XYL', 'YUMC', 'YUM']
 
         # nasdaq100: https://www.nasdaq.com/market-activity/quotes/nasdaq-ndx-index
         symbols_nasdaq_100_csv = [] # nasdaq100.csv
@@ -2305,15 +2316,6 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
                     else:
                         symbols_snp500_download_csv.append(row[0])
                         row_index += 1
-
-        symbols_russel1000_wiki = [] # https://en.wikipedia.org/wiki/Russell_1000_Index
-        russel1000_filenames_wiki_list = ['Indices/Russel_1000_index_wiki.csv']
-        for filename in russel1000_filenames_wiki_list:
-            with open(filename, mode='r', newline='', encoding='cp1252') as engine:
-                reader = csv.reader(engine, delimiter=',')
-                for row in reader:
-                    symbols_russel1000_wiki.append(row[1])
-
 
         symbols_russel1000_csv = []  # TODO: ASAFR: Make a general CSV reading function (with title row and withour, and which component in row to take, etc...
         russel1000_filenames_list = ['Indices/russell1000.csv']
@@ -2452,7 +2454,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
                                     continue
                             symbols_united_states.append(stock_symbol)
 
-        symbols = symbols_snp500 + symbols_snp500_download + symbols_nasdaq100 + symbols_nasdaq_100_csv + symbols_russel1000 + symbols_russel1000_csv + symbols_united_states + symbols_six + symbols_st
+        symbols = symbols_snp500 + symbols_nasdaq_100_csv + symbols_russel1000_csv + symbols_united_states + symbols_six + symbols_st
 
         if tase_mode:
             symbols = symbols_tase + stocks_list_tase
