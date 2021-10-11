@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.60 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.61 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -123,11 +123,11 @@ PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_EARNINGS    = 4.25   # Pro
 PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_REVENUE     = 7.77   # Provide a "bonus" for companies whose revenue        has  been continuously increasing annually - TODO: ASAFR: This is a very good indicator for stock value growth
 PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_EARNINGS = 3.25   # Provide a "bonus" for companies whose earnings       have been continuously increasing quarterly
 PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_REVENUE  = 9.99   # Provide a "bonus" for companies whose revenue        has  been continuously increasing quarterly - TODO: ASAFR: This is a very good indicator for stock value growth
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_DECREASE                = 0.1    # Provide a "bonus" for companies whose profit margins have decreased continuously annually
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_DECREASE             = 0.1    # Provide a "bonus" for companies whose profit margins have decreased continuously quarterly
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_DECREASE_IN_EARNINGS    = 0.1    # Provide a "bonus" for companies whose earnings       have been continuously decreasing annually
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_DECREASE_IN_REVENUE     = 0.1    # Provide a "bonus" for companies whose revenue        has  been continuously decreasing annually - TODO: ASAFR: This is a very good indicator for stock value growth
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_DECREASE_IN_EARNINGS = 0.1    # Provide a "bonus" for companies whose earnings       have been continuously decreasing quarterly
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_DECREASE                = 0.25   # Provide a "bonus" for companies whose profit margins have decreased continuously annually
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_DECREASE             = 0.25   # Provide a "bonus" for companies whose profit margins have decreased continuously quarterly
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_DECREASE_IN_EARNINGS    = 0.25   # Provide a "bonus" for companies whose earnings       have been continuously decreasing annually
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_DECREASE_IN_REVENUE     = 0.2    # Provide a "bonus" for companies whose revenue        has  been continuously decreasing annually - TODO: ASAFR: This is a very good indicator for stock value growth
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_DECREASE_IN_EARNINGS = 0.25   # Provide a "bonus" for companies whose earnings       have been continuously decreasing quarterly
 PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_DECREASE_IN_REVENUE  = 0.1    # Provide a "bonus" for companies whose revenue        has  been continuously decreasing quarterly - TODO: ASAFR: This is a very good indicator for stock value growth
 PROFIT_MARGIN_DUPLICATION_FACTOR                                  = 8.0    # When copying profit margin (if either quarterized/annualized/profit_margin is missing) - devide by this factor
 NEGATIVE_CFO_FACTOR                                               = 10000.0   #
@@ -1384,10 +1384,13 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                 last_ratio                = None
                 last_earnings             = None
                 last_revenue              = None
-                boost_cont_inc_ratio      = True # Will be set to True if there is a continuous increase in the profit margin
-                boost_cont_inc_pos        = True # Will be set to True if there is a continuous positive in the profit margin
-                boost_cont_inc_earnings   = True # Will be set to True if there is a continuous increase in the earnings
-                boost_cont_inc_revenue    = True # Will be set to True if there is a continuous increase in the revenue
+                boost_cont_inc_ratio      = True # Will be set to (a Final Value of) True if there is a continuous increase in the profit margin
+                boost_cont_inc_pos        = True # Will be set to (a Final Value of) True if there is a continuous positive in the profit margin
+                boost_cont_inc_earnings   = True # Will be set to (a Final Value of) True if there is a continuous increase in the earnings
+                boost_cont_inc_revenue    = True # Will be set to (a Final Value of) True if there is a continuous increase in the revenue
+                boost_cont_dec_ratio      = True # Will be set to (a Final Value of) True if there is a continuous increase in the profit margin
+                boost_cont_dec_earnings   = True # Will be set to (a Final Value of) True if there is a continuous increase in the earnings
+                boost_cont_dec_revenue    = True # Will be set to (a Final Value of) True if there is a continuous increase in the revenue
                 try:
                     if VERBOSE_LOGS: print("[{} {}]".format(__name__, 4))
 
@@ -1398,27 +1401,36 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                             used_weights += 1
                             current_ratio = float(earnings_yearly['Earnings'][key])/float(earnings_yearly['Revenue'][key])
                             if used_weights > 1:
-                                boost_cont_inc_ratio    = True if boost_cont_inc_ratio    and current_ratio                    > last_ratio                    else False
-                                boost_cont_inc_pos      = True if boost_cont_inc_pos      and current_ratio                    > 0          and last_ratio > 0 else False
+                                boost_cont_inc_ratio    = True if boost_cont_inc_ratio    and current_ratio                           > last_ratio                    else False
+                                boost_cont_inc_pos      = True if boost_cont_inc_pos      and current_ratio                           > 0          and last_ratio > 0 else False
                                 boost_cont_inc_earnings = True if boost_cont_inc_earnings and float(earnings_yearly['Earnings'][key]) > last_earnings                 else False
                                 boost_cont_inc_revenue  = True if boost_cont_inc_revenue  and float(earnings_yearly['Revenue' ][key]) > last_revenue                  else False
+                                boost_cont_dec_ratio    = True if boost_cont_dec_ratio    and current_ratio                           < last_ratio                    else False
+                                boost_cont_dec_earnings = True if boost_cont_dec_earnings and float(earnings_yearly['Earnings'][key]) < last_earnings                 else False
+                                boost_cont_dec_revenue  = True if boost_cont_dec_revenue  and float(earnings_yearly['Revenue'][key])  < last_revenue                  else False
                             last_ratio    = current_ratio
                             last_earnings = float(earnings_yearly['Earnings'][key])
                             last_revenue  = float(earnings_yearly['Revenue' ][key])
                         weight_index += 1
                     if weights_sum > 0:
                         stock_data.annualized_profit_margin        = sum(earnings_to_revenues_list)/weights_sum
-                        if stock_data.annualized_profit_margin > 0:
+                        if   stock_data.annualized_profit_margin > 0 and used_weights > 1:
                             stock_data.annualized_profit_margin_boost  = 1.0 if not boost_cont_inc_ratio    or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE
                             stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_inc_pos      or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_POSITIVE
                             stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_inc_earnings or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_EARNINGS
                             stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_inc_revenue  or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_REVENUE
+                            stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_dec_ratio    or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_DECREASE
+                            stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_dec_earnings or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_DECREASE_IN_EARNINGS
+                            stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_dec_revenue  or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_DECREASE_IN_REVENUE
                             stock_data.annualized_profit_margin       *= stock_data.annualized_profit_margin_boost
-                        elif stock_data.annualized_profit_margin < 0:
+                        elif stock_data.annualized_profit_margin < 0 and used_weights > 1:
                             stock_data.annualized_profit_margin_boost  = 1.0 if not boost_cont_inc_ratio    or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE
                             stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_inc_pos      or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_POSITIVE
                             stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_inc_earnings or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_EARNINGS
                             stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_inc_revenue  or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_REVENUE
+                            stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_dec_ratio    or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_DECREASE
+                            stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_dec_earnings or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_DECREASE_IN_EARNINGS
+                            stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_dec_revenue  or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_DECREASE_IN_REVENUE
                             stock_data.annualized_profit_margin       /= stock_data.annualized_profit_margin_boost
 
                 except Exception as e:
@@ -1467,7 +1479,7 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                         weight_index += 1
                     if weights_sum > 0:
                         stock_data.quarterized_profit_margin            = sum(earnings_to_revenues_list)/weights_sum
-                        if stock_data.quarterized_profit_margin > 0:
+                        if   stock_data.quarterized_profit_margin > 0 and used_weights > 1:  # boosts irrelevant if only 1 weight used
                             stock_data.quarterized_profit_margin_boost  = 1.0 if not boost_cont_inc_ratio    or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE
                             stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_inc_pos      or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_POSITIVE
                             stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_inc_earnings or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_EARNINGS
@@ -1476,6 +1488,15 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                             stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_dec_earnings or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_DECREASE_IN_EARNINGS
                             stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_dec_revenue  or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_DECREASE_IN_REVENUE
                             stock_data.quarterized_profit_margin       *= stock_data.quarterized_profit_margin_boost
+                        elif stock_data.quarterized_profit_margin < 0 and used_weights > 1:
+                            stock_data.quarterized_profit_margin_boost  = 1.0 if not boost_cont_inc_ratio    or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE
+                            stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_inc_pos      or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_POSITIVE
+                            stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_inc_earnings or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_EARNINGS
+                            stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_inc_revenue  or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_REVENUE
+                            stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_dec_ratio    or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_DECREASE
+                            stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_dec_earnings or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_DECREASE_IN_EARNINGS
+                            stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_dec_revenue  or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_DECREASE_IN_REVENUE
+                            stock_data.quarterized_profit_margin       /= stock_data.quarterized_profit_margin_boost
                 except Exception as e:
                     print("Exception in {} quarterized_profit_margin: {}".format(stock_data.symbol, e))
                     stock_data.quarterized_profit_margin = None
