@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.64 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.65 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -935,7 +935,7 @@ def round_and_avoid_none_values(stock_data):
     if stock_data.effective_retained_earnings                           != None: stock_data.effective_retained_earnings                           = round(stock_data.effective_retained_earnings,                           NUM_ROUND_DECIMALS)
     if stock_data.effective_revenue                                     != None: stock_data.effective_revenue                                     = round(stock_data.effective_revenue,                                     NUM_ROUND_DECIMALS)
     if stock_data.annualized_total_revenue                              != None: stock_data.annualized_total_revenue                              = round(stock_data.annualized_total_revenue,                              NUM_ROUND_DECIMALS)
-    if stock_data.annualized_total_revenue_bonus                        != None: stock_data.annualized_total_revenue                              = round(stock_data.annualized_total_revenue_bonus,                        NUM_ROUND_DECIMALS)
+    if stock_data.annualized_total_revenue_bonus                        != None: stock_data.annualized_total_revenue_bonus                        = round(stock_data.annualized_total_revenue_bonus,                        NUM_ROUND_DECIMALS)
     if stock_data.annualized_net_income                                 != None: stock_data.annualized_net_income                                 = round(stock_data.annualized_net_income,                                 NUM_ROUND_DECIMALS)
     if stock_data.quarterized_total_revenue                             != None: stock_data.quarterized_total_revenue                             = round(stock_data.quarterized_total_revenue,                             NUM_ROUND_DECIMALS)
     if stock_data.quarterized_total_revenue_bonus                       != None: stock_data.quarterized_total_revenue_bonus                       = round(stock_data.quarterized_total_revenue_bonus,                       NUM_ROUND_DECIMALS)
