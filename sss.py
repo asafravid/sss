@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.65 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.67 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -115,6 +115,8 @@ NEGATIVE_ALTMAN_Z_FACTOR                     = 0.00001
 #              1. The rarety (statistically comapred to all the stocks in scan) - proportionaly to it (the rarest the case - the more boost)
 #              2. The ascent (slope) of the increase and the positive value -> the higher - the more boost
 #              3. Add similar boosters for other annual and quarterly weighted-averaged parameters
+PROFIT_MARGIN_BOOST_FOR_PRESENCE_OF_ANNUAL_NEGATIVE_EARNINGS      = 0.1
+PROFIT_MARGIN_BOOST_FOR_PRESENCE_OF_QUARTERLY_NEGATIVE_EARNINGS   = 0.1
 PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE                = 3.75   # Provide a "bonus" for companies whose profit margins have increased continuously annually
 PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE             = 2.25   # Provide a "bonus" for companies whose profit margins have increased continuously quarterly
 PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_POSITIVE                = 4.75   # Provide a "bonus" for companies whose profit margins have been continuously positive annually
@@ -1201,7 +1203,7 @@ def round_and_avoid_none_values(stock_data):
     if stock_data.altman_z_score_factor                                 is None: stock_data.altman_z_score_factor                                 = 0
 
 
-def calculate_weighted_stock_data_on_dict(dict_input, dict_name, str_in_dict, weights, stock_data, reverse_required, force_only_sum=False, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=1.0, bonus_mon_dec=1.0):
+def calculate_weighted_stock_data_on_dict(dict_input, dict_name, str_in_dict, weights, stock_data, reverse_required, force_only_sum=False, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=1.0, bonus_mon_dec=1.0, bonus_neg_pres=1.0):
     if VERBOSE_LOGS: print("[{} calculate_weighted_stock_data_on_dict]".format(__name__))
     weight_index  = 0
     weighted_list = []
@@ -1210,6 +1212,7 @@ def calculate_weighted_stock_data_on_dict(dict_input, dict_name, str_in_dict, we
     all_neg       = True  # Values are all negative
     mon_inc       = True  # Values are monotonically increasing
     mon_dec       = True  # Values are monotonically decreasing
+    neg_pres      = False # Negative value presence
     bonus         = 0
     try:
         if str_in_dict is None:
@@ -1221,10 +1224,11 @@ def calculate_weighted_stock_data_on_dict(dict_input, dict_name, str_in_dict, we
                 if weight_index == 1:  # 1st value: save previous
                     prev_value = current_value
                 else:
-                    all_pos = True if all_pos and current_value > 0          and prev_value > 0 else False
-                    all_neg = True if all_neg and current_value < 0          and prev_value < 0 else False
-                    mon_inc = True if mon_inc and current_value > prev_value                    else False
-                    mon_dec = True if mon_dec and current_value < prev_value                    else False
+                    all_pos  = True if all_pos and current_value > 0          and prev_value > 0 else False
+                    all_neg  = True if all_neg and current_value < 0          and prev_value < 0 else False
+                    mon_inc  = True if mon_inc and current_value > prev_value                    else False
+                    mon_dec  = True if mon_dec and current_value < prev_value                    else False
+                    neg_pres = True if neg_pres or current_value < 0                             else False
 
         else:
             for key in (reversed(list(dict_input)) if reverse_required else list(dict_input)):  # The 1st element will be the oldest, receiving the lowest weight
@@ -1236,16 +1240,18 @@ def calculate_weighted_stock_data_on_dict(dict_input, dict_name, str_in_dict, we
                     if weight_index == 1:  # 1st value: save previous
                         prev_value = current_value
                     else:
-                        all_pos = True if all_pos and current_value > 0          and prev_value > 0 else False
-                        all_neg = True if all_neg and current_value < 0          and prev_value < 0 else False
-                        mon_inc = True if mon_inc and current_value > prev_value                    else False
-                        mon_dec = True if mon_dec and current_value < prev_value                    else False
+                        all_pos  = True if all_pos and current_value > 0          and prev_value > 0 else False
+                        all_neg  = True if all_neg and current_value < 0          and prev_value < 0 else False
+                        mon_inc  = True if mon_inc and current_value > prev_value                    else False
+                        mon_dec  = True if mon_dec and current_value < prev_value                    else False
+                        neg_pres = True if neg_pres or current_value < 0                             else False
 
         bonus = 1.0
-        if all_pos: bonus *= bonus_all_pos
-        if all_neg: bonus *= bonus_all_neg
-        if mon_inc: bonus *= bonus_mon_inc
-        if mon_dec: bonus *= bonus_mon_dec
+        if all_pos:  bonus *= bonus_all_pos
+        if all_neg:  bonus *= bonus_all_neg
+        if mon_inc:  bonus *= bonus_mon_inc
+        if mon_dec:  bonus *= bonus_mon_dec
+        if neg_pres: bonus *= bonus_neg_pres
         if weights_sum > 0:
             return_value = stock_data.financial_currency_conversion_rate_mult_to_usd * sum(weighted_list) / (1 if force_only_sum else weights_sum)  # Multiplying by the factor to get the valu in USD.
             if return_value > 0: return_value *= bonus
@@ -1260,7 +1266,7 @@ def calculate_weighted_stock_data_on_dict(dict_input, dict_name, str_in_dict, we
     return [return_value, bonus]
 
 
-def calculate_weighted_ratio_from_dict(dict_input, dict_name, str_in_dict_numerator, str_in_dict_denominator, weights, stock_data, default_return_value, reverse_required, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=1.0, bonus_mon_dec=1.0):
+def calculate_weighted_ratio_from_dict(dict_input, dict_name, str_in_dict_numerator, str_in_dict_denominator, weights, stock_data, default_return_value, reverse_required, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=1.0, bonus_mon_dec=1.0, bonus_neg_pres=1.0):
     if VERBOSE_LOGS: print("[{} calculate_weighted_ratio_from_dict]".format(__name__))
     return_value         = default_return_value
     weighted_ratios_list = []
@@ -1268,6 +1274,7 @@ def calculate_weighted_ratio_from_dict(dict_input, dict_name, str_in_dict_numera
     all_neg       = True  # Values are all negative
     mon_inc       = True  # Values are monotonically increasing
     mon_dec       = True  # Values are monotonically decreasing
+    neg_pres      = False # Negative value presence
     bonus         = 0
     try:
         for key in (reversed(list(dict_input)) if reverse_required else list(dict_input)):  # The 1st element will be the oldest, receiving the lowest weight
@@ -1277,10 +1284,11 @@ def calculate_weighted_ratio_from_dict(dict_input, dict_name, str_in_dict_numera
                 if len(weighted_ratios_list) == 1:  # 1st value: save previous
                     prev_ratio = current_ratio
                 else:
-                    all_pos = True if all_pos and current_ratio > 0 and prev_ratio > 0 else False
-                    all_neg = True if all_neg and current_ratio < 0 and prev_ratio < 0 else False
-                    mon_inc = True if mon_inc and current_ratio > prev_ratio           else False
-                    mon_dec = True if mon_dec and current_ratio < prev_ratio           else False
+                    all_pos  = True if all_pos and current_ratio > 0 and prev_ratio > 0 else False
+                    all_neg  = True if all_neg and current_ratio < 0 and prev_ratio < 0 else False
+                    mon_inc  = True if mon_inc and current_ratio > prev_ratio           else False
+                    mon_dec  = True if mon_dec and current_ratio < prev_ratio           else False
+                    neg_pres = True if neg_pres or current_ratio < 0                    else False
 
     except Exception as e:
         print("Exception in {} {}}: {}".format(stock_data.symbol, dict_name, e))
@@ -1288,10 +1296,11 @@ def calculate_weighted_ratio_from_dict(dict_input, dict_name, str_in_dict_numera
     if len(weighted_ratios_list):
         return_value = weighted_average(weighted_ratios_list, weights[:len(weighted_ratios_list)])
         bonus = 1.0
-        if all_pos: bonus *= bonus_all_pos
-        if all_neg: bonus *= bonus_all_neg
-        if mon_inc: bonus *= bonus_mon_inc
-        if mon_dec: bonus *= bonus_mon_dec
+        if all_pos:  bonus *= bonus_all_pos
+        if all_neg:  bonus *= bonus_all_neg
+        if mon_inc:  bonus *= bonus_mon_inc
+        if mon_dec:  bonus *= bonus_mon_dec
+        if neg_pres: bonus *= bonus_neg_pres
         if return_value > 0: return_value *= bonus
         else               : return_value /= bonus
 
@@ -1477,21 +1486,21 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
         else:                   stock_data.short_name = 'None'
 
         # Balance sheets are listed from newest to oldest, so for the weights, must reverse the dictionary:
-        [stock_data.annualized_total_ratio,         stock_data.annualized_total_ratio_bonus        ] = calculate_weighted_ratio_from_dict(balance_sheets_yearly,    'annualized_total_ratio',          'Total Assets',         'Total Liab',                BALANCE_SHEETS_WEIGHTS, stock_data, 0, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=3.0, bonus_mon_dec=1/3.0)
-        [stock_data.annualized_other_current_ratio, stock_data.annualized_other_current_ratio_bonus] = calculate_weighted_ratio_from_dict(balance_sheets_yearly,    'annualized_other_current_ratio',  'Other Current Assets', 'Other Current Liab',        BALANCE_SHEETS_WEIGHTS, stock_data, 0, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=3.0, bonus_mon_dec=1/3.0)
-        [stock_data.annualized_other_ratio,         stock_data.annualized_other_ratio_bonus        ] = calculate_weighted_ratio_from_dict(balance_sheets_yearly,    'annualized_other_ratio',          'Other Assets',         'Other Liab',                BALANCE_SHEETS_WEIGHTS, stock_data, 0, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=3.0, bonus_mon_dec=1/3.0)
-        [stock_data.annualized_total_current_ratio, stock_data.annualized_total_current_ratio_bonus] = calculate_weighted_ratio_from_dict(balance_sheets_yearly,    'annualized_total_current_ratio',  'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data, 0, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=3.0, bonus_mon_dec=1/3.0)
+        [stock_data.annualized_total_ratio,         stock_data.annualized_total_ratio_bonus        ] = calculate_weighted_ratio_from_dict(balance_sheets_yearly,    'annualized_total_ratio',          'Total Assets',         'Total Liab',                BALANCE_SHEETS_WEIGHTS, stock_data, 0, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=3.0, bonus_mon_dec=1/3.0, bonus_neg_pres=1.0)
+        [stock_data.annualized_other_current_ratio, stock_data.annualized_other_current_ratio_bonus] = calculate_weighted_ratio_from_dict(balance_sheets_yearly,    'annualized_other_current_ratio',  'Other Current Assets', 'Other Current Liab',        BALANCE_SHEETS_WEIGHTS, stock_data, 0, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=3.0, bonus_mon_dec=1/3.0, bonus_neg_pres=1.0)
+        [stock_data.annualized_other_ratio,         stock_data.annualized_other_ratio_bonus        ] = calculate_weighted_ratio_from_dict(balance_sheets_yearly,    'annualized_other_ratio',          'Other Assets',         'Other Liab',                BALANCE_SHEETS_WEIGHTS, stock_data, 0, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=3.0, bonus_mon_dec=1/3.0, bonus_neg_pres=1.0)
+        [stock_data.annualized_total_current_ratio, stock_data.annualized_total_current_ratio_bonus] = calculate_weighted_ratio_from_dict(balance_sheets_yearly,    'annualized_total_current_ratio',  'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data, 0, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=3.0, bonus_mon_dec=1/3.0, bonus_neg_pres=1.0)
 
-        [stock_data.quarterized_total_ratio,         stock_data.quarterized_total_ratio_bonus        ] = calculate_weighted_ratio_from_dict(balance_sheets_quarterly, 'quarterized_total_ratio',         'Total Assets',         'Total Liab',                BALANCE_SHEETS_WEIGHTS, stock_data, 0, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5)
-        [stock_data.quarterized_other_current_ratio, stock_data.quarterized_other_current_ratio_bonus] = calculate_weighted_ratio_from_dict(balance_sheets_quarterly, 'quarterized_other_current_ratio', 'Other Current Assets', 'Other Current Liab',        BALANCE_SHEETS_WEIGHTS, stock_data, 0, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5)
-        [stock_data.quarterized_other_ratio,         stock_data.quarterized_other_ratio_bonus        ] = calculate_weighted_ratio_from_dict(balance_sheets_quarterly, 'quarterized_other_ratio',         'Other Assets',         'Other Liab',                BALANCE_SHEETS_WEIGHTS, stock_data, 0, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5)
-        [stock_data.quarterized_total_current_ratio, stock_data.quarterized_total_current_ratio_bonus] = calculate_weighted_ratio_from_dict(balance_sheets_quarterly, 'quarterized_total_current_ratio', 'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data, 0, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5)
+        [stock_data.quarterized_total_ratio,         stock_data.quarterized_total_ratio_bonus        ] = calculate_weighted_ratio_from_dict(balance_sheets_quarterly, 'quarterized_total_ratio',         'Total Assets',         'Total Liab',                BALANCE_SHEETS_WEIGHTS, stock_data, 0, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5, bonus_neg_pres=1.0)
+        [stock_data.quarterized_other_current_ratio, stock_data.quarterized_other_current_ratio_bonus] = calculate_weighted_ratio_from_dict(balance_sheets_quarterly, 'quarterized_other_current_ratio', 'Other Current Assets', 'Other Current Liab',        BALANCE_SHEETS_WEIGHTS, stock_data, 0, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5, bonus_neg_pres=1.0)
+        [stock_data.quarterized_other_ratio,         stock_data.quarterized_other_ratio_bonus        ] = calculate_weighted_ratio_from_dict(balance_sheets_quarterly, 'quarterized_other_ratio',         'Other Assets',         'Other Liab',                BALANCE_SHEETS_WEIGHTS, stock_data, 0, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5, bonus_neg_pres=1.0)
+        [stock_data.quarterized_total_current_ratio, stock_data.quarterized_total_current_ratio_bonus] = calculate_weighted_ratio_from_dict(balance_sheets_quarterly, 'quarterized_total_current_ratio', 'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data, 0, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5, bonus_neg_pres=1.0)
 
         stock_data.annualized_working_capital      = calculate_weighted_diff_from_dict( balance_sheets_yearly,    'annualized_working_capital',      'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data, 0, True)
         stock_data.quarterized_working_capital     = calculate_weighted_diff_from_dict( balance_sheets_quarterly, 'quarterized_working_capital',     'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data, 0, True)
 
-        [stock_data.annualized_total_liabilities,  stock_data.annualized_total_liabilities_bonus ]  = calculate_weighted_stock_data_on_dict(balance_sheets_yearly,    'annualized_total_liabilities',  'Total Liab', BALANCE_SHEETS_WEIGHTS, stock_data, True, bonus_all_pos=1, bonus_all_neg=1, bonus_mon_inc=2,   bonus_mon_dec=0.5  )
-        [stock_data.quarterized_total_liabilities, stock_data.quarterized_total_liabilities_bonus]  = calculate_weighted_stock_data_on_dict(balance_sheets_quarterly, 'quarterized_total_liabilities', 'Total Liab', BALANCE_SHEETS_WEIGHTS, stock_data, True, bonus_all_pos=1, bonus_all_neg=1, bonus_mon_inc=1.5, bonus_mon_dec=1/1.5)
+        [stock_data.annualized_total_liabilities,  stock_data.annualized_total_liabilities_bonus ]  = calculate_weighted_stock_data_on_dict(balance_sheets_yearly,    'annualized_total_liabilities',  'Total Liab', BALANCE_SHEETS_WEIGHTS, stock_data, True, bonus_all_pos=1, bonus_all_neg=1, bonus_mon_inc=2,   bonus_mon_dec=0.5,   bonus_neg_pres=1.0)
+        [stock_data.quarterized_total_liabilities, stock_data.quarterized_total_liabilities_bonus]  = calculate_weighted_stock_data_on_dict(balance_sheets_quarterly, 'quarterized_total_liabilities', 'Total Liab', BALANCE_SHEETS_WEIGHTS, stock_data, True, bonus_all_pos=1, bonus_all_neg=1, bonus_mon_inc=1.5, bonus_mon_dec=1/1.5, bonus_neg_pres=1.0)
 
         if stock_data.annualized_total_ratio          == 0.0: stock_data.annualized_total_ratio          = stock_data.quarterized_total_ratio        *QUARTERLY_YEARLY_MISSING_FACTOR
         if stock_data.quarterized_total_ratio         == 0.0: stock_data.quarterized_total_ratio         = stock_data.annualized_total_ratio         *QUARTERLY_YEARLY_MISSING_FACTOR
@@ -1525,8 +1534,8 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
 
         # TODO: ASAFR: Add Other Current Liab / Other Stockholder Equity
         # Balance Sheets are listed from newest to olders, so for proper weight: Reverse required
-        [stock_data.annualized_debt_to_equity, stock_data.annualized_debt_to_equity_bonus  ] = calculate_weighted_ratio_from_dict(balance_sheets_yearly,    'annualized_debt_to_equity',  'Total Liab', 'Total Stockholder Equity', BALANCE_SHEETS_WEIGHTS, stock_data, None, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5)
-        [stock_data.quarterized_debt_to_equity, stock_data.quarterized_debt_to_equity_bonus] = calculate_weighted_ratio_from_dict(balance_sheets_quarterly, 'quarterized_debt_to_equity', 'Total Liab', 'Total Stockholder Equity', BALANCE_SHEETS_WEIGHTS, stock_data, None, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5)
+        [stock_data.annualized_debt_to_equity,  stock_data.annualized_debt_to_equity_bonus ] = calculate_weighted_ratio_from_dict(balance_sheets_yearly,    'annualized_debt_to_equity',  'Total Liab', 'Total Stockholder Equity', BALANCE_SHEETS_WEIGHTS, stock_data, None, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5, bonus_neg_pres=1.0)
+        [stock_data.quarterized_debt_to_equity, stock_data.quarterized_debt_to_equity_bonus] = calculate_weighted_ratio_from_dict(balance_sheets_quarterly, 'quarterized_debt_to_equity', 'Total Liab', 'Total Stockholder Equity', BALANCE_SHEETS_WEIGHTS, stock_data, None, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5, bonus_neg_pres=1.0)
 
         if stock_data.annualized_debt_to_equity is None and stock_data.quarterized_debt_to_equity is None:
             stock_data.annualized_debt_to_equity = stock_data.quarterized_debt_to_equity = 1000.0*debt_to_equity_limit
@@ -1544,20 +1553,20 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                 stock_data.debt_to_equity_effective_used = DEBT_TO_EQUITY_MIN_BASE + math.sqrt(stock_data.debt_to_equity_effective)
 
         # Cash Flows are listed from newest to oldest, so reverse required for weights:
-        [stock_data.annualized_cash_flow_from_operating_activities,  stock_data.annualized_cash_flow_from_operating_activities_bonus ] = calculate_weighted_stock_data_on_dict(cash_flows_yearly,    'cash_flows_yearly',    'Total Cash From Operating Activities', CASH_FLOW_WEIGHTS, stock_data, True,       bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5)
-        [stock_data.quarterized_cash_flow_from_operating_activities, stock_data.quarterized_cash_flow_from_operating_activities_bonus] = calculate_weighted_stock_data_on_dict(cash_flows_quarterly, 'cash_flows_quarterly', 'Total Cash From Operating Activities', NO_WEIGHTS,        stock_data, True, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=1.5, bonus_mon_dec=1/1.5)
+        [stock_data.annualized_cash_flow_from_operating_activities,  stock_data.annualized_cash_flow_from_operating_activities_bonus ] = calculate_weighted_stock_data_on_dict(cash_flows_yearly,    'cash_flows_yearly',    'Total Cash From Operating Activities', CASH_FLOW_WEIGHTS, stock_data, True,       bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5,   bonus_neg_pres=0.5)
+        [stock_data.quarterized_cash_flow_from_operating_activities, stock_data.quarterized_cash_flow_from_operating_activities_bonus] = calculate_weighted_stock_data_on_dict(cash_flows_quarterly, 'cash_flows_quarterly', 'Total Cash From Operating Activities', NO_WEIGHTS,        stock_data, True, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=1.5, bonus_mon_dec=1/1.5, bonus_neg_pres=0.5)
 
         # Balance Sheets are listed from newest to oldest, so reverse required for weights:
-        [stock_data.annualized_total_assets,  stock_data.annualized_total_assets_bonus ]     = calculate_weighted_stock_data_on_dict(balance_sheets_yearly,    'balance_sheets_yearly',    'Total Assets', BALANCE_SHEETS_WEIGHTS, stock_data, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5)
-        [stock_data.quarterized_total_assets, stock_data.quarterized_total_assets_bonus]     = calculate_weighted_stock_data_on_dict(balance_sheets_quarterly, 'balance_sheets_quarterly', 'Total Assets', BALANCE_SHEETS_WEIGHTS, stock_data, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=1.5, bonus_mon_dec=1/1.5)
+        [stock_data.annualized_total_assets,  stock_data.annualized_total_assets_bonus ]     = calculate_weighted_stock_data_on_dict(balance_sheets_yearly,    'balance_sheets_yearly',    'Total Assets', BALANCE_SHEETS_WEIGHTS, stock_data, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5,   bonus_neg_pres=1.0)
+        [stock_data.quarterized_total_assets, stock_data.quarterized_total_assets_bonus]     = calculate_weighted_stock_data_on_dict(balance_sheets_quarterly, 'balance_sheets_quarterly', 'Total Assets', BALANCE_SHEETS_WEIGHTS, stock_data, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=1.5, bonus_mon_dec=1/1.5, bonus_neg_pres=1.0)
 
         # Balance Sheets are listed from newest to oldest, so reverse required for weights:
-        [stock_data.annualized_total_stockholder_equity,  stock_data.annualized_total_stockholder_equity_bonus ] = calculate_weighted_stock_data_on_dict(balance_sheets_yearly,    'balance_sheets_yearly',    'Total Stockholder Equity', BALANCE_SHEETS_WEIGHTS, stock_data, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5)
-        [stock_data.quarterized_total_stockholder_equity, stock_data.quarterized_total_stockholder_equity_bonus] = calculate_weighted_stock_data_on_dict(balance_sheets_quarterly, 'balance_sheets_quarterly', 'Total Stockholder Equity', BALANCE_SHEETS_WEIGHTS, stock_data, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=1.5, bonus_mon_dec=1/1.5)
+        [stock_data.annualized_total_stockholder_equity,  stock_data.annualized_total_stockholder_equity_bonus ] = calculate_weighted_stock_data_on_dict(balance_sheets_yearly,    'balance_sheets_yearly',    'Total Stockholder Equity', BALANCE_SHEETS_WEIGHTS, stock_data, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5,   bonus_neg_pres=1.0)
+        [stock_data.quarterized_total_stockholder_equity, stock_data.quarterized_total_stockholder_equity_bonus] = calculate_weighted_stock_data_on_dict(balance_sheets_quarterly, 'balance_sheets_quarterly', 'Total Stockholder Equity', BALANCE_SHEETS_WEIGHTS, stock_data, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=1.5, bonus_mon_dec=1/1.5, bonus_neg_pres=1.0)
 
         # Balance Sheets are listed from newest to oldest, so reverse required for weights:
-        [stock_data.annualized_retained_earnings,  stock_data.annualized_retained_earnings_bonus ] = calculate_weighted_stock_data_on_dict(balance_sheets_yearly,    'balance_sheets_yearly',    'Retained Earnings', BALANCE_SHEETS_WEIGHTS, stock_data, True,       bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5)
-        [stock_data.quarterized_retained_earnings, stock_data.quarterized_retained_earnings_bonus] = calculate_weighted_stock_data_on_dict(balance_sheets_quarterly, 'balance_sheets_yearly',    'Retained Earnings', NO_WEIGHTS,             stock_data, True, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=1.5, bonus_mon_dec=1/1.5)
+        [stock_data.annualized_retained_earnings,  stock_data.annualized_retained_earnings_bonus ] = calculate_weighted_stock_data_on_dict(balance_sheets_yearly,    'balance_sheets_yearly',    'Retained Earnings', BALANCE_SHEETS_WEIGHTS, stock_data, True,       bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5,   bonus_neg_pres=0.25)
+        [stock_data.quarterized_retained_earnings, stock_data.quarterized_retained_earnings_bonus] = calculate_weighted_stock_data_on_dict(balance_sheets_quarterly, 'balance_sheets_yearly',    'Retained Earnings', NO_WEIGHTS,             stock_data, True, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=1.5, bonus_mon_dec=1/1.5, bonus_neg_pres=0.25)
 
         if stock_data.short_name is     None:                       stock_data.short_name = 'None'
         # if stock_data.short_name != None and not research_mode: print('              {:35}:'.format(stock_data.short_name))
@@ -1601,6 +1610,7 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                 boost_cont_dec_ratio      = True # Will be set to (a Final Value of) True if there is a continuous increase in the profit margin
                 boost_cont_dec_earnings   = True # Will be set to (a Final Value of) True if there is a continuous increase in the earnings
                 boost_cont_dec_revenue    = True # Will be set to (a Final Value of) True if there is a continuous increase in the revenue
+                boost_neg_earnings        = False
                 try:
                     if VERBOSE_LOGS: print("[{} {}]".format(__name__, 4))
 
@@ -1618,6 +1628,7 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                                 boost_cont_dec_ratio    = True if boost_cont_dec_ratio    and current_ratio                           < last_ratio                    else False
                                 boost_cont_dec_earnings = True if boost_cont_dec_earnings and float(earnings_yearly['Earnings'][key]) < last_earnings                 else False
                                 boost_cont_dec_revenue  = True if boost_cont_dec_revenue  and float(earnings_yearly['Revenue'][key])  < last_revenue                  else False
+                                boost_neg_earnings      = True if boost_neg_earnings      or  float(earnings_yearly['Earnings'][key]) < 0                             else False
                             last_ratio    = current_ratio
                             last_earnings = float(earnings_yearly['Earnings'][key])
                             last_revenue  = float(earnings_yearly['Revenue' ][key])
@@ -1632,6 +1643,7 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                             stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_dec_ratio    or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_DECREASE
                             stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_dec_earnings or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_DECREASE_IN_EARNINGS
                             stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_dec_revenue  or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_DECREASE_IN_REVENUE
+                            stock_data.annualized_profit_margin_boost *= 1.0 if not boost_neg_earnings      or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_PRESENCE_OF_ANNUAL_NEGATIVE_EARNINGS
                             stock_data.annualized_profit_margin       *= stock_data.annualized_profit_margin_boost
                         elif stock_data.annualized_profit_margin < 0 and used_weights > 1:
                             stock_data.annualized_profit_margin_boost  = 1.0 if not boost_cont_inc_ratio    or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE
@@ -1641,6 +1653,7 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                             stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_dec_ratio    or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_DECREASE
                             stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_dec_earnings or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_DECREASE_IN_EARNINGS
                             stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_dec_revenue  or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_DECREASE_IN_REVENUE
+                            stock_data.annualized_profit_margin_boost *= 1.0 if not boost_neg_earnings      or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_PRESENCE_OF_ANNUAL_NEGATIVE_EARNINGS
                             stock_data.annualized_profit_margin       /= stock_data.annualized_profit_margin_boost
 
                 except Exception as e:
@@ -1666,6 +1679,7 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                 boost_cont_dec_ratio      = True # Will be set to (Final Value of) True if there is a continuous increase in the profit   margin  TODO: ASAFR: Do the same boosting for cash flows ev_to_cfo
                 boost_cont_dec_earnings   = True # Will be set to (Final Value of) True if there is a continuous increase in the earnings
                 boost_cont_dec_revenue    = True # Will be set to (Final Value of) True if there is a continuous increase in the revenue
+                boost_neg_earnings        = False
                 try:
                     if VERBOSE_LOGS: print("[{} {}]".format(__name__, 5))
 
@@ -1683,6 +1697,7 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                                 boost_cont_dec_ratio    = True if boost_cont_dec_ratio    and current_ratio                              < last_ratio                    else False
                                 boost_cont_dec_earnings = True if boost_cont_dec_earnings and float(earnings_quarterly['Earnings'][key]) < last_earnings                 else False
                                 boost_cont_dec_revenue  = True if boost_cont_dec_revenue  and float(earnings_quarterly['Revenue'][key])  < last_revenue                  else False
+                                boost_neg_earnings      = True if boost_neg_earnings      or  float(earnings_quarterly['Earnings'][key]) < 0                             else False
                             last_ratio    = current_ratio
                             last_earnings = float(earnings_quarterly['Earnings'][key])
                             last_revenue  = float(earnings_quarterly['Revenue' ][key])
@@ -1697,6 +1712,7 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                             stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_dec_ratio    or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_DECREASE
                             stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_dec_earnings or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_DECREASE_IN_EARNINGS
                             stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_dec_revenue  or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_DECREASE_IN_REVENUE
+                            stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_neg_earnings      or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_PRESENCE_OF_QUARTERLY_NEGATIVE_EARNINGS
                             stock_data.quarterized_profit_margin       *= stock_data.quarterized_profit_margin_boost
                         elif stock_data.quarterized_profit_margin < 0 and used_weights > 1:
                             stock_data.quarterized_profit_margin_boost  = 1.0 if not boost_cont_inc_ratio    or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE
@@ -1706,6 +1722,7 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                             stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_dec_ratio    or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_DECREASE
                             stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_dec_earnings or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_DECREASE_IN_EARNINGS
                             stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_dec_revenue  or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_DECREASE_IN_REVENUE
+                            stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_neg_earnings      or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_PRESENCE_OF_QUARTERLY_NEGATIVE_EARNINGS
                             stock_data.quarterized_profit_margin       /= stock_data.quarterized_profit_margin_boost
                 except Exception as e:
                     print("Exception in {} quarterized_profit_margin: {}".format(stock_data.symbol, e))
@@ -1713,12 +1730,12 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                     pass
 
         # Earnings are ordered from oldest to newest so no reversing required for weights:
-        if earnings_yearly != None and 'Revenue' in earnings_yearly: [stock_data.annualized_revenue, stock_data.annualized_revenue_bonus] = calculate_weighted_stock_data_on_dict(earnings_yearly['Revenue'],    'earnings_yearly[Revenue]', None,            REVENUES_WEIGHTS, stock_data, False, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=4.0, bonus_mon_dec=0.25)
+        if earnings_yearly != None and 'Revenue' in earnings_yearly: [stock_data.annualized_revenue, stock_data.annualized_revenue_bonus] = calculate_weighted_stock_data_on_dict(earnings_yearly['Revenue'],    'earnings_yearly[Revenue]', None,            REVENUES_WEIGHTS, stock_data, False, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=4.0, bonus_mon_dec=0.25, bonus_neg_pres=1.0)
         else:                                                        stock_data.annualized_revenue = None
 
         # TODO: ASAFR: Add a calculation of net_income_to_total_revenue_list
         # Financials are ordered newest to oldest so reversing is required for weights:
-        [stock_data.annualized_total_revenue, stock_data.annualized_total_revenue_bonus] = calculate_weighted_stock_data_on_dict(financials_yearly,             'financials_yearly',        'Total Revenue', REVENUES_WEIGHTS, stock_data, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=4.0, bonus_mon_dec=0.25)
+        [stock_data.annualized_total_revenue, stock_data.annualized_total_revenue_bonus] = calculate_weighted_stock_data_on_dict(financials_yearly,             'financials_yearly',        'Total Revenue', REVENUES_WEIGHTS, stock_data, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=4.0, bonus_mon_dec=0.25, bonus_neg_pres=1.0)
 
         if earnings_yearly != None and 'Earnings' in earnings_yearly:
             weight_index      = 0
@@ -1837,19 +1854,19 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
             stock_data.annualized_net_income = None
 
         # Earnings are ordered from oldest to newest so no reversing required for weights:
-        if earnings_quarterly != None and 'Revenue' in earnings_quarterly: [stock_data.quarterized_revenue, stock_data.quarterized_revenue_bonus] = calculate_weighted_stock_data_on_dict(earnings_quarterly['Revenue'],   'earnings_quarterly[Revenue]',   None,            NO_WEIGHTS, stock_data, False, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=3.0, bonus_mon_dec=1/3.0)
+        if earnings_quarterly != None and 'Revenue' in earnings_quarterly: [stock_data.quarterized_revenue, stock_data.quarterized_revenue_bonus] = calculate_weighted_stock_data_on_dict(earnings_quarterly['Revenue'],   'earnings_quarterly[Revenue]',   None,            NO_WEIGHTS, stock_data, False, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=3.0, bonus_mon_dec=1/3.0, bonus_neg_pres=1.0)
         else:                                                              stock_data.quarterized_revenue = None
 
         # Financials are ordered newest to oldest so reversing is required for weights:
-        [stock_data.quarterized_total_revenue, stock_data.quarterized_total_revenue_bonus] = calculate_weighted_stock_data_on_dict(financials_quarterly,            'financials_quarterly',          'Total Revenue', NO_WEIGHTS,       stock_data, True, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=3.0, bonus_mon_dec=1/3.0)
+        [stock_data.quarterized_total_revenue, stock_data.quarterized_total_revenue_bonus] = calculate_weighted_stock_data_on_dict(financials_quarterly,            'financials_quarterly',          'Total Revenue', NO_WEIGHTS,       stock_data, True, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=3.0, bonus_mon_dec=1/3.0, bonus_neg_pres=1.0)
 
         # Earnings are ordered from oldest to newest so no reversing required for weights:
-        if earnings_quarterly != None and 'Earnings' in earnings_quarterly: [stock_data.quarterized_earnings, stock_data.quarterized_earnings_bonus] = calculate_weighted_stock_data_on_dict(earnings_quarterly['Earnings'],  'earnings_quarterly[Earnings]',  None,            NO_WEIGHTS, stock_data, False, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2, bonus_mon_dec=0.5)
+        if earnings_quarterly != None and 'Earnings' in earnings_quarterly: [stock_data.quarterized_earnings, stock_data.quarterized_earnings_bonus] = calculate_weighted_stock_data_on_dict(earnings_quarterly['Earnings'],  'earnings_quarterly[Earnings]',  None,            NO_WEIGHTS, stock_data, False, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2, bonus_mon_dec=0.5, bonus_neg_pres=0.25)
         else:                                                               stock_data.quarterized_earnings = None
 
         # TODO: ASAFR: Add a calculation of net_income_to_total_revenue_list
         # Financials are ordered newest to oldest so reversing is required for weights:
-        [stock_data.quarterized_net_income, stock_data.quarterized_net_income_bonus]    = calculate_weighted_stock_data_on_dict(financials_quarterly,            'financials_quarterly',          'Net Income',    NO_WEIGHTS, stock_data, True, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5)
+        [stock_data.quarterized_net_income, stock_data.quarterized_net_income_bonus]    = calculate_weighted_stock_data_on_dict(financials_quarterly,            'financials_quarterly',          'Net Income',    NO_WEIGHTS, stock_data, True, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5, bonus_neg_pres=0.25)
 
         # At this stage, use the Total Revenue and Net Income as backups for revenues and earnings. TODO: ASAFR: Later on run comparisons and take them into account as well!
         if   stock_data.annualized_net_income  is None and stock_data.quarterized_net_income is None: stock_data.effective_net_income = None
