@@ -1,7 +1,7 @@
 Market Data - Dual Listed by Securities Law
-As of  21/10/2021 
+As of (date and time) 21/10/2021 
 
-Name,Symbol ,ISIN,Index,Closing Price (0.01 NIS),Change (%),Turnover(NIS thousands),Last Trade,Foreign Stock Exchange
+Name,Symbol ,ISIN,Index Membership,Closing Price,Change (%),Turnover(NIS thousands),Last transaction,Foreign Stock Exchange
 ALLOT,ALLT,IL0010996549,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Dual listing",4838.00,0.60,557.88,EoD,NASDAQ GSM
 ARKO CORP,ARKO,US0412421085,,3083.00,-0.77,1162.63,EoD,NASDAQ-CM
 AUDIOCODES,AUDC,IL0010829658,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Industrials, TA-125 Fossil Free, TA-Dual listing",11500.00,-0.95,5546.59,EoD,NASDAQ GSM
