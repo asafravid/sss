@@ -388,7 +388,7 @@ def research_db(sectors_list, sectors_filter_out, countries_list, countries_filt
                             average_sec_per_iteration = round(elapsed_time_sec / iteration, int(sss.NUM_ROUND_DECIMALS / 3))
                             percentage_complete       = round(100 * iteration / (estimated_iterations_left+iteration), int(sss.NUM_ROUND_DECIMALS / 3))
                             estimated_time_left_sec   = int(round(average_sec_per_iteration*estimated_iterations_left, 0))
-                            print('time [sec] total/avg/%/left {:3.0f}/{:1.2f}/{:2.2f}/{:5} : pb {:6} | pi {:6} | evm {:6} | pe {:8} | evr {:8} | pm {:7}% -> num_results = {}'.format(elapsed_time_sec, average_sec_per_iteration, percentage_complete, estimated_time_left_sec, pb_limit, pi_limit, ev_millions_limit, price_to_earnings_limit, enterprise_value_to_revenue_limit, profit_margin_limit, num_results_for_pb_pi_ev_pe_evr_and_pm))
+                            print('time [sec] tot/avg/%/left {:3.0f}/{:1.2f}/{:2.2f}/{:5} : pb {:6.3f} | pi {:6.6f} | evm {:6.0f} | pe {:8.3f} | evr {:8.3f} | pm {:7.3f}% -> num_results = {}'.format(elapsed_time_sec, average_sec_per_iteration, percentage_complete, estimated_time_left_sec, pb_limit, pi_limit, ev_millions_limit, price_to_earnings_limit, enterprise_value_to_revenue_limit, profit_margin_limit, num_results_for_pb_pi_ev_pe_evr_and_pm))
     results_filename    = 'results_without_labels_{}'.format(db_filename)
 
     mesh_combined = combine_multi_dim_to_table_6d(multi_dim_data=research_num_results_multi_dim_data, dim6=pb_range, dim5=pi_range, dim4=ev_millions_range, dim3=pe_range, dim2_rows=evr_range, dim1_cols=pm_range)
