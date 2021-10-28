@@ -1,5 +1,16 @@
 # Overview
- Stock Scanner & Screener: A `yfinance`-based Stock Scanner & Screener for the Custom, Israeli, US, Swedish and Swiss Stock Markets (Extendable to other stock markets as well). Within the code, the following libraries and fonts are used:
+* Stock Scanner & Screener: A `yfinance`-based Stock Scanner & Screener Based on a Core Equation of Fundamental Financial Properties, followed by a Multi-dimensional Scan Ranking process.
+* Supports Custom Portfolio and the Israeli, US, Swedish and Swiss Stock Markets (Extendable to other stock markets as well).
+* The stocks scan and sorting is done according to the below documentation (Core Equation and Multi-Dimensional scan) written using Google Documents (https://www.google.com/docs/about/):
+
+# Core Equation
+http://bit.ly/SssCoreEquation
+
+# Muti-Dimensional Scan and Ranking Equation
+https://bit.ly/MultiDimensionalScan
+
+# Setup
+ Within the code, the following libraries and fonts are used:
  - Mandatory Python Libraries:
    - https://pypi.org/project/yfinance/
    - https://pypi.org/project/fpdf/
@@ -13,15 +24,6 @@
  - Fonts:
    - https://fonts2u.com/dejavu-sans-condensed.font
 
-The stocks scan and sorting is done according to the below documentation (Core Equation and Multi-Dimensional scan) written using Google Documents (https://www.google.com/docs/about/):
-
-# Core Equation
-http://bit.ly/SssCoreEquation
-
-# Muti-Dimensional Scan and Ranking Equation
-https://bit.ly/MultiDimensionalScan
-
-# Setup
 - Install `Python 3.6` or higher from https://www.python.org/downloads/
 - (Reccomended but Optional) Install `Pycharm Community Edition` from https://www.jetbrains.com/pycharm/download/
 - Download the `SSS` source code as a Zip file from this page (https://github.com/asafravid/sss/archive/master.zip) or clone/fork the repository directly
