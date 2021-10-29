@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.68 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.69 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -1393,6 +1393,22 @@ def calculate_altman_z_score_factor(stock_data):
     elif         stock_data.altman_z_score_factor <= 0:    stock_data.altman_z_score_factor   = NEGATIVE_ALTMAN_Z_FACTOR    # a very low value -> Much less attractive
 
 
+def print_sss_value_results(stock_data):
+    print('{:20}, ({:10}, {:10}), sss_value: {:.3e}, evr_effective: {:.3e}, trailing_12months_price_to_sales: {:.3e}, pe_effective: {:.3e}, effective_ev_to_ebitda: {:.3e}, effective_profit_margin: {:.3e}, held_percent_insiders: {:.3e}, price_to_book: {:.3e}, enterprise_value: {:.3e}, market_cap: {:.3e}, eqg_factor_effective: {:.3e}, rqg_factor_effective: {:.3e}, effective_peg_ratio: {:.3e}, ev_to_cfo_ratio_effective: {:.3e}, debt_to_equity_effective_used: {:.3e}, financial_currency: {:4}, summary_currency: {:4}, financial_currency_conversion_rate_mult_to_usd: {:.3e}, summary_currency_conversion_rate_mult_to_usd: {:.3e}, skip_reason: {}'.format(
+           stock_data.short_name[0:19],
+                  stock_data.sector[0:9],
+                          stock_data.country[0:9],
+                                  stock_data.sss_value, stock_data.evr_effective, stock_data.trailing_12months_price_to_sales,
+                                                                                                                      stock_data.pe_effective,
+                                                                                                                                            stock_data.effective_ev_to_ebitda, stock_data.effective_profit_margin, stock_data.held_percent_insiders,
+                                                                                                                                                                                                                                            stock_data.price_to_book, stock_data.enterprise_value,
+                                                                                                                                                                                                                                                                                             stock_data.market_cap, stock_data.eqg_factor_effective, stock_data.rqg_factor_effective,
+                                                                                                                                                                                                                                                                                                                                                                             stock_data.effective_peg_ratio, stock_data.ev_to_cfo_ratio_effective, stock_data.debt_to_equity_effective_used,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                    stock_data.financial_currency, stock_data.summary_currency,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     stock_data.financial_currency_conversion_rate_mult_to_usd,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                             stock_data.summary_currency_conversion_rate_mult_to_usd, stock_data.skip_reason))
+
+
 def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out, countries_list, countries_filter_out, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, db_filename):
     return_value = True
     if research_mode:
@@ -2282,13 +2298,7 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
         round_and_avoid_none_values(stock_data)
 
         if return_value:
-            print('{:20}, ({:10}, {:10}), sss_value: {:.3e}, evr_effective: {:.3e}, trailing_12months_price_to_sales: {:.3e}, pe_effective: {:.3e}, effective_ev_to_ebitda: {:.3e}, effective_profit_margin: {:.3e}, held_percent_insiders: {:.3e}, price_to_book: {:.3e}, enterprise_value: {:.3e}, market_cap: {:.3e}, eqg_factor_effective: {:.3e}, rqg_factor_effective: {:.3e}, effective_peg_ratio: {:.3e}, ev_to_cfo_ratio_effective: {:.3e}, debt_to_equity_effective_used: {:.3e}, financial_currency: {:4}, summary_currency: {:4}, financial_currency_conversion_rate_mult_to_usd: {:.3e}, summary_currency_conversion_rate_mult_to_usd: {:.3e}, skip_reason: {}'.format(
-                    stock_data.short_name[0:19],
-                 stock_data.sector[0:9],
-                        stock_data.country[0:9],
-                               stock_data.sss_value,stock_data.evr_effective,stock_data.trailing_12months_price_to_sales,stock_data.pe_effective,
-                                                                                                                                         stock_data.effective_ev_to_ebitda,stock_data.effective_profit_margin,stock_data.held_percent_insiders,stock_data.price_to_book,stock_data.enterprise_value,
-                                                                                                                                                                                                                                                                                          stock_data.market_cap,stock_data.eqg_factor_effective,stock_data.rqg_factor_effective,stock_data.effective_peg_ratio,stock_data.ev_to_cfo_ratio_effective, stock_data.debt_to_equity_effective_used, stock_data.financial_currency, stock_data.summary_currency, stock_data.financial_currency_conversion_rate_mult_to_usd, stock_data.summary_currency_conversion_rate_mult_to_usd, stock_data.skip_reason))
+            print_sss_value_results(stock_data)
         else:
             print('Skipped - skip_reason: {}'.format(stock_data.skip_reason))
         if not return_value and (not research_mode or VERBOSE_LOGS): print('                            ' + stock_data.skip_reason)
@@ -2413,7 +2423,7 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
                                 pass
 
                     if found_differences:
-                        get_stock_data_from_db_row(row_to_append)
+                        stock_data = get_stock_data_from_db_row(row_to_append)
                         if stock_data.sector             in ['None', '', 'Unknown']: stock_data.sector             = reference_db[symbol_index_in_reference_db][g_sector_index]
                         if stock_data.country            in ['None', '', 'Unknown']: stock_data.country            = reference_db[symbol_index_in_reference_db][g_country_index]
                         if stock_data.short_name         in ['None', '', 'Unknown']: stock_data.short_name         = reference_db[symbol_index_in_reference_db][g_name_index]
@@ -2424,6 +2434,8 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
                         # Re-process with more correct information:
                         sss_core_equation_value_set(stock_data)
                         diff_rows.append(reference_db[symbol_index_in_reference_db])
+                        print('[DB] Difference Found, recalculating sss_value: ', end='')
+                        print_sss_value_results(stock_data)
 
             dividends_sum = stock_data.last_dividend_0+stock_data.last_dividend_1+stock_data.last_dividend_2+stock_data.last_dividend_3
 
