@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.69 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.70 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -858,7 +858,7 @@ def text_to_num(text):
 
 
 def weighted_average(values_list, weights):
-    if VERBOSE_LOGS: print("[{} weighted_average]".format(__name__))
+    if VERBOSE_LOGS < 2: print("[{} weighted_average]".format(__name__))
     return sum([values_list[i]*weights[i] for i in range(len(values_list))])/sum(weights)
 
 
@@ -900,7 +900,7 @@ def set_skip_reason(stock_data):
 
 
 def sss_core_equation_value_set(stock_data):
-    if VERBOSE_LOGS: print("[{} sss_core_equation_value_set]".format(__name__))
+    if VERBOSE_LOGS < 2: print("[{} sss_core_equation_value_set]".format(__name__))
     if stock_data.shares_outstanding and stock_data.net_income_to_common_shareholders != None: stock_data.nitcsh_to_shares_outstanding = float(stock_data.net_income_to_common_shareholders) / float(stock_data.shares_outstanding)
     if stock_data.employees          and stock_data.net_income_to_common_shareholders != None: stock_data.nitcsh_to_num_employees = float(stock_data.net_income_to_common_shareholders) / float(stock_data.employees)
 
@@ -1204,7 +1204,7 @@ def round_and_avoid_none_values(stock_data):
 
 
 def calculate_weighted_stock_data_on_dict(dict_input, dict_name, str_in_dict, weights, stock_data, reverse_required, force_only_sum=False, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=1.0, bonus_mon_dec=1.0, bonus_neg_pres=1.0):
-    if VERBOSE_LOGS: print("[{} calculate_weighted_stock_data_on_dict]".format(__name__))
+    if VERBOSE_LOGS < 2: print("[{} calculate_weighted_stock_data_on_dict]".format(__name__))
     weight_index  = 0
     weighted_list = []
     weights_sum   = 0
@@ -1267,7 +1267,7 @@ def calculate_weighted_stock_data_on_dict(dict_input, dict_name, str_in_dict, we
 
 
 def calculate_weighted_ratio_from_dict(dict_input, dict_name, str_in_dict_numerator, str_in_dict_denominator, weights, stock_data, default_return_value, reverse_required, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=1.0, bonus_mon_dec=1.0, bonus_neg_pres=1.0):
-    if VERBOSE_LOGS: print("[{} calculate_weighted_ratio_from_dict]".format(__name__))
+    if VERBOSE_LOGS < 2: print("[{} calculate_weighted_ratio_from_dict]".format(__name__))
     return_value         = default_return_value
     weighted_ratios_list = []
     all_pos       = True  # Values are all positive
@@ -1308,7 +1308,7 @@ def calculate_weighted_ratio_from_dict(dict_input, dict_name, str_in_dict_numera
 
 
 def calculate_weighted_diff_from_dict(dict_input, dict_name, str_in_dict_left_term, str_in_dict_right_term, weights, stock_data, default_return_value, reverse_required, force_only_sum=False):
-    if VERBOSE_LOGS: print("[{} calculate_weighted_diff_from_dict]".format(__name__))
+    if VERBOSE_LOGS < 2: print("[{} calculate_weighted_diff_from_dict]".format(__name__))
     return_value         = default_return_value
     weighted_diffs_list = []
     try:
@@ -1324,7 +1324,7 @@ def calculate_weighted_diff_from_dict(dict_input, dict_name, str_in_dict_left_te
 
 
 def calculate_weighted_sum_from_2_dicts(dict1_input, dict1_name, str_in_dict1, dict2_input, dict2_name, str_in_dict2, weights, stock_data, default_return_value, reverse_required1, reverse_required2, force_only_sum=False):
-    if VERBOSE_LOGS: print("[{} calculate_weighted_sum_from_2_dicts]".format(__name__))
+    if VERBOSE_LOGS < 2: print("[{} calculate_weighted_sum_from_2_dicts]".format(__name__))
     return_value       = default_return_value
     weighted_sums_list = []
     try:
@@ -1340,7 +1340,7 @@ def calculate_weighted_sum_from_2_dicts(dict1_input, dict1_name, str_in_dict1, d
 
 
 def calculate_current_vs_previous_change_ratio(current_value, previous_value):
-    if VERBOSE_LOGS: print("[{} calculate_current_vs_previous_change_ratio]".format(__name__))
+    if VERBOSE_LOGS < 2: print("[{} calculate_current_vs_previous_change_ratio]".format(__name__))
     if   current_value >  0 and previous_value >  0: value_to_return = current_value /previous_value - 1  #  100/ 1000 - 1 = -0.9;  1000/ 100 - 1 = 9
     elif current_value == 0 and previous_value >  0: value_to_return = current_value /previous_value - 1  #  100/ 1000 - 1 = -0.9;  1000/ 100 - 1 = 9
     elif current_value >  0 and previous_value == 0: value_to_return =  1  #  100% Growth (from     0        to     positive)
@@ -1374,7 +1374,6 @@ def calculate_current_vs_previous_change_ratio(current_value, previous_value):
 # - Investors can use Altman Z-score Plus to evaluate corporate credit risk. A score below 1.8 means it's likely the company is headed for bankruptcy, while companies with scores above 3 are not likely to go bankrupt. Investors may consider purchasing a stock if its Altman Z-Score value is closer to 3 and selling, or shorting, a stock if the value is closer to 1.8.
 # Beneish M Score
 def calculate_altman_z_score_factor(stock_data):
-    if VERBOSE_LOGS: print("[{} calculate_altman_z_score_factor]".format(__name__))
     stock_data.altman_z_score_factor = 0
 
     # TODO: ASAFR: Each of the elements can (and should) most probably be calculated by quarterized and annualized (and then effective) ratio prior
@@ -1472,9 +1471,7 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
             if stock_data.summary_currency == 'ILA':  # Sometimes (in TASE mode) in info['currency'] ILA may show instead of ILS so just substitute
                 stock_data.summary_currency = 'ILS'
             log_id = 0
-            if VERBOSE_LOGS: print("[{} {}]".format(__name__, 1))
             if currency_conversion_tool:
-                if VERBOSE_LOGS: print("[{} {}]".format(__name__, 2))
                 stock_data.financial_currency_conversion_rate_mult_to_usd = round(1.0/currency_conversion_tool[stock_data.financial_currency], NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
                 stock_data.summary_currency_conversion_rate_mult_to_usd   = round(1.0/currency_conversion_tool[stock_data.summary_currency],   NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
             elif currency_conversion_tool_alternative:
@@ -1490,6 +1487,20 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
 
             financials_yearly                           = symbol.get_financials(as_dict=True, freq="yearly")
             financials_quarterly                        = symbol.get_financials(as_dict=True, freq="quarterly")
+
+            if VERBOSE_LOGS:
+                print('[DB Debug] Symbol: {}', stock_data.symbol)
+                print('[DB Debug] info: {}', info)
+                print('[DB Debug] cash_flows_yearly: {}', cash_flows_yearly)
+                print('[DB Debug] cash_flows_quarterly: {}', cash_flows_quarterly)
+                print('[DB Debug] balance_sheets_yearly: {}', balance_sheets_yearly)
+                print('[DB Debug] balance_sheets_quarterly: {}', balance_sheets_quarterly)
+                print('[DB Debug] earnings_yearly: {}', earnings_yearly)
+                print('[DB Debug] earnings_yearly: {}', earnings_quarterly)
+                print('[DB Debug] financials_yearly: {}', financials_yearly)
+                print('[DB Debug] financials_quarterly: {}', financials_quarterly)
+
+
             # institutional_holders                = symbol.get_institutional_holders(as_dict=True)
             # sustainability                       = symbol.get_sustainability(as_dict=True)
             # major_holders                        = symbol.get_major_holders(as_dict=True)
@@ -1533,7 +1544,7 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
         if stock_data.annualized_total_liabilities    is None and stock_data.quarterized_total_liabilities != None: stock_data.annualized_total_liabilities  = stock_data.quarterized_total_liabilities*QUARTERLY_YEARLY_MISSING_FACTOR
         if stock_data.quarterized_total_liabilities   is None and stock_data.annualized_total_liabilities  != None: stock_data.quarterized_total_liabilities = stock_data.annualized_total_liabilities *QUARTERLY_YEARLY_MISSING_FACTOR
 
-        if VERBOSE_LOGS: print("[{} {}]".format(__name__, 3))
+        if VERBOSE_LOGS < 2: print("[{} {}]".format(__name__, 3))
 
         # The correct methos is the TTM only: avoid (quareterly+annual)/2 - Keep it Simple -> Apply to all calculations
         # TODO: ASAFR: In the next stage - add the other current and other ratio to a sum of the ratios Investigate prior
@@ -1628,8 +1639,6 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                 boost_cont_dec_revenue    = True # Will be set to (a Final Value of) True if there is a continuous increase in the revenue
                 boost_neg_earnings        = False
                 try:
-                    if VERBOSE_LOGS: print("[{} {}]".format(__name__, 4))
-
                     for key in earnings_yearly['Revenue']:
                         if float(earnings_yearly['Revenue'][key]) > 0:
                             earnings_to_revenues_list.append((float(earnings_yearly['Earnings'][key])/float(earnings_yearly['Revenue'][key]))*PROFIT_MARGIN_YEARLY_WEIGHTS[weight_index])
@@ -1697,8 +1706,6 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                 boost_cont_dec_revenue    = True # Will be set to (Final Value of) True if there is a continuous increase in the revenue
                 boost_neg_earnings        = False
                 try:
-                    if VERBOSE_LOGS: print("[{} {}]".format(__name__, 5))
-
                     for key in earnings_quarterly['Revenue']:
                         if float(earnings_quarterly['Revenue'][key]) > 0:
                             earnings_to_revenues_list.append((float(earnings_quarterly['Earnings'][key])/float(earnings_quarterly['Revenue'][key]))*PROFIT_MARGIN_QUARTERLY_WEIGHTS[weight_index])
@@ -1773,7 +1780,6 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                     qeg_weights_sum += EARNINGS_WEIGHTS[weight_index-1]
                 previous_earnings = earnings_yearly['Earnings'][key]
                 weight_index     += 1
-            if VERBOSE_LOGS: print("[{} {}]".format(__name__, 6))
 
             stock_data.annualized_earnings = stock_data.financial_currency_conversion_rate_mult_to_usd*sum(earnings_list) / weights_sum  # Multiplying by the factor to get the valu in USD.
             if len(qeg_list):
@@ -1801,8 +1807,6 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                 previous_revenue = earnings_yearly['Revenue'][key]
                 weight_index     += 1
             if len(qrg_list):
-                if VERBOSE_LOGS: print("[{} {}]".format(__name__, 7))
-
                 stock_data.rqg_yoy = sum(qrg_list) / qrg_weights_sum
             else:
                 stock_data.rqg_yoy = None
@@ -1821,7 +1825,6 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
             qtrg_weights_sum = 0
             previous_net_income = None
             previous_total_revenue = None
-            if VERBOSE_LOGS: print("[{} {}]".format(__name__, 8))
 
             for key in reversed(list(financials_yearly)):  # 1st will be oldest
                 if 'Net Income' in financials_yearly[key]:
@@ -1849,12 +1852,9 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                     previous_total_revenue = financials_yearly[key]['Total Revenue']
                     qtrg_weight_index += 1
             if len(net_income_list):
-                if VERBOSE_LOGS: print("[{} {}]".format(__name__, 9))
-
                 stock_data.annualized_net_income = stock_data.financial_currency_conversion_rate_mult_to_usd * sum(net_income_list) / weights_sum  # Multiplying by the factor to get the valu in USD.
             else:
                 stock_data.annualized_net_income = None
-            if VERBOSE_LOGS: print("[{} {}]".format(__name__, 10))
 
             if len(qnig_list):
                 stock_data.niqg_yoy = sum(qnig_list) / qnig_weights_sum
@@ -1964,23 +1964,15 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                 stock_data.enterprise_value_to_ebitda *= stock_data.summary_currency_conversion_rate_mult_to_usd  # The lower the better: https://www.investopedia.com/ask/answers/072715/what-considered-healthy-evebitda.asp
 
                 # Calculate ebitda from enterprise_value_to_ebitda:
-                if VERBOSE_LOGS: print("[{} {}]".format(__name__, 11))
-
                 if stock_data.enterprise_value_to_ebitda != 0: stock_data.ebitda = (stock_data.enterprise_value/stock_data.enterprise_value_to_ebitda + stock_data.ebitd)/2
         else:
             if stock_data.ebitd != 0:
-                if VERBOSE_LOGS: print("[{} {}]".format(__name__, 12))
-
                 stock_data.enterprise_value_to_ebitda = stock_data.enterprise_value/stock_data.ebitd
 
         if stock_data.enterprise_value_to_ebitda != None:
-            if VERBOSE_LOGS: print("[{} {}]".format(__name__, 13))
-
             stock_data.effective_ev_to_ebitda = (stock_data.enterprise_value_to_ebitda + stock_data.enterprise_value/stock_data.ebitda if stock_data.ebitda != 0 else stock_data.enterprise_value_to_ebitda)/2
         else:
             stock_data.effective_ev_to_ebitda = EV_TO_EBITDA_MAX_UNKNOWN
-
-        if VERBOSE_LOGS: print("[{} {}]".format(__name__, 14))
 
         if 'trailingPE' in info:
             stock_data.trailing_price_to_earnings  = info['trailingPE']  # https://www.investopedia.com/terms/t/trailingpe.asp
@@ -1991,8 +1983,6 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
         elif stock_data.effective_earnings != None and stock_data.effective_earnings != 0:
             stock_data.trailing_price_to_earnings  = stock_data.market_cap / stock_data.effective_earnings # Calculate manually.
         if isinstance(stock_data.trailing_price_to_earnings,str):  stock_data.trailing_price_to_earnings  = None # Mark as None, so as to try and calculate manually.
-
-        if VERBOSE_LOGS: print("[{} {}]".format(__name__, 15))
 
         if 'forwardPE' in info:
             stock_data.forward_price_to_earnings  = info['forwardPE']  # https://www.investopedia.com/terms/t/trailingpe.asp
@@ -2008,7 +1998,6 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
 
         # Handle Negative Values of P/E: Negative P/E handling (TODO: ASAFR: Research this, maybe a smiling parabola is preferred, or some different less harsh function than 1/-x, like some damper n/[e+X])
         # Sources: https://www.investopedia.com/ask/answers/05/negativeeps.asp
-        if VERBOSE_LOGS: print("[{} {}]".format(__name__, 16))
 
         if stock_data.trailing_price_to_earnings != None:
             if   stock_data.trailing_price_to_earnings  < 0: stock_data.trailing_price_to_earnings = -NEGATIVE_EARNINGS_FACTOR/stock_data.trailing_price_to_earnings
@@ -2043,8 +2032,6 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
         if stock_data.two_hundred_day_average                                                      is None: stock_data.two_hundred_day_average = stock_data.previous_close
         if stock_data.previous_close != None and stock_data.previous_close < stock_data.fifty_two_week_low: stock_data.previous_close          = stock_data.fifty_two_week_low
 
-        if VERBOSE_LOGS: print("[{} {}]".format(__name__, 17))
-
         if stock_data.two_hundred_day_average > 0.0: stock_data.previous_close_percentage_from_200d_ma  = 100.0 * ((stock_data.previous_close - stock_data.two_hundred_day_average) / stock_data.two_hundred_day_average)
         if stock_data.fifty_two_week_low      > 0.0: stock_data.previous_close_percentage_from_52w_low  = 100.0 * ((stock_data.previous_close - stock_data.fifty_two_week_low     ) / stock_data.fifty_two_week_low     )
         if stock_data.fifty_two_week_high     > 0.0: stock_data.previous_close_percentage_from_52w_high = 100.0 * ((stock_data.previous_close - stock_data.fifty_two_week_high    ) / stock_data.fifty_two_week_high    )
@@ -2055,12 +2042,8 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                 stock_data.dist_from_low_factor = (stock_data.previous_close - stock_data.fifty_two_week_low)/(0.5*(stock_data.fifty_two_week_high-stock_data.fifty_two_week_low))
             stock_data.eff_dist_from_low_factor = (DIST_FROM_LOW_FACTOR_DAMPER + stock_data.dist_from_low_factor) if stock_data.dist_from_low_factor < 1.0 else (stock_data.dist_from_low_factor**DIST_FROM_LOW_FACTOR_HIGHER_THAN_ONE_POWER)
 
-        if VERBOSE_LOGS: print("[{} {}]".format(__name__, 18))
-
         if stock_data.trailing_eps != None and stock_data.previous_close != None and stock_data.previous_close > 0:
             stock_data.trailing_eps_percentage = stock_data.trailing_eps / stock_data.previous_close
-
-        if VERBOSE_LOGS: print("[{} {}]".format(__name__, 19))
 
         if 'priceToBook'                                in info:
             stock_data.price_to_book = info['priceToBook']
@@ -2115,8 +2098,6 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
 
         if 'netIncomeToCommon' in info: stock_data.net_income_to_common_shareholders = info['netIncomeToCommon']
         else:                           stock_data.net_income_to_common_shareholders = None # TODO: ASAFR: It may be possible to calculate this manually
-
-        if VERBOSE_LOGS: print("[{} {}]".format(__name__, 20))
 
         # if no effective_ev_to_ebitda, use earnings.
         if stock_data.effective_ev_to_ebitda is None and stock_data.enterprise_value != None and stock_data.enterprise_value != 0 and stock_data.effective_earnings != None and stock_data.effective_earnings != 0:
@@ -2195,7 +2176,6 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                 stock_data.annualized_ev_to_cfo_ratio = -NEGATIVE_CFO_FACTOR/(float(stock_data.enterprise_value)/stock_data.annualized_cash_flow_from_operating_activities)
         else:
             stock_data.annualized_ev_to_cfo_ratio = ev_to_cfo_ratio_limit * 1000
-        if VERBOSE_LOGS: print("[{} {}]".format(__name__, 101))
         if stock_data.quarterized_cash_flow_from_operating_activities != None:
             if stock_data.quarterized_cash_flow_from_operating_activities >= 0:
                 if stock_data.enterprise_value == 0 or stock_data.quarterized_cash_flow_from_operating_activities == 0: # When 0, it means either EV is 0 (strange!) or a very very good cash flow (strange as well)
@@ -2209,7 +2189,6 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
 
         # Seems value is calculated relatively similarly in dual (TASE, NASDAQ) stocks so no compensation required
         stock_data.ev_to_cfo_ratio_effective = (stock_data.quarterized_ev_to_cfo_ratio) # Prefer TTM only
-        if VERBOSE_LOGS: print("[{} {}]".format(__name__, 200))
         if 'priceToSalesTrailing12Months' in info and info['priceToSalesTrailing12Months'] != None:
             stock_data.trailing_12months_price_to_sales = info['priceToSalesTrailing12Months'] # https://www.investopedia.com/articles/fundamental/03/032603.asp#:~:text=The%20price%2Dto%2Dsales%20ratio%20(Price%2FSales%20or,the%20more%20attractive%20the%20investment.
             if isinstance(stock_data.trailing_12months_price_to_sales, str):  stock_data.trailing_12months_price_to_sales = None
@@ -2259,13 +2238,11 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
         else:
             stock_data.price_to_earnings_to_growth_ratio = PEG_UNKNOWN
 
-        if VERBOSE_LOGS: print("[{} {}]".format(__name__, 500))
         if stock_data.price_to_earnings_to_growth_ratio is None or stock_data.price_to_earnings_to_growth_ratio == PEG_UNKNOWN:
             if stock_data.eqg_effective != 0 and stock_data.effective_price_to_earnings > 0:
                 stock_data.price_to_earnings_to_growth_ratio = stock_data.effective_price_to_earnings / stock_data.eqg_effective
             else:
                 stock_data.price_to_earnings_to_growth_ratio = stock_data.effective_price_to_earnings * PEG_UNKNOWN # At this stage effective_price_to_earnings is always positive so this code will not be reached
-        if VERBOSE_LOGS: print("[{} {}]".format(__name__, 600))
         if   stock_data.price_to_earnings_to_growth_ratio > 0: stock_data.effective_peg_ratio =  stock_data.price_to_earnings_to_growth_ratio
         elif stock_data.price_to_earnings_to_growth_ratio < 0: stock_data.effective_peg_ratio = -NEGATIVE_PEG_RATIO_FACTOR/stock_data.price_to_earnings_to_growth_ratio
         else                                                 : stock_data.effective_peg_ratio =  1.0  # Something must be wrong, so take a neutral value of 1.0
@@ -2301,7 +2278,7 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
             print_sss_value_results(stock_data)
         else:
             print('Skipped - skip_reason: {}'.format(stock_data.skip_reason))
-        if not return_value and (not research_mode or VERBOSE_LOGS): print('                            ' + stock_data.skip_reason)
+        if not return_value and (not research_mode or VERBOSE_LOGS < 2): print('                            ' + stock_data.skip_reason)
 
         return return_value
 
@@ -2396,7 +2373,7 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
                 if symbol_index_in_reference_db >= 0:
                     found_differences = False
                     for index in range(len(g_header_row)):
-                        if (VERBOSE_LOGS): print('      comparing column {}'.format(g_header_row[index]))
+                        if (VERBOSE_LOGS < 2): print('      comparing column {}'.format(g_header_row[index]))
                         if type(row_to_append[index]) == int or type(row_to_append[index]) == float:
                             try:
                                 if g_header_row[index] in reference_db_title_row:
@@ -2539,8 +2516,6 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
     symbols_nasdaq_100_csv  = []
     symbols_russel1000      = []
     symbols_russel1000_csv  = []
-    stocks_list_tase        = []
-
 
     if not tase_mode and not research_mode and read_all_country_symbols not in [sss_config.ALL_COUNTRY_SYMBOLS_SIX, sss_config.ALL_COUNTRY_SYMBOLS_ST]:
         payload            = pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies') # There are 2 tables on the Wikipedia page, get the first table
@@ -2593,8 +2568,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
                         symbols_russel1000_csv.append(row[0])
                         row_index += 1
 
-        symbols_tase     = []  # symbols_tase       = ['ALD.TA', 'ABIL.TA', 'ACCL.TA', 'ADGR.TA', 'ADKA.TA', 'ARDM.TA', 'AFHL.TA', 'AFPR.TA', 'AFID.TA', 'AFRE.TA', 'AICS.TA', 'ARPT.TA', 'ALBA.TA', 'ALMD.TA', 'ALLT.TA', 'AMDA.L.TA', 'ALMA.TA', 'ALGS.TA', 'ALHE.TA', 'ALRPR.TA', 'ASPF.TA', 'AMAN.TA', 'AMRK.TA', 'AMOT.TA', 'ANLT.TA', 'ANGL.TA', 'APIO.M.TA', 'APLP.TA', 'ARD.TA', 'ARAD.TA', 'ARAN.TA', 'ARNA.TA', 'ARKO.TA', 'ARYT.TA', 'ASHO.TA', 'ASHG.TA', 'ASPR.TA', 'ASGR.TA', 'ATRY.TA', 'AUDC.TA', 'AUGN.TA', 'AURA.TA', 'SHVA.TA', 'AVER.TA', 'AVGL.TA', 'AVIA.TA', 'AVIV.TA', 'AVLN.TA', 'AVRT.TA', 'AYAL.TA', 'AZRM.TA', 'AZRG.TA', 'BCOM.TA', 'BYAR.TA', 'BBYL.TA', 'BRAN.TA', 'BVC.TA', 'BYSD.TA', 'ORL.TA', 'BSEN.TA', 'BEZQ.TA', 'BGI-M.TA', 'BIG.TA', 'BIOV.TA', 'BOLT.TA', 'BLRX.TA', 'PHGE.TA', 'BIRM.TA', 'BLSR.TA', 'BOTI.TA', 'BONS.TA', 'BCNV.TA', 'BWAY.TA', 'BRAM.TA', 'BRND.TA', 'BNRG.TA', 'BRIL.TA', 'BRMG.TA', 'CISY.TA', 'CAMT.TA', 'CANF.TA', 'CSURE.TA', 'CNMD.TA', 'CNZN.TA', 'CPTP.TA', 'CRSO.TA', 'CRMT.TA', 'CAST.TA', 'CEL.TA', 'CHAM.TA', 'CHR.TA', 'CMCT.TA', 'CMCTP.TA', 'CTPL5.TA', 'CTPL1.TA', 'CLBV.TA', 'CBI.TA', 'CLIS.TA', 'CFX.TA', 'CDEV.TA', 'CGEN.TA', 'CMDR.TA', 'DNA.TA', 'DANH.TA', 'DANE.TA', 'DCMA.TA', 'DLRL.TA', 'DLEA.TA', 'DEDR.L.TA', 'DLEKG.TA', 'DELT.TA', 'DIMRI.TA', 'DIFI.TA', 'DSCT.TA', 'DISI.TA', 'DRAL.TA', 'DORL.TA', 'DRSL.TA', 'DUNI.TA', 'EMCO.TA', 'EDRL.TA', 'ELAL.TA', 'EMITF.TA', 'EMTC.TA', 'ESLT.TA', 'ELCO.TA', 'ELDAV.TA', 'ELTR.TA', 'ECP.TA', 'ELCRE.TA', 'ELWS.TA', 'ELLO.TA', 'ELMR.TA', 'ELRN.TA', 'ELSPC.TA', 'EMDV.TA', 'ENDY.TA', 'ENOG.TA', 'ENRG.TA', 'ENLT.TA', 'ENLV.TA', 'EQTL.TA', 'EFNC.TA', 'EVGN.TA', 'EXPO.TA', 'FNTS.TA', 'FTAL.TA', 'FIBI.TA', 'FIBIH.TA', 'FGAS.TA', 'FBRT.TA', 'FRSX.TA', 'FORTY.TA', 'FOX.TA', 'FRSM.TA', 'FRDN.TA', 'GOSS.TA', 'GFC-L.TA', 'GPGB.TA', 'GADS.TA', 'GSFI.TA', 'GAON.TA', 'GAGR.TA', 'GZT.TA', 'GNRS.TA', 'GIBUI.TA', 'GILT.TA', 'GNGR.TA', 'GIVO.L.TA', 'GIX.TA', 'GLTC.TA', 'GLEX.L.TA', 'GKL.TA', 'GLRS.TA', 'GODM-M.TA', 'GLPL.TA', 'GOLD.TA', 'GOHO.TA', 'GOLF.TA', 'HDST.TA', 'HAP.TA', 'HGG.TA', 'HAIN.TA', 'HMAM.TA', 'MSBI.TA', 'HAMAT.TA', 'HAML.TA', 'HNMR.TA', 'HARL.TA', 'HLAN.TA', 'HRON.TA', 'HOD.TA', 'HLMS.TA', 'IBI.TA', 'IBITEC.F.TA', 'ICB.TA', 'ICCM.TA', 'ICL.TA', 'IDIN.TA', 'IES.TA', 'IFF.TA', 'ILDR.TA', 'ILX.TA', 'IMCO.TA', 'INBR.TA', 'INFR.TA', 'INRM.TA', 'INTL.TA', 'ININ.TA', 'INCR.TA', 'INTR.TA', 'IGLD-M.TA', 'ISCD.TA', 'ISCN.TA', 'ILCO.TA', 'ISOP.L.TA', 'ISHI.TA', 'ISRA.L.TA', 'ISRS.TA', 'ISRO.TA', 'ISTA.TA', 'ITMR.TA', 'JBNK.TA', 'KDST.TA', 'KAFR.TA', 'KMDA.TA', 'KRNV-L.TA', 'KARE.TA', 'KRDI.TA', 'KEN.TA', 'KRUR.TA', 'KTOV.TA', 'KLIL.TA', 'KMNK-M.TA', 'KNFM.TA', 'LHIS.TA', 'LAHAV.TA', 'ILDC.TA', 'LPHL.L.TA', 'LAPD.TA', 'LDER.TA', 'LSCO.TA', 'LUMI.TA', 'LEOF.TA', 'LEVI.TA', 'LVPR.TA', 'LBTL.TA', 'LCTX.TA', 'LPSN.TA', 'LODZ.TA', 'LUDN.TA', 'LUZN.TA', 'LZNR.TA', 'MGIC.TA', 'MLTM.TA', 'MMAN.TA', 'MSLA.TA', 'MTMY.TA', 'MTRX.TA', 'MAXO.TA', 'MTRN.TA', 'MEAT.TA', 'MDGS.TA', 'MDPR.TA', 'MDTR.TA', 'MDVI.TA', 'MGOR.TA', 'MEDN.TA', 'MTDS.TA', 'MLSR.TA', 'MNIN.TA', 'MNRT.TA', 'MMHD.TA', 'CMER.TA', 'MRHL.TA', 'MSKE.TA', 'MGRT.TA', 'MCRNT.TA', 'MGDL.TA', 'MIFT.TA', 'MNGN.TA', 'MNRV.TA', 'MLD.TA', 'MSHR.TA', 'MVNE.TA', 'MISH.TA', 'MZTF.TA', 'MBMX-M.TA', 'MDIN.L.TA', 'MRIN.TA', 'MYSZ.TA', 'MYDS.TA', 'NFTA.TA', 'NVPT.L.TA', 'NAWI.TA', 'NTGR.TA', 'NTO.TA', 'NTML.TA', 'NERZ-M.TA', 'NXTG.TA', 'NXTM.TA', 'NXGN-M.TA', 'NICE.TA', 'NISA.TA', 'NSTR.TA', 'NVMI.TA', 'NVLG.TA', 'ORTC.TA', 'ONE.TA', 'OPAL.TA', 'OPCE.TA', 'OPK.TA', 'OBAS.TA', 'ORAD.TA', 'ORMP.TA', 'ORBI.TA', 'ORIN.TA', 'ORA.TA', 'ORON.TA', 'OVRS.TA', 'PCBT.TA', 'PLTF.TA', 'PLRM.TA', 'PNAX.TA', 'PTNR.TA', 'PAYT.TA', 'PZOL.TA', 'PEN.TA', 'PFLT.TA', 'PERI.TA', 'PRGO.TA', 'PTCH.TA', 'PTX.TA', 'PMCN.TA', 'PHOE.TA', 'PLSN.TA', 'PLCR.TA', 'PPIL-M.TA', 'PLAZ-L.TA', 'PSTI.TA', 'POLI.TA', 'PIU.TA', 'POLY.TA', 'PWFL.TA', 'PRSK.TA', 'PRTC.TA', 'PTBL.TA', 'PLX.TA', 'QLTU.TA', 'QNCO.TA', 'RLCO.TA', 'RMN.TA', 'RMLI.TA', 'RANI.TA', 'RPAC.TA', 'RATI.L.TA', 'RTPT.L.TA', 'RAVD.TA', 'RVL.TA', 'RIT1.TA', 'AZRT.TA', 'REKA.TA', 'RIMO.TA', 'ROBO.TA', 'RTEN.L.TA', 'ROTS.TA', 'RSEL.TA', 'SRAC.TA', 'SFET.TA', 'SANO1.TA', 'SPNS.TA', 'SRFT.TA', 'STCM.TA', 'SAVR.TA', 'SHNP.TA', 'SCOP.TA', 'SEMG.TA', 'SLARL.TA', 'SHGR.TA', 'SALG.TA', 'SHAN.TA', 'SPEN.TA', 'SEFA.TA', 'SMNIN.TA', 'SKBN.TA', 'SHOM.TA', 'SAE.TA', 'SKLN.TA', 'SLGN.TA', 'SMTO.TA', 'SCC.TA', 'SPRG.TA', 'SPNTC.TA', 'STG.TA', 'STRS.TA', 'SMT.TA', 'SNFL.TA', 'SNCM.TA', 'SPGE.TA', 'SNEL.TA', 'TDGN-L.TA', 'TDRN.TA', 'TALD.TA', 'TMRP.TA', 'TASE.TA', 'TATT.TA', 'TAYA.TA', 'TNPV.TA', 'TEDE.TA', 'TFRLF.TA', 'TLRD.TA', 'TLSY.TA', 'TUZA.TA', 'TEVA.TA', 'TIGBUR.TA', 'TKUN.TA', 'TTAM.TA', 'TGTR.TA', 'TOPS.TA', 'TSEM.TA', 'TREN.TA', 'UNCR.TA', 'UNCT.L.TA', 'UNIT.TA', 'UNVO.TA', 'UTRN.TA', 'VCTR.TA', 'VILR.TA', 'VISN.TA', 'VTLC-M.TA', 'VTNA.TA', 'VNTZ-M.TA', 'WSMK.TA', 'WTS.TA', 'WILC.TA', 'WLFD.TA', 'XENA.TA', 'XTLB.TA', 'YAAC.TA', 'YBOX.TA', 'YHNF.TA', 'ZNKL.TA', 'ZMH.TA', 'ZUR.TA']
-        stocks_list_tase = []  # https://info.tase.co.il/eng/MarketData/Stocks/MarketData/Pages/MarketData.aspx
+        symbols_tase     = []
 
     if tase_mode and not research_mode:
         try:
@@ -2667,7 +2641,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
                             continue
                         else:
                             row_index += 1
-                            if VERBOSE_LOGS: print('[sss_run] ticker_column_list[index={}] = {}, row = {}'.format(index, ticker_column_list[index], row))
+                            if VERBOSE_LOGS < 2: print('[sss_run] ticker_column_list[index={}] = {}, row = {}'.format(index, ticker_column_list[index], row))
                             stock_symbol = row[ticker_column_list[index]]
                             if '.S.DX' not in stock_symbol: continue
                             symbols_st.append(stock_symbol)
@@ -2719,7 +2693,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
         symbols = symbols_snp500 + symbols_nasdaq_100_csv + symbols_russel1000_csv + symbols_united_states + symbols_six + symbols_st
 
         if tase_mode:
-            symbols = symbols_tase + stocks_list_tase
+            symbols = symbols_tase
 
         symbols = sorted(list(set(symbols)))
 
