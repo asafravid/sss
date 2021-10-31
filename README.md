@@ -40,7 +40,7 @@ https://bit.ly/MultiDimensionalScan
     - `pip[3] install currency.converter`
   
 # Run Step-By-Step Instructions
-- 1: Set the required scanning mode(s) (`custom`/`tase`/`nsr`/`all`) in `sss_run.py` and run `sss_run.py`
+- 1: Set the required scanning mode(s) (`custom`/`tase`/`nsr`/`all`) in `sss_config.py` and run `sss_run.py`
 - 2: A Results folder shall be created under `Results/<mode>/` Folder
 - 3: Feed the Results path into the `research_mode` (Multi-Dimensional Scan). A `PDF` and `sss_results_*.csv` files shall be created in the same folder
 
