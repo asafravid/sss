@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.71 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.72 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -132,10 +132,10 @@ PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_DECREASE_IN_REVENUE     = 0.2    # Pro
 PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_DECREASE_IN_EARNINGS = 0.25   # Provide a "bonus" for companies whose earnings       have been continuously decreasing quarterly
 PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_DECREASE_IN_REVENUE  = 0.1    # Provide a "bonus" for companies whose revenue        has  been continuously decreasing quarterly - TODO: ASAFR: This is a very good indicator for stock value growth
 PROFIT_MARGIN_DUPLICATION_FACTOR                                  = 8.0    # When copying profit margin (if either quarterized/annualized/profit_margin is missing) - devide by this factor
-NEGATIVE_CFO_FACTOR                                               = 10000.0   #
+NEGATIVE_CFO_FACTOR                                               = 100000.0   #
 NEGATIVE_PEG_RATIO_FACTOR                                         = 100000.0
 NEGATIVE_DEBT_TO_EQUITY_FACTOR                                    = 100.0   # -0.5 -> 50, and -0.001 -> 0.1
-NEGATIVE_EARNINGS_FACTOR                                          = 10000.0
+NEGATIVE_EARNINGS_FACTOR                                          = 100000.0
 DEBT_TO_EQUITY_MIN_BASE                                           = 0.001  # Clearing from 0 values for companies without debt
 
 FORWARD_PRICE_TO_EARNINGS_WEIGHT  = 0.125 # Give less weight to forward (estimation)
