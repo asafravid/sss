@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.72 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.73 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -1619,6 +1619,7 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
         if stock_data.employees is None: stock_data.employees = NUM_EMPLOYEES_UNKNOWN
 
         # Oldest is the lower index
+        alternative_annual_pm_required = True
         if earnings_yearly != None and 'Revenue' in earnings_yearly and 'Earnings' in earnings_yearly:
             len_revenue_list  = len(earnings_yearly['Revenue'])
             len_earnings_list = len(earnings_yearly['Earnings'])
@@ -1680,12 +1681,14 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                             stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_dec_revenue  or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_DECREASE_IN_REVENUE
                             stock_data.annualized_profit_margin_boost *= 1.0 if not boost_neg_earnings      or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_PRESENCE_OF_ANNUAL_NEGATIVE_EARNINGS
                             stock_data.annualized_profit_margin       /= stock_data.annualized_profit_margin_boost
+                        alternative_annual_pm_required = False
 
                 except Exception as e:
                     print("Exception in {} annualized_profit_margin: {}".format(stock_data.symbol, e))
                     stock_data.annualized_profit_margin = None
                     pass
         # TODO: ASAFR: This below can be duplicated for usage of total_revenue and net_income. Analyze and implement as/if required:
+        alternative_quarterly_pm_required = True
         if earnings_quarterly != None and 'Revenue' in earnings_quarterly and 'Earnings' in earnings_quarterly:
             len_revenue_list  = len(earnings_quarterly['Revenue'])
             len_earnings_list = len(earnings_quarterly['Earnings'])
@@ -1726,6 +1729,7 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                             last_revenue  = float(earnings_quarterly['Revenue' ][key])
                         weight_index += 1
                     if weights_sum > 0:
+                        alternative_quarterly_pm_required               = False
                         stock_data.quarterized_profit_margin            = sum(earnings_to_revenues_list)/weights_sum
                         if   stock_data.quarterized_profit_margin > 0 and used_weights > 1:  # boosts irrelevant if only 1 weight used
                             stock_data.quarterized_profit_margin_boost  = 1.0 if not boost_cont_inc_ratio    or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE
@@ -1751,6 +1755,11 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                     print("Exception in {} quarterized_profit_margin: {}".format(stock_data.symbol, e))
                     stock_data.quarterized_profit_margin = None
                     pass
+
+        # TODO: ASAFR: 1. Apply the bonuses here (configure) and test + verify
+        #              2. Add mon_dec and mon_inc bonuses here
+        if alternative_quarterly_pm_required:
+            [stock_data.quarterized_profit_margin, stock_data.quarterized_profit_margin_boost] = calculate_weighted_ratio_from_dict(financials_quarterly, 'quarterized_profit_margin', 'Net Income', 'Total Revenue', PROFIT_MARGIN_WEIGHTS, stock_data, 0, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=1.0, bonus_mon_dec=1.0, bonus_neg_pres=1.0)
 
         # Earnings are ordered from oldest to newest so no reversing required for weights:
         if earnings_yearly != None and 'Revenue' in earnings_yearly: [stock_data.annualized_revenue, stock_data.annualized_revenue_bonus] = calculate_weighted_stock_data_on_dict(earnings_yearly['Revenue'],    'earnings_yearly[Revenue]', None,            REVENUES_WEIGHTS, stock_data, False, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=4.0, bonus_mon_dec=0.25, bonus_neg_pres=1.0)
@@ -1818,6 +1827,7 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
             qnig_weight_index = 0
             qtrg_weight_index = 0
             net_income_list = []
+            earnings_to_revenues_list = []
             qnig_list = []
             qtrg_list = [] # Quarterly Total Revenue Growth
             weights_sum = 0
@@ -1825,6 +1835,8 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
             qtrg_weights_sum = 0
             previous_net_income = None
             previous_total_revenue = None
+            weight_index = 0
+            alternative_pm_weights_sum = 0
 
             for key in reversed(list(financials_yearly)):  # 1st will be oldest
                 if 'Net Income' in financials_yearly[key]:
@@ -1851,6 +1863,15 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                         qtrg_weights_sum += REVENUES_WEIGHTS[qtrg_weight_index - 1]
                     previous_total_revenue = financials_yearly[key]['Total Revenue']
                     qtrg_weight_index += 1
+                # Calculate an alternative to the profit_margin calculation: TODO: ASAFR: Apply the bonuses here as well!
+                if 'Net Income' in financials_yearly[key] and 'Total Revenue' in financials_yearly[key]:
+                    earnings_to_revenues_list.append((float(financials_yearly[key]['Net Income'])/float(financials_yearly[key]['Total Revenue']))*PROFIT_MARGIN_YEARLY_WEIGHTS[weight_index])
+                    alternative_pm_weights_sum += PROFIT_MARGIN_YEARLY_WEIGHTS[weight_index]
+                    weight_index += 1
+
+            if alternative_annual_pm_required and alternative_pm_weights_sum > 0:
+                stock_data.annualized_profit_margin = sum(earnings_to_revenues_list)/alternative_pm_weights_sum
+
             if len(net_income_list):
                 stock_data.annualized_net_income = stock_data.financial_currency_conversion_rate_mult_to_usd * sum(net_income_list) / weights_sum  # Multiplying by the factor to get the valu in USD.
             else:
@@ -2137,6 +2158,7 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
         if stock_data.quarterized_retained_earnings != None:
             stock_data.effective_retained_earnings = (stock_data.quarterized_retained_earnings) # Prefer TTM only
 
+        # TODO: ASAFR: This must be upgraded to the form of an ongoing ration calculations like done in Net Income / Total Revenue
         if stock_data.effective_total_assets != None and stock_data.effective_total_assets > 0 and stock_data.effective_net_income != None:
             stock_data.calculated_roa = ROA_DAMPER + stock_data.effective_net_income/stock_data.effective_total_assets
         if stock_data.calculated_roa != None and 0 < stock_data.calculated_roa < ROA_DAMPER:
