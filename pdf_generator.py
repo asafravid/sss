@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.52 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.53 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -124,7 +124,7 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
         telegram_discussion_group_description = 'עדכונים, תמיכה טכנית ודיונים'[::-1]
         open_source_description               = 'קוד פתוח'[::-1]
         the_engine_begind_description         = 'מנוע הסריקה'[::-1]
-        lecture_description                   = 'הרצאה על הסורק'[::-1]
+        lecture_description                   = 'הרצאות על הסורק'[::-1]
 
         pdf.set_text_color(0, 0, 200)  # blue
         pdf.cell(30, 3, txt=telegram_channel_description,          ln=0, align="C", border=1)
@@ -137,16 +137,16 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
         html_telegram_channel_description          = "<A HREF=""https://t.me/investorsIL"">t.me/investorsIL</A><"
         pdf.write_html(text=html_telegram_channel_description)
 
-        html_telegram_discussion_group_description = "   <A HREF=""http://t.me/StockScannerIL"">t.me/StockScannerIL</A>"
+        html_telegram_discussion_group_description = " | <A HREF=""http://t.me/StockScannerIL"">t.me/StockScannerIL</A>"
         pdf.write_html(text=html_telegram_discussion_group_description)
 
-        html_open_source_description               = " <A HREF=""http://bit.ly/OpenSourceStockScanner"">bit.ly/OpenSourceStockScanner</A>"
+        html_open_source_description               = " |<A HREF=""http://bit.ly/OpenSourceStockScanner"">bit.ly/OpenSourceStockScanner</A>"
         pdf.write_html(text=html_open_source_description)
 
-        html_the_engine_begind_description         = " <A HREF=""http://bit.ly/SssCoreEquation"">bit.ly/SssCoreEquation</A>"
+        html_the_engine_begind_description         = "|<A HREF=""http://bit.ly/SssCoreEquation"">bit.ly/SssCoreEquation</A>"
         pdf.write_html(text=html_the_engine_begind_description)
 
-        html_lecture_description                   = "  <A HREF=""http://bit.ly/SssLecture"">bit.ly/SssLecture</A>"
+        html_lecture_description                   = "| <A HREF=""http://bit.ly/SssLecture"">Core</A> | <A HREF=""https://bit.ly/ZoomLectureMultiDimScan"">MultiDim</A>"
         pdf.write_html(text=html_lecture_description)
 
         pdf.cell(200, 3, txt='', ln=1, align="R")
