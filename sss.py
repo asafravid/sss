@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.74 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.75 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -1275,10 +1275,10 @@ def calculate_weighted_ratio_from_dict(dict_input, dict_name, str_in_dict_numera
     mon_inc       = True  # Values are monotonically increasing
     mon_dec       = True  # Values are monotonically decreasing
     neg_pres      = False # Negative value presence
-    bonus         = 0
+    bonus         = 1
     try:
         for key in (reversed(list(dict_input)) if reverse_required else list(dict_input)):  # The 1st element will be the oldest, receiving the lowest weight
-            if str_in_dict_denominator in dict_input[key] and not math.isnan(dict_input[key][str_in_dict_denominator]) and str_in_dict_numerator in dict_input[key] and not math.isnan(dict_input[key][str_in_dict_numerator]):
+            if str_in_dict_denominator in dict_input[key] and not math.isnan(dict_input[key][str_in_dict_denominator]) and str_in_dict_numerator in dict_input[key] and not math.isnan(dict_input[key][str_in_dict_numerator]) and dict_input[key][str_in_dict_denominator] != 0:
                 current_ratio = (dict_input[key][str_in_dict_numerator] / dict_input[key][str_in_dict_denominator])
                 weighted_ratios_list.append(current_ratio)
                 if len(weighted_ratios_list) == 1:  # 1st value: save previous
@@ -1863,11 +1863,12 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                         qtrg_weights_sum += REVENUES_WEIGHTS[qtrg_weight_index - 1]
                     previous_total_revenue = financials_yearly[key]['Total Revenue']
                     qtrg_weight_index += 1
-                # Calculate an alternative to the profit_margin calculation: TODO: ASAFR: Apply the bonuses here as well!
+                # Calculate an alternative to the profit_margin calculation: TODO: ASAFR: Apply the bonuses and the previous comparison for slope bonus here as well!
                 if 'Net Income' in financials_yearly[key] and 'Total Revenue' in financials_yearly[key]:
-                    earnings_to_revenues_list.append((float(financials_yearly[key]['Net Income'])/float(financials_yearly[key]['Total Revenue']))*PROFIT_MARGIN_YEARLY_WEIGHTS[weight_index])
-                    alternative_pm_weights_sum += PROFIT_MARGIN_YEARLY_WEIGHTS[weight_index]
-                    weight_index += 1
+                    if float(financials_yearly[key]['Total Revenue']) > 0:
+                        earnings_to_revenues_list.append((float(financials_yearly[key]['Net Income'])/float(financials_yearly[key]['Total Revenue']))*PROFIT_MARGIN_YEARLY_WEIGHTS[weight_index])
+                        alternative_pm_weights_sum += PROFIT_MARGIN_YEARLY_WEIGHTS[weight_index]
+                        weight_index += 1
 
             if alternative_annual_pm_required and alternative_pm_weights_sum > 0:
                 stock_data.annualized_profit_margin = sum(earnings_to_revenues_list)/alternative_pm_weights_sum
@@ -1990,7 +1991,7 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
             if stock_data.ebitd != 0:
                 stock_data.enterprise_value_to_ebitda = stock_data.enterprise_value/stock_data.ebitd
 
-        if stock_data.enterprise_value_to_ebitda != None:
+        if stock_data.enterprise_value_to_ebitda != None and stock_data.enterprise_value_to_ebitda != 0:
             stock_data.effective_ev_to_ebitda = (stock_data.enterprise_value_to_ebitda + stock_data.enterprise_value/stock_data.ebitda if stock_data.ebitda != 0 else stock_data.enterprise_value_to_ebitda)/2
         else:
             stock_data.effective_ev_to_ebitda = EV_TO_EBITDA_MAX_UNKNOWN
