@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.73 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.74 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -1259,7 +1259,7 @@ def calculate_weighted_stock_data_on_dict(dict_input, dict_name, str_in_dict, we
         else:
             return_value = None
     except Exception as e:
-        print("Exception in {} {}}: {}".format(stock_data.symbol, dict_name, e))
+        print("Exception in {} {}: {}".format(stock_data.symbol, dict_name, e))
         return_value = None
         pass
 
@@ -1291,7 +1291,7 @@ def calculate_weighted_ratio_from_dict(dict_input, dict_name, str_in_dict_numera
                     neg_pres = True if neg_pres or current_ratio < 0                    else False
 
     except Exception as e:
-        print("Exception in {} {}}: {}".format(stock_data.symbol, dict_name, e))
+        print("Exception in {} {}: {}".format(stock_data.symbol, dict_name, e))
         pass
     if len(weighted_ratios_list):
         return_value = weighted_average(weighted_ratios_list, weights[:len(weighted_ratios_list)])
@@ -1316,7 +1316,7 @@ def calculate_weighted_diff_from_dict(dict_input, dict_name, str_in_dict_left_te
             if str_in_dict_right_term in dict_input[key] and not math.isnan(dict_input[key][str_in_dict_right_term]) and str_in_dict_left_term in dict_input[key] and not math.isnan(dict_input[key][str_in_dict_left_term]):
                 weighted_diffs_list.append((dict_input[key][str_in_dict_left_term] - dict_input[key][str_in_dict_right_term]))
     except Exception as e:
-        print("Exception in {} {}}: {}".format(stock_data.symbol, dict_name, e))
+        print("Exception in {} {}: {}".format(stock_data.symbol, dict_name, e))
         pass
     if len(weighted_diffs_list): return_value = sum(weighted_diffs_list) if force_only_sum else weighted_average(weighted_diffs_list, weights[:len(weighted_diffs_list)])
 
@@ -1332,7 +1332,7 @@ def calculate_weighted_sum_from_2_dicts(dict1_input, dict1_name, str_in_dict1, d
             if str_in_dict1 in dict1_input[key] and not math.isnan(dict1_input[key][str_in_dict1]) and str_in_dict2 in dict2_input[key] and not math.isnan(dict2_input[key][str_in_dict2]):
                 weighted_sums_list.append((dict1_input[key][str_in_dict1] + dict2_input[key][str_in_dict2]))
     except Exception as e:
-        print("Exception in {} {} {}}: {}".format(stock_data.symbol, dict1_name, dict2_name, e))
+        print("Exception in {} {} {}: {}".format(stock_data.symbol, dict1_name, dict2_name, e))
         pass
     if len(weighted_sums_list): return_value = sum(weighted_sums_list) if force_only_sum else weighted_average(weighted_sums_list, weights[:len(weighted_sums_list)])
 
