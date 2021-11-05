@@ -858,7 +858,7 @@ def text_to_num(text):
 
 
 def weighted_average(values_list, weights):
-    if VERBOSE_LOGS > 2: print("[{} weighted_average]".format(__name__))
+    if VERBOSE_LOGS > 2: print("[{} weighted_average]".format(__name__), end='')
     return sum([values_list[i]*weights[i] for i in range(len(values_list))])/sum(weights)
 
 
@@ -900,7 +900,7 @@ def set_skip_reason(stock_data):
 
 
 def sss_core_equation_value_set(stock_data):
-    if VERBOSE_LOGS > 2: print("[{} sss_core_equation_value_set]".format(__name__))
+    if VERBOSE_LOGS > 2: print("[{} sss_core_equation_value_set]".format(__name__), end='')
     if stock_data.shares_outstanding and stock_data.net_income_to_common_shareholders != None: stock_data.nitcsh_to_shares_outstanding = float(stock_data.net_income_to_common_shareholders) / float(stock_data.shares_outstanding)
     if stock_data.employees          and stock_data.net_income_to_common_shareholders != None: stock_data.nitcsh_to_num_employees = float(stock_data.net_income_to_common_shareholders) / float(stock_data.employees)
 
@@ -1204,7 +1204,7 @@ def round_and_avoid_none_values(stock_data):
 
 
 def calculate_weighted_stock_data_on_dict(dict_input, dict_name, str_in_dict, weights, stock_data, reverse_required, force_only_sum=False, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=1.0, bonus_mon_dec=1.0, bonus_neg_pres=1.0):
-    if VERBOSE_LOGS > 2: print("[{} calculate_weighted_stock_data_on_dict]".format(__name__))
+    if VERBOSE_LOGS > 2: print("[{} calculate_weighted_stock_data_on_dict]".format(__name__), end='')
     weight_index  = 0
     weighted_list = []
     weights_sum   = 0
@@ -1267,7 +1267,7 @@ def calculate_weighted_stock_data_on_dict(dict_input, dict_name, str_in_dict, we
 
 
 def calculate_weighted_ratio_from_dict(dict_input, dict_name, str_in_dict_numerator, str_in_dict_denominator, weights, stock_data, default_return_value, reverse_required, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=1.0, bonus_mon_dec=1.0, bonus_neg_pres=1.0):
-    if VERBOSE_LOGS > 2: print("[{} calculate_weighted_ratio_from_dict]".format(__name__))
+    if VERBOSE_LOGS > 2: print("[{} calculate_weighted_ratio_from_dict]".format(__name__), end='')
     return_value         = default_return_value
     weighted_ratios_list = []
     all_pos       = True  # Values are all positive
@@ -1308,7 +1308,7 @@ def calculate_weighted_ratio_from_dict(dict_input, dict_name, str_in_dict_numera
 
 
 def calculate_weighted_diff_from_dict(dict_input, dict_name, str_in_dict_left_term, str_in_dict_right_term, weights, stock_data, default_return_value, reverse_required, force_only_sum=False):
-    if VERBOSE_LOGS > 2: print("[{} calculate_weighted_diff_from_dict]".format(__name__))
+    if VERBOSE_LOGS > 2: print("[{} calculate_weighted_diff_from_dict]".format(__name__), end='')
     return_value         = default_return_value
     weighted_diffs_list = []
     try:
@@ -1324,7 +1324,7 @@ def calculate_weighted_diff_from_dict(dict_input, dict_name, str_in_dict_left_te
 
 
 def calculate_weighted_sum_from_2_dicts(dict1_input, dict1_name, str_in_dict1, dict2_input, dict2_name, str_in_dict2, weights, stock_data, default_return_value, reverse_required1, reverse_required2, force_only_sum=False):
-    if VERBOSE_LOGS > 2: print("[{} calculate_weighted_sum_from_2_dicts]".format(__name__))
+    if VERBOSE_LOGS > 2: print("[{} calculate_weighted_sum_from_2_dicts]".format(__name__), end='')
     return_value       = default_return_value
     weighted_sums_list = []
     try:
@@ -1340,7 +1340,7 @@ def calculate_weighted_sum_from_2_dicts(dict1_input, dict1_name, str_in_dict1, d
 
 
 def calculate_current_vs_previous_change_ratio(current_value, previous_value):
-    if VERBOSE_LOGS > 2: print("[{} calculate_current_vs_previous_change_ratio]".format(__name__))
+    if VERBOSE_LOGS > 2: print("[{} calculate_current_vs_previous_change_ratio]".format(__name__), end='')
     if   current_value >  0 and previous_value >  0: value_to_return = current_value /previous_value - 1  #  100/ 1000 - 1 = -0.9;  1000/ 100 - 1 = 9
     elif current_value == 0 and previous_value >  0: value_to_return = current_value /previous_value - 1  #  100/ 1000 - 1 = -0.9;  1000/ 100 - 1 = 9
     elif current_value >  0 and previous_value == 0: value_to_return =  1  #  100% Growth (from     0        to     positive)
@@ -2396,7 +2396,7 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
                 if symbol_index_in_reference_db >= 0:
                     found_differences = False
                     for index in range(len(g_header_row)):
-                        if (VERBOSE_LOGS > 2): print('      comparing column {}'.format(g_header_row[index]))
+                        if (VERBOSE_LOGS > 3): print('      comparing column {}'.format(g_header_row[index]))
                         if type(row_to_append[index]) == int or type(row_to_append[index]) == float:
                             try:
                                 if g_header_row[index] in reference_db_title_row:
