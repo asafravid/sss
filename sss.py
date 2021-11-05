@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.76 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.78 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -2004,8 +2004,10 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                 stock_data.trailing_price_to_earnings /= 100.0  # In TLV stocks, yfinance multiplies trailingPE by a factor of 100, so compensate
                 if stock_data.symbol in g_symbols_tase_duals:  # TODO: ASAFR: Do research and add this condition to all relevant cases in other fundamental parameters
                     stock_data.trailing_price_to_earnings *= stock_data.summary_currency_conversion_rate_mult_to_usd # Additionally, in TLV DUAL stocks this ratio is mistakenly calculated using PriceInNis/EarningsInUSD -> so Compensate
-        elif stock_data.effective_earnings != None and stock_data.effective_earnings != 0:
-            stock_data.trailing_price_to_earnings  = stock_data.market_cap / stock_data.effective_earnings # Calculate manually.
+        elif stock_data.effective_earnings != None and stock_data.effective_earnings != 0 and stock_data.market_cap != None:
+            stock_data.trailing_price_to_earnings = stock_data.market_cap       / stock_data.effective_earnings # Calculate manually.
+        elif stock_data.effective_net_income != None and stock_data.effective_net_income != 0 and stock_data.enterprise_value != None:
+            stock_data.trailing_price_to_earnings = stock_data.enterprise_value / stock_data.effective_net_income  # Calculate manually.
         if isinstance(stock_data.trailing_price_to_earnings,str):  stock_data.trailing_price_to_earnings  = None # Mark as None, so as to try and calculate manually.
 
         if 'forwardPE' in info:
@@ -2469,6 +2471,11 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
             rows.append(                           row_to_append)
             if dividends_sum: rows_only_div.append(row_to_append)
             else:             rows_no_div.append(  row_to_append)
+
+            # Probing:
+            for symbol in sss_config.research_mode_probe_list:
+                if symbol in stock_data.symbol:
+                    print('[Probe] {:5}: {:5} | '.format(symbol, len(rows)), end='')
 
 
 def download_ftp_files(filenames_list, ftp_path):

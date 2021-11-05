@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.54 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.55 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -29,12 +29,12 @@ ALL_COUNTRY_SYMBOLS_ST  = 3  # Swedish (Stockholm) Stock Exchange
 
 run_custom_tase      = False   # Custom Portfolio
 run_custom           = False
-run_tase             = True   # Tel Aviv Stock Exchange
+run_tase             = True    # Tel Aviv Stock Exchange
 run_nsr              = False   # NASDAQ100+S&P500+RUSSEL1000
 run_all              = False   # All Nasdaq Stocks
 run_six              = False    # All Swiss Stocks
 run_st               = False    # All (Stockholm) Swedish Stocks
-research_mode        = False     # Research Mode
+research_mode        = True     # Research Mode
 aggregate_only       = False
 research_mode_max_ev = False   # @JustLearning's suggestion in Telegram: Multi-Dimensional Scan by Max EV Limit rather than Min EV Limit
 
@@ -55,7 +55,7 @@ reference_run_six    = 'Results/Six/20211012-141034_S_Bdb_nRes30'
 reference_run_st     = 'Results/St/20210915-023602_St_Bdb_nRes130'
 
 new_run_custom = 'Results/Custom/20210917-201728_Bdb_nRes312_Custom'
-new_run_tase   = 'Results/Tase/20211105-113630_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes291'
+new_run_tase   = 'Results/Tase/20211105-164729_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes291'
 new_run_nsr    = 'Results/Nsr/20211020-050008_Tchnlgy3.0_FnnclSrvcs0.75_Bdb_nRes855'
 new_run_all    = 'Results/All/20211024-030156_Tchnlgy3.0_FnnclSrvcs0.75_A_Bdb_nRes3214'
 new_run_six    = 'Results/Six/20211012-141034_S_Bdb_nRes30'
@@ -64,6 +64,8 @@ new_run_st     = 'Results/St/20210915-023602_St_Bdb_nRes130'
 # TODO: ASAFR: Why is normalized AGIO giving a Good low value?? this is deceiving! Check this
 custom_portfolio      = ['EXC']
 custom_portfolio_tase = ['TDGN']
+
+research_mode_probe_list = []  # ['MTDS']
 
 # TODO: ASAFR: Check these warnings:
 # [DB] AAP       (0015/0016/7427 [0.22%], Diff: 0001), time/left/avg [sec]:    56/25938/3.50 -> /home/asaf/.local/lib/python3.8/site-packages/yfinance/base.py:542: UserWarning: DataFrame columns are not unique, some columns will be omitted.
