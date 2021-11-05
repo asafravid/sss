@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.75 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.76 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -62,6 +62,7 @@ import sss_config
 import sss_post_processing
 import math
 import json
+import traceback
 
 from contextlib             import closing
 from threading              import Thread
@@ -1254,12 +1255,12 @@ def calculate_weighted_stock_data_on_dict(dict_input, dict_name, str_in_dict, we
         if neg_pres: bonus *= bonus_neg_pres
         if weights_sum > 0:
             return_value = stock_data.financial_currency_conversion_rate_mult_to_usd * sum(weighted_list) / (1 if force_only_sum else weights_sum)  # Multiplying by the factor to get the valu in USD.
-            if return_value > 0: return_value *= bonus
-            else               : return_value /= bonus
+            if return_value  > 0: return_value *= bonus
+            elif      bonus != 0: return_value /= bonus
         else:
             return_value = None
     except Exception as e:
-        print("Exception in {} {}: {}".format(stock_data.symbol, dict_name, e))
+        print("Exception in {} {}: {} -> {}".format(stock_data.symbol, dict_name, e, traceback.format_exc()))
         return_value = None
         pass
 
@@ -1279,7 +1280,7 @@ def calculate_weighted_ratio_from_dict(dict_input, dict_name, str_in_dict_numera
     try:
         for key in (reversed(list(dict_input)) if reverse_required else list(dict_input)):  # The 1st element will be the oldest, receiving the lowest weight
             if str_in_dict_denominator in dict_input[key] and not math.isnan(dict_input[key][str_in_dict_denominator]) and str_in_dict_numerator in dict_input[key] and not math.isnan(dict_input[key][str_in_dict_numerator]) and dict_input[key][str_in_dict_denominator] != 0:
-                current_ratio = (dict_input[key][str_in_dict_numerator] / dict_input[key][str_in_dict_denominator])
+                current_ratio = (float(dict_input[key][str_in_dict_numerator]) / float(dict_input[key][str_in_dict_denominator]))
                 weighted_ratios_list.append(current_ratio)
                 if len(weighted_ratios_list) == 1:  # 1st value: save previous
                     prev_ratio = current_ratio
@@ -1291,7 +1292,7 @@ def calculate_weighted_ratio_from_dict(dict_input, dict_name, str_in_dict_numera
                     neg_pres = True if neg_pres or current_ratio < 0                    else False
 
     except Exception as e:
-        print("Exception in {} {}: {}".format(stock_data.symbol, dict_name, e))
+        print("Exception in {} {}: {} -> {}".format(stock_data.symbol, dict_name, e, traceback.format_exc()))
         pass
     if len(weighted_ratios_list):
         return_value = weighted_average(weighted_ratios_list, weights[:len(weighted_ratios_list)])
@@ -1316,7 +1317,7 @@ def calculate_weighted_diff_from_dict(dict_input, dict_name, str_in_dict_left_te
             if str_in_dict_right_term in dict_input[key] and not math.isnan(dict_input[key][str_in_dict_right_term]) and str_in_dict_left_term in dict_input[key] and not math.isnan(dict_input[key][str_in_dict_left_term]):
                 weighted_diffs_list.append((dict_input[key][str_in_dict_left_term] - dict_input[key][str_in_dict_right_term]))
     except Exception as e:
-        print("Exception in {} {}: {}".format(stock_data.symbol, dict_name, e))
+        print("Exception in {} {}: {} -> {}".format(stock_data.symbol, dict_name, e, traceback.format_exc()))
         pass
     if len(weighted_diffs_list): return_value = sum(weighted_diffs_list) if force_only_sum else weighted_average(weighted_diffs_list, weights[:len(weighted_diffs_list)])
 
@@ -1332,7 +1333,7 @@ def calculate_weighted_sum_from_2_dicts(dict1_input, dict1_name, str_in_dict1, d
             if str_in_dict1 in dict1_input[key] and not math.isnan(dict1_input[key][str_in_dict1]) and str_in_dict2 in dict2_input[key] and not math.isnan(dict2_input[key][str_in_dict2]):
                 weighted_sums_list.append((dict1_input[key][str_in_dict1] + dict2_input[key][str_in_dict2]))
     except Exception as e:
-        print("Exception in {} {} {}: {}".format(stock_data.symbol, dict1_name, dict2_name, e))
+        print("Exception in {} {} {}: {} -> ".format(stock_data.symbol, dict1_name, dict2_name, e, traceback.format_exc()))
         pass
     if len(weighted_sums_list): return_value = sum(weighted_sums_list) if force_only_sum else weighted_average(weighted_sums_list, weights[:len(weighted_sums_list)])
 
@@ -1481,6 +1482,7 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                 except Exception as e:
                     stock_data.financial_currency_conversion_rate_mult_to_usd = round(1.0 / currency_conversion_tool_manual[stock_data.financial_currency], NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
                     stock_data.summary_currency_conversion_rate_mult_to_usd   = round(1.0 / currency_conversion_tool_manual[stock_data.summary_currency],   NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
+                    print("Exception {} -> {}".format(e, traceback.format_exc()))
             else:
                 stock_data.financial_currency_conversion_rate_mult_to_usd = round(1.0 / currency_conversion_tool_manual[stock_data.financial_currency], NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
                 stock_data.summary_currency_conversion_rate_mult_to_usd   = round(1.0 / currency_conversion_tool_manual[stock_data.summary_currency],   NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
@@ -1506,7 +1508,7 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
             # major_holders                        = symbol.get_major_holders(as_dict=True)
             # mutualfund_holders                   = symbol.get_mutualfund_holders(as_dict=True)
         except Exception as e:
-            if not research_mode: print("              Exception in {} symbol.get_info(): {}".format(stock_data.symbol, e))
+            if not research_mode: print("              Exception in {} symbol.get_info(): {} -> {}".format(stock_data.symbol, e, traceback.format_exc()))
             pass
 
         if 'shortName' in info: stock_data.short_name = info['shortName']
@@ -1684,7 +1686,7 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                         alternative_annual_pm_required = False
 
                 except Exception as e:
-                    print("Exception in {} annualized_profit_margin: {}".format(stock_data.symbol, e))
+                    print("Exception in {} annualized_profit_margin: {} -> {}".format(stock_data.symbol, e, traceback.format_exc()))
                     stock_data.annualized_profit_margin = None
                     pass
         # TODO: ASAFR: This below can be duplicated for usage of total_revenue and net_income. Analyze and implement as/if required:
@@ -1752,7 +1754,7 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                             stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_neg_earnings      or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_PRESENCE_OF_QUARTERLY_NEGATIVE_EARNINGS
                             stock_data.quarterized_profit_margin       /= stock_data.quarterized_profit_margin_boost
                 except Exception as e:
-                    print("Exception in {} quarterized_profit_margin: {}".format(stock_data.symbol, e))
+                    print("Exception in {} quarterized_profit_margin: {} -> {}".format(stock_data.symbol, e, traceback.format_exc()))
                     stock_data.quarterized_profit_margin = None
                     pass
 
@@ -2292,7 +2294,7 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                 stock_data.last_dividend_3 = last_4_dividends[-4]
 
         except Exception as e:
-            # if not research_mode: print("Exception in symbol.dividends: {}".format(e))
+            # if not research_mode: print("Exception in symbol.dividends: {} -> {}".format(e, traceback.format_exc()))
             pass
 
         round_and_avoid_none_values(stock_data)
@@ -2306,7 +2308,7 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
         return return_value
 
     except Exception as e:  # More information is output when exception is used instead of Exception
-        if not research_mode: print("              Exception in {} info: {}".format(stock_data.symbol, e))
+        if not research_mode: print("              Exception in {} info: {} -> {}".format(stock_data.symbol, e, traceback.format_exc()))
         return False
 
 
@@ -2419,7 +2421,7 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
                                             print('                                                                           Diff (Taking [{} < {}]): ref[{:25}]={:6}, db[{:25}]={:6} -> comp -> {:6}'.format((reference_db[symbol_index_in_reference_db][g_sss_value_index]), (row_to_append[g_sss_value_index]), g_header_row[index], reference_db[symbol_index_in_reference_db][column_index_in_reference_db], g_header_row[index], row_to_append[index], compensated_value))
                                             row_to_append[index] = compensated_value  # Overwrite specific index value with compensated value from reference db
                             except Exception as e:
-                                print("Exception {} in comparison of {}: row_to_append is {} while reference_db is {}".format(e, g_header_row[index], row_to_append[index], reference_db[symbol_index_in_reference_db][column_index_in_reference_db]))
+                                print("Exception {} in comparison of {}: row_to_append is {} while reference_db is {} -> {}".format(e, g_header_row[index], row_to_append[index], reference_db[symbol_index_in_reference_db][column_index_in_reference_db], traceback.format_exc()))
                                 pass
 
                     if found_differences:
@@ -2597,7 +2599,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
         try:
             sss_indices.update_tase_indices()
         except Exception as e:
-            print("Error updating Indices/Data_TASE.csv: {}".format(e))
+            print("Error updating Indices/Data_TASE.csv: {} -> {}".format(e, traceback.format_exc()))
 
         tase_filenames_list = ['Indices/Data_TASE.csv']
         for filename in tase_filenames_list:
