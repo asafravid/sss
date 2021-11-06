@@ -55,7 +55,7 @@ reference_run_six    = 'Results/Six/20211012-141034_S_Bdb_nRes30'
 reference_run_st     = 'Results/St/20210915-023602_St_Bdb_nRes130'
 
 new_run_custom = 'Results/Custom/20210917-201728_Bdb_nRes312_Custom'
-new_run_tase   = 'Results/Tase/20211105-164729_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes291'
+new_run_tase   = 'Results/Tase/20211105-113630_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes291'
 new_run_nsr    = 'Results/Nsr/20211020-050008_Tchnlgy3.0_FnnclSrvcs0.75_Bdb_nRes855'
 new_run_all    = 'Results/All/20211024-030156_Tchnlgy3.0_FnnclSrvcs0.75_A_Bdb_nRes3214'
 new_run_six    = 'Results/Six/20211012-141034_S_Bdb_nRes30'
@@ -63,7 +63,7 @@ new_run_st     = 'Results/St/20210915-023602_St_Bdb_nRes130'
 
 # TODO: ASAFR: Why is normalized AGIO giving a Good low value?? this is deceiving! Check this
 custom_portfolio      = ['EXC']
-custom_portfolio_tase = ['TDGN']
+custom_portfolio_tase = ['TDGN', 'TEVA']
 
 research_mode_probe_list = []  # ['MTDS']
 

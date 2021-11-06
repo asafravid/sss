@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.78 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.79 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -65,7 +65,6 @@ import json
 import traceback
 
 from contextlib             import closing
-from threading              import Thread
 from dataclasses            import dataclass
 from forex_python.converter import CurrencyRates
 from currency_converter     import CurrencyConverter
@@ -1408,8 +1407,27 @@ def print_sss_value_results(stock_data):
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      stock_data.financial_currency_conversion_rate_mult_to_usd,
                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                              stock_data.summary_currency_conversion_rate_mult_to_usd, stock_data.skip_reason))
 
+def stringify_keys(d, check_inner):
+    """Convert a dict's keys to strings if they are not."""
+    converted_dict = {}
+    for key in d.keys():
+        # check inner dict if required:
+        if check_inner and isinstance(d[key], dict):
+            value = stringify_keys(d[key], check_inner)
+        else:
+            value = d[key]
 
-def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out, countries_list, countries_filter_out, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, db_filename):
+        # convert nonstring to string if needed:
+        if not isinstance(key, str):
+            key_str = '{}'.format(key)
+            converted_dict[key_str] = value
+        else:
+            converted_dict[key]     = value
+
+    return converted_dict
+
+
+def process_info(json_db, symbol, stock_data, tase_mode, sectors_list, sectors_filter_out, countries_list, countries_filter_out, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, db_filename):
     return_value = True
     if research_mode:
         if   stock_data.previous_close < 1.0:                                                                                                                         return_value = False  # Avoid Penny Stocks
@@ -1434,7 +1452,6 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
         return return_value
 
     try:
-
         info                     = {}
         earnings_quarterly       = {}
         earnings_yearly          = {}
@@ -1446,13 +1463,20 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
         financials_quarterly     = {}
         # TODO: ASAFR: Here: id no previous_close, use market_high, low regular, or anything possible to avoid none!
         try:
-            info                                   = symbol.get_info()
-            cash_flows_yearly                      = symbol.get_cashflow(     as_dict=True, freq="yearly")
-            cash_flows_quarterly                   = symbol.get_cashflow(     as_dict=True, freq="quarterly")
-            balance_sheets_yearly                  = symbol.get_balance_sheet(as_dict=True, freq="yearly")
-            balance_sheets_quarterly               = symbol.get_balance_sheet(as_dict=True, freq="quarterly")
-            earnings_yearly                        = symbol.get_earnings(     as_dict=True, freq="yearly")
-            earnings_quarterly                     = symbol.get_earnings(     as_dict=True, freq="quarterly")
+            info                     = symbol.get_info()
+            cash_flows_yearly        = symbol.get_cashflow(     as_dict=True, freq="yearly")
+            cash_flows_quarterly     = symbol.get_cashflow(     as_dict=True, freq="quarterly")
+            balance_sheets_yearly    = symbol.get_balance_sheet(as_dict=True, freq="yearly")
+            balance_sheets_quarterly = symbol.get_balance_sheet(as_dict=True, freq="quarterly")
+            earnings_yearly          = symbol.get_earnings(     as_dict=True, freq="yearly")
+            earnings_quarterly       = symbol.get_earnings(     as_dict=True, freq="quarterly")
+
+            cash_flows_yearly        = stringify_keys(d=cash_flows_yearly,        check_inner=False)
+            cash_flows_quarterly     = stringify_keys(d=cash_flows_quarterly,     check_inner=False)
+            balance_sheets_yearly    = stringify_keys(d=balance_sheets_yearly,    check_inner=False)
+            balance_sheets_quarterly = stringify_keys(d=balance_sheets_quarterly, check_inner=False)
+            earnings_yearly          = stringify_keys(d=earnings_yearly,          check_inner=False)
+            earnings_quarterly       = stringify_keys(d=earnings_quarterly,       check_inner=False)
 
             if   earnings_yearly    != None: stock_data.financial_currency = earnings_yearly[   'financialCurrency']
             elif earnings_quarterly != None: stock_data.financial_currency = earnings_quarterly['financialCurrency']
@@ -1487,8 +1511,11 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                 stock_data.financial_currency_conversion_rate_mult_to_usd = round(1.0 / currency_conversion_tool_manual[stock_data.financial_currency], NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
                 stock_data.summary_currency_conversion_rate_mult_to_usd   = round(1.0 / currency_conversion_tool_manual[stock_data.summary_currency],   NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
 
-            financials_yearly                           = symbol.get_financials(as_dict=True, freq="yearly")
-            financials_quarterly                        = symbol.get_financials(as_dict=True, freq="quarterly")
+            financials_yearly          = symbol.get_financials(as_dict=True, freq="yearly")
+            financials_quarterly       = symbol.get_financials(as_dict=True, freq="quarterly")
+            financials_yearly          = stringify_keys(d=financials_yearly,    check_inner=False)
+            financials_quarterly       = stringify_keys(d=financials_quarterly, check_inner=False)
+
 
             if VERBOSE_LOGS:
                 print('[DB Debug] Symbol:                   {}'.format(stock_data.symbol))
@@ -1502,6 +1529,17 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
                 print('[DB Debug] financials_yearly:        {}'.format(financials_yearly))
                 print('[DB Debug] financials_quarterly:     {}'.format(financials_quarterly))
 
+            # Save raw json db:
+            json_db[stock_data.symbol] = {}
+            json_db[stock_data.symbol]["info"]                     = info
+            json_db[stock_data.symbol]["cash_flows_yearly"]        = cash_flows_yearly
+            json_db[stock_data.symbol]["cash_flows_quarterly"]     = cash_flows_quarterly
+            json_db[stock_data.symbol]["balance_sheets_yearly"]    = balance_sheets_yearly
+            json_db[stock_data.symbol]["balance_sheets_quarterly"] = balance_sheets_quarterly
+            json_db[stock_data.symbol]["earnings_yearly"]          = earnings_yearly
+            json_db[stock_data.symbol]["earnings_yearly"]          = earnings_yearly
+            json_db[stock_data.symbol]["financials_yearly"]        = financials_yearly
+            json_db[stock_data.symbol]["financials_quarterly"]     = financials_quarterly
 
             # institutional_holders                = symbol.get_institutional_holders(as_dict=True)
             # sustainability                       = symbol.get_sustainability(as_dict=True)
@@ -2314,14 +2352,6 @@ def process_info(symbol, stock_data, tase_mode, sectors_list, sectors_filter_out
         return False
 
 
-def check_interval(thread_id, interval_threads, interval_secs_to_avoid_http_errors, research_mode):
-    if thread_id > 0 and thread_id % interval_threads == 0 and not research_mode:
-        print("\n===========================================================================")
-        print(  "[thread_id {:2} is an interval {} point, going to sleep for {} seconds]".format(thread_id, interval_threads, interval_secs_to_avoid_http_errors))
-        print(  "===========================================================================\n")
-        time.sleep(interval_secs_to_avoid_http_errors)
-
-
 # Assumption is that reference_db is sorted by symbol name, but just find it, no need to optimize as of now
 def find_symbol_in_reference_db(symbol, reference_db):
     for index in range(len(reference_db)):
@@ -2364,21 +2394,20 @@ def get_stock_data_normalized_from_db_row_compact(row, stock_symbol):
     return StockDataNormalized(symbol=stock_symbol, short_name=row[g_name_index_n], sector=row[g_sector_index_n], country=row[g_country_index_n], sss_value=float(row[g_sss_value_index_n]), sss_value_normalized=float(row[g_sss_value_normalized_index_n]), evr_effective=float(row[g_evr_effective_index_n]), evr_effective_normalized=float(row[g_evr_effective_normalized_index_n]), effective_price_to_earnings=float(row[g_effective_price_to_earnings_index_n]), trailing_12months_price_to_sales=float(row[g_trailing_12months_price_to_sales_index_n]), trailing_12months_price_to_sales_normalized=float(row[g_trailing_12months_price_to_sales_normalized_index_n]), pe_effective=float(row[g_pe_effective_index_n]), pe_effective_normalized=float(row[g_pe_effective_normalized_index_n]), effective_ev_to_ebitda=float(row[g_effective_ev_to_ebitda_index_n]), effective_ev_to_ebitda_normalized=float(row[g_effective_ev_to_ebitda_normalized_index_n]), effective_profit_margin=float(row[g_effective_profit_margin_index_n]), effective_profit_margin_normalized=float(row[g_effective_profit_margin_normalized_index_n]), held_percent_insiders=float(row[g_held_percent_insiders_index_n]), held_percent_insiders_normalized=float(row[g_held_percent_insiders_normalized_index_n]), previous_close=float(row[g_previous_close_index_n]), price_to_book=float(row[g_price_to_book_index_n]), price_to_book_normalized=float(row[g_price_to_book_normalized_index_n]), enterprise_value=int(float(row[g_enterprise_value_index_n])), eqg_factor_effective=float(row[g_eqg_factor_effective_index_n]), eqg_factor_effective_normalized=float(row[g_eqg_factor_effective_normalized_index_n]), rqg_factor_effective=float(row[g_rqg_factor_effective_index_n]), rqg_factor_effective_normalized=float(row[g_rqg_factor_effective_normalized_index_n]), effective_peg_ratio=float(row[g_effective_peg_ratio_index_n]), effective_peg_ratio_normalized=float(row[g_effective_peg_ratio_normalized_index_n]), ev_to_cfo_ratio_effective=float(row[g_ev_to_cfo_ratio_effective_index_n]), ev_to_cfo_ratio_effective_normalized=float(row[g_ev_to_cfo_ratio_effective_normalized_index_n]), debt_to_equity_effective=float(row[g_debt_to_equity_effective_index_n]), debt_to_equity_effective_used=float(row[g_debt_to_equity_effective_used_index_n]), debt_to_equity_effective_used_normalized=float(row[g_debt_to_equity_effective_used_normalized_index_n]), eff_dist_from_low_factor=float(row[g_eff_dist_from_low_factor_index_n]), eff_dist_from_low_factor_normalized=float(row[g_eff_dist_from_low_factor_normalized_index_n]), total_ratio_effective=float(row[g_total_ratio_effective_index_n]), total_current_ratio_effective=float(row[g_total_current_ratio_effective_index_n]), effective_current_ratio=float(row[g_effective_current_ratio_index_n]), effective_current_ratio_normalized=float(row[g_effective_current_ratio_normalized_index_n]), calculated_roa=float(row[g_calculated_roa_index_n]), calculated_roa_normalized=float(row[g_calculated_roa_normalized_index_n]), calculated_roe=float(row[g_calculated_roe_index_n]), calculated_roe_normalized=float(row[g_calculated_roe_normalized_index_n]), altman_z_score_factor=float(row[g_altman_z_score_factor_index_n]), altman_z_score_factor_normalized=float(row[g_altman_z_score_factor_normalized_index_n]))
 
 
-def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thread_id, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, diff_rows, db_filename):
+def process_symbols(json_db, symbols, csv_db_data, rows, rows_no_div, rows_only_div, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, diff_rows, db_filename):
     iteration = 0
     if not research_mode:
         elapsed_time_start_sec = time.time()
         for symb in symbols:
             iteration += 1
-            sleep_seconds = round(random.uniform(float(relaxed_access)/2.0, float(relaxed_access)*2), NUM_ROUND_DECIMALS)
+            sleep_seconds = 0
             time.sleep(sleep_seconds)
             elapsed_time_sample_sec = time.time()
             elapsed_time_sec        = round(elapsed_time_sample_sec - elapsed_time_start_sec, 0)
             average_sec_per_symbol  = round(elapsed_time_sec/iteration, int(NUM_ROUND_DECIMALS/3))
             percentage_complete     = round(100*iteration/len(symbols), int(NUM_ROUND_DECIMALS/3))
             if not research_mode:
-                if sleep_seconds > 0: print('[DB]: thread_id {:2} Sleeping for {:10} sec] Checking {:9} ({:4}/{:4}/{:4} ({:6}%) [Diff: {:4}], elapsed_time_sec: {} (average_sec_per_symbol: {:6}):'.format(thread_id, sleep_seconds, symb, len(rows), iteration, len(symbols), percentage_complete, len(diff_rows), elapsed_time_sec, average_sec_per_symbol), end='')
-                else:                 print('[DB] {:9} ({:04}/{:04}/{:04} [{:2.2f}%], Diff: {:04}), time/left/avg [sec]: {:5.0f}/{:5.0f}/{:2.2f} -> '.format(symb, len(rows), iteration, len(symbols), percentage_complete, len(diff_rows), elapsed_time_sec, average_sec_per_symbol*(len(symbols)-iteration), average_sec_per_symbol), end='')
+                print('[DB] {:9} ({:04}/{:04}/{:04} [{:2.2f}%], Diff: {:04}), time/left/avg [sec]: {:5.0f}/{:5.0f}/{:2.2f} -> '.format(symb, len(rows), iteration, len(symbols), percentage_complete, len(diff_rows), elapsed_time_sec, average_sec_per_symbol*(len(symbols)-iteration), average_sec_per_symbol), end='')
             if tase_mode:
                 symbol = yf.Ticker(symb)
             else:
@@ -2388,7 +2417,7 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
                     if read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_ST and '.ST' not in symb: symb = symb.replace('.S.DX', '.ST')
                     symbol = yf.Ticker(symb)
             stock_data = StockData(symbol=symb)
-            process_info_result = process_info(symbol=symbol, stock_data=stock_data, tase_mode=tase_mode, sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, profit_margin_limit=profit_margin_limit, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, debt_to_equity_limit=debt_to_equity_limit, pb_limit=pb_limit, pi_limit=pi_limit, enterprise_value_millions_usd_limit=enterprise_value_millions_usd_limit, research_mode_max_ev=research_mode_max_ev, eqg_min=eqg_min, rqg_min=rqg_min, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, market_cap_included=market_cap_included, research_mode=research_mode, currency_conversion_tool=currency_conversion_tool, currency_conversion_tool_alternative=currency_conversion_tool_alternative, currency_conversion_tool_manual=currency_conversion_tool_manual, reference_db=reference_db, reference_db_title_row=reference_db_title_row, db_filename=None)
+            process_info_result = process_info(json_db=json_db, symbol=symbol, stock_data=stock_data, tase_mode=tase_mode, sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, profit_margin_limit=profit_margin_limit, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, debt_to_equity_limit=debt_to_equity_limit, pb_limit=pb_limit, pi_limit=pi_limit, enterprise_value_millions_usd_limit=enterprise_value_millions_usd_limit, research_mode_max_ev=research_mode_max_ev, eqg_min=eqg_min, rqg_min=rqg_min, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, market_cap_included=market_cap_included, research_mode=research_mode, currency_conversion_tool=currency_conversion_tool, currency_conversion_tool_alternative=currency_conversion_tool_alternative, currency_conversion_tool_manual=currency_conversion_tool_manual, reference_db=reference_db, reference_db_title_row=reference_db_title_row, db_filename=None)
             if   tase_mode                                                      and 'TLV:' not in stock_data.symbol: stock_data.symbol = 'TLV:' + stock_data.symbol.replace('.TA', '').replace('-', '.')
             elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_SIX and 'SWX:' not in stock_data.symbol: stock_data.symbol = 'SWX:' + stock_data.symbol.replace('.SW', '')  # .replace('.', '-')
             elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_ST  and 'STO:' not in stock_data.symbol: stock_data.symbol = 'STO:' + stock_data.symbol.replace('.ST', '')  # .replace('.', '-')
@@ -2447,7 +2476,7 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
                 rows.append(                           row_to_append)
                 if dividends_sum: rows_only_div.append(row_to_append)
                 else:             rows_no_div.append(  row_to_append)
-            csv_db_data.append(                    row_to_append)
+            csv_db_data.append(                        row_to_append)
     else: # DB already present
         for row_index, row in enumerate(csv_db_data):
             iteration += 1
@@ -2462,7 +2491,7 @@ def process_symbols(symbols, csv_db_data, rows, rows_no_div, rows_only_div, thre
                     else:
                         row[fix_row_index] = 0
             stock_data = get_stock_data_normalized_from_db_row_compact(row, symbol) if "normalized" in db_filename else get_stock_data_from_db_row_compact(row, symbol)
-            if not process_info(symbol=symbol, stock_data=stock_data, tase_mode=tase_mode, sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, profit_margin_limit=profit_margin_limit, pb_limit=pb_limit, pi_limit=pi_limit, enterprise_value_millions_usd_limit=enterprise_value_millions_usd_limit, research_mode_max_ev=research_mode_max_ev, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, debt_to_equity_limit=debt_to_equity_limit, eqg_min=eqg_min, rqg_min=rqg_min, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, market_cap_included=market_cap_included, research_mode=research_mode, currency_conversion_tool=currency_conversion_tool, currency_conversion_tool_alternative=currency_conversion_tool_alternative, currency_conversion_tool_manual=currency_conversion_tool_manual, reference_db=reference_db, reference_db_title_row=reference_db_title_row, db_filename=db_filename):
+            if not process_info(json_db=None, symbol=symbol, stock_data=stock_data, tase_mode=tase_mode, sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, profit_margin_limit=profit_margin_limit, pb_limit=pb_limit, pi_limit=pi_limit, enterprise_value_millions_usd_limit=enterprise_value_millions_usd_limit, research_mode_max_ev=research_mode_max_ev, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, debt_to_equity_limit=debt_to_equity_limit, eqg_min=eqg_min, rqg_min=rqg_min, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, market_cap_included=market_cap_included, research_mode=research_mode, currency_conversion_tool=currency_conversion_tool, currency_conversion_tool_alternative=currency_conversion_tool_alternative, currency_conversion_tool_manual=currency_conversion_tool_manual, reference_db=reference_db, reference_db_title_row=reference_db_title_row, db_filename=db_filename):
                 if research_mode: continue
 
             dividends_sum = stock_data.last_dividend_0 + stock_data.last_dividend_1 + stock_data.last_dividend_2 + stock_data.last_dividend_3
@@ -2489,13 +2518,15 @@ def download_ftp_files(filenames_list, ftp_path):
 
 # reference_run : Used for identifying anomalies in which some symbol information is completely different from last run. It can be different but only in new quartely reports
 #                 It is sometimes observed that stocks information is wrongly fetched. Is such cases, the last run's reference point shall be used, with a forgetting factor
-def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, countries_filter_out, csv_db_path, db_filename, read_all_country_symbols, tase_mode, num_threads, market_cap_included, research_mode, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, appearance_counter_dict_sss={}, appearance_counter_min=25, appearance_counter_max=35, custom_portfolio=[], num_results_list=[], num_results_list_index=0):
+def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, countries_filter_out, csv_db_path, db_filename, read_all_country_symbols, tase_mode, market_cap_included, research_mode, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, appearance_counter_dict_sss={}, appearance_counter_min=25, appearance_counter_max=35, custom_portfolio=[], num_results_list=[], num_results_list_index=0):
     # https://en.wikipedia.org/wiki/ISO_4217
     currency_filename = 'Indices/currencies.json'
     with open(currency_filename, 'r') as file:
         currency_rates_raw_dict = json.loads(file.read())
     currency_conversion_tool_manual = {k: round(float(v), NUM_ROUND_DECIMALS) for k, v in currency_rates_raw_dict.items()}
     # print(currency_conversion_tool_manual)
+
+    json_db = dict()
 
     currency_conversion_tool             = None
     currency_conversion_tool_alternative = None
@@ -2533,11 +2564,6 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
                     reference_db.append(row)
                     row_index += 1
 
-    # Working Mode:
-    relaxed_access                     = (num_threads-1)/10.0                                                           if not research_mode else 0  # In seconds
-    interval_threads                   = 4 +     1*tase_mode -    (1 if read_all_country_symbols else 0)                if not research_mode else 0
-    interval_secs_to_avoid_http_errors = num_threads*(num_threads - 1*tase_mode + num_threads*read_all_country_symbols) if not research_mode else 0  # Every interval_threads, a INTERVALS_TO_AVOID_HTTP_ERRORS sec sleep will take place
-
     # Working Parameters:
     eqg_min = EQG_UNKNOWN     # The earnings can decrease but there is still a requirement that price_to_earnings_to_growth_ratio > 0. TODO: ASAFR: Add to multi-dimension
     rqg_min = RQG_UNKNOWN     # The revenue  can decrease there is still a requirement that price_to_earnings_to_growth_ratio > 0. TODO: ASAFR: Add to multi-dimension
@@ -2546,7 +2572,6 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
     symbols_tase            = []
     symbols_snp500          = []
     symbols_nasdaq_100_csv  = []
-    symbols_russel1000      = []
     symbols_russel1000_csv  = []
 
     if not tase_mode and not research_mode and read_all_country_symbols not in [sss_config.ALL_COUNTRY_SYMBOLS_SIX, sss_config.ALL_COUNTRY_SYMBOLS_ST]:
@@ -2739,25 +2764,19 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
             else:
                 symbols = custom_portfolio
 
-        print('\n{} Symbols to Scan (Using {} thread{}): {}\n'.format(len(symbols), num_threads, 's' if num_threads == 1 else '', symbols))
+        print('\n{} Symbols to Scan: {}\n'.format(len(symbols), symbols))
 
         # After printing: shuffle (better content from Yahoo Finance):
         random.shuffle(symbols)
-        print('\n{} Symbols order to Scan (Using {} thread{}): {}\n'.format(len(symbols), num_threads, 's' if num_threads == 1 else '', symbols))
+        print('\n{} Symbols order to Scan: {}\n'.format(len(symbols), symbols))
 
-    csv_db_data   = [];	rows   = []; rows_no_div   = []; rows_only_div   = []; rows_diff   = []
-    csv_db_data0  = []; rows0  = []; rows0_no_div  = []; rows0_only_div  = []; rows0_diff  = []; csv_db_data1  = []; rows1  = []; rows1_no_div  = []; rows1_only_div  = []; rows1_diff  = []
-    csv_db_data2  = []; rows2  = []; rows2_no_div  = []; rows2_only_div  = []; rows2_diff  = []; csv_db_data3  = []; rows3  = []; rows3_no_div  = []; rows3_only_div  = []; rows3_diff  = []
-    csv_db_data4  = []; rows4  = []; rows4_no_div  = []; rows4_only_div  = []; rows4_diff  = []; csv_db_data5  = []; rows5  = []; rows5_no_div  = []; rows5_only_div  = []; rows5_diff  = []
-    csv_db_data6  = []; rows6  = []; rows6_no_div  = []; rows6_only_div  = []; rows6_diff  = []; csv_db_data7  = []; rows7  = []; rows7_no_div  = []; rows7_only_div  = []; rows7_diff  = []
-    csv_db_data8  = []; rows8  = []; rows8_no_div  = []; rows8_only_div  = []; rows8_diff  = []; csv_db_data9  = []; rows9  = []; rows9_no_div  = []; rows9_only_div  = []; rows9_diff  = []
-    csv_db_data10 = []; rows10 = []; rows10_no_div = []; rows10_only_div = []; rows10_diff = []; csv_db_data11 = []; rows11 = []; rows11_no_div = []; rows11_only_div = []; rows11_diff = []
-    csv_db_data12 = []; rows12 = []; rows12_no_div = []; rows12_only_div = []; rows12_diff = []; csv_db_data13 = []; rows13 = []; rows13_no_div = []; rows13_only_div = []; rows13_diff = []
-    csv_db_data14 = []; rows14 = []; rows14_no_div = []; rows14_only_div = []; rows14_diff = []; csv_db_data15 = []; rows15 = []; rows15_no_div = []; rows15_only_div = []; rows15_diff = []
-    csv_db_data16 = []; rows16 = []; rows16_no_div = []; rows16_only_div = []; rows16_diff = []; csv_db_data17 = []; rows17 = []; rows17_no_div = []; rows17_only_div = []; rows17_diff = []
-    csv_db_data18 = []; rows18 = []; rows18_no_div = []; rows18_only_div = []; rows18_diff = []; csv_db_data19 = []; rows19 = []; rows19_no_div = []; rows19_only_div = []; rows19_diff = []
+    csv_db_data   = []
+    rows          = []
+    rows_no_div   = []
+    rows_only_div = []
+    rows_diff     = []
 
-    if research_mode: # if DB is already present, read from it and prepare input to threads
+    if research_mode: # if DB is already present, read from it and prepare input
         symbols = []
         csv_db_filename = csv_db_path+'/'+db_filename
         num_title_rows = 1 if "normalized" in db_filename else 2
@@ -2770,165 +2789,12 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
                     continue
                 else:
                     symbols.append(row[0])
-                    if   (row_index-2) % num_threads ==  0: csv_db_data0.append(row)
-                    elif (row_index-2) % num_threads ==  1: csv_db_data1.append(row)
-                    elif (row_index-2) % num_threads ==  2: csv_db_data2.append(row)
-                    elif (row_index-2) % num_threads ==  3: csv_db_data3.append(row)
-                    elif (row_index-2) % num_threads ==  4: csv_db_data4.append(row)
-                    elif (row_index-2) % num_threads ==  5: csv_db_data5.append(row)
-                    elif (row_index-2) % num_threads ==  6: csv_db_data6.append(row)
-                    elif (row_index-2) % num_threads ==  7: csv_db_data7.append(row)
-                    elif (row_index-2) % num_threads ==  8: csv_db_data8.append(row)
-                    elif (row_index-2) % num_threads ==  9: csv_db_data9.append(row)
-                    elif (row_index-2) % num_threads == 10: csv_db_data10.append(row)
-                    elif (row_index-2) % num_threads == 11: csv_db_data11.append(row)
-                    elif (row_index-2) % num_threads == 12: csv_db_data12.append(row)
-                    elif (row_index-2) % num_threads == 13: csv_db_data13.append(row)
-                    elif (row_index-2) % num_threads == 14: csv_db_data14.append(row)
-                    elif (row_index-2) % num_threads == 15: csv_db_data15.append(row)
-                    elif (row_index-2) % num_threads == 16: csv_db_data16.append(row)
-                    elif (row_index-2) % num_threads == 17: csv_db_data17.append(row)
-                    elif (row_index-2) % num_threads == 18: csv_db_data18.append(row)
-                    elif (row_index-2) % num_threads == 19: csv_db_data19.append(row)
+                    csv_db_data.append(row)
                     row_index += 1
 
-    symbols0 = symbols1 = symbols2 = symbols3 = symbols4 = symbols5 = symbols6 = symbols7 = symbols8 = symbols9 = symbols10 = symbols11 = symbols12 = symbols13 = symbols14 = symbols15 = symbols16 = symbols17 = symbols18 = symbols19 = None
-    thread0  = thread1  = thread2  = thread3  = thread4  = thread5  = thread6  = thread7  = thread8  = thread9  = thread10  = thread11  = thread12  = thread13  = thread14  = thread15  = thread16  = thread17  = thread18  = thread19  = None
+    process_symbols(json_db=json_db, symbols=symbols, csv_db_data=csv_db_data, rows=rows, rows_no_div=rows_no_div, rows_only_div=rows_only_div, tase_mode=tase_mode, read_all_country_symbols=read_all_country_symbols, sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, profit_margin_limit=profit_margin_limit, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, debt_to_equity_limit=debt_to_equity_limit, pb_limit=pb_limit, pi_limit=pi_limit, enterprise_value_millions_usd_limit=enterprise_value_millions_usd_limit, research_mode_max_ev=research_mode_max_ev, eqg_min=eqg_min, rqg_min=rqg_min, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, market_cap_included=market_cap_included, research_mode=research_mode, currency_conversion_tool=currency_conversion_tool, currency_conversion_tool_alternative=currency_conversion_tool_alternative, currency_conversion_tool_manual=currency_conversion_tool_manual, reference_db=reference_db, reference_db_title_row=reference_db_title_row, diff_rows=rows_diff, db_filename=db_filename)
 
-    if num_threads >=  1: symbols0  = symbols[ 0:][::num_threads] #  0,    num_threads,    2*num_threads,    3*num_threads, ...
-    if num_threads >=  2: symbols1  = symbols[ 1:][::num_threads] #  1,  1+num_threads,  2+2*num_threads,  2+3*num_threads, ...
-    if num_threads >=  3: symbols2  = symbols[ 2:][::num_threads] #  2,  2+num_threads,  3+2*num_threads,  3+3*num_threads, ...
-    if num_threads >=  4: symbols3  = symbols[ 3:][::num_threads] #  3,  3+num_threads,  4+2*num_threads,  4+3*num_threads, ...
-    if num_threads >=  5: symbols4  = symbols[ 4:][::num_threads] #  4,  4+num_threads,  5+2*num_threads,  5+3*num_threads, ...
-    if num_threads >=  6: symbols5  = symbols[ 5:][::num_threads] #  5,  5+num_threads,  6+2*num_threads,  6+3*num_threads, ...
-    if num_threads >=  7: symbols6  = symbols[ 6:][::num_threads] #  6,  6+num_threads,  7+2*num_threads,  7+3*num_threads, ...
-    if num_threads >=  8: symbols7  = symbols[ 7:][::num_threads] #  7,  7+num_threads,  8+2*num_threads,  8+3*num_threads, ...
-    if num_threads >=  9: symbols8  = symbols[ 8:][::num_threads] #  8,  8+num_threads,  9+2*num_threads,  9+3*num_threads, ...
-    if num_threads >= 10: symbols9  = symbols[ 9:][::num_threads] #  9,  9+num_threads, 10+2*num_threads, 10+3*num_threads, ...
-    if num_threads >= 11: symbols10 = symbols[10:][::num_threads] # 10, 10+num_threads, 11+2*num_threads, 11+3*num_threads, ...
-    if num_threads >= 12: symbols11 = symbols[11:][::num_threads] # 11, 11+num_threads, 12+2*num_threads, 12+3*num_threads, ...
-    if num_threads >= 13: symbols12 = symbols[12:][::num_threads] # 12, 12+num_threads, 13+2*num_threads, 13+3*num_threads, ...
-    if num_threads >= 14: symbols13 = symbols[13:][::num_threads] # 13, 13+num_threads, 14+2*num_threads, 14+3*num_threads, ...
-    if num_threads >= 15: symbols14 = symbols[14:][::num_threads] # 14, 14+num_threads, 15+2*num_threads, 15+3*num_threads, ...
-    if num_threads >= 16: symbols15 = symbols[15:][::num_threads] # 15, 15+num_threads, 16+2*num_threads, 16+3*num_threads, ...
-    if num_threads >= 17: symbols16 = symbols[16:][::num_threads] # 16, 16+num_threads, 17+2*num_threads, 17+3*num_threads, ...
-    if num_threads >= 18: symbols17 = symbols[17:][::num_threads] # 17, 17+num_threads, 18+2*num_threads, 18+3*num_threads, ...
-    if num_threads >= 19: symbols18 = symbols[18:][::num_threads] # 18, 18+num_threads, 19+2*num_threads, 19+3*num_threads, ...
-    if num_threads >= 20: symbols19 = symbols[19:][::num_threads] # 19, 19+num_threads, 20+2*num_threads, 20+3*num_threads, ...
-
-    if num_threads ==  1:
-        process_symbols(                                symbols0,  csv_db_data0,  rows0,  rows0_no_div,  rows0_only_div,   0, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows0_diff, db_filename)
-    elif num_threads >= 1:
-        check_interval(0, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread0  = Thread(target=process_symbols, args=(symbols0,  csv_db_data0,  rows0,  rows0_no_div,  rows0_only_div,   0, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows0_diff, db_filename))
-        thread0.start()
-    if num_threads >=  2:
-        check_interval(1, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread1  = Thread(target=process_symbols, args=(symbols1,  csv_db_data1,  rows1,  rows1_no_div,  rows1_only_div,   1, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows1_diff, db_filename))
-        thread1.start()
-    if num_threads >=  3:
-        check_interval(2, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread2  = Thread(target=process_symbols, args=(symbols2,  csv_db_data2,  rows2,  rows2_no_div,  rows2_only_div,   2, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows2_diff, db_filename))
-        thread2.start()
-    if num_threads >=  4:
-        check_interval(3, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread3  = Thread(target=process_symbols, args=(symbols3,  csv_db_data3,  rows3,  rows3_no_div,  rows3_only_div,   3, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows3_diff, db_filename))
-        thread3.start()
-    if num_threads >=  5:
-        check_interval(4, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread4  = Thread(target=process_symbols, args=(symbols4,  csv_db_data4,  rows4,  rows4_no_div,  rows4_only_div,   4, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows4_diff, db_filename))
-        thread4.start()
-    if num_threads >=  6:
-        check_interval(5, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread5  = Thread(target=process_symbols, args=(symbols5,  csv_db_data5,  rows5,  rows5_no_div,  rows5_only_div,   5, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows5_diff, db_filename))
-        thread5.start()
-    if num_threads >=  7:
-        check_interval(6, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread6  = Thread(target=process_symbols, args=(symbols6,  csv_db_data6,  rows6,  rows6_no_div,  rows6_only_div,   6, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows6_diff, db_filename))
-        thread6.start()
-    if num_threads >=  8:
-        check_interval(7, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread7  = Thread(target=process_symbols, args=(symbols7,  csv_db_data7,  rows7,  rows7_no_div,  rows7_only_div,   7, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows7_diff, db_filename))
-        thread7.start()
-    if num_threads >=  9:
-        check_interval(8, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread8  = Thread(target=process_symbols, args=(symbols8,  csv_db_data8,  rows8,  rows8_no_div,  rows8_only_div,   8, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows8_diff, db_filename))
-        thread8.start()
-    if num_threads >= 10:
-        check_interval(9, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread9  = Thread(target=process_symbols, args=(symbols9,  csv_db_data9,  rows9,  rows9_no_div,  rows9_only_div,   9, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows9_diff, db_filename))
-        thread9.start()
-    if num_threads >= 11:
-        check_interval(10, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread10 = Thread(target=process_symbols, args=(symbols10, csv_db_data10, rows10, rows10_no_div, rows10_only_div, 10, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows10_diff, db_filename))
-        thread10.start()
-    if num_threads >= 12:
-        check_interval(11, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread11 = Thread(target=process_symbols, args=(symbols11, csv_db_data11, rows11, rows11_no_div, rows11_only_div, 11, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows11_diff, db_filename))
-        thread11.start()
-    if num_threads >= 13:
-        check_interval(12, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread12 = Thread(target=process_symbols, args=(symbols12, csv_db_data12, rows12, rows12_no_div, rows12_only_div, 12, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows12_diff, db_filename))
-        thread12.start()
-    if num_threads >= 14:
-        check_interval(13, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread13 = Thread(target=process_symbols, args=(symbols13, csv_db_data13, rows13, rows13_no_div, rows13_only_div, 13, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows13_diff, db_filename))
-        thread13.start()
-    if num_threads >= 15:
-        check_interval(14, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread14 = Thread(target=process_symbols, args=(symbols14, csv_db_data14, rows14, rows14_no_div, rows14_only_div, 14, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows14_diff, db_filename))
-        thread14.start()
-    if num_threads >= 16:
-        check_interval(15, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread15 = Thread(target=process_symbols, args=(symbols15, csv_db_data15, rows15, rows15_no_div, rows15_only_div, 15, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows15_diff, db_filename))
-        thread15.start()
-    if num_threads >= 17:
-        check_interval(16, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread16 = Thread(target=process_symbols, args=(symbols16, csv_db_data16, rows16, rows16_no_div, rows16_only_div, 16, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows16_diff, db_filename))
-        thread16.start()
-    if num_threads >= 18:
-        check_interval(17, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread17 = Thread(target=process_symbols, args=(symbols17, csv_db_data17, rows17, rows17_no_div, rows17_only_div, 17, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows17_diff, db_filename))
-        thread17.start()
-    if num_threads >= 19:
-        check_interval(18, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread18 = Thread(target=process_symbols, args=(symbols18, csv_db_data18, rows18, rows18_no_div, rows18_only_div, 18, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows18_diff, db_filename))
-        thread18.start()
-    if num_threads >= 20:
-        check_interval(19, interval_threads, interval_secs_to_avoid_http_errors, research_mode)
-        thread19 = Thread(target=process_symbols, args=(symbols19, csv_db_data19, rows19, rows19_no_div, rows19_only_div, 19, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, relaxed_access, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, rows19_diff, db_filename))
-        thread19.start()
-
-    if num_threads == 1:
-        pass
-    elif num_threads >=  1: thread0.join()
-    if num_threads >=  2: thread1.join()
-    if num_threads >=  3: thread2.join()
-    if num_threads >=  4: thread3.join()
-    if num_threads >=  5: thread4.join()
-    if num_threads >=  6: thread5.join()
-    if num_threads >=  7: thread6.join()
-    if num_threads >=  8: thread7.join()
-    if num_threads >=  9: thread8.join()
-    if num_threads >= 10: thread9.join()
-    if num_threads >= 11: thread10.join()
-    if num_threads >= 12: thread11.join()
-    if num_threads >= 13: thread12.join()
-    if num_threads >= 14: thread13.join()
-    if num_threads >= 15: thread14.join()
-    if num_threads >= 16: thread15.join()
-    if num_threads >= 17: thread16.join()
-    if num_threads >= 18: thread17.join()
-    if num_threads >= 19: thread18.join()
-    if num_threads >= 20: thread19.join()
-
-    csv_db_data.extend(  csv_db_data0   + csv_db_data1   + csv_db_data2   + csv_db_data3   + csv_db_data4   + csv_db_data5   + csv_db_data6   + csv_db_data7   + csv_db_data8   + csv_db_data9   + csv_db_data10   + csv_db_data11   + csv_db_data12   + csv_db_data13   + csv_db_data14   + csv_db_data15   + csv_db_data16   + csv_db_data17   + csv_db_data18   + csv_db_data19  )
-    rows.extend(         rows0          + rows1          + rows2          + rows3          + rows4          + rows5          + rows6          + rows7          + rows8          + rows9          + rows10          + rows11          + rows12          + rows13          + rows14          + rows15          + rows16          + rows17          + rows18          + rows19         )
-    rows_no_div.extend(  rows0_no_div   + rows1_no_div   + rows2_no_div   + rows3_no_div   + rows4_no_div   + rows5_no_div   + rows6_no_div   + rows7_no_div   + rows8_no_div   + rows9_no_div   + rows10_no_div   + rows11_no_div   + rows12_no_div   + rows13_no_div   + rows14_no_div   + rows15_no_div   + rows16_no_div   + rows17_no_div   + rows18_no_div   + rows19_no_div  )
-    rows_only_div.extend(rows0_only_div + rows1_only_div + rows2_only_div + rows3_only_div + rows4_only_div + rows5_only_div + rows6_only_div + rows7_only_div + rows8_only_div + rows9_only_div + rows10_only_div + rows11_only_div + rows12_only_div + rows13_only_div + rows14_only_div + rows15_only_div + rows16_only_div + rows17_only_div + rows18_only_div + rows19_only_div)
-    rows_diff.extend(    rows0_diff     + rows1_diff     + rows2_diff     + rows3_diff     + rows4_diff     + rows5_diff     + rows6_diff     + rows7_diff     + rows8_diff     + rows9_diff     + rows10_diff     + rows11_diff     + rows12_diff     + rows13_diff     + rows14_diff     + rows15_diff     + rows16_diff     + rows17_diff     + rows18_diff     + rows19_diff    )
-
-    # remove (from rows, not from db or diff) rows whose sss[s[s]]_value is a bad one - irrelevant:
+    # remove (from rows, not from db or diff) rows whose sss_value is irrelevant:
     compact_rows          = []
     compact_rows_no_div   = []
     compact_rows_only_div = []
@@ -3005,6 +2871,9 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
                 writer = csv.writer(engine)
                 sorted_lists_list[index].insert(0, evr_pm_col_title_row)
                 writer.writerows(sorted_lists_list[index])
+        # Save raw database as json:
+        json_db_file = open(date_and_time+'/db.json', "w")
+        json.dump(json_db, json_db_file, indent=1)
 
         sss_post_processing.process_engine_csv(date_and_time)
     else:
