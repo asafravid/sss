@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.80 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.81 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -100,9 +100,9 @@ EQG_WEIGHT_VS_YOY                            = 0.75   # the provided EQG is weig
 RQG_WEIGHT_VS_YOY                            = 0.75   # the provided RQG (yfinance now provides it) is weighted more than the manually calculated one
 EQG_DAMPER                                   = 0.25
 RQG_DAMPER                                   = 0.25
-TRAILING_EPS_PERCENTAGE_DAMP_FACTOR          = 0.01   # When the trailing_eps_percentage is very low (units are ratio here), this damper shall limit the affect to x100 not more)
-PROFIT_MARGIN_DAMPER                         = 0.01   # When the profit_margin                   is very low (units are ratio here), this damper shall limit the affect to x100 not more)
-RATIO_DAMPER                                 = 0.01   # When the total/current_other_other ratio is very low (units are ratio here), this damper shall limit the affect to x100 not more)
+TRAILING_EPS_PERCENTAGE_DAMP_FACTOR          = 0.01  # When the trailing_eps_percentage is very low (units are ratio here), this damper shall limit the affect to x100 not more)
+PROFIT_MARGIN_DAMPER                         = 0.001 # When the profit_margin                   is very low (units are ratio here), this damper shall limit the affect to x100 not more)
+RATIO_DAMPER                                 = 0.01  # When the total/current_other_other ratio is very low (units are ratio here), this damper shall limit the affect to x100 not more)
 ROA_DAMPER                                   = 0.1   # When the ROA is very low (units are ratio here), this damper shall limit the affect to x50 not more)
 ROA_NEG_FACTOR                               = 0.000001
 ROE_DAMPER                                   = 0.1   # When the ROE is very low (units are ratio here), this damper shall limit the affect to x50 not more)
