@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.79 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.80 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -2294,7 +2294,7 @@ def process_info(json_db, symbol, stock_data, tase_mode, sectors_list, sectors_f
             elif stock_data.quarterized_profit_margin is None: stock_data.quarterized_profit_margin = stock_data.profit_margin/PROFIT_MARGIN_DUPLICATION_FACTOR
 
             sorted_pms = sorted([stock_data.profit_margin, stock_data.annualized_profit_margin, stock_data.quarterized_profit_margin])
-            weighted_average_pm = weighted_average(sorted_pms, PROFIT_MARGIN_WEIGHTS[:len(sorted_pms)]) # Higher weight to the higher profit margin when averaging out
+            weighted_average_pm = weighted_average(sorted_pms, NO_WEIGHTS[:len(sorted_pms)]) # Higher weight to the higher profit margin when averaging out
             stock_data.effective_profit_margin = PROFIT_MARGIN_DAMPER + weighted_average_pm
 
         # The PEG Ratio is equal to (share_price / earnings_per_share) / (earnings_per_share_growth_ratio [% units])
