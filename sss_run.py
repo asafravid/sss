@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.49 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.50 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -369,10 +369,15 @@ def research_db(sectors_list, sectors_filter_out, countries_list, countries_filt
     iteration              = 0
     estimated_iterations_left = pb_range_len*pi_range_len*ev_millions_range_len*pe_range_len*evr_range_len*pm_range_len
     for pb_index, pb_limit                                           in enumerate(pb_range):
+        print('\n')
         for pi_index, pi_limit                                       in enumerate(pi_range):
+            print('\n')
             for ev_millions_index, ev_millions_limit                 in enumerate(ev_millions_range):
+                print('\n')
                 for pe_index, price_to_earnings_limit                in enumerate(pe_range):
+                    print('\n')
                     for evr_index, enterprise_value_to_revenue_limit in enumerate(evr_range):
+                        print('\n')
                         for pm_index, profit_margin_limit            in enumerate(pm_range):  # TODO: ASAFR: Below 1. Ambiguity of parameters - narrow down. 2. Some magic numbers on ev_to_cfo_ration etc 100.0 and 1000.0 - make order and defines/constants/multi_dim here
                             num_results_for_pb_pi_ev_pe_evr_and_pm = sss.sss_run(reference_run=[], sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, csv_db_path=csv_db_path, db_filename=db_filename, read_all_country_symbols=read_all_country_symbols, tase_mode=tase_mode, num_threads=1, market_cap_included=1, research_mode=1, profit_margin_limit=float(profit_margin_limit)/100.0, pb_limit=pb_limit, pi_limit=pi_limit, enterprise_value_millions_usd_limit=ev_millions_limit, research_mode_max_ev=research_mode_max_ev, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, appearance_counter_dict_sss=appearance_counter_dict_sss, appearance_counter_min=appearance_counter_min, appearance_counter_max=appearance_counter_max)
                             if num_results_for_pb_pi_ev_pe_evr_and_pm < appearance_counter_min:
@@ -528,7 +533,7 @@ def execute():
                 for db_filename in DB_FILENAMES:
                     pb_range_tase          = get_range(csv_db_path=new_run_tase, db_filename=db_filename, column_name='price_to_book',           num_sections=5, reverse=1, pop_1st_percentile_range=False)  # TODO: ASAFR: Revisit this - perhaps no popping required for non-TASE as well?
                     pi_range_tase          = get_range(csv_db_path=new_run_tase, db_filename=db_filename, column_name='held_percent_insiders',   num_sections=3, reverse=0, pop_1st_percentile_range=False)
-                    ev_range_tase          = get_range(csv_db_path=new_run_tase, db_filename=db_filename, column_name='enterprise_value',        num_sections=4, reverse=0, pop_1st_percentile_range=False)
+                    ev_range_tase          = get_range(csv_db_path=new_run_tase, db_filename=db_filename, column_name='enterprise_value',        num_sections=3, reverse=0, pop_1st_percentile_range=False)
                     pe_range_tase          = get_range(csv_db_path=new_run_tase, db_filename=db_filename, column_name='pe_effective',            num_sections=5, reverse=1, pop_1st_percentile_range=False)
                     evr_range_tase         = get_range(csv_db_path=new_run_tase, db_filename=db_filename, column_name='evr_effective',           num_sections=6, reverse=1, pop_1st_percentile_range=False)
                     pm_ratios_range_tase   = get_range(csv_db_path=new_run_tase, db_filename=db_filename, column_name='effective_profit_margin', num_sections=7, reverse=0, pop_1st_percentile_range=False)
@@ -545,7 +550,7 @@ def execute():
                 for db_filename in DB_FILENAMES:
                     pb_range_nsr          = get_range(csv_db_path=new_run_nsr, db_filename=db_filename, column_name='price_to_book',           num_sections=6, reverse=1)
                     pi_range_nsr          = get_range(csv_db_path=new_run_nsr, db_filename=db_filename, column_name='held_percent_insiders',   num_sections=4, reverse=0)
-                    ev_range_nsr          = get_range(csv_db_path=new_run_nsr, db_filename=db_filename, column_name='enterprise_value',        num_sections=5, reverse=0)
+                    ev_range_nsr          = get_range(csv_db_path=new_run_nsr, db_filename=db_filename, column_name='enterprise_value',        num_sections=4, reverse=0)
                     pe_range_nsr          = get_range(csv_db_path=new_run_nsr, db_filename=db_filename, column_name='pe_effective',            num_sections=6, reverse=1)
                     evr_range_nsr         = get_range(csv_db_path=new_run_nsr, db_filename=db_filename, column_name='evr_effective',           num_sections=7, reverse=1)
                     pm_ratios_range_nsr   = get_range(csv_db_path=new_run_nsr, db_filename=db_filename, column_name='effective_profit_margin', num_sections=8, reverse=0)
@@ -562,7 +567,7 @@ def execute():
                 for db_filename in DB_FILENAMES:
                     pb_range_all          = get_range(csv_db_path=new_run_all, db_filename=db_filename, column_name='price_to_book',            num_sections=7, reverse=1)
                     pi_range_all          = get_range(csv_db_path=new_run_all, db_filename=db_filename, column_name='held_percent_insiders',    num_sections=5, reverse=0)
-                    ev_range_all          = get_range(csv_db_path=new_run_all, db_filename=db_filename, column_name='enterprise_value',         num_sections=6, reverse=0)
+                    ev_range_all          = get_range(csv_db_path=new_run_all, db_filename=db_filename, column_name='enterprise_value',         num_sections=5, reverse=0)
                     pe_range_all          = get_range(csv_db_path=new_run_all, db_filename=db_filename, column_name='pe_effective',             num_sections=7, reverse=1)
                     evr_range_all         = get_range(csv_db_path=new_run_all, db_filename=db_filename, column_name='evr_effective',            num_sections=8, reverse=1)
                     pm_ratios_range_all   = get_range(csv_db_path=new_run_all, db_filename=db_filename, column_name='effective_profit_margin',  num_sections=9, reverse=0)
@@ -577,7 +582,7 @@ def execute():
         if run_six:
             if not sss_config.aggregate_only:
                 for db_filename in DB_FILENAMES:
-                    pb_range_six          = get_range(csv_db_path=new_run_six, db_filename=db_filename, column_name='price_to_book',            num_sections=3, reverse=1)
+                    pb_range_six          = get_range(csv_db_path=new_run_six, db_filename=db_filename, column_name='price_to_book',            num_sections=4, reverse=1)
                     pi_range_six          = get_range(csv_db_path=new_run_six, db_filename=db_filename, column_name='held_percent_insiders',    num_sections=2, reverse=0)
                     ev_range_six          = get_range(csv_db_path=new_run_six, db_filename=db_filename, column_name='enterprise_value',         num_sections=2, reverse=0)
                     pe_range_six          = get_range(csv_db_path=new_run_six, db_filename=db_filename, column_name='pe_effective',             num_sections=3, reverse=1)
@@ -594,12 +599,12 @@ def execute():
         if run_st:
             if not sss_config.aggregate_only:
                 for db_filename in DB_FILENAMES:
-                    pb_range_st          = get_range(csv_db_path=new_run_st, db_filename=db_filename, column_name='price_to_book',            num_sections=3, reverse=1)
+                    pb_range_st          = get_range(csv_db_path=new_run_st, db_filename=db_filename, column_name='price_to_book',            num_sections=5, reverse=1)
                     pi_range_st          = get_range(csv_db_path=new_run_st, db_filename=db_filename, column_name='held_percent_insiders',    num_sections=3, reverse=0)
                     ev_range_st          = get_range(csv_db_path=new_run_st, db_filename=db_filename, column_name='enterprise_value',         num_sections=3, reverse=0)
-                    pe_range_st          = get_range(csv_db_path=new_run_st, db_filename=db_filename, column_name='pe_effective',             num_sections=3, reverse=1)
-                    evr_range_st         = get_range(csv_db_path=new_run_st, db_filename=db_filename, column_name='evr_effective',            num_sections=4, reverse=1)
-                    pm_ratios_range_st   = get_range(csv_db_path=new_run_st, db_filename=db_filename, column_name='effective_profit_margin',  num_sections=5, reverse=0)
+                    pe_range_st          = get_range(csv_db_path=new_run_st, db_filename=db_filename, column_name='pe_effective',             num_sections=4, reverse=1)
+                    evr_range_st         = get_range(csv_db_path=new_run_st, db_filename=db_filename, column_name='evr_effective',            num_sections=5, reverse=1)
+                    pm_ratios_range_st   = get_range(csv_db_path=new_run_st, db_filename=db_filename, column_name='effective_profit_margin',  num_sections=6, reverse=0)
 
                     ev_millions_range_st = [int(  ev/1000000                       ) for ev in ev_range_st       ]
                     pm_range_st          = [round(pm*100,    sss.NUM_ROUND_DECIMALS) for pm in pm_ratios_range_st]
@@ -611,7 +616,7 @@ def execute():
         if run_custom:
             if not sss_config.aggregate_only:
                 for db_filename in DB_FILENAMES:
-                    pb_range_custom          = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='price_to_book',            num_sections=4, reverse=1)
+                    pb_range_custom          = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='price_to_book',            num_sections=5, reverse=1)
                     pi_range_custom          = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='held_percent_insiders',    num_sections=3, reverse=0)
                     ev_range_custom          = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='enterprise_value',         num_sections=3, reverse=0)
                     pe_range_custom          = get_range(csv_db_path=new_run_custom, db_filename=db_filename, column_name='pe_effective',             num_sections=4, reverse=1)
