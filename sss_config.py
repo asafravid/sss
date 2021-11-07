@@ -50,14 +50,14 @@ automatic_results_folder_selection = False
 reference_run_custom = 'Results/Tase/20211029-093700_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes325'  # 'Results/Nsr/20211009-123302_Tchnlgy3.0_FnnclSrvcs0.75_Bdb_nRes908'  # 'Results/Nsr/20211009-123302_Tchnlgy3.0_FnnclSrvcs0.75_Bdb_nRes908'  # 'Results/Custom/20210909-154648_Bdb_nRes309_Custom'
 reference_run_tase   = 'Results/Tase/20211105-113630_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes291'
 reference_run_nsr    = 'Results/Nsr/20211106-170744_Tchnlgy3.0_FnnclSrvcs0.75_Bdb_nRes788'
-reference_run_all    = 'Results/All/20211010-032632_Tchnlgy3.0_FnnclSrvcs0.75_A_Bdb_nRes3489'
+reference_run_all    = 'Results/All/20211107-151952_Tchnlgy3.0_FnnclSrvcs0.75_A_Bdb_nRes3004'
 reference_run_six    = 'Results/Six/20211012-141034_S_Bdb_nRes30'
 reference_run_st     = 'Results/St/20210915-023602_St_Bdb_nRes130'
 
 new_run_custom = 'Results/Custom/20210917-201728_Bdb_nRes312_Custom'
 new_run_tase   = 'Results/Tase/20211105-113630_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes291'
 new_run_nsr    = 'Results/Nsr/20211106-170744_Tchnlgy3.0_FnnclSrvcs0.75_Bdb_nRes788'
-new_run_all    = 'Results/All/20211024-030156_Tchnlgy3.0_FnnclSrvcs0.75_A_Bdb_nRes3214'
+new_run_all    = 'Results/All/20211107-151952_Tchnlgy3.0_FnnclSrvcs0.75_A_Bdb_nRes3004'
 new_run_six    = 'Results/Six/20211012-141034_S_Bdb_nRes30'
 new_run_st     = 'Results/St/20210915-023602_St_Bdb_nRes130'
 
