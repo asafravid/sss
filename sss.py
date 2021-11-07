@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.81 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.82 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -1463,20 +1463,29 @@ def process_info(json_db, symbol, stock_data, tase_mode, sectors_list, sectors_f
         financials_quarterly     = {}
         # TODO: ASAFR: Here: id no previous_close, use market_high, low regular, or anything possible to avoid none!
         try:
-            info                     = symbol.get_info()
-            cash_flows_yearly        = symbol.get_cashflow(     as_dict=True, freq="yearly")
-            cash_flows_quarterly     = symbol.get_cashflow(     as_dict=True, freq="quarterly")
-            balance_sheets_yearly    = symbol.get_balance_sheet(as_dict=True, freq="yearly")
-            balance_sheets_quarterly = symbol.get_balance_sheet(as_dict=True, freq="quarterly")
-            earnings_yearly          = symbol.get_earnings(     as_dict=True, freq="yearly")
-            earnings_quarterly       = symbol.get_earnings(     as_dict=True, freq="quarterly")
+            if isinstance(symbol, dict):
+                info                     = symbol['info'                    ] if 'info'                     in symbol else None
+                cash_flows_yearly        = symbol['cash_flows_yearly'       ] if 'cash_flows_yearly'        in symbol else None
+                cash_flows_quarterly     = symbol['cash_flows_quarterly'    ] if 'cash_flows_quarterly'     in symbol else None
+                balance_sheets_yearly    = symbol['balance_sheets_yearly'   ] if 'balance_sheets_yearly'    in symbol else None
+                balance_sheets_quarterly = symbol['balance_sheets_quarterly'] if 'balance_sheets_quarterly' in symbol else None
+                earnings_yearly          = symbol['earnings_yearly'         ] if 'earnings_yearly'          in symbol else None
+                earnings_quarterly       = symbol['earnings_quarterly'      ] if 'earnings_quarterly'       in symbol else None
+            else:
+                info                     = symbol.get_info()
+                cash_flows_yearly        = symbol.get_cashflow(     as_dict=True, freq="yearly")
+                cash_flows_quarterly     = symbol.get_cashflow(     as_dict=True, freq="quarterly")
+                balance_sheets_yearly    = symbol.get_balance_sheet(as_dict=True, freq="yearly")
+                balance_sheets_quarterly = symbol.get_balance_sheet(as_dict=True, freq="quarterly")
+                earnings_yearly          = symbol.get_earnings(     as_dict=True, freq="yearly")
+                earnings_quarterly       = symbol.get_earnings(     as_dict=True, freq="quarterly")
 
-            cash_flows_yearly        = stringify_keys(d=cash_flows_yearly,        check_inner=False)
-            cash_flows_quarterly     = stringify_keys(d=cash_flows_quarterly,     check_inner=False)
-            balance_sheets_yearly    = stringify_keys(d=balance_sheets_yearly,    check_inner=False)
-            balance_sheets_quarterly = stringify_keys(d=balance_sheets_quarterly, check_inner=False)
-            earnings_yearly          = stringify_keys(d=earnings_yearly,          check_inner=False)
-            earnings_quarterly       = stringify_keys(d=earnings_quarterly,       check_inner=False)
+                cash_flows_yearly        = stringify_keys(d=cash_flows_yearly,        check_inner=False)
+                cash_flows_quarterly     = stringify_keys(d=cash_flows_quarterly,     check_inner=False)
+                balance_sheets_yearly    = stringify_keys(d=balance_sheets_yearly,    check_inner=False)
+                balance_sheets_quarterly = stringify_keys(d=balance_sheets_quarterly, check_inner=False)
+                earnings_yearly          = stringify_keys(d=earnings_yearly,          check_inner=False)
+                earnings_quarterly       = stringify_keys(d=earnings_quarterly,       check_inner=False)
 
             if   earnings_yearly    != None: stock_data.financial_currency = earnings_yearly[   'financialCurrency']
             elif earnings_quarterly != None: stock_data.financial_currency = earnings_quarterly['financialCurrency']
@@ -1511,10 +1520,14 @@ def process_info(json_db, symbol, stock_data, tase_mode, sectors_list, sectors_f
                 stock_data.financial_currency_conversion_rate_mult_to_usd = round(1.0 / currency_conversion_tool_manual[stock_data.financial_currency], NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
                 stock_data.summary_currency_conversion_rate_mult_to_usd   = round(1.0 / currency_conversion_tool_manual[stock_data.summary_currency],   NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
 
-            financials_yearly          = symbol.get_financials(as_dict=True, freq="yearly")
-            financials_quarterly       = symbol.get_financials(as_dict=True, freq="quarterly")
-            financials_yearly          = stringify_keys(d=financials_yearly,    check_inner=False)
-            financials_quarterly       = stringify_keys(d=financials_quarterly, check_inner=False)
+            if isinstance(symbol, dict):
+                financials_yearly    = symbol['financials_yearly'   ] if 'financials_yearly'    in symbol else None
+                financials_quarterly = symbol['financials_quarterly'] if 'financials_quarterly' in symbol else None
+            else:
+                financials_yearly    = symbol.get_financials(as_dict=True, freq="yearly")
+                financials_quarterly = symbol.get_financials(as_dict=True, freq="quarterly")
+                financials_yearly    = stringify_keys(d=financials_yearly,    check_inner=False)
+                financials_quarterly = stringify_keys(d=financials_quarterly, check_inner=False)
 
 
             if VERBOSE_LOGS:
@@ -1525,7 +1538,7 @@ def process_info(json_db, symbol, stock_data, tase_mode, sectors_list, sectors_f
                 print('[DB Debug] balance_sheets_yearly:    {}'.format(balance_sheets_yearly))
                 print('[DB Debug] balance_sheets_quarterly: {}'.format(balance_sheets_quarterly))
                 print('[DB Debug] earnings_yearly:          {}'.format(earnings_yearly))
-                print('[DB Debug] earnings_yearly:          {}'.format( earnings_quarterly))
+                print('[DB Debug] earnings_quarterly:       {}'.format(earnings_quarterly))
                 print('[DB Debug] financials_yearly:        {}'.format(financials_yearly))
                 print('[DB Debug] financials_quarterly:     {}'.format(financials_quarterly))
 
@@ -1537,7 +1550,7 @@ def process_info(json_db, symbol, stock_data, tase_mode, sectors_list, sectors_f
             json_db[stock_data.symbol]["balance_sheets_yearly"]    = balance_sheets_yearly
             json_db[stock_data.symbol]["balance_sheets_quarterly"] = balance_sheets_quarterly
             json_db[stock_data.symbol]["earnings_yearly"]          = earnings_yearly
-            json_db[stock_data.symbol]["earnings_yearly"]          = earnings_yearly
+            json_db[stock_data.symbol]["earnings_quarterly"]       = earnings_quarterly
             json_db[stock_data.symbol]["financials_yearly"]        = financials_yearly
             json_db[stock_data.symbol]["financials_quarterly"]     = financials_quarterly
 
@@ -2394,28 +2407,34 @@ def get_stock_data_normalized_from_db_row_compact(row, stock_symbol):
     return StockDataNormalized(symbol=stock_symbol, short_name=row[g_name_index_n], sector=row[g_sector_index_n], country=row[g_country_index_n], sss_value=float(row[g_sss_value_index_n]), sss_value_normalized=float(row[g_sss_value_normalized_index_n]), evr_effective=float(row[g_evr_effective_index_n]), evr_effective_normalized=float(row[g_evr_effective_normalized_index_n]), effective_price_to_earnings=float(row[g_effective_price_to_earnings_index_n]), trailing_12months_price_to_sales=float(row[g_trailing_12months_price_to_sales_index_n]), trailing_12months_price_to_sales_normalized=float(row[g_trailing_12months_price_to_sales_normalized_index_n]), pe_effective=float(row[g_pe_effective_index_n]), pe_effective_normalized=float(row[g_pe_effective_normalized_index_n]), effective_ev_to_ebitda=float(row[g_effective_ev_to_ebitda_index_n]), effective_ev_to_ebitda_normalized=float(row[g_effective_ev_to_ebitda_normalized_index_n]), effective_profit_margin=float(row[g_effective_profit_margin_index_n]), effective_profit_margin_normalized=float(row[g_effective_profit_margin_normalized_index_n]), held_percent_insiders=float(row[g_held_percent_insiders_index_n]), held_percent_insiders_normalized=float(row[g_held_percent_insiders_normalized_index_n]), previous_close=float(row[g_previous_close_index_n]), price_to_book=float(row[g_price_to_book_index_n]), price_to_book_normalized=float(row[g_price_to_book_normalized_index_n]), enterprise_value=int(float(row[g_enterprise_value_index_n])), eqg_factor_effective=float(row[g_eqg_factor_effective_index_n]), eqg_factor_effective_normalized=float(row[g_eqg_factor_effective_normalized_index_n]), rqg_factor_effective=float(row[g_rqg_factor_effective_index_n]), rqg_factor_effective_normalized=float(row[g_rqg_factor_effective_normalized_index_n]), effective_peg_ratio=float(row[g_effective_peg_ratio_index_n]), effective_peg_ratio_normalized=float(row[g_effective_peg_ratio_normalized_index_n]), ev_to_cfo_ratio_effective=float(row[g_ev_to_cfo_ratio_effective_index_n]), ev_to_cfo_ratio_effective_normalized=float(row[g_ev_to_cfo_ratio_effective_normalized_index_n]), debt_to_equity_effective=float(row[g_debt_to_equity_effective_index_n]), debt_to_equity_effective_used=float(row[g_debt_to_equity_effective_used_index_n]), debt_to_equity_effective_used_normalized=float(row[g_debt_to_equity_effective_used_normalized_index_n]), eff_dist_from_low_factor=float(row[g_eff_dist_from_low_factor_index_n]), eff_dist_from_low_factor_normalized=float(row[g_eff_dist_from_low_factor_normalized_index_n]), total_ratio_effective=float(row[g_total_ratio_effective_index_n]), total_current_ratio_effective=float(row[g_total_current_ratio_effective_index_n]), effective_current_ratio=float(row[g_effective_current_ratio_index_n]), effective_current_ratio_normalized=float(row[g_effective_current_ratio_normalized_index_n]), calculated_roa=float(row[g_calculated_roa_index_n]), calculated_roa_normalized=float(row[g_calculated_roa_normalized_index_n]), calculated_roe=float(row[g_calculated_roe_index_n]), calculated_roe_normalized=float(row[g_calculated_roe_normalized_index_n]), altman_z_score_factor=float(row[g_altman_z_score_factor_index_n]), altman_z_score_factor_normalized=float(row[g_altman_z_score_factor_normalized_index_n]))
 
 
-def process_symbols(json_db, symbols, csv_db_data, rows, rows_no_div, rows_only_div, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, diff_rows, db_filename):
+def process_symbols(json_db, symbols, csv_db_data, rows, rows_no_div, rows_only_div, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, market_cap_included, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, diff_rows, db_filename, reference_raw_data=None):
     iteration = 0
     if not research_mode:
         elapsed_time_start_sec = time.time()
         for symb in symbols:
             iteration += 1
-            sleep_seconds = 0
-            time.sleep(sleep_seconds)
             elapsed_time_sample_sec = time.time()
             elapsed_time_sec        = round(elapsed_time_sample_sec - elapsed_time_start_sec, 0)
             average_sec_per_symbol  = round(elapsed_time_sec/iteration, int(NUM_ROUND_DECIMALS/3))
             percentage_complete     = round(100*iteration/len(symbols), int(NUM_ROUND_DECIMALS/3))
-            if not research_mode:
-                print('[DB] {:9} ({:04}/{:04}/{:04} [{:2.2f}%], Diff: {:04}), time/left/avg [sec]: {:5.0f}/{:5.0f}/{:2.2f} -> '.format(symb, len(rows), iteration, len(symbols), percentage_complete, len(diff_rows), elapsed_time_sec, average_sec_per_symbol*(len(symbols)-iteration), average_sec_per_symbol), end='')
-            if tase_mode:
-                symbol = yf.Ticker(symb)
-            else:
-                if read_all_country_symbols not in [sss_config.ALL_COUNTRY_SYMBOLS_SIX, sss_config.ALL_COUNTRY_SYMBOLS_ST]:
-                    symbol = yf.Ticker(symb.replace('.U','-UN').replace('.W','-WT').replace('.','-'))  # TODO: ASFAR: Sometimes the '.' Is needed, especially for non-US companies. See for instance 5205.kl. In this case the parameter is also case-sensitive! -> https://github.com/pydata/pandas-datareader/issues/810#issuecomment-789684354
-                else:
-                    if read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_ST and '.ST' not in symb: symb = symb.replace('.S.DX', '.ST')
+            print('[DB] {:9} ({:04}/{:04}/{:04} [{:2.2f}%], Diff: {:04}), time/left/avg [sec]: {:5.0f}/{:5.0f}/{:2.2f} -> '.format(symb, len(rows), iteration, len(symbols), percentage_complete, len(diff_rows), elapsed_time_sec, average_sec_per_symbol*(len(symbols)-iteration), average_sec_per_symbol), end='')
+
+            if reference_raw_data is None:
+                if tase_mode:
                     symbol = yf.Ticker(symb)
+                else:
+                    if read_all_country_symbols not in [sss_config.ALL_COUNTRY_SYMBOLS_SIX, sss_config.ALL_COUNTRY_SYMBOLS_ST]:
+                        symbol = yf.Ticker(symb.replace('.U','-UN').replace('.W','-WT').replace('.','-'))  # TODO: ASFAR: Sometimes the '.' Is needed, especially for non-US companies. See for instance 5205.kl. In this case the parameter is also case-sensitive! -> https://github.com/pydata/pandas-datareader/issues/810#issuecomment-789684354
+                    else:
+                        if read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_ST and '.ST' not in symb: symb = symb.replace('.S.DX', '.ST')
+                        symbol = yf.Ticker(symb)
+            else:
+                if symb in reference_raw_data:
+                    symbol = reference_raw_data[symb]
+                else:
+                    print('[DB] symbol {} not in reference_raw_data {}'.format(symb, reference_raw_data))
+                    continue
+
             stock_data = StockData(symbol=symb)
             process_info_result = process_info(json_db=json_db, symbol=symbol, stock_data=stock_data, tase_mode=tase_mode, sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, profit_margin_limit=profit_margin_limit, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, debt_to_equity_limit=debt_to_equity_limit, pb_limit=pb_limit, pi_limit=pi_limit, enterprise_value_millions_usd_limit=enterprise_value_millions_usd_limit, research_mode_max_ev=research_mode_max_ev, eqg_min=eqg_min, rqg_min=rqg_min, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, market_cap_included=market_cap_included, research_mode=research_mode, currency_conversion_tool=currency_conversion_tool, currency_conversion_tool_alternative=currency_conversion_tool_alternative, currency_conversion_tool_manual=currency_conversion_tool_manual, reference_db=reference_db, reference_db_title_row=reference_db_title_row, db_filename=None)
             if   tase_mode                                                      and 'TLV:' not in stock_data.symbol: stock_data.symbol = 'TLV:' + stock_data.symbol.replace('.TA', '').replace('-', '.')
@@ -2792,7 +2811,12 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
                     csv_db_data.append(row)
                     row_index += 1
 
-    process_symbols(json_db=json_db, symbols=symbols, csv_db_data=csv_db_data, rows=rows, rows_no_div=rows_no_div, rows_only_div=rows_only_div, tase_mode=tase_mode, read_all_country_symbols=read_all_country_symbols, sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, profit_margin_limit=profit_margin_limit, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, debt_to_equity_limit=debt_to_equity_limit, pb_limit=pb_limit, pi_limit=pi_limit, enterprise_value_millions_usd_limit=enterprise_value_millions_usd_limit, research_mode_max_ev=research_mode_max_ev, eqg_min=eqg_min, rqg_min=rqg_min, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, market_cap_included=market_cap_included, research_mode=research_mode, currency_conversion_tool=currency_conversion_tool, currency_conversion_tool_alternative=currency_conversion_tool_alternative, currency_conversion_tool_manual=currency_conversion_tool_manual, reference_db=reference_db, reference_db_title_row=reference_db_title_row, diff_rows=rows_diff, db_filename=db_filename)
+    reference_raw_data = None
+    if sss_config.use_reference_as_raw_data:
+        json_db_filename = open(reference_run + '/db.json')
+        reference_raw_data = json.load(json_db_filename)
+
+    process_symbols(json_db=json_db, symbols=symbols, csv_db_data=csv_db_data, rows=rows, rows_no_div=rows_no_div, rows_only_div=rows_only_div, tase_mode=tase_mode, read_all_country_symbols=read_all_country_symbols, sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, profit_margin_limit=profit_margin_limit, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, debt_to_equity_limit=debt_to_equity_limit, pb_limit=pb_limit, pi_limit=pi_limit, enterprise_value_millions_usd_limit=enterprise_value_millions_usd_limit, research_mode_max_ev=research_mode_max_ev, eqg_min=eqg_min, rqg_min=rqg_min, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, market_cap_included=market_cap_included, research_mode=research_mode, currency_conversion_tool=currency_conversion_tool, currency_conversion_tool_alternative=currency_conversion_tool_alternative, currency_conversion_tool_manual=currency_conversion_tool_manual, reference_db=reference_db, reference_db_title_row=reference_db_title_row, diff_rows=rows_diff, db_filename=db_filename, reference_raw_data=reference_raw_data)
 
     # remove (from rows, not from db or diff) rows whose sss_value is irrelevant:
     compact_rows          = []
