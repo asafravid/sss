@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.83 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.84 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -899,6 +899,10 @@ def set_skip_reason(stock_data):
     elif stock_data.held_percent_insiders            <= 0:    stock_data.skip_reason += 'held_percent_insiders            <= 0   |'
 
 
+def get_list_of_csv_row_indices_which_affect_core_equation():
+    return [g_eff_dist_from_low_factor_index, g_held_percent_insiders_index, g_evr_effective_index, g_pe_effective_index, g_effective_ev_to_ebitda_index, g_trailing_12months_price_to_sales_index, g_price_to_book_index, g_effective_profit_margin_index, g_effective_current_ratio_index, g_calculated_roa_index, g_calculated_roe_index, g_effective_peg_ratio_index, g_ev_to_cfo_ratio_effective_index, g_debt_to_equity_effective_used_index, g_eqg_factor_effective_index, g_rqg_factor_effective_index, g_altman_z_score_factor_index]
+
+
 def sss_core_equation_value_set(stock_data):
     if VERBOSE_LOGS > 2: print("[{} sss_core_equation_value_set]".format(__name__), end='')
     if stock_data.shares_outstanding and stock_data.net_income_to_common_shareholders != None: stock_data.nitcsh_to_shares_outstanding = float(stock_data.net_income_to_common_shareholders) / float(stock_data.shares_outstanding)
@@ -1064,26 +1068,26 @@ def round_and_avoid_none_values(stock_data):
     # TODO: ASAFR: Unify below with above to single line for each parameter
     if stock_data.sss_value                                             is None: stock_data.sss_value                                             = BAD_SSS
     if stock_data.annualized_revenue                                    is None: stock_data.annualized_revenue                                    = 0
-    if stock_data.annualized_revenue_bonus                              is None: stock_data.annualized_revenue_bonus                              = 0
+    if stock_data.annualized_revenue_bonus                              is None: stock_data.annualized_revenue_bonus                              = 0.0
     if stock_data.annualized_earnings                                   is None: stock_data.annualized_earnings                                   = 0
     if stock_data.annualized_retained_earnings                          is None: stock_data.annualized_retained_earnings                          = 0
-    if stock_data.annualized_retained_earnings_bonus                    is None: stock_data.annualized_retained_earnings_bonus                    = 0
+    if stock_data.annualized_retained_earnings_bonus                    is None: stock_data.annualized_retained_earnings_bonus                    = 0.0
     if stock_data.quarterized_revenue                                   is None: stock_data.quarterized_revenue                                   = 0
-    if stock_data.quarterized_revenue_bonus                             is None: stock_data.quarterized_revenue_bonus                             = 0
+    if stock_data.quarterized_revenue_bonus                             is None: stock_data.quarterized_revenue_bonus                             = 0.0
     if stock_data.quarterized_earnings                                  is None: stock_data.quarterized_earnings                                  = 0
-    if stock_data.quarterized_earnings_bonus                            is None: stock_data.quarterized_earnings_bonus                            = 0
+    if stock_data.quarterized_earnings_bonus                            is None: stock_data.quarterized_earnings_bonus                            = 0.0
     if stock_data.quarterized_retained_earnings                         is None: stock_data.quarterized_retained_earnings                         = 0
-    if stock_data.quarterized_retained_earnings_bonus                   is None: stock_data.quarterized_retained_earnings_bonus                   = 0
+    if stock_data.quarterized_retained_earnings_bonus                   is None: stock_data.quarterized_retained_earnings_bonus                   = 0.0
     if stock_data.effective_earnings                                    is None: stock_data.effective_earnings                                    = 0
     if stock_data.effective_retained_earnings                           is None: stock_data.effective_retained_earnings                           = 0
     if stock_data.effective_revenue                                     is None: stock_data.effective_revenue                                     = 0
     if stock_data.annualized_total_revenue                              is None: stock_data.annualized_total_revenue                              = 0
-    if stock_data.annualized_total_revenue_bonus                        is None: stock_data.annualized_total_revenue_bonus                        = 0
+    if stock_data.annualized_total_revenue_bonus                        is None: stock_data.annualized_total_revenue_bonus                        = 0.0
     if stock_data.annualized_net_income                                 is None: stock_data.annualized_net_income                                 = 0
     if stock_data.quarterized_total_revenue                             is None: stock_data.quarterized_total_revenue                             = 0
-    if stock_data.quarterized_total_revenue_bonus                       is None: stock_data.quarterized_total_revenue_bonus                       = 0
+    if stock_data.quarterized_total_revenue_bonus                       is None: stock_data.quarterized_total_revenue_bonus                       = 0.0
     if stock_data.quarterized_net_income                                is None: stock_data.quarterized_net_income                                = 0
-    if stock_data.quarterized_net_income_bonus                          is None: stock_data.quarterized_net_income_bonus                          = 0
+    if stock_data.quarterized_net_income_bonus                          is None: stock_data.quarterized_net_income_bonus                          = 0.0
     if stock_data.effective_net_income                                  is None: stock_data.effective_net_income                                  = 0
     if stock_data.effective_total_revenue                               is None: stock_data.effective_total_revenue                               = 0
     if stock_data.enterprise_value_to_revenue                           is None: stock_data.enterprise_value_to_revenue                           = 0
@@ -1132,16 +1136,16 @@ def round_and_avoid_none_values(stock_data):
     if stock_data.price_to_earnings_to_growth_ratio                     is None: stock_data.price_to_earnings_to_growth_ratio                     = 0
     if stock_data.effective_peg_ratio                                   is None: stock_data.effective_peg_ratio                                   = 0
     if stock_data.annualized_cash_flow_from_operating_activities        is None: stock_data.annualized_cash_flow_from_operating_activities        = 0
-    if stock_data.annualized_cash_flow_from_operating_activities_bonus  is None: stock_data.annualized_cash_flow_from_operating_activities_bonus  = 0
+    if stock_data.annualized_cash_flow_from_operating_activities_bonus  is None: stock_data.annualized_cash_flow_from_operating_activities_bonus  = 0.0
     if stock_data.quarterized_cash_flow_from_operating_activities       is None: stock_data.quarterized_cash_flow_from_operating_activities       = 0
-    if stock_data.quarterized_cash_flow_from_operating_activities_bonus is None: stock_data.quarterized_cash_flow_from_operating_activities_bonus = 0
+    if stock_data.quarterized_cash_flow_from_operating_activities_bonus is None: stock_data.quarterized_cash_flow_from_operating_activities_bonus = 0.0
     if stock_data.annualized_ev_to_cfo_ratio                            is None: stock_data.annualized_ev_to_cfo_ratio                            = 0
     if stock_data.quarterized_ev_to_cfo_ratio                           is None: stock_data.quarterized_ev_to_cfo_ratio                           = 0
     if stock_data.ev_to_cfo_ratio_effective                             is None: stock_data.ev_to_cfo_ratio_effective                             = 0
     if stock_data.annualized_debt_to_equity                             is None: stock_data.annualized_debt_to_equity                             = 0
-    if stock_data.annualized_debt_to_equity_bonus                       is None: stock_data.annualized_debt_to_equity_bonus                       = 0
+    if stock_data.annualized_debt_to_equity_bonus                       is None: stock_data.annualized_debt_to_equity_bonus                       = 0.0
     if stock_data.quarterized_debt_to_equity                            is None: stock_data.quarterized_debt_to_equity                            = 0
-    if stock_data.quarterized_debt_to_equity_bonus                      is None: stock_data.quarterized_debt_to_equity_bonus                      = 0
+    if stock_data.quarterized_debt_to_equity_bonus                      is None: stock_data.quarterized_debt_to_equity_bonus                      = 0.0
     if stock_data.debt_to_equity_effective                              is None: stock_data.debt_to_equity_effective                              = 0
     if stock_data.debt_to_equity_effective_used                         is None: stock_data.debt_to_equity_effective_used                         = 0
     if stock_data.financial_currency_conversion_rate_mult_to_usd        is None: stock_data.financial_currency_conversion_rate_mult_to_usd        = 0
@@ -1160,35 +1164,35 @@ def round_and_avoid_none_values(stock_data):
     if stock_data.dist_from_low_factor                                  is None: stock_data.dist_from_low_factor                                  = 0
     if stock_data.eff_dist_from_low_factor                              is None: stock_data.eff_dist_from_low_factor                              = 0
     if stock_data.annualized_total_ratio                                is None: stock_data.annualized_total_ratio                                = 0
-    if stock_data.annualized_total_ratio_bonus                          is None: stock_data.annualized_total_ratio_bonus                          = 0
+    if stock_data.annualized_total_ratio_bonus                          is None: stock_data.annualized_total_ratio_bonus                          = 0.0
     if stock_data.quarterized_total_ratio                               is None: stock_data.quarterized_total_ratio                               = 0
-    if stock_data.quarterized_total_ratio_bonus                         is None: stock_data.quarterized_total_ratio_bonus                         = 0
+    if stock_data.quarterized_total_ratio_bonus                         is None: stock_data.quarterized_total_ratio_bonus                         = 0.0
     if stock_data.annualized_other_current_ratio                        is None: stock_data.annualized_other_current_ratio                        = 0
-    if stock_data.annualized_other_current_ratio_bonus                  is None: stock_data.annualized_other_current_ratio_bonus                  = 0
+    if stock_data.annualized_other_current_ratio_bonus                  is None: stock_data.annualized_other_current_ratio_bonus                  = 0.0
     if stock_data.quarterized_other_current_ratio                       is None: stock_data.quarterized_other_current_ratio                       = 0
-    if stock_data.quarterized_other_current_ratio_bonus                 is None: stock_data.quarterized_other_current_ratio_bonus                 = 0
+    if stock_data.quarterized_other_current_ratio_bonus                 is None: stock_data.quarterized_other_current_ratio_bonus                 = 0.0
     if stock_data.annualized_other_ratio                                is None: stock_data.annualized_other_ratio                                = 0
-    if stock_data.annualized_other_ratio_bonus                          is None: stock_data.annualized_other_ratio_bonus                          = 0
+    if stock_data.annualized_other_ratio_bonus                          is None: stock_data.annualized_other_ratio_bonus                          = 0.0
     if stock_data.quarterized_other_ratio                               is None: stock_data.quarterized_other_ratio                               = 0
-    if stock_data.quarterized_other_ratio_bonus                         is None: stock_data.quarterized_other_ratio_bonus                         = 0
+    if stock_data.quarterized_other_ratio_bonus                         is None: stock_data.quarterized_other_ratio_bonus                         = 0.0
     if stock_data.annualized_total_current_ratio                        is None: stock_data.annualized_total_current_ratio                        = 0
-    if stock_data.annualized_total_current_ratio_bonus                  is None: stock_data.annualized_total_current_ratio_bonus                  = 0
+    if stock_data.annualized_total_current_ratio_bonus                  is None: stock_data.annualized_total_current_ratio_bonus                  = 0.0
     if stock_data.quarterized_total_current_ratio                       is None: stock_data.quarterized_total_current_ratio                       = 0
-    if stock_data.quarterized_total_current_ratio_bonus                 is None: stock_data.quarterized_total_current_ratio_bonus                 = 0
+    if stock_data.quarterized_total_current_ratio_bonus                 is None: stock_data.quarterized_total_current_ratio_bonus                 = 0.0
     if stock_data.total_ratio_effective                                 is None: stock_data.total_ratio_effective                                 = 0
     if stock_data.other_current_ratio_effective                         is None: stock_data.other_current_ratio_effective                         = 0
     if stock_data.other_ratio_effective                                 is None: stock_data.other_ratio_effective                                 = 0
     if stock_data.total_current_ratio_effective                         is None: stock_data.total_current_ratio_effective                         = 0
     if stock_data.effective_current_ratio                               is None: stock_data.effective_current_ratio                               = 0
     if stock_data.annualized_total_assets                               is None: stock_data.annualized_total_assets                               = 0
-    if stock_data.annualized_total_assets_bonus                         is None: stock_data.annualized_total_assets_bonus                         = 0
+    if stock_data.annualized_total_assets_bonus                         is None: stock_data.annualized_total_assets_bonus                         = 0.0
     if stock_data.quarterized_total_assets                              is None: stock_data.quarterized_total_assets                              = 0
-    if stock_data.quarterized_total_assets_bonus                        is None: stock_data.quarterized_total_assets_bonus                        = 0
+    if stock_data.quarterized_total_assets_bonus                        is None: stock_data.quarterized_total_assets_bonus                        = 0.0
     if stock_data.effective_total_assets                                is None: stock_data.effective_total_assets                                = 0
     if stock_data.annualized_total_stockholder_equity                   is None: stock_data.annualized_total_stockholder_equity                   = 0
-    if stock_data.annualized_total_stockholder_equity_bonus             is None: stock_data.annualized_total_stockholder_equity_bonus             = 0
+    if stock_data.annualized_total_stockholder_equity_bonus             is None: stock_data.annualized_total_stockholder_equity_bonus             = 0.0
     if stock_data.quarterized_total_stockholder_equity                  is None: stock_data.quarterized_total_stockholder_equity                  = 0
-    if stock_data.quarterized_total_stockholder_equity_bonus            is None: stock_data.quarterized_total_stockholder_equity_bonus            = 0
+    if stock_data.quarterized_total_stockholder_equity_bonus            is None: stock_data.quarterized_total_stockholder_equity_bonus            = 0.0
     if stock_data.effective_total_stockholder_equity                    is None: stock_data.effective_total_stockholder_equity                    = 0
     if stock_data.calculated_roa                                        is None: stock_data.calculated_roa                                        = 0
     if stock_data.calculated_roe                                        is None: stock_data.calculated_roe                                        = 0
@@ -1196,9 +1200,9 @@ def round_and_avoid_none_values(stock_data):
     if stock_data.quarterized_working_capital                           is None: stock_data.quarterized_working_capital                           = 0
     if stock_data.effective_working_capital                             is None: stock_data.effective_working_capital                             = 0
     if stock_data.annualized_total_liabilities                          is None: stock_data.annualized_total_liabilities                          = 0
-    if stock_data.annualized_total_liabilities_bonus                    is None: stock_data.annualized_total_liabilities_bonus                    = 0
+    if stock_data.annualized_total_liabilities_bonus                    is None: stock_data.annualized_total_liabilities_bonus                    = 0.0
     if stock_data.quarterized_total_liabilities                         is None: stock_data.quarterized_total_liabilities                         = 0
-    if stock_data.quarterized_total_liabilities_bonus                   is None: stock_data.quarterized_total_liabilities_bonus                   = 0
+    if stock_data.quarterized_total_liabilities_bonus                   is None: stock_data.quarterized_total_liabilities_bonus                   = 0.0
     if stock_data.effective_total_liabilities                           is None: stock_data.effective_total_liabilities                           = 0
     if stock_data.altman_z_score_factor                                 is None: stock_data.altman_z_score_factor                                 = 0
 
@@ -2446,10 +2450,13 @@ def process_symbols(json_db, symbols, csv_db_data, rows, rows_no_div, rows_only_
             row_to_append = get_db_row_from_stock_data(stock_data)
             # Find symbol in reference_db:
             if len(reference_db):
+                # for reference db, use only the values which affect the core equation
+                indices_list_to_check_changes_in = get_list_of_csv_row_indices_which_affect_core_equation()
+
                 symbol_index_in_reference_db = find_symbol_in_reference_db(stock_data.symbol, reference_db)
                 if symbol_index_in_reference_db >= 0:
                     found_differences = False
-                    for index in range(len(g_header_row)):
+                    for index in indices_list_to_check_changes_in:
                         if (VERBOSE_LOGS > 3): print('      comparing column {}'.format(g_header_row[index]))
                         if type(row_to_append[index]) == int or type(row_to_append[index]) == float:
                             try:
@@ -2461,10 +2468,8 @@ def process_symbols(json_db, symbols, csv_db_data, rows, rows_no_div, rows_only_
                                     else:
                                         min_val = max_val = float(row_to_append[index])
                                     diff = abs(max_val-min_val)
-                                    # TODO: ASAFR: 1. 52-week change is not really working and not really needed - fix or eliminate
-                                    #              2. Some of the values ignored below - can eventually be removed from ignoring - investigate this! if they are caluclated correctly - then the transition is only once, when they are new
-                                    indices_list_to_ignore_changes_in = [g_sss_value_index, g_financial_currency_index, g_summary_currency_index]  # , g_quarterized_profit_margin_boost_index, g_annualized_profit_margin_boost_index, g_annualized_revenue_bonus_index, g_annualized_retained_earnings_bonus_index, g_quarterized_revenue_bonus_index, g_quarterized_earnings_bonus_index, g_quarterized_retained_earnings_bonus_index, g_annualized_total_revenue_bonus_index, g_quarterized_total_revenue_bonus_index, g_quarterized_net_income_bonus_index, g_annualized_cash_flow_from_operating_activities_bonus_index, g_quarterized_cash_flow_from_operating_activities_bonus_index, g_annualized_debt_to_equity_bonus_index, g_quarterized_debt_to_equity_bonus_index, g_annualized_total_ratio_bonus_index, g_quarterized_total_ratio_bonus_index, g_annualized_other_current_ratio_bonus_index, g_quarterized_other_current_ratio_bonus_index, g_annualized_total_current_ratio_bonus_index, g_quarterized_total_current_ratio_bonus_index, g_annualized_total_stockholder_equity_bonus_index, g_quarterized_total_stockholder_equity_bonus_index, g_annualized_total_liabilities_bonus_index, g_quarterized_total_liabilities_bonus_index] # [g_fifty_two_week_change_index, g_sss_value_index, g_two_hundred_day_average_index, g_previous_close_percentage_from_200d_ma_index]
-                                    if diff > abs(max_val)*REFERENCE_DB_MAX_VALUE_DIFF_FACTOR_THRESHOLD and index not in indices_list_to_ignore_changes_in:
+
+                                    if diff > abs(max_val)*REFERENCE_DB_MAX_VALUE_DIFF_FACTOR_THRESHOLD:
                                         if 0.0 < float(reference_db[symbol_index_in_reference_db][g_sss_value_index]) < float(row_to_append[g_sss_value_index]):
                                             found_differences = True
                                             compensated_value = round(REFERENCE_DB_MAX_VALUE_DIFF_FACTOR_THRESHOLD*float(reference_db[symbol_index_in_reference_db][column_index_in_reference_db]) + (1-REFERENCE_DB_MAX_VALUE_DIFF_FACTOR_THRESHOLD)*float(row_to_append[index]), NUM_ROUND_DECIMALS)
