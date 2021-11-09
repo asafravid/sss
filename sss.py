@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.86 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.87 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -2795,10 +2795,10 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
             else:
                 symbols = custom_portfolio
 
-        print('\n{} Symbols to Scan: {}\n'.format(len(symbols), symbols))
+        print('\n{} Symbols to Scan: {}'.format(len(symbols), symbols))
 
         # After printing: shuffle (better content from Yahoo Finance):
-        random.shuffle(symbols)
+        # random.shuffle(symbols)
         print('\n{} Symbols order to Scan: {}\n'.format(len(symbols), symbols))
 
     csv_db_data   = []
@@ -2910,6 +2910,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
         # Save raw database as json:
         json_db_file = open(date_and_time+'/db.json', "w")
         json.dump(json_db, json_db_file, indent=1)
+        json_db_file.close()
 
         sss_post_processing.process_engine_csv(date_and_time)
     else:
