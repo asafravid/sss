@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.87 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.88 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -1470,8 +1470,6 @@ def process_info(json_db, symbol, stock_data, tase_mode, sectors_list, sectors_f
         elif stock_data.debt_to_equity_effective         >  debt_to_equity_limit  or stock_data.debt_to_equity_effective  <= 0:                                       return_value = False
         elif stock_data.eqg_factor_effective             <  eqg_min:                                                                                                  return_value = False
         elif stock_data.rqg_factor_effective             <  rqg_min:                                                                                                  return_value = False
-        elif not tase_mode and SKIP_5LETTER_Y_STOCK_LISTINGS and stock_data.symbol[-1] == 'Y' and len(stock_data.symbol) == 5 and '.' not in stock_data.symbol and \
-                '-' not in stock_data.symbol and '$' not in stock_data.symbol:                                                                                        return_value = False  # Checkout http://www.nasdaqtrader.com/trader.aspx?id=symboldirdefs for all symbol definitions (for instance - `$` in stock names, 5-letter stocks ending with `Y`)
 
         return return_value
 
@@ -2568,51 +2566,6 @@ def download_ftp_files(filenames_list, ftp_path):
 # reference_run : Used for identifying anomalies in which some symbol information is completely different from last run. It can be different but only in new quartely reports
 #                 It is sometimes observed that stocks information is wrongly fetched. Is such cases, the last run's reference point shall be used, with a forgetting factor
 def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, countries_filter_out, csv_db_path, db_filename, read_all_country_symbols, tase_mode, market_cap_included, research_mode, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, appearance_counter_dict_sss={}, appearance_counter_min=25, appearance_counter_max=35, custom_portfolio=[], num_results_list=[], num_results_list_index=0):
-    # https://en.wikipedia.org/wiki/ISO_4217
-    currency_filename = 'Indices/currencies.json'
-    with open(currency_filename, 'r') as file:
-        currency_rates_raw_dict = json.loads(file.read())
-    currency_conversion_tool_manual = {k: round(float(v), NUM_ROUND_DECIMALS) for k, v in currency_rates_raw_dict.items()}
-    # print(currency_conversion_tool_manual)
-
-    json_db = dict()
-
-    currency_conversion_tool             = None
-    currency_conversion_tool_alternative = None
-    if not research_mode:
-        try:
-            currency_conversion_tool = CurrencyRates().get_rates('USD') if not research_mode else None
-        except Exception as e:
-            pass
-
-        try:
-            currency_conversion_tool_alternative = CurrencyConverter() if not research_mode else None
-        except Exception as e:
-            pass
-
-        for item in currency_conversion_tool_manual:
-            if currency_conversion_tool != None and item not in currency_conversion_tool:
-                try:
-                    currency_conversion_tool[item] = 1.0/float(currency_conversion_tool_alternative.convert(1.0, item, 'USD'))
-                except:
-                    currency_conversion_tool[item] = 1.0/float(currency_conversion_tool_manual[item])
-
-    reference_db           = []
-    reference_db_title_row = []
-    if not research_mode and reference_run != None and len(reference_run):  # in non-research mode, compare to reference run
-        reference_csv_db_filename = reference_run+'/db.csv'
-        with open(reference_csv_db_filename, mode='r', newline='') as engine:
-            reader = csv.reader(engine, delimiter=',')
-            row_index = 0
-            for row in reader:
-                if row_index <= 1: # first row is just a title of evr and pm, then a title of columns
-                    if row_index == 1: reference_db_title_row = row
-                    row_index += 1
-                    continue
-                else:
-                    reference_db.append(row)
-                    row_index += 1
-
     # Working Parameters:
     eqg_min = EQG_UNKNOWN     # The earnings can decrease but there is still a requirement that price_to_earnings_to_growth_ratio > 0. TODO: ASAFR: Add to multi-dimension
     rqg_min = RQG_UNKNOWN     # The revenue  can decrease there is still a requirement that price_to_earnings_to_growth_ratio > 0. TODO: ASAFR: Add to multi-dimension
@@ -2623,97 +2576,141 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
     symbols_nasdaq_100_csv  = []
     symbols_russel1000_csv  = []
 
-    if not tase_mode and not research_mode and read_all_country_symbols not in [sss_config.ALL_COUNTRY_SYMBOLS_SIX, sss_config.ALL_COUNTRY_SYMBOLS_ST]:
-        payload            = pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies') # There are 2 tables on the Wikipedia page, get the first table
-        first_table        = payload[0]
-        second_table       = payload[1]
-        df                 = first_table
-        symbols_snp500     = df['Symbol'].values.tolist()
-
-        # nasdaq100: https://www.nasdaq.com/market-activity/quotes/nasdaq-ndx-index
-        symbols_nasdaq_100_csv = [] # nasdaq100.csv
-        nasdq100_filenames_list = ['Indices/nasdaq100.csv']
-        for filename in nasdq100_filenames_list:
-            with open(filename, mode='r', newline='') as engine:
-                reader = csv.reader(engine, delimiter=',')
-                row_index = 0
-                for row in reader:
-                    if row_index == 0:
-                        row_index += 1
-                        continue
-                    else:
-                        symbols_nasdaq_100_csv.append(row[0])
-                        row_index += 1
-
-        # s&p500:
-        symbols_snp500_download_csv = [] # snp500.csv
-        symbols_snp500_download_filenames_list = ['Indices/snp500.csv']
-        for filename in symbols_snp500_download_filenames_list:
-            with open(filename, mode='r', newline='') as engine:
-                reader = csv.reader(engine, delimiter=',')
-                row_index = 0
-                for row in reader:
-                    if row_index == 0:
-                        row_index += 1
-                        continue
-                    else:
-                        symbols_snp500_download_csv.append(row[0])
-                        row_index += 1
-
-        symbols_russel1000_csv = []  # TODO: ASAFR: Make a general CSV reading function (with title row and withour, and which component in row to take, etc...
-        russel1000_filenames_list = ['Indices/russell1000.csv']
-        for filename in russel1000_filenames_list:
-            with open(filename, mode='r', newline='') as engine:
-                reader = csv.reader(engine, delimiter=',')
-                row_index = 0
-                for row in reader:
-                    if row_index == 0:
-                        row_index += 1
-                        continue
-                    else:
-                        symbols_russel1000_csv.append(row[0])
-                        row_index += 1
-
-        symbols_tase     = []
-
-    if tase_mode and not research_mode:
-        try:
-            sss_indices.update_tase_indices()
-        except Exception as e:
-            print("Error updating Indices/Data_TASE.csv: {} -> {}".format(e, traceback.format_exc()))
-
-        tase_filenames_list = ['Indices/Data_TASE.csv']
-        for filename in tase_filenames_list:
-            with open(filename, mode='r', newline='') as engine:
-                reader = csv.reader(engine, delimiter=',')
-                row_index = 0
-                for row in reader:
-                    if row_index <= 3:
-                        row_index += 1
-                        continue
-                    else:
-                        symbols_tase.append(row[1].replace('.','-')+'.TA')
-                        row_index += 1
-
-        tase_filenames_list = ['Indices/Data_Duals_TASE.csv']
-        for filename in tase_filenames_list:
-            with open(filename, mode='r', newline='') as engine:
-                reader = csv.reader(engine, delimiter=',')
-                row_index = 0
-                for row in reader:
-                    if row_index <= 3:
-                        row_index += 1
-                        continue
-                    else:
-                        g_symbols_tase_duals.append(row[1].replace('.','-')+'.TA')
-                        row_index += 1
-
-    # All nasdaq and others: ftp://ftp.nasdaqtrader.com/symboldirectory/ -> Downloaded automatically
-    # Legend: http://www.nasdaqtrader.com/trader.aspx?id=symboldirdefs
-    # ftp.nasdaqtrader.com/SymbolDirectory/nasdaqlisted.txt
-    # ftp.nasdaqtrader.com/SymbolDirectory/otherlisted.txt
-    # ftp.nasdaqtrader.com/SymbolDirectory/nasdaqtraded.txt
     if not research_mode:
+        # https://en.wikipedia.org/wiki/ISO_4217
+        currency_filename = 'Indices/currencies.json'
+        with open(currency_filename, 'r') as file:
+            currency_rates_raw_dict = json.loads(file.read())
+        currency_conversion_tool_manual = {k: round(float(v), NUM_ROUND_DECIMALS) for k, v in currency_rates_raw_dict.items()}
+        # print(currency_conversion_tool_manual)
+
+        json_db = dict()
+
+        currency_conversion_tool = None
+        currency_conversion_tool_alternative = None
+
+        try:
+            currency_conversion_tool = CurrencyRates().get_rates('USD')
+        except Exception as e:
+            pass
+
+        try:
+            currency_conversion_tool_alternative = CurrencyConverter()
+        except Exception as e:
+            pass
+
+        for item in currency_conversion_tool_manual:
+            if currency_conversion_tool != None and item not in currency_conversion_tool:
+                try:
+                    currency_conversion_tool[item] = 1.0/float(currency_conversion_tool_alternative.convert(1.0, item, 'USD'))
+                except:
+                    currency_conversion_tool[item] = 1.0/float(currency_conversion_tool_manual[item])
+
+        reference_db           = []
+        reference_db_title_row = []
+        if reference_run != None and len(reference_run):  # in non-research mode, compare to reference run
+            reference_csv_db_filename = reference_run+'/db.csv'
+            with open(reference_csv_db_filename, mode='r', newline='') as engine:
+                reader = csv.reader(engine, delimiter=',')
+                row_index = 0
+                for row in reader:
+                    if row_index <= 1: # first row is just a title of evr and pm, then a title of columns
+                        if row_index == 1: reference_db_title_row = row
+                        row_index += 1
+                        continue
+                    else:
+                        reference_db.append(row)
+                        row_index += 1
+
+        if not tase_mode and read_all_country_symbols not in [sss_config.ALL_COUNTRY_SYMBOLS_SIX, sss_config.ALL_COUNTRY_SYMBOLS_ST]:
+            payload            = pd.read_html('https://en.wikipedia.org/wiki/List_of_S%26P_500_companies') # There are 2 tables on the Wikipedia page, get the first table
+            first_table        = payload[0]
+            second_table       = payload[1]
+            df                 = first_table
+            symbols_snp500     = df['Symbol'].values.tolist()
+
+            # nasdaq100: https://www.nasdaq.com/market-activity/quotes/nasdaq-ndx-index
+            symbols_nasdaq_100_csv = [] # nasdaq100.csv
+            nasdq100_filenames_list = ['Indices/nasdaq100.csv']
+            for filename in nasdq100_filenames_list:
+                with open(filename, mode='r', newline='') as engine:
+                    reader = csv.reader(engine, delimiter=',')
+                    row_index = 0
+                    for row in reader:
+                        if row_index == 0:
+                            row_index += 1
+                            continue
+                        else:
+                            symbols_nasdaq_100_csv.append(row[0])
+                            row_index += 1
+
+            # s&p500:
+            symbols_snp500_download_csv = [] # snp500.csv
+            symbols_snp500_download_filenames_list = ['Indices/snp500.csv']
+            for filename in symbols_snp500_download_filenames_list:
+                with open(filename, mode='r', newline='') as engine:
+                    reader = csv.reader(engine, delimiter=',')
+                    row_index = 0
+                    for row in reader:
+                        if row_index == 0:
+                            row_index += 1
+                            continue
+                        else:
+                            symbols_snp500_download_csv.append(row[0])
+                            row_index += 1
+
+            symbols_russel1000_csv = []  # TODO: ASAFR: Make a general CSV reading function (with title row and withour, and which component in row to take, etc...
+            russel1000_filenames_list = ['Indices/russell1000.csv']
+            for filename in russel1000_filenames_list:
+                with open(filename, mode='r', newline='') as engine:
+                    reader = csv.reader(engine, delimiter=',')
+                    row_index = 0
+                    for row in reader:
+                        if row_index == 0:
+                            row_index += 1
+                            continue
+                        else:
+                            symbols_russel1000_csv.append(row[0])
+                            row_index += 1
+
+            symbols_tase     = []
+        elif tase_mode:
+            try:
+                sss_indices.update_tase_indices()
+            except Exception as e:
+                print("Error updating Indices/Data_TASE.csv: {} -> {}".format(e, traceback.format_exc()))
+
+            tase_filenames_list = ['Indices/Data_TASE.csv']
+            for filename in tase_filenames_list:
+                with open(filename, mode='r', newline='') as engine:
+                    reader = csv.reader(engine, delimiter=',')
+                    row_index = 0
+                    for row in reader:
+                        if row_index <= 3:
+                            row_index += 1
+                            continue
+                        else:
+                            symbols_tase.append(row[1].replace('.','-')+'.TA')
+                            row_index += 1
+
+            tase_filenames_list = ['Indices/Data_Duals_TASE.csv']
+            for filename in tase_filenames_list:
+                with open(filename, mode='r', newline='') as engine:
+                    reader = csv.reader(engine, delimiter=',')
+                    row_index = 0
+                    for row in reader:
+                        if row_index <= 3:
+                            row_index += 1
+                            continue
+                        else:
+                            g_symbols_tase_duals.append(row[1].replace('.','-')+'.TA')
+                            row_index += 1
+
+        # All nasdaq and others: ftp://ftp.nasdaqtrader.com/symboldirectory/ -> Downloaded automatically
+        # Legend: http://www.nasdaqtrader.com/trader.aspx?id=symboldirdefs
+        # ftp.nasdaqtrader.com/SymbolDirectory/nasdaqlisted.txt
+        # ftp.nasdaqtrader.com/SymbolDirectory/otherlisted.txt
+        # ftp.nasdaqtrader.com/SymbolDirectory/nasdaqtraded.txt
         symbols_united_states               = []
         symbols_six                         = []
         symbols_st                          = []
@@ -2846,7 +2843,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
         json_db_filename = open(reference_run + '/db.json')
         reference_raw_data = json.load(json_db_filename)
 
-    process_symbols(json_db=json_db, symbols=symbols, csv_db_data=csv_db_data, rows=rows, rows_no_div=rows_no_div, rows_only_div=rows_only_div, tase_mode=tase_mode, read_all_country_symbols=read_all_country_symbols, sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, profit_margin_limit=profit_margin_limit, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, debt_to_equity_limit=debt_to_equity_limit, pb_limit=pb_limit, pi_limit=pi_limit, enterprise_value_millions_usd_limit=enterprise_value_millions_usd_limit, research_mode_max_ev=research_mode_max_ev, eqg_min=eqg_min, rqg_min=rqg_min, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, market_cap_included=market_cap_included, research_mode=research_mode, currency_conversion_tool=currency_conversion_tool, currency_conversion_tool_alternative=currency_conversion_tool_alternative, currency_conversion_tool_manual=currency_conversion_tool_manual, reference_db=reference_db, reference_db_title_row=reference_db_title_row, diff_rows=rows_diff, db_filename=db_filename, reference_raw_data=reference_raw_data)
+    process_symbols(json_db=json_db if not research_mode else None, symbols=symbols, csv_db_data=csv_db_data, rows=rows, rows_no_div=rows_no_div, rows_only_div=rows_only_div, tase_mode=tase_mode, read_all_country_symbols=read_all_country_symbols, sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, profit_margin_limit=profit_margin_limit, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, debt_to_equity_limit=debt_to_equity_limit, pb_limit=pb_limit, pi_limit=pi_limit, enterprise_value_millions_usd_limit=enterprise_value_millions_usd_limit, research_mode_max_ev=research_mode_max_ev, eqg_min=eqg_min, rqg_min=rqg_min, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, market_cap_included=market_cap_included, research_mode=research_mode, currency_conversion_tool=currency_conversion_tool if not research_mode else None, currency_conversion_tool_alternative=currency_conversion_tool_alternative if not research_mode else None, currency_conversion_tool_manual=currency_conversion_tool_manual if not research_mode else None, reference_db=reference_db if not research_mode else None, reference_db_title_row=reference_db_title_row if not research_mode else None, diff_rows=rows_diff, db_filename=db_filename, reference_raw_data=reference_raw_data)
 
     # remove (from rows, not from db or diff) rows whose sss_value is irrelevant:
     compact_rows          = []
