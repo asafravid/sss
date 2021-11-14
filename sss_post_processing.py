@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.7 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.8 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -32,8 +32,8 @@ SSS_VALUE_COLUMN_NAME            = "sss_value"
 
 def process_engine_csv(path) -> object:
     filename_path = path+"/"+sss_filenames.ENGINE_FILENAME
-    data = pd.read_csv(filename_path+".csv", skiprows=[0])  # 1st row is a description row, irrelevant for the data processing
-    max_values   = data.max()
+    data          = pd.read_csv(filename_path+".csv", skiprows=[0])  # 1st row is a description row, irrelevant for the data processing
+    max_values    = data.max()
     # max_2_nlargest = data.nlargest(2,numerator_parameters_list+denominator_parameters_list)
     [numerator_parameters_list, denominator_parameters_list] = sss.get_used_parameters_names_in_core_equation()
     for parameter in numerator_parameters_list:
