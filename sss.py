@@ -110,6 +110,7 @@ ROE_NEG_FACTOR                               = 0.000001
 REFERENCE_DB_MAX_VALUE_DIFF_FACTOR_THRESHOLD = 0.9   # if there is a parameter difference from reference db, in which the difference of values is higher than 0.75*abs(max_value) then something went wrong with the fetch of values from yfinance. Compensate smartly from reference database
 QUARTERLY_YEARLY_MISSING_FACTOR              = 0.25  # if either yearly or quarterly values are missing - compensate by other with bad factor (less information means less attractive)
 NEGATIVE_ALTMAN_Z_FACTOR                     = 0.00001
+MIN_REVENUE_FOR_0_REVENUE_DIV_BY_0_AVOIDANCE = 0.001
 
 # TODO: ASAFR: All below boosters should be calibrated by:
 #              1. The rarety (statistically comapred to all the stocks in scan) - proportionaly to it (the rarest the case - the more boost)
@@ -922,8 +923,12 @@ def sss_core_equation_value_set(stock_data):
 
 
 def get_used_parameters_names_in_core_equation():
-    numerator_parameters_list   = ["eff_dist_from_low_factor", "evr_effective", "pe_effective", "effective_ev_to_ebitda", "trailing_12months_price_to_sales", "price_to_book",        "effective_peg_ratio",   "ev_to_cfo_ratio_effective", "debt_to_equity_effective_used"]  # The lower  the better
-    denominator_parameters_list = ["effective_profit_margin",  "effective_current_ratio",       "calculated_roa",       "calculated_roe",         "eqg_factor_effective",             "rqg_factor_effective", "altman_z_score_factor", "held_percent_insiders"                                     ]  # The higher the better
+    if sss_config.custom_sss_value_equation:
+        numerator_parameters_list   = ["pe_effective", "trailing_12months_price_to_sales"]  # The lower  the better
+        denominator_parameters_list = ["effective_profit_margin",                        ]  # The higher the better
+    else:
+        numerator_parameters_list   = ["eff_dist_from_low_factor", "evr_effective", "pe_effective", "effective_ev_to_ebitda", "trailing_12months_price_to_sales", "price_to_book",        "effective_peg_ratio",   "ev_to_cfo_ratio_effective", "debt_to_equity_effective_used"]  # The lower  the better
+        denominator_parameters_list = ["effective_profit_margin",  "effective_current_ratio",       "calculated_roa",       "calculated_roe",         "eqg_factor_effective",             "rqg_factor_effective", "altman_z_score_factor", "held_percent_insiders"                                     ]  # The higher the better
     return [numerator_parameters_list, denominator_parameters_list]
 
 
@@ -1229,15 +1234,13 @@ def calculate_weighted_stock_data_on_dict(dict_input, dict_name, str_in_dict, we
                 weighted_list.append(current_value * weights[weight_index])
                 weights_sum  += weights[weight_index]
                 weight_index += 1
-                if weight_index == 1:  # 1st value: just save previous
-                    prev_value = current_value
-                else:
+                if weight_index > 1:
                     all_pos  = True if all_pos and current_value > 0          and prev_value > 0 else False
                     all_neg  = True if all_neg and current_value < 0          and prev_value < 0 else False
                     mon_inc  = True if mon_inc and current_value > prev_value                    else False
                     mon_dec  = True if mon_dec and current_value < prev_value                    else False
-                    neg_pres = True if neg_pres or current_value < 0                             else False
-                    prev_value = current_value
+                neg_pres     = True if neg_pres or current_value < 0                             else False
+                prev_value   = current_value
         else:
             for key in (reversed(list(dict_input)) if reverse_required else list(dict_input)):  # The 1st element will be the oldest, receiving the lowest weight
                 if str_in_dict in dict_input[key] and not math.isnan(dict_input[key][str_in_dict]):
@@ -1245,22 +1248,21 @@ def calculate_weighted_stock_data_on_dict(dict_input, dict_name, str_in_dict, we
                     weighted_list.append(current_value * weights[weight_index])
                     weights_sum  += weights[weight_index]
                     weight_index += 1
-                    if weight_index == 1:  # 1st value: save previous
-                        prev_value = current_value
-                    else:
+                    if weight_index > 1:  # 1st value: save previous
                         all_pos  = True if all_pos and current_value > 0          and prev_value > 0 else False
                         all_neg  = True if all_neg and current_value < 0          and prev_value < 0 else False
                         mon_inc  = True if mon_inc and current_value > prev_value                    else False
                         mon_dec  = True if mon_dec and current_value < prev_value                    else False
-                        neg_pres = True if neg_pres or current_value < 0                             else False
-                        prev_value = current_value
+                    neg_pres     = True if neg_pres or current_value < 0                             else False
+                    prev_value = current_value
 
         bonus = 1.0
-        if all_pos:  bonus *= bonus_all_pos
-        if all_neg:  bonus *= bonus_all_neg
-        if mon_inc:  bonus *= bonus_mon_inc
-        if mon_dec:  bonus *= bonus_mon_dec
-        if neg_pres: bonus *= bonus_neg_pres
+        if weight_index > 1:
+            if all_pos:  bonus *= bonus_all_pos
+            if all_neg:  bonus *= bonus_all_neg
+            if mon_inc:  bonus *= bonus_mon_inc
+            if mon_dec:  bonus *= bonus_mon_dec
+            if neg_pres: bonus *= bonus_neg_pres
         if weights_sum > 0:
             return_value = stock_data.financial_currency_conversion_rate_mult_to_usd * sum(weighted_list) / (1.0 if force_only_sum else float(weights_sum))  # Multiplying by the factor to get the valu in USD.
             if return_value  > 0: return_value *= bonus
@@ -1296,41 +1298,38 @@ def calculate_weighted_ratio_from_dict(dict_input, dict_name, str_in_dict_numera
                 current_denominator  = float(dict_input[key][str_in_dict_denominator])
                 current_ratio        = (current_numerator / current_denominator)
                 weighted_ratios_list.append(current_ratio)
-                if len(weighted_ratios_list) == 1:  # 1st value: just save previous
-                    prev_ratio       = current_ratio
-                    prev_numerator   = current_numerator
-                    prev_denominator = current_denominator
-                else:
+                if len(weighted_ratios_list) > 1:  # 1st value: just save previous
                     all_pos          = True if all_pos     and current_ratio       > 0 and prev_ratio > 0 else False
                     all_neg          = True if all_neg     and current_ratio       < 0 and prev_ratio < 0 else False
                     mon_inc          = True if mon_inc     and current_ratio       > prev_ratio           else False
                     mon_dec          = True if mon_dec     and current_ratio       < prev_ratio           else False
-                    neg_pres         = True if neg_pres     or current_ratio       < 0                    else False
                     mon_inc_num      = True if mon_inc_num and current_numerator   > prev_numerator       else False
                     mon_dec_num      = True if mon_dec_num and current_numerator   < prev_numerator       else False
                     mon_inc_den      = True if mon_inc_den and current_denominator > prev_denominator     else False
                     mon_dec_den      = True if mon_dec_den and current_denominator < prev_denominator     else False
-                    prev_ratio       = current_ratio
-                    prev_numerator   = current_numerator
-                    prev_denominator = current_denominator
+                neg_pres             = True if neg_pres     or current_ratio       < 0                    else False
+                prev_ratio           = current_ratio
+                prev_numerator       = current_numerator
+                prev_denominator     = current_denominator
 
     except Exception as e:
         print("Exception in {} {}: {} -> {}".format(stock_data.symbol, dict_name, e, traceback.format_exc()))
         pass
     if len(weighted_ratios_list):
         return_value = weighted_average(weighted_ratios_list, weights[:len(weighted_ratios_list)])
-        bonus = 1.0
-        if all_pos:     bonus *= bonus_all_pos
-        if all_neg:     bonus *= bonus_all_neg
-        if mon_inc:     bonus *= bonus_mon_inc
-        if mon_dec:     bonus *= bonus_mon_dec
-        if neg_pres:    bonus *= bonus_neg_pres
-        if mon_inc_num: bonus *= bonus_mon_inc_num
-        if mon_inc_den: bonus *= bonus_mon_inc_den
-        if mon_dec_num: bonus *= bonus_mon_dec_num
-        if mon_dec_den: bonus *= bonus_mon_dec_den
-        if return_value > 0: return_value *= bonus
-        else               : return_value /= float(bonus)
+        if len(weighted_ratios_list) > 1:
+            bonus = 1.0
+            if all_pos:     bonus *= bonus_all_pos
+            if all_neg:     bonus *= bonus_all_neg
+            if mon_inc:     bonus *= bonus_mon_inc
+            if mon_dec:     bonus *= bonus_mon_dec
+            if neg_pres:    bonus *= bonus_neg_pres
+            if mon_inc_num: bonus *= bonus_mon_inc_num
+            if mon_inc_den: bonus *= bonus_mon_inc_den
+            if mon_dec_num: bonus *= bonus_mon_dec_num
+            if mon_dec_den: bonus *= bonus_mon_dec_den
+            if return_value > 0: return_value *= bonus
+            else               : return_value /= float(bonus)
 
     return [return_value, bonus]
 
@@ -1710,7 +1709,7 @@ def process_info(json_db, symbol, stock_data, tase_mode, sectors_list, sectors_f
                 last_earnings             = None
                 last_revenue              = None
                 boost_cont_inc_ratio      = True # Will be set to (a Final Value of) True if there is a continuous increase in the profit margin
-                boost_cont_inc_pos        = True # Will be set to (a Final Value of) True if there is a continuous positive in the profit margin
+                boost_cont_ratio_pos      = True # Will be set to (a Final Value of) True if there is a continuous positive in the profit margin
                 boost_cont_inc_earnings   = True # Will be set to (a Final Value of) True if there is a continuous increase in the earnings
                 boost_cont_inc_revenue    = True # Will be set to (a Final Value of) True if there is a continuous increase in the revenue
                 boost_cont_dec_ratio      = True # Will be set to (a Final Value of) True if there is a continuous increase in the profit margin
@@ -1719,29 +1718,31 @@ def process_info(json_db, symbol, stock_data, tase_mode, sectors_list, sectors_f
                 boost_neg_earnings        = False
                 try:
                     for key in earnings_yearly['Revenue']:
-                        if float(earnings_yearly['Revenue'][key]) > 0:
-                            earnings_to_revenues_list.append((float(earnings_yearly['Earnings'][key])/float(earnings_yearly['Revenue'][key]))*PROFIT_MARGIN_YEARLY_WEIGHTS[weight_index])
+                        if float(earnings_yearly['Revenue'][key]) >= 0:
+                            earnings = float(          earnings_yearly['Earnings'][key])
+                            revenue  = float(max(MIN_REVENUE_FOR_0_REVENUE_DIV_BY_0_AVOIDANCE,earnings_yearly['Revenue' ][key]))
+                            earnings_to_revenues_list.append((earnings/revenue)*PROFIT_MARGIN_YEARLY_WEIGHTS[weight_index])
                             weights_sum  += PROFIT_MARGIN_YEARLY_WEIGHTS[weight_index]
                             used_weights += 1
-                            current_ratio = float(earnings_yearly['Earnings'][key])/float(earnings_yearly['Revenue'][key])
+                            current_ratio = earnings/revenue
                             if used_weights > 1:
-                                boost_cont_inc_ratio    = True if boost_cont_inc_ratio    and current_ratio                           > last_ratio                    else False
-                                boost_cont_inc_pos      = True if boost_cont_inc_pos      and current_ratio                           > 0          and last_ratio > 0 else False
-                                boost_cont_inc_earnings = True if boost_cont_inc_earnings and float(earnings_yearly['Earnings'][key]) > last_earnings                 else False
-                                boost_cont_inc_revenue  = True if boost_cont_inc_revenue  and float(earnings_yearly['Revenue' ][key]) > last_revenue                  else False
-                                boost_cont_dec_ratio    = True if boost_cont_dec_ratio    and current_ratio                           < last_ratio                    else False
-                                boost_cont_dec_earnings = True if boost_cont_dec_earnings and float(earnings_yearly['Earnings'][key]) < last_earnings                 else False
-                                boost_cont_dec_revenue  = True if boost_cont_dec_revenue  and float(earnings_yearly['Revenue'][key])  < last_revenue                  else False
-                                boost_neg_earnings      = True if boost_neg_earnings      or  float(earnings_yearly['Earnings'][key]) < 0                             else False
+                                boost_cont_inc_ratio    = True if boost_cont_inc_ratio    and current_ratio > last_ratio                                                               else False
+                                boost_cont_inc_earnings = True if boost_cont_inc_earnings and earnings      > last_earnings                                                            else False
+                                boost_cont_inc_revenue  = True if boost_cont_inc_revenue  and revenue       > last_revenue                                                             else False
+                                boost_cont_dec_ratio    = True if boost_cont_dec_ratio    and current_ratio < last_ratio                                                               else False
+                                boost_cont_dec_earnings = True if boost_cont_dec_earnings and earnings      < last_earnings                                                            else False
+                                boost_cont_dec_revenue  = True if boost_cont_dec_revenue  and revenue       < last_revenue                                                             else False
+                            boost_cont_ratio_pos        = True if boost_cont_ratio_pos    and current_ratio > 0             and revenue > MIN_REVENUE_FOR_0_REVENUE_DIV_BY_0_AVOIDANCE else False
+                            boost_neg_earnings          = True if boost_neg_earnings      or  earnings      < 0                                                                        else False
                             last_ratio    = current_ratio
-                            last_earnings = float(earnings_yearly['Earnings'][key])
-                            last_revenue  = float(earnings_yearly['Revenue' ][key])
+                            last_earnings = earnings
+                            last_revenue  = revenue
                         weight_index += 1
                     if weights_sum > 0:
                         stock_data.annualized_profit_margin        = sum(earnings_to_revenues_list)/float(weights_sum)
                         if   stock_data.annualized_profit_margin > 0 and used_weights > 1:
                             stock_data.annualized_profit_margin_boost  = 1.0 if not boost_cont_inc_ratio    or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE
-                            stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_inc_pos      or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_POSITIVE
+                            stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_ratio_pos    or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_POSITIVE
                             stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_inc_earnings or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_EARNINGS
                             stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_inc_revenue  or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_REVENUE
                             stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_dec_ratio    or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_DECREASE
@@ -1751,7 +1752,7 @@ def process_info(json_db, symbol, stock_data, tase_mode, sectors_list, sectors_f
                             stock_data.annualized_profit_margin       *= stock_data.annualized_profit_margin_boost
                         elif stock_data.annualized_profit_margin < 0 and used_weights > 1:
                             stock_data.annualized_profit_margin_boost  = 1.0 if not boost_cont_inc_ratio    or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE
-                            stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_inc_pos      or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_POSITIVE
+                            stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_ratio_pos    or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_POSITIVE
                             stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_inc_earnings or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_EARNINGS
                             stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_inc_revenue  or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_REVENUE
                             stock_data.annualized_profit_margin_boost *= 1.0 if not boost_cont_dec_ratio    or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_DECREASE
@@ -1779,7 +1780,7 @@ def process_info(json_db, symbol, stock_data, tase_mode, sectors_list, sectors_f
                 last_earnings             = None
                 last_revenue              = None
                 boost_cont_inc_ratio      = True # Will be set to (Final Value of) True if there is a continuous increase in the profit   margin  TODO: ASAFR: Do the same boosting for cash flows ev_to_cfo
-                boost_cont_inc_pos        = True # Will be set to (Final Value of) True if there is a continuous positive in the profit   margin
+                boost_cont_ratio_pos      = True # Will be set to (Final Value of) True if there is a continuous positive in the profit   margin
                 boost_cont_inc_earnings   = True # Will be set to (Final Value of) True if there is a continuous increase in the earnings
                 boost_cont_inc_revenue    = True # Will be set to (Final Value of) True if there is a continuous increase in the revenue
                 boost_cont_dec_ratio      = True # Will be set to (Final Value of) True if there is a continuous increase in the profit   margin  TODO: ASAFR: Do the same boosting for cash flows ev_to_cfo
@@ -1788,30 +1789,33 @@ def process_info(json_db, symbol, stock_data, tase_mode, sectors_list, sectors_f
                 boost_neg_earnings        = False
                 try:
                     for key in earnings_quarterly['Revenue']:
-                        if float(earnings_quarterly['Revenue'][key]) > 0:
-                            earnings_to_revenues_list.append((float(earnings_quarterly['Earnings'][key])/float(earnings_quarterly['Revenue'][key]))*PROFIT_MARGIN_QUARTERLY_WEIGHTS[weight_index])
+                        if float(earnings_quarterly['Revenue'][key]) >= 0:
+                            earnings = float(          earnings_quarterly['Earnings'][key])
+                            revenue  = float(max(MIN_REVENUE_FOR_0_REVENUE_DIV_BY_0_AVOIDANCE,earnings_quarterly['Revenue' ][key]))
+
+                            earnings_to_revenues_list.append((earnings/revenue)*PROFIT_MARGIN_QUARTERLY_WEIGHTS[weight_index])
                             weights_sum  += PROFIT_MARGIN_QUARTERLY_WEIGHTS[weight_index]
                             used_weights += 1
-                            current_ratio = float(earnings_quarterly['Earnings'][key])/float(earnings_quarterly['Revenue'][key])
+                            current_ratio = earnings/revenue
                             if used_weights > 1:
-                                boost_cont_inc_ratio    = True if boost_cont_inc_ratio    and current_ratio                              > last_ratio                    else False
-                                boost_cont_inc_pos      = True if boost_cont_inc_pos      and current_ratio                              > 0          and last_ratio > 0 else False
-                                boost_cont_inc_earnings = True if boost_cont_inc_earnings and float(earnings_quarterly['Earnings'][key]) > last_earnings                 else False
-                                boost_cont_inc_revenue  = True if boost_cont_inc_revenue  and float(earnings_quarterly['Revenue' ][key]) > last_revenue                  else False
-                                boost_cont_dec_ratio    = True if boost_cont_dec_ratio    and current_ratio                              < last_ratio                    else False
-                                boost_cont_dec_earnings = True if boost_cont_dec_earnings and float(earnings_quarterly['Earnings'][key]) < last_earnings                 else False
-                                boost_cont_dec_revenue  = True if boost_cont_dec_revenue  and float(earnings_quarterly['Revenue'][key])  < last_revenue                  else False
-                                boost_neg_earnings      = True if boost_neg_earnings      or  float(earnings_quarterly['Earnings'][key]) < 0                             else False
+                                boost_cont_inc_ratio    = True if boost_cont_inc_ratio    and current_ratio > last_ratio                                                               else False
+                                boost_cont_inc_earnings = True if boost_cont_inc_earnings and earnings      > last_earnings                                                            else False
+                                boost_cont_inc_revenue  = True if boost_cont_inc_revenue  and revenue       > last_revenue                                                             else False
+                                boost_cont_dec_ratio    = True if boost_cont_dec_ratio    and current_ratio < last_ratio                                                               else False
+                                boost_cont_dec_earnings = True if boost_cont_dec_earnings and earnings      < last_earnings                                                            else False
+                                boost_cont_dec_revenue  = True if boost_cont_dec_revenue  and revenue       < last_revenue                                                             else False
+                            boost_cont_ratio_pos        = True if boost_cont_ratio_pos    and current_ratio > 0             and revenue > MIN_REVENUE_FOR_0_REVENUE_DIV_BY_0_AVOIDANCE else False
+                            boost_neg_earnings          = True if boost_neg_earnings      or  earnings      < 0                                                                        else False
                             last_ratio    = current_ratio
-                            last_earnings = float(earnings_quarterly['Earnings'][key])
-                            last_revenue  = float(earnings_quarterly['Revenue' ][key])
+                            last_earnings = earnings
+                            last_revenue  = revenue
                         weight_index += 1
                     if weights_sum > 0:
                         alternative_quarterly_pm_required               = False
                         stock_data.quarterized_profit_margin            = sum(earnings_to_revenues_list)/float(weights_sum)
                         if   stock_data.quarterized_profit_margin > 0 and used_weights > 1:  # boosts irrelevant if only 1 weight used
                             stock_data.quarterized_profit_margin_boost  = 1.0 if not boost_cont_inc_ratio    or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE
-                            stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_inc_pos      or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_POSITIVE
+                            stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_ratio_pos    or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_POSITIVE
                             stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_inc_earnings or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_EARNINGS
                             stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_inc_revenue  or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_REVENUE
                             stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_dec_ratio    or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_DECREASE
@@ -1821,7 +1825,7 @@ def process_info(json_db, symbol, stock_data, tase_mode, sectors_list, sectors_f
                             stock_data.quarterized_profit_margin       *= stock_data.quarterized_profit_margin_boost
                         elif stock_data.quarterized_profit_margin < 0 and used_weights > 1:
                             stock_data.quarterized_profit_margin_boost  = 1.0 if not boost_cont_inc_ratio    or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE
-                            stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_inc_pos      or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_POSITIVE
+                            stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_ratio_pos    or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_POSITIVE
                             stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_inc_earnings or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_EARNINGS
                             stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_inc_revenue  or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_REVENUE
                             stock_data.quarterized_profit_margin_boost *= 1.0 if not boost_cont_dec_ratio    or used_weights <= 1 else PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_DECREASE
