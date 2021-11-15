@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.91 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.92 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -910,8 +910,8 @@ def sss_core_equation_value_set(stock_data):
     if stock_data.shares_outstanding and stock_data.net_income_to_common_shareholders != None: stock_data.nitcsh_to_shares_outstanding = float(stock_data.net_income_to_common_shareholders) / float(stock_data.shares_outstanding)
     if stock_data.employees          and stock_data.net_income_to_common_shareholders != None: stock_data.nitcsh_to_num_employees      = float(stock_data.net_income_to_common_shareholders) / float(stock_data.employees)
 
-    if sss_config.custom_sss_value_equation and stock_data.trailing_12months_price_to_sales != None and stock_data.trailing_12months_price_to_sales > 0 and stock_data.effective_profit_margin != None and stock_data.effective_profit_margin > 0 and stock_data.pe_effective != None and stock_data.pe_effective > 0:
-        stock_data.sss_value = float(stock_data.pe_effective * stock_data.trailing_12months_price_to_sales / stock_data.effective_profit_margin)  # The lower  the better
+    if sss_config.custom_sss_value_equation and stock_data.trailing_12months_price_to_sales != None and stock_data.trailing_12months_price_to_sales > 0 and stock_data.effective_profit_margin != None and stock_data.effective_profit_margin > 0 and stock_data.pe_effective != None and stock_data.pe_effective > 0 and stock_data.evr_effective != None and stock_data.evr_effective > 0.0:
+        stock_data.sss_value = float(float(stock_data.evr_effective) * stock_data.pe_effective * stock_data.trailing_12months_price_to_sales / stock_data.effective_profit_margin)  # The lower  the better
         min_sss_value = round(10 ** (-NUM_ROUND_DECIMALS), NUM_ROUND_DECIMALS)
         stock_data.sss_value = max(stock_data.sss_value, min_sss_value)
     elif stock_data.trailing_12months_price_to_sales != None and stock_data.trailing_12months_price_to_sales > 0 and stock_data.effective_profit_margin != None and stock_data.effective_profit_margin > 0 and stock_data.eqg_factor_effective != None and stock_data.eqg_factor_effective > 0 and stock_data.rqg_factor_effective != None and stock_data.rqg_factor_effective > 0 and stock_data.pe_effective != None and stock_data.pe_effective > 0 and stock_data.effective_ev_to_ebitda != None and stock_data.effective_ev_to_ebitda > 0 and stock_data.ev_to_cfo_ratio_effective != None and stock_data.ev_to_cfo_ratio_effective > 0 and stock_data.effective_peg_ratio != None and stock_data.effective_peg_ratio > 0 and stock_data.price_to_book != None and stock_data.price_to_book > 0 and stock_data.debt_to_equity_effective_used != None and stock_data.debt_to_equity_effective_used > 0 and stock_data.effective_current_ratio != None and stock_data.effective_current_ratio > 0 and stock_data.evr_effective != None and stock_data.evr_effective > 0.0 and stock_data.calculated_roa != None and stock_data.calculated_roa > 0 and stock_data.calculated_roe != None and stock_data.calculated_roe > 0 and stock_data.altman_z_score_factor != None and stock_data.altman_z_score_factor > 0 and stock_data.held_percent_insiders != None and stock_data.held_percent_insiders > 0:
@@ -925,7 +925,7 @@ def sss_core_equation_value_set(stock_data):
 
 def get_used_parameters_names_in_core_equation():
     if sss_config.custom_sss_value_equation:
-        numerator_parameters_list   = ["pe_effective", "trailing_12months_price_to_sales"]  # The lower  the better
+        numerator_parameters_list   = ["evr_effective", "pe_effective", "trailing_12months_price_to_sales"]  # The lower  the better
         denominator_parameters_list = ["effective_profit_margin",                        ]  # The higher the better
     else:
         numerator_parameters_list   = ["eff_dist_from_low_factor", "evr_effective", "pe_effective", "effective_ev_to_ebitda", "trailing_12months_price_to_sales", "price_to_book",        "effective_peg_ratio",   "ev_to_cfo_ratio_effective", "debt_to_equity_effective_used"]  # The lower  the better
