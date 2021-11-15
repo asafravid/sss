@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.90 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.91 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -26,6 +26,7 @@
 #               1.0. https://en.wikipedia.org/wiki/Piotroski_F-score
 #               1.2. https://en.wikipedia.org/wiki/Magic_formula_investing
 #               1.3. https://www.oldschoolvalue.com/investing-strategy/backtest-graham-nnwc-ncav-screen/
+#               2. Back to Investpy to download all Japanese stocks and all swiss stocks (and all swedish stocks!)
 #               3. Investigate and add: https://www.investopedia.com/terms/o/operatingmargin.asp - operating margin
 #               4. Add Free Cash flow [FCF] (EV/FreeCashFlow): Inverse of the Free Cash Flow Yield (https://www.stockopedia.com/ratios/ev-free-cash-flow-336/
 #               5. There is already an EV/CFO ratio.
