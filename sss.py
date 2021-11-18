@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.92 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.93 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -50,7 +50,6 @@
 
 
 import time
-import random
 import shutil
 import urllib.request as request
 import pandas         as pd
