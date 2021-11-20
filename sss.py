@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.94 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.95 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -2558,7 +2558,7 @@ def process_symbols(json_db, symbols, csv_db_data, rows, rows_no_div, rows_only_
             # Probing:
             for symbol in sss_config.research_mode_probe_list:
                 if symbol in stock_data.symbol:
-                    print('[Probe] {:5}: {:5} pb {:6.3f} | pi {:6.6f} | evm {:6.0f} | pe {:8.3f} | evr {:8.3f} | pm {:7.3f}% :'.format(symbol, len(rows), stock_data.price_to_book, stock_data.held_percent_insiders, stock_data.enterprise_value, stock_data.effective_price_to_earnings, stock_data.evr_effective, stock_data.effective_profit_margin), end='')
+                    print('[Probe] {:5}: {:5} pb {:6.3f} | pi {:6.6f} | evm {:6.0f} | pe {:8.3f} | evr {:8.3f} | pm {:7.3f}% :'.format(symbol, len(rows), stock_data.price_to_book, stock_data.held_percent_insiders, stock_data.enterprise_value, stock_data.effective_price_to_earnings, stock_data.evr_effective, stock_data.effective_profit_margin*100), end='')
 
 
 def download_ftp_files(filenames_list, ftp_path):
