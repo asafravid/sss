@@ -36,6 +36,8 @@ DB_FILENAMES = ['sss_engine.csv', 'sss_engine_normalized.csv']  # 'db.csv' -> bu
 
 # TODO: ASAFR: 1. read_csv in pandas, and then .describe() and .quantiles() will provide mean, std and percentiles for all the columns (sss_engine.csv and/or db.csv)
 #              2. Calculate the angle (dericative) of the Profit margin change over years and quarters and apply a bonus relative to the slope
+#              3. Add a column with position number or just #. Symbol
+#              4. Add a a Removed Column reports!
 PDF_NUM_ENTRIES_IN_REPORT       = 49
 RESEARCH_MODE_MIN_ENTRIES_LIMIT = 7
 
