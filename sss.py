@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.95 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.96 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -111,6 +111,7 @@ REFERENCE_DB_MAX_VALUE_DIFF_FACTOR_THRESHOLD = 0.9   # if there is a parameter d
 QUARTERLY_YEARLY_MISSING_FACTOR              = 0.25  # if either yearly or quarterly values are missing - compensate by other with bad factor (less information means less attractive)
 NEGATIVE_ALTMAN_Z_FACTOR                     = 0.00001
 MIN_REVENUE_FOR_0_REVENUE_DIV_BY_0_AVOIDANCE = 0.001
+MAX_UNKNOWN_PE                               = 100000
 
 # TODO: ASAFR: All below boosters should be calibrated by:
 #              1. The rarety (statistically comapred to all the stocks in scan) - proportionaly to it (the rarest the case - the more boost)
@@ -2087,7 +2088,7 @@ def process_info(json_db, symbol, stock_data, tase_mode, sectors_list, sectors_f
             stock_data.trailing_price_to_earnings = float(stock_data.market_cap)       / float(stock_data.effective_earnings) # Calculate manually.
         elif stock_data.effective_net_income != None and stock_data.effective_net_income != 0 and stock_data.enterprise_value != None:
             stock_data.trailing_price_to_earnings = float(stock_data.enterprise_value) / float(stock_data.effective_net_income)  # Calculate manually.
-        if isinstance(stock_data.trailing_price_to_earnings,str):  stock_data.trailing_price_to_earnings  = None # Mark as None, so as to try and calculate manually.
+        if isinstance(stock_data.trailing_price_to_earnings,str):  stock_data.trailing_price_to_earnings  = MAX_UNKNOWN_PE # Mark as None, so as to try and calculate manually.
 
         if 'forwardPE' in info:
             stock_data.forward_price_to_earnings  = info['forwardPE']  # https://www.investopedia.com/terms/t/trailingpe.asp
@@ -2112,7 +2113,8 @@ def process_info(json_db, symbol, stock_data, tase_mode, sectors_list, sectors_f
             elif stock_data.forward_price_to_earnings  == 0: stock_data.forward_price_to_earnings  =  NEGATIVE_EARNINGS_FACTOR
 
         # Calculate the weighted average of the forward and trailing P/E:
-        stock_data.effective_price_to_earnings = (stock_data.trailing_price_to_earnings*TRAILING_PRICE_TO_EARNINGS_WEIGHT+stock_data.forward_price_to_earnings*FORWARD_PRICE_TO_EARNINGS_WEIGHT)
+        if (stock_data.trailing_price_to_earnings != None and stock_data.forward_price_to_earnings != None):
+            stock_data.effective_price_to_earnings = (stock_data.trailing_price_to_earnings*TRAILING_PRICE_TO_EARNINGS_WEIGHT+stock_data.forward_price_to_earnings*FORWARD_PRICE_TO_EARNINGS_WEIGHT)
 
         if 'forwardEps'                                 in info: stock_data.forward_eps                       = info['forwardEps']
         else:                                                    stock_data.forward_eps                       = None
@@ -2137,10 +2139,10 @@ def process_info(json_db, symbol, stock_data, tase_mode, sectors_list, sectors_f
         if stock_data.two_hundred_day_average                                                      is None: stock_data.two_hundred_day_average = stock_data.previous_close
         if stock_data.previous_close != None and stock_data.previous_close < stock_data.fifty_two_week_low: stock_data.previous_close          = stock_data.fifty_two_week_low
 
-        if stock_data.two_hundred_day_average > 0.0: stock_data.previous_close_percentage_from_200d_ma  = 100.0 * ((float(stock_data.previous_close) - float(stock_data.two_hundred_day_average)) / float(stock_data.two_hundred_day_average))
-        if stock_data.fifty_two_week_low      > 0.0: stock_data.previous_close_percentage_from_52w_low  = 100.0 * ((float(stock_data.previous_close) - float(stock_data.fifty_two_week_low)     ) / float(stock_data.fifty_two_week_low)     )
-        if stock_data.fifty_two_week_high     > 0.0: stock_data.previous_close_percentage_from_52w_high = 100.0 * ((float(stock_data.previous_close) - float(stock_data.fifty_two_week_high)    ) / float(stock_data.fifty_two_week_high)    )
-        if stock_data.fifty_two_week_low      > 0.0 and stock_data.fifty_two_week_high > 0.0 and stock_data.previous_close > 0.0:
+        if stock_data.two_hundred_day_average != None and stock_data.two_hundred_day_average > 0.0: stock_data.previous_close_percentage_from_200d_ma  = 100.0 * ((float(stock_data.previous_close) - float(stock_data.two_hundred_day_average)) / float(stock_data.two_hundred_day_average))
+        if stock_data.fifty_two_week_low      != None and stock_data.fifty_two_week_low      > 0.0: stock_data.previous_close_percentage_from_52w_low  = 100.0 * ((float(stock_data.previous_close) - float(stock_data.fifty_two_week_low)     ) / float(stock_data.fifty_two_week_low)     )
+        if stock_data.fifty_two_week_high     != None and stock_data.fifty_two_week_high     > 0.0: stock_data.previous_close_percentage_from_52w_high = 100.0 * ((float(stock_data.previous_close) - float(stock_data.fifty_two_week_high)    ) / float(stock_data.fifty_two_week_high)    )
+        if stock_data.fifty_two_week_low      != None and stock_data.fifty_two_week_low      > 0.0 and stock_data.fifty_two_week_high > 0.0 and stock_data.previous_close > 0.0:
             if stock_data.fifty_two_week_high == stock_data.fifty_two_week_low or stock_data.previous_close == 0:  # TODO: ASAFR: Take these values from nasdaq_traded.csv when they are not available temporarily on yfinance
                 stock_data.dist_from_low_factor = 1.0  # When there is no range or no previous_close_data, leave as neutral
             else:
@@ -2351,13 +2353,15 @@ def process_info(json_db, symbol, stock_data, tase_mode, sectors_list, sectors_f
             stock_data.price_to_earnings_to_growth_ratio = PEG_UNKNOWN
 
         if stock_data.price_to_earnings_to_growth_ratio is None or stock_data.price_to_earnings_to_growth_ratio == PEG_UNKNOWN:
-            if stock_data.eqg_effective != 0 and stock_data.effective_price_to_earnings > 0:
+            if stock_data.eqg_effective != None and stock_data.eqg_effective != 0 and stock_data.effective_price_to_earnings != None and stock_data.effective_price_to_earnings > 0:
                 stock_data.price_to_earnings_to_growth_ratio = float(stock_data.effective_price_to_earnings) / float(stock_data.eqg_effective)
-            else:
+            elif stock_data.effective_price_to_earnings != None:
                 stock_data.price_to_earnings_to_growth_ratio = stock_data.effective_price_to_earnings * PEG_UNKNOWN # At this stage effective_price_to_earnings is always positive so this code will not be reached
-        if   stock_data.price_to_earnings_to_growth_ratio > 0: stock_data.effective_peg_ratio =  stock_data.price_to_earnings_to_growth_ratio
-        elif stock_data.price_to_earnings_to_growth_ratio < 0: stock_data.effective_peg_ratio = -NEGATIVE_PEG_RATIO_FACTOR/float(stock_data.price_to_earnings_to_growth_ratio)
-        else                                                 : stock_data.effective_peg_ratio =  1.0  # Something must be wrong, so take a neutral value of 1.0
+        elif stock_data.price_to_earnings_to_growth_ratio != None:
+            if   stock_data.price_to_earnings_to_growth_ratio > 0: stock_data.effective_peg_ratio =  stock_data.price_to_earnings_to_growth_ratio
+            elif stock_data.price_to_earnings_to_growth_ratio < 0: stock_data.effective_peg_ratio = -NEGATIVE_PEG_RATIO_FACTOR/float(stock_data.price_to_earnings_to_growth_ratio)
+            else                                                 : stock_data.effective_peg_ratio =  1.0  # Something must be wrong, so take a neutral value of 1.0
+        else                                                     : stock_data.effective_peg_ratio =  1.0  # Something must be wrong, so take a neutral value of 1.0
 
         if return_value: sss_core_equation_value_set(stock_data)
         else:            stock_data.sss_value = BAD_SSS
