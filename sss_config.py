@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.59 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.60 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -68,31 +68,3 @@ custom_portfolio_tase = ['APLP', 'ITMR']
 
 research_mode_probe_list = ['TLV:DEDR.L']  # ['MTDS']
 
-# TODO: ASAFR: Check & Fix these warnings:
-# [DB] AAP       (0015/0016/7427 [0.22%], Diff: 0001), time/left/avg [sec]:    56/25938/3.50 -> /home/asaf/.local/lib/python3.8/site-packages/yfinance/base.py:542: UserWarning: DataFrame columns are not unique, some columns will be omitted.
-#   return data.to_dict()
-# /home/asaf/.local/lib/python3.8/site-packages/yfinance/base.py:532: UserWarning: DataFrame columns are not unique, some columns will be omitted.
-#   return data.to_dict()
-# /home/asaf/.local/lib/python3.8/site-packages/yfinance/base.py:525: UserWarning: DataFrame columns are not unique, some columns will be omitted.
-#   return data.to_dict()
-
-# TODO: ASAFR: DB] G107.TA   (0184/0186/0535 [34.77%], Diff: 0016), time/left/avg [sec]:  1152/ 2160/6.19 ->               Exception in G107.TA symbol.get_info(): None
-#               Exception in G107.TA info: local variable 'financials_yearly' referenced before assignment
-
-# TODO: ASAFR: [DB] GGMC      (2869/2930/7628 [38.41%], Diff: 0000), time/left/avg [sec]: 29715/47638/10.14 ->               Exception in GGMC info: unsupported operand type(s) for *: 'NoneType' and 'float' -> Traceback (most recent call last):
-#               File "/root/PycharmProjects/sss/sss.py", line 2115, in process_info
-#                 stock_data.effective_price_to_earnings = (stock_data.trailing_price_to_earnings*TRAILING_PRICE_TO_EARNINGS_WEIGHT+stock_data.forward_price_to_earnings*FORWARD_PRICE_TO_EARNINGS_WEIGHT)
-#              TypeError: unsupported operand type(s) for *: 'NoneType' and 'float'
-#              And:
-#              [DB] DTST      (2073/2105/7628 [27.60%], Diff: 0000), time/left/avg [sec]: 21074/55285/10.01 ->               Exception in DTST info: unsupported operand type(s) for *: 'NoneType' and 'float' -> Traceback (most recent call last):
-#                File "/root/PycharmProjects/sss/sss.py", line 2115, in process_info
-#                  stock_data.effective_price_to_earnings = (stock_data.trailing_price_to_earnings*TRAILING_PRICE_TO_EARNINGS_WEIGHT+stock_data.forward_price_to_earnings*FORWARD_PRICE_TO_EARNINGS_WEIGHT)
-#              TypeError: unsupported operand type(s) for *: 'NoneType' and 'float'
-#              And:
-#              [DB] IGZ       (3463/3532/7628 [46.30%], Diff: 0000), time/left/avg [sec]: 36259/42066/10.27 ->               Exception in IGZ info: '>' not supported between instances of 'NoneType' and 'float' -> Traceback (most recent call last):
-#                File "/root/PycharmProjects/sss/sss.py", line 2140, in process_info
-#              And:
-#              [DB] ZVV       (7491/7616/7628 [99.84%], Diff: 0000), time/left/avg [sec]: 79005/  124/10.37 ->               Exception in ZVV info: '>' not supported between instances of 'NoneType' and 'float' -> Traceback (most recent call last):
-#                File "/root/PycharmProjects/sss/sss.py", line 2140, in process_info
-#                  if stock_data.two_hundred_day_average > 0.0: stock_data.previous_close_percentage_from_200d_ma  = 100.0 * ((float(stock_data.previous_close) - float(stock_data.two_hundred_day_average)) / float(stock_data.two_hundred_day_average))
-#              TypeError: '>' not supported between instances of 'NoneType' and 'float'
