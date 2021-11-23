@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.53 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.56 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -30,7 +30,7 @@ import matplotlib.pyplot as plt; plt.rcdefaults()
 import numpy as np
 
 
-def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, diff_list, tase_mode, db_filename):
+def csv_to_pdf(csv_filename, output_path, data_time_str, title, limit_num_rows, diff_list_new, tase_mode, db_filename, append_to_pdf, output):
     title_for_figures = data_time_str + ' ' + (title[::-1] if tase_mode else title) + ' ' + ']כתב ויתור: תוצאות הסריקה אינן המלצה בשום צורה, אלא אך ורק בסיס למחקר.['[::-1]
 
     # Read CSV file:
@@ -43,7 +43,9 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
     class MyFPDF(FPDF, HTMLMixin):
         pass
 
-    pdf = MyFPDF(format='letter')
+    if append_to_pdf != None: pdf = append_to_pdf
+    else:                     pdf = MyFPDF(format='letter')
+
     pdf.add_page()
     # Access DejaVuSansCondensed.ttf on the machine. This font supports practically all languages.
     # Install it via https://fonts2u.com/dejavu-sans-condensed.font
@@ -62,7 +64,7 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
         if row_index > 0:  # row 0 is title
             names.append(row[1][0:28])
             appearances.append(float(row[5]))
-            diffs.append(int(diff_list[row_index].replace('new+','').replace('new','0')))
+            diffs.append(int(diff_list_new[row_index].replace('new+','').replace('new','0').replace('removed-','-').replace('removed','0')))
         if row_index == 0:
             if tase_mode: # overrwrite to hebrew
                 row = ['סימבול'[::-1],'שם החברה'[::-1],'ענף'[::-1],'ערך'[::-1],'סגירה'[::-1],'ציון'[::-1]]
@@ -87,20 +89,22 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
                 pdf.set_text_color(0, 0, 200 if row_index == 0 else 0)  # blue for title and black otherwise
                 pdf.cell(w=w, h=3, txt=col.replace('appearance_counter','Rank'), border=1, ln=0, align="C" if row_index == 0 else "L")
                 if w_diff:
-                    if diff_list is not None and row_index < len(diff_list):
+                    if diff_list_new is not None and row_index < len(diff_list_new):
                         if row_index == 0:
                             pdf.set_text_color(0, 0, 200 if row_index == 0 else 0)  # blue for title and black otherwise
                             pdf.cell(w=w, h=3, txt='שינוי'[::-1] if tase_mode else 'Change', border=1, ln=1, align="C")
                         else:
-                            if 'new' in str(diff_list[row_index]):
-                                pdf.set_text_color(0, 0, 200)  # blue
-                            elif '-' in str(diff_list[row_index]):
-                                pdf.set_text_color(200,0,0)   # red
-                            elif '+' in str(diff_list[row_index]):
-                                pdf.set_text_color(0,200,0)   # green
+                            if   'new'     in str(diff_list_new[row_index]):
+                                pdf.set_text_color(0,0,200)  # blue
+                            elif 'removed' in str(diff_list_new[row_index]):
+                                pdf.set_text_color(200,0,0)  # red
+                            elif '-'       in str(diff_list_new[row_index]):
+                                pdf.set_text_color(150,0,0)  # darker red
+                            elif '+'       in str(diff_list_new[row_index]):
+                                pdf.set_text_color(0,200,0)  # green
                             else:
-                                pdf.set_text_color(0, 0, 0)   # black
-                            pdf.cell(w=w, h=3, txt=str(diff_list[row_index]), border=1, ln=1, align="L")
+                                pdf.set_text_color(0, 0, 0)  # black
+                            pdf.cell(w=w, h=3, txt=str(diff_list_new[row_index]), border=1, ln=1, align="L")
     pdf.cell(200, 3, txt='', ln=1, align="L")
     fig, ax = plt.subplots(figsize=(15, 10))
     y_pos = np.arange(len(names))
@@ -163,9 +167,8 @@ def csv_to_pdf(csv_filename, csv_db_path, data_time_str, title, limit_num_rows, 
              "<p><img src=""{}"" width=""630"" height=""230""></p>".format(csv_filename+"_fig.png")
         pdf.write_html(text=html)
 
-    if csv_db_path is not None:
-        output_filename = csv_db_path+'/'+data_time_str+title.replace('detagergga','aggregated')+("_n" if "normalized" in db_filename else "")+'.pdf'
-    else:
-        output_filename = csv_filename+'.pdf'
-    pdf.output(output_filename, 'F')
+    output_filename = output_path+'/'+data_time_str+title.replace('detagergga','aggregated')+("_n" if "normalized" in db_filename else "")+'.pdf'
+
+    if output: pdf.output(output_filename, 'F')
+    return pdf
 

@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.55 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.56 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -349,7 +349,7 @@ def combine_multi_dim_to_table_6d(multi_dim_data, dim6, dim5, dim4, dim3, dim2_r
 #              2. Like the EQG - see other places where there are filterings out (around that area in sss.py) and handle properly - EV/CFO and D/E
 #              3. Move to Pandas in CSV readings!
 def research_db(sectors_list, sectors_filter_out, countries_list, countries_filter_out, pb_range, pi_range, research_mode_max_ev, ev_millions_range, evr_range, pe_range, pm_range, csv_db_path, db_filename, read_all_country_symbols, scan_mode, appearance_counter_min, appearance_counter_max, favor_sectors, favor_sectors_by,
-                newer_path, older_path, db_exists_in_both_folders, diff_only_result, movement_threshold, res_length):
+                newer_path, older_path, movement_threshold, res_length):
     if scan_mode == SCAN_MODE_TASE:
         tase_mode = 1
     else:
@@ -427,19 +427,38 @@ def research_db(sectors_list, sectors_filter_out, countries_list, countries_filt
     sorted_appearance_counter_dict_sss          = {k: v for k, v in sorted(appearance_counter_dict_sss.items(),   key=lambda item: item[1], reverse=True)}
     result_sorted_appearance_counter_dict_sss   = {k: v for k, v in sorted_appearance_counter_dict_sss.items()    if v > 0.0}
 
-    result_list_filename_sss   = csv_db_path+'/results_{}'.format(db_filename.replace('_engine',''))
+    result_list_filename_sss              = csv_db_path+'/results_{}'.format(    db_filename.replace('_engine',''))
+    result_list_filename_sss_ref_to_read  = older_path +'/results_{}'.format(    db_filename.replace('_engine',''))
+    result_list_filename_sss_ref_to_write = csv_db_path+'/results_ref_{}'.format(db_filename.replace('_engine',''))
 
+    # Create the new results file without yet adding the Diff column
     with open(result_list_filename_sss, 'w') as f:
         f.write("Symbol,Name,Sector,Value,Close,Grade\n")
         for key in result_sorted_appearance_counter_dict_sss.keys():
             #                              Symbol,    Name,                    Sector Value           Close        Grade
             f.write("%s,%s,%s,%s,%s,%s\n"%(key[0],str(key[1]).replace(',',' '),key[2],round(key[3],5),key[4],round(result_sorted_appearance_counter_dict_sss[  key],4)))
 
-    if older_path is not None:
-        diff_lists = sss_diff.run(newer_path=newer_path, older_path=older_path, db_filename=db_filename, db_exists_in_both_folders=db_exists_in_both_folders, diff_only_result=diff_only_result, movement_threshold=movement_threshold, res_length=res_length, consider_as_new_from=PDF_NUM_ENTRIES_IN_REPORT)
+    # Read the reference results file without the Diff column
+    ref_rows_no_diff = []
+    with open(result_list_filename_sss_ref_to_read, mode='r', newline='') as engine:
+        reader = csv.reader(engine, delimiter=',')
+        row_index = 0
+        for row in reader:
+            ref_rows_no_diff.append(row)
+            if row_index >= res_length: break
+            row_index += 1
 
-        #                                                                                          0:15 is date and time
-        pdf_generator.csv_to_pdf(csv_filename=result_list_filename_sss,   csv_db_path=csv_db_path, data_time_str=result_list_filename_sss.replace(  'Results','').replace('Tase','').replace('Nsr','').replace('All','').replace('Six','').replace('St','').replace('Custom','').replace('/','')[0:15], title=TITLES[scan_mode].replace('_',' '),         limit_num_rows=PDF_NUM_ENTRIES_IN_REPORT, diff_list=diff_lists[0], tase_mode=tase_mode, db_filename=db_filename)
+    # Create the removed results file without yet adding the Diff column
+    with open(result_list_filename_sss_ref_to_write, 'w') as f:
+        for row in ref_rows_no_diff:
+            #                                    Symbol, Name,   Sector  Value   Close   Grade
+            f.write("{},{},{},{},{},{}\n".format(row[0], row[1], row[2], row[3], row[4], row[5]))
+
+    if older_path is not None:
+        [diff_list_new, diff_list_removed] = sss_diff.run(newer_path=newer_path, older_path=older_path, db_filename=db_filename, movement_threshold=movement_threshold, res_length=res_length, consider_as_new_from=PDF_NUM_ENTRIES_IN_REPORT)
+
+        pdf_to_append = pdf_generator.csv_to_pdf(csv_filename=result_list_filename_sss,              output_path=csv_db_path, data_time_str=result_list_filename_sss.replace(             'Results','').replace('Tase','').replace('Nsr','').replace('All','').replace('Six','').replace('St','').replace('Custom','').replace('/','')[0:15], title=TITLES[scan_mode].replace('_',' '), limit_num_rows=PDF_NUM_ENTRIES_IN_REPORT, diff_list_new=diff_list_new,     tase_mode=tase_mode, db_filename=db_filename, append_to_pdf=None,          output=False)
+        pdf_generator.csv_to_pdf(                csv_filename=result_list_filename_sss_ref_to_write, output_path=csv_db_path, data_time_str=result_list_filename_sss_ref_to_write.replace('Results','').replace('Tase','').replace('Nsr','').replace('All','').replace('Six','').replace('St','').replace('Custom','').replace('/','')[0:15], title=TITLES[scan_mode].replace('_',' '), limit_num_rows=PDF_NUM_ENTRIES_IN_REPORT, diff_list_new=diff_list_removed, tase_mode=tase_mode, db_filename=db_filename, append_to_pdf=pdf_to_append, output=True )
 
 
 def find_symbol_in_aggregated_results(symbol, aggregated_results):
@@ -480,11 +499,30 @@ def aggregate_results(newer_path, older_path, res_length, scan_mode):
             #                                    Symbol, Name,   Sector  Value   Close   Grade
             f.write("{},{},{},{},{},{}\n".format(row[0], row[1], row[2], row[3], row[4], round(row[5],4)))
 
-    if older_path is not None:
-        aggregated_diff_lists = sss_diff.run(newer_path=newer_path, older_path=older_path, db_filename='sss_aggregated.csv', db_exists_in_both_folders=1, diff_only_result=1, movement_threshold=0, res_length=res_length, consider_as_new_from=PDF_NUM_ENTRIES_IN_REPORT)
+    # Read reference aggregated_results less the diff column:
+    result_list_filename_sss_ref = older_path + '/results_sss_aggregated.csv'
+    ref_rows_no_diff = []
+    with open(result_list_filename_sss_ref, mode='r', newline='') as engine:
+        reader = csv.reader(engine, delimiter=',')
+        row_index = 0
+        for row in reader:
+            ref_rows_no_diff.append(row)
+            if row_index >= res_length: break
+            row_index += 1
 
-        #                                                                                       0:15 is date and time
-        pdf_generator.csv_to_pdf(csv_filename=result_list_filename_sss, csv_db_path=newer_path, data_time_str=result_list_filename_sss.replace('Results', '').replace('Tase', '').replace('Nsr', '').replace('All', '').replace('Six','').replace('St','').replace('Custom', '').replace('/', '')[0:15], title=TITLES[scan_mode].replace('_', ' ') + ' ' + ('aggregated'[::-1] if scan_mode==SCAN_MODE_TASE else 'aggregated'), limit_num_rows=PDF_NUM_ENTRIES_IN_REPORT, diff_list=aggregated_diff_lists[0], tase_mode=(1 if scan_mode==SCAN_MODE_TASE else 0), db_filename="")
+    # Create the removed results file without yet adding the Diff column
+    result_list_filename_sss_ref_to_write = newer_path + '/results_ref_sss_aggregated.csv'
+    with open(result_list_filename_sss_ref_to_write, 'w') as f:
+        for row in ref_rows_no_diff:
+            #                                    Symbol, Name,   Sector  Value   Close   Grade
+            f.write("{},{},{},{},{},{}\n".format(row[0], row[1], row[2], row[3], row[4], row[5]))
+
+
+    if older_path is not None:
+        [aggregated_diff_list_new, aggregated_diff_list_removed] = sss_diff.run(newer_path=newer_path, older_path=older_path, db_filename='sss_aggregated.csv', movement_threshold=0, res_length=res_length, consider_as_new_from=PDF_NUM_ENTRIES_IN_REPORT)
+
+        pdf_to_append = pdf_generator.csv_to_pdf(csv_filename=result_list_filename_sss,              output_path=newer_path, data_time_str=result_list_filename_sss.replace(             'Results', '').replace('Tase', '').replace('Nsr', '').replace('All', '').replace('Six','').replace('St','').replace('Custom', '').replace('/', '')[0:15], title=TITLES[scan_mode].replace('_', ' ') + ' ' + ('aggregated'[::-1] if scan_mode==SCAN_MODE_TASE else 'aggregated'), limit_num_rows=PDF_NUM_ENTRIES_IN_REPORT, diff_list_new=aggregated_diff_list_new,     tase_mode=(1 if scan_mode == SCAN_MODE_TASE else 0), db_filename="", append_to_pdf=None,          output=False)
+        pdf_generator.csv_to_pdf(                csv_filename=result_list_filename_sss_ref_to_write, output_path=newer_path, data_time_str=result_list_filename_sss_ref_to_write.replace('Results', '').replace('Tase', '').replace('Nsr', '').replace('All', '').replace('Six','').replace('St','').replace('Custom', '').replace('/', '')[0:15], title=TITLES[scan_mode].replace('_', ' ') + ' ' + ('aggregated'[::-1] if scan_mode==SCAN_MODE_TASE else 'aggregated'), limit_num_rows=PDF_NUM_ENTRIES_IN_REPORT, diff_list_new=aggregated_diff_list_removed, tase_mode=(1 if scan_mode == SCAN_MODE_TASE else 0), db_filename="", append_to_pdf=pdf_to_append, output=True )
 
 
 def execute():
@@ -544,7 +582,7 @@ def execute():
                     pm_range_tase          = [round(pm*100,    sss.NUM_ROUND_DECIMALS) for pm in pm_ratios_range_tase]
 
                     research_db(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, pb_range=pb_range_tase, pi_range=pi_range_tase, research_mode_max_ev=research_mode_max_ev, ev_millions_range=ev_millions_range_tase, pe_range=pe_range_tase, evr_range=evr_range_tase, pm_range=pm_range_tase,   csv_db_path=new_run_tase, db_filename=db_filename,   read_all_country_symbols=sss_config.ALL_COUNTRY_SYMBOLS_OFF, scan_mode=SCAN_MODE_TASE, appearance_counter_min=RESEARCH_MODE_MIN_ENTRIES_LIMIT, appearance_counter_max=1000, favor_sectors=['Technology', 'Real Estate'], favor_sectors_by=[3.0, 1.0],
-                                newer_path=new_run_tase, older_path=reference_run_tase, db_exists_in_both_folders=1, diff_only_result=1, movement_threshold=0, res_length=400)
+                                newer_path=new_run_tase, older_path=reference_run_tase, movement_threshold=0, res_length=400)
             aggregate_results(newer_path=new_run_tase, older_path=reference_run_tase, res_length=400, scan_mode=SCAN_MODE_TASE)
 
         if run_nsr:
@@ -561,7 +599,7 @@ def execute():
                     pm_range_nsr          = [round(pm*100,    sss.NUM_ROUND_DECIMALS) for pm in pm_ratios_range_nsr]
 
                     research_db(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, pb_range=pb_range_nsr, pi_range=pi_range_nsr, research_mode_max_ev=research_mode_max_ev, ev_millions_range=ev_millions_range_nsr, pe_range=pe_range_nsr, evr_range=evr_range_nsr, pm_range=pm_range_nsr,  csv_db_path=new_run_nsr, db_filename=db_filename,   read_all_country_symbols=sss_config.ALL_COUNTRY_SYMBOLS_OFF, scan_mode=SCAN_MODE_NSR, appearance_counter_min=RESEARCH_MODE_MIN_ENTRIES_LIMIT, appearance_counter_max=5000, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[3.5, 0.75],
-                                newer_path=new_run_nsr, older_path=reference_run_nsr, db_exists_in_both_folders=1, diff_only_result=1, movement_threshold=0, res_length=800)
+                                newer_path=new_run_nsr, older_path=reference_run_nsr, movement_threshold=0, res_length=800)
             aggregate_results(newer_path=new_run_nsr, older_path=reference_run_nsr, res_length=800, scan_mode=SCAN_MODE_NSR)
 
         if run_all:
@@ -578,7 +616,7 @@ def execute():
                     pm_range_all          = [round(pm*100,    sss.NUM_ROUND_DECIMALS) for pm in pm_ratios_range_all]
 
                     research_db(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, pb_range=pb_range_all, pi_range=pi_range_all, research_mode_max_ev=research_mode_max_ev, ev_millions_range=ev_millions_range_all, pe_range=pe_range_all, evr_range=evr_range_all, pm_range=pm_range_all, csv_db_path=new_run_all, db_filename=db_filename, read_all_country_symbols=sss_config.ALL_COUNTRY_SYMBOLS_US, scan_mode=SCAN_MODE_ALL, appearance_counter_min=RESEARCH_MODE_MIN_ENTRIES_LIMIT, appearance_counter_max=50000, favor_sectors=['Technology', 'Financial Services'], favor_sectors_by=[3.5, 0.75],
-                                newer_path=new_run_all, older_path=reference_run_all, db_exists_in_both_folders=1, diff_only_result=1, movement_threshold=0, res_length=1000)
+                                newer_path=new_run_all, older_path=reference_run_all, movement_threshold=0, res_length=1000)
             aggregate_results(newer_path=new_run_all, older_path=reference_run_all, res_length=1000, scan_mode=SCAN_MODE_ALL)
 
         if run_six:
@@ -595,7 +633,7 @@ def execute():
                     pm_range_six          = [round(pm*100,    sss.NUM_ROUND_DECIMALS) for pm in pm_ratios_range_six]
 
                     research_db(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, pb_range=pb_range_six, pi_range=pi_range_six, research_mode_max_ev=research_mode_max_ev, ev_millions_range=ev_millions_range_six, pe_range=pe_range_six, evr_range=evr_range_six, pm_range=pm_range_six, csv_db_path=new_run_six, db_filename=db_filename, read_all_country_symbols=sss_config.ALL_COUNTRY_SYMBOLS_SIX, scan_mode=SCAN_MODE_SIX, appearance_counter_min=RESEARCH_MODE_MIN_ENTRIES_LIMIT/2, appearance_counter_max=50000, favor_sectors=[], favor_sectors_by=[],
-                                newer_path=new_run_six, older_path=reference_run_six, db_exists_in_both_folders=1, diff_only_result=1, movement_threshold=0, res_length=1000)
+                                newer_path=new_run_six, older_path=reference_run_six, movement_threshold=0, res_length=100)
             aggregate_results(newer_path=new_run_six, older_path=reference_run_six, res_length=1000, scan_mode=SCAN_MODE_SIX)
 
         if run_st:
@@ -612,7 +650,7 @@ def execute():
                     pm_range_st          = [round(pm*100,    sss.NUM_ROUND_DECIMALS) for pm in pm_ratios_range_st]
 
                     research_db(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, pb_range=pb_range_st, pi_range=pi_range_st, research_mode_max_ev=research_mode_max_ev, ev_millions_range=ev_millions_range_st, pe_range=pe_range_st, evr_range=evr_range_st, pm_range=pm_range_st, csv_db_path=new_run_st, db_filename=db_filename, read_all_country_symbols=sss_config.ALL_COUNTRY_SYMBOLS_ST, scan_mode=SCAN_MODE_ST, appearance_counter_min=RESEARCH_MODE_MIN_ENTRIES_LIMIT, appearance_counter_max=50000, favor_sectors=[], favor_sectors_by=[],
-                                newer_path=new_run_st, older_path=reference_run_st, db_exists_in_both_folders=1, diff_only_result=1, movement_threshold=0, res_length=1000)
+                                newer_path=new_run_st, older_path=reference_run_st, movement_threshold=0, res_length=1000)
             aggregate_results(newer_path=new_run_st, older_path=reference_run_st, res_length=1000, scan_mode=SCAN_MODE_ST)
 
         if run_custom:
@@ -629,7 +667,7 @@ def execute():
                     pm_range_custom          = [round(pm*100,    sss.NUM_ROUND_DECIMALS) for pm in pm_ratios_range_custom]
 
                     research_db(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, pb_range=pb_range_custom, pi_range=pi_range_custom, research_mode_max_ev=research_mode_max_ev, ev_millions_range=ev_millions_range_custom, pe_range=pe_range_custom, evr_range=evr_range_custom, pm_range=pm_range_custom, csv_db_path=new_run_custom, db_filename=db_filename, read_all_country_symbols=sss_config.ALL_COUNTRY_SYMBOLS_US, scan_mode=SCAN_MODE_CUSTOM, appearance_counter_min=RESEARCH_MODE_MIN_ENTRIES_LIMIT, appearance_counter_max=50000, favor_sectors=[], favor_sectors_by=[],
-                                newer_path=new_run_custom, older_path=reference_run_custom, db_exists_in_both_folders=1, diff_only_result=1, movement_threshold=0, res_length=1000)
+                                newer_path=new_run_custom, older_path=reference_run_custom, movement_threshold=0, res_length=1000)
             aggregate_results(newer_path=new_run_custom, older_path=reference_run_custom, res_length=1000, scan_mode=SCAN_MODE_CUSTOM)
 
 if sss_config.PROFILE:
