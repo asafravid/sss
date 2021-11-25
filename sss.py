@@ -923,8 +923,8 @@ def sss_core_equation_value_set(stock_data):
         set_skip_reason(stock_data)
 
 
-def get_used_parameters_names_in_core_equation():
-    if sss_config.custom_sss_value_equation:
+def get_used_parameters_names_in_core_equation(custom_sss_value_equation):
+    if custom_sss_value_equation:
         numerator_parameters_list   = ["evr_effective", "pe_effective", "trailing_12months_price_to_sales"]  # The lower  the better
         denominator_parameters_list = ["effective_profit_margin",                        ]  # The higher the better
     else:
