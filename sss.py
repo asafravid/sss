@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.96 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.97 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -2370,22 +2370,36 @@ def process_info(json_db, symbol, stock_data, tase_mode, sectors_list, sectors_f
         stock_data.last_dividend_2 = 0; stock_data.last_dividend_3 = 0
 
         try:  # It is important to note that: 1. latest value is in index 0. 2. For the actual value in USD, need to translate the date of the dividend to the value of share at that time, because the dividends[] are pare share
-            dividends = symbol.get_dividends()
+            # if sss_config.custom_sss_value_equation:
+            #     dividends =
+            if isinstance(symbol, dict):
+                dividends = symbol['dividends'] if 'dividends' in symbol else None
+            else:
+                dividends = symbol.get_dividends()
+
+            last_dividends_list = []
             if len(dividends) > 0:
                 last_4_dividends = dividends[-1:]
                 stock_data.last_dividend_0 = last_4_dividends[-1] # Latest
+                last_dividends_list.insert(0, stock_data.last_dividend_0)
             if len(dividends) > 1:
                 last_4_dividends = dividends[-2:]
                 stock_data.last_dividend_1 = last_4_dividends[-2] # One before latest
+                last_dividends_list.insert(0, stock_data.last_dividend_1)
             if len(dividends) > 2:
                 last_4_dividends = dividends[-3:]
                 stock_data.last_dividend_2 = last_4_dividends[-3] # 2 before latest, etc
+                last_dividends_list.insert(0, stock_data.last_dividend_2)
             if len(dividends) > 3:
                 last_4_dividends = dividends[-4:]
                 stock_data.last_dividend_3 = last_4_dividends[-4]
+                last_dividends_list.insert(0, stock_data.last_dividend_3)
+
+            json_db[stock_data.symbol]["dividends"] = last_dividends_list
 
         except Exception as e:
             # if not research_mode: print("Exception in symbol.dividends: {} -> {}".format(e, traceback.format_exc()))
+            json_db[stock_data.symbol]["dividends"] = []
             pass
 
         round_and_avoid_none_values(stock_data)
@@ -2532,8 +2546,10 @@ def process_symbols(json_db, symbols, csv_db_data, rows, rows_no_div, rows_only_
 
             if process_info_result:
                 rows.append(                           row_to_append)
-                if dividends_sum: rows_only_div.append(row_to_append)
-                else:             rows_no_div.append(  row_to_append)
+                if dividends_sum:
+                    rows_only_div.append(row_to_append)
+                else:
+                    rows_no_div.append(  row_to_append)
             csv_db_data.append(                        row_to_append)
     else: # DB already present
         for row_index, row in enumerate(csv_db_data):
@@ -2862,9 +2878,9 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
     compact_rows_only_div = []
     if not research_mode:
         for row in rows:
-            if row[g_sss_value_index_n if "normalized" in db_filename else g_sss_value_index] != BAD_SSS: compact_rows.append(row)
+            if row[         g_sss_value_index_n if "normalized" in db_filename else g_sss_value_index] != BAD_SSS: compact_rows.append(row)
         for row_no_div in rows_no_div:
-            if row_no_div[g_sss_value_index_n if "normalized" in db_filename else g_sss_value_index] != BAD_SSS: compact_rows_no_div.append(row_no_div)
+            if row_no_div[  g_sss_value_index_n if "normalized" in db_filename else g_sss_value_index] != BAD_SSS: compact_rows_no_div.append(row_no_div)
         for row_only_div in rows_only_div:
             if row_only_div[g_sss_value_index_n if "normalized" in db_filename else g_sss_value_index] != BAD_SSS: compact_rows_only_div.append(row_only_div)
 
