@@ -117,22 +117,22 @@ MAX_UNKNOWN_PE                               = 100000
 #              1. The rarety (statistically comapred to all the stocks in scan) - proportionaly to it (the rarest the case - the more boost)
 #              2. The ascent (slope) of the increase and the positive value -> the higher - the more boost
 #              3. Add similar boosters for other annual and quarterly weighted-averaged parameters
-PROFIT_MARGIN_BOOST_FOR_PRESENCE_OF_ANNUAL_NEGATIVE_EARNINGS      = 0.1
-PROFIT_MARGIN_BOOST_FOR_PRESENCE_OF_QUARTERLY_NEGATIVE_EARNINGS   = 0.1
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE                = 3.75   # Provide a "bonus" for companies whose profit margins have increased continuously annually
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE             = 2.25   # Provide a "bonus" for companies whose profit margins have increased continuously quarterly
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_POSITIVE                = 4.75   # Provide a "bonus" for companies whose profit margins have been continuously positive annually
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_POSITIVE             = 2.75   # Provide a "bonus" for companies whose profit margins have been continuously positive quarterly
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_EARNINGS    = 4.25   # Provide a "bonus" for companies whose earnings       have been continuously increasing annually
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_REVENUE     = 7.77   # Provide a "bonus" for companies whose revenue        has  been continuously increasing annually - TODO: ASAFR: This is a very good indicator for stock value growth
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_EARNINGS = 3.25   # Provide a "bonus" for companies whose earnings       have been continuously increasing quarterly
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_REVENUE  = 9.99   # Provide a "bonus" for companies whose revenue        has  been continuously increasing quarterly - TODO: ASAFR: This is a very good indicator for stock value growth
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_DECREASE                = 0.25   # Provide a "bonus" for companies whose profit margins have decreased continuously annually
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_DECREASE             = 0.25   # Provide a "bonus" for companies whose profit margins have decreased continuously quarterly
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_DECREASE_IN_EARNINGS    = 0.25   # Provide a "bonus" for companies whose earnings       have been continuously decreasing annually
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_DECREASE_IN_REVENUE     = 0.2    # Provide a "bonus" for companies whose revenue        has  been continuously decreasing annually - TODO: ASAFR: This is a very good indicator for stock value growth
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_DECREASE_IN_EARNINGS = 0.25   # Provide a "bonus" for companies whose earnings       have been continuously decreasing quarterly
-PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_DECREASE_IN_REVENUE  = 0.1    # Provide a "bonus" for companies whose revenue        has  been continuously decreasing quarterly - TODO: ASAFR: This is a very good indicator for stock value growth
+PROFIT_MARGIN_BOOST_FOR_PRESENCE_OF_ANNUAL_NEGATIVE_EARNINGS      = 0.025 if sss_config.custom_sss_value_equation else 0.1
+PROFIT_MARGIN_BOOST_FOR_PRESENCE_OF_QUARTERLY_NEGATIVE_EARNINGS   = 0.025 if sss_config.custom_sss_value_equation else 0.1
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE                = 10.0  if sss_config.custom_sss_value_equation else 3.75   # Provide a "bonus" for companies whose profit margins have increased continuously annually
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE             = 10.0  if sss_config.custom_sss_value_equation else 2.25   # Provide a "bonus" for companies whose profit margins have increased continuously quarterly
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_POSITIVE                = 10.0  if sss_config.custom_sss_value_equation else 4.75   # Provide a "bonus" for companies whose profit margins have been continuously positive annually
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_POSITIVE             = 10.0  if sss_config.custom_sss_value_equation else 2.75   # Provide a "bonus" for companies whose profit margins have been continuously positive quarterly
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_EARNINGS    = 10.0  if sss_config.custom_sss_value_equation else 4.25   # Provide a "bonus" for companies whose earnings       have been continuously increasing annually
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_INCREASE_IN_REVENUE     = 14.0  if sss_config.custom_sss_value_equation else 7.77   # Provide a "bonus" for companies whose revenue        has  been continuously increasing annually - TODO: ASAFR: This is a very good indicator for stock value growth
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_EARNINGS = 10.0  if sss_config.custom_sss_value_equation else 3.25   # Provide a "bonus" for companies whose earnings       have been continuously increasing quarterly
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_INCREASE_IN_REVENUE  = 25.0  if sss_config.custom_sss_value_equation else 9.99   # Provide a "bonus" for companies whose revenue        has  been continuously increasing quarterly - TODO: ASAFR: This is a very good indicator for stock value growth
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_DECREASE                = 0.05  if sss_config.custom_sss_value_equation else 0.25   # Provide a "bonus" for companies whose profit margins have decreased continuously annually
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_DECREASE             = 0.05  if sss_config.custom_sss_value_equation else 0.25   # Provide a "bonus" for companies whose profit margins have decreased continuously quarterly
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_DECREASE_IN_EARNINGS    = 0.05  if sss_config.custom_sss_value_equation else 0.25   # Provide a "bonus" for companies whose earnings       have been continuously decreasing annually
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_ANNUAL_DECREASE_IN_REVENUE     = 0.05  if sss_config.custom_sss_value_equation else 0.2    # Provide a "bonus" for companies whose revenue        has  been continuously decreasing annually - TODO: ASAFR: This is a very good indicator for stock value growth
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_DECREASE_IN_EARNINGS = 0.05  if sss_config.custom_sss_value_equation else 0.25   # Provide a "bonus" for companies whose earnings       have been continuously decreasing quarterly
+PROFIT_MARGIN_BOOST_FOR_CONTINUOUS_QUARTERLY_DECREASE_IN_REVENUE  = 0.05  if sss_config.custom_sss_value_equation else 0.1    # Provide a "bonus" for companies whose revenue        has  been continuously decreasing quarterly - TODO: ASAFR: This is a very good indicator for stock value growth
 PROFIT_MARGIN_DUPLICATION_FACTOR                                  = 8.0    # When copying profit margin (if either quarterized/annualized/profit_margin is missing) - devide by this factor
 NEGATIVE_CFO_FACTOR                                               = 100000.0   #
 NEGATIVE_PEG_RATIO_FACTOR                                         = 100000.0
@@ -1841,8 +1841,8 @@ def process_info(json_db, symbol, stock_data, tase_mode, sectors_list, sectors_f
 
         # TODO: ASAFR: 1. Apply the bonuses here (configure) and test + verify
         #              2. Add mon_dec and mon_inc bonuses here
-        if alternative_quarterly_pm_required:
-            [stock_data.quarterized_profit_margin, stock_data.quarterized_profit_margin_boost] = calculate_weighted_ratio_from_dict(financials_quarterly, 'quarterized_profit_margin', 'Net Income', 'Total Revenue', PROFIT_MARGIN_WEIGHTS, stock_data, 0, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=1.0, bonus_mon_dec=1.0, bonus_neg_pres=1.0, bonus_mon_inc_num=4.0, bonus_mon_inc_den=4.0, bonus_mon_dec_num=0.25, bonus_mon_dec_den=0.25)
+        if alternative_quarterly_pm_required:   # TODO: ASAFR: replace the bonuses below with the existing quarterly bonuses CONSTANTS
+            [stock_data.quarterized_profit_margin, stock_data.quarterized_profit_margin_boost] = calculate_weighted_ratio_from_dict(financials_quarterly, 'quarterized_profit_margin', 'Net Income', 'Total Revenue', PROFIT_MARGIN_WEIGHTS, stock_data, 0, True, bonus_all_pos=(10.0 if sss_config.custom_sss_value_equation else 1.0), bonus_all_neg=(0.1 if sss_config.custom_sss_value_equation else 1.0), bonus_mon_inc=(10.0 if sss_config.custom_sss_value_equation else 1.0), bonus_mon_dec=(0.1 if sss_config.custom_sss_value_equation else 1.0), bonus_neg_pres=(0.1 if sss_config.custom_sss_value_equation else 1.0), bonus_mon_inc_num=(10.0 if sss_config.custom_sss_value_equation else 4.0), bonus_mon_inc_den=(10.0 if sss_config.custom_sss_value_equation else 4.0), bonus_mon_dec_num=(0.1 if sss_config.custom_sss_value_equation else 0.25), bonus_mon_dec_den=(0.1 if sss_config.custom_sss_value_equation else 0.25))
 
         # Earnings are ordered from oldest to newest so no reversing required for weights:
         if earnings_yearly != None and 'Revenue' in earnings_yearly: [stock_data.annualized_revenue, stock_data.annualized_revenue_bonus] = calculate_weighted_stock_data_on_dict(earnings_yearly['Revenue'],    'earnings_yearly[Revenue]', None,            REVENUES_WEIGHTS, stock_data, False, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=4.0, bonus_mon_dec=0.25, bonus_neg_pres=1.0)
