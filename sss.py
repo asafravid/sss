@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.97 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.98 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -2357,7 +2357,7 @@ def process_info(json_db, symbol, stock_data, tase_mode, sectors_list, sectors_f
                 stock_data.price_to_earnings_to_growth_ratio = float(stock_data.effective_price_to_earnings) / float(stock_data.eqg_effective)
             elif stock_data.effective_price_to_earnings != None:
                 stock_data.price_to_earnings_to_growth_ratio = stock_data.effective_price_to_earnings * PEG_UNKNOWN # At this stage effective_price_to_earnings is always positive so this code will not be reached
-        elif stock_data.price_to_earnings_to_growth_ratio != None:
+        if stock_data.price_to_earnings_to_growth_ratio != None:
             if   stock_data.price_to_earnings_to_growth_ratio > 0: stock_data.effective_peg_ratio =  stock_data.price_to_earnings_to_growth_ratio
             elif stock_data.price_to_earnings_to_growth_ratio < 0: stock_data.effective_peg_ratio = -NEGATIVE_PEG_RATIO_FACTOR/float(stock_data.price_to_earnings_to_growth_ratio)
             else                                                 : stock_data.effective_peg_ratio =  1.0  # Something must be wrong, so take a neutral value of 1.0
