@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.57 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.58 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -29,8 +29,6 @@ import csv
 import matplotlib.pyplot as plt; plt.rcdefaults()
 import numpy as np
 
-
-# TODO: ASAFR: Add a simple column on the left with the numbering (1..49) - will be very helpful fo rthe reader of the reports
 
 def csv_to_pdf(csv_filename, output_path, data_time_str, title, limit_num_rows, diff_list_new, tase_mode, db_filename, append_to_pdf, output):
     title_for_figures = data_time_str + ' ' + (title[::-1] if tase_mode else title) + ' ' + ']כתב ויתור: תוצאות הסריקה אינן המלצה בשום צורה, אלא אך ורק בסיס למחקר.['[::-1]
@@ -69,17 +67,20 @@ def csv_to_pdf(csv_filename, output_path, data_time_str, title, limit_num_rows, 
             diffs.append(int(diff_list_new[row_index].replace('new+','').replace('new','0').replace('removed-','-').replace('removed','0')))
         if row_index == 0:
             if tase_mode: # overrwrite to hebrew
-                row = ['סימבול'[::-1],'שם החברה'[::-1],'ענף'[::-1],'ערך'[::-1],'סגירה'[::-1],'ציון'[::-1]]
+                row = ['#', 'סימבול'[::-1], 'שם החברה'[::-1], 'ענף'[::-1], 'ערך'[::-1], 'סגירה'[::-1], 'ציון'[::-1]]
             else:
-                row = ['Symbol', 'Name', 'Sector', 'Value', 'Close', 'Rank']
+                row = ['#', 'Symbol', 'Name', 'Sector', 'Value', 'Close', 'Rank']
+        else:
+            row.insert(0, str(row_index))
         for col_index, col in enumerate(row):
             w_diff                =0
-            if   col_index == 0: w=16 # Symbol
-            elif col_index == 1: w=42 # Name
-            elif col_index == 2: w=33 # Sector
-            elif col_index == 3: w=40 # Value
-            elif col_index == 4: w=15 # Close
-            elif col_index == 5:
+            if   col_index == 0: w=5  # #
+            elif col_index == 1: w=16 # Symbol
+            elif col_index == 2: w=42 # Name
+            elif col_index == 3: w=33 # Sector
+            elif col_index == 4: w=40 # Value
+            elif col_index == 5: w=15 # Close
+            elif col_index == 6:
                 w                = 18 # Rank
                 w_diff           = 5  # Diff
 
