@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.56 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.57 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -29,6 +29,8 @@ import csv
 import matplotlib.pyplot as plt; plt.rcdefaults()
 import numpy as np
 
+
+# TODO: ASAFR: Add a simple column on the left with the numbering (1..49) - will be very helpful fo rthe reader of the reports
 
 def csv_to_pdf(csv_filename, output_path, data_time_str, title, limit_num_rows, diff_list_new, tase_mode, db_filename, append_to_pdf, output):
     title_for_figures = data_time_str + ' ' + (title[::-1] if tase_mode else title) + ' ' + ']כתב ויתור: תוצאות הסריקה אינן המלצה בשום צורה, אלא אך ורק בסיס למחקר.['[::-1]
