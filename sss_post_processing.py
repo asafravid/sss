@@ -21,6 +21,10 @@
 #############################################################################
 
 
+# TODO: ASAFR: Fix this: sss_post_processing.py:37: FutureWarning: Dropping of nuisance columns in DataFrame reductions (with 'numeric_only=None') is deprecated; in a future version this will raise TypeError.  Select only valid columns before calling the reduction.
+#  max_values    = data.max()
+
+
 import pandas as pd
 
 import sss
