@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.98 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.99 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -2967,9 +2967,9 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
                 # if 'ISRA-L' in row[g_symbol_index]:
                 #     print('ISRA-L - index is {}'.format(index))
                 if "normalized" in db_filename:
-                    appearance_counter_dict_sss[(row[g_symbol_index_n], row[g_name_index_n], row[g_sector_index_n], row[g_sss_value_normalized_index_n], row[g_previous_close_index_n])] = appearance_counter_dict_sss[(row[g_symbol_index_n], row[g_name_index_n], row[g_sector_index_n], row[g_sss_value_normalized_index_n], row[g_previous_close_index_n])] + math.sqrt(float(list_len_sss - index)) / float(list_len_sss)
+                    appearance_counter_dict_sss[(row[g_symbol_index_n], row[g_name_index_n], row[g_sector_index_n], row[g_sss_value_normalized_index_n], row[g_previous_close_index_n])] = appearance_counter_dict_sss[(row[g_symbol_index_n], row[g_name_index_n], row[g_sector_index_n], row[g_sss_value_normalized_index_n], row[g_previous_close_index_n])] + (float(list_len_sss - index)) / (float(list_len_sss)**2)
                 else:
-                    appearance_counter_dict_sss[(row[g_symbol_index],   row[g_name_index],   row[g_sector_index],   row[g_sss_value_index],              row[g_previous_close_index])]   = appearance_counter_dict_sss[(row[g_symbol_index],   row[g_name_index],   row[g_sector_index],   row[g_sss_value_index],              row[g_previous_close_index])]   + math.sqrt(float(list_len_sss - index)) / float(list_len_sss)
+                    appearance_counter_dict_sss[(row[g_symbol_index],   row[g_name_index],   row[g_sector_index],   row[g_sss_value_index],              row[g_previous_close_index])]   = appearance_counter_dict_sss[(row[g_symbol_index],   row[g_name_index],   row[g_sector_index],   row[g_sss_value_index],              row[g_previous_close_index])]   + (float(list_len_sss - index)) / (float(list_len_sss)**2)
 
 
     if num_results_list != None and num_results_list_index < len(num_results_list): num_results_list[num_results_list_index] = len(compact_rows)
