@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.60 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.58 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -49,22 +49,22 @@ automatic_results_folder_selection = False
 # Upon 1st ever run: reference must be set to None
 # After 1st ever Run: Recommended to use reference (filter and damper)
 # The research mode shall run on new_run as input (new_run >= reference_run) where > means newer
-reference_run_custom = 'Results/All/20211121-225822_Tchnlgy3.0_FnnclSrvcs0.75_A_Bdb_nRes2968'
-reference_run_tase   = 'Results/Tase/20211126-195743_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes276'
+reference_run_custom = None  # 'Results/Custom/20211109-235448_Bdb_nRes271_Custom'
+reference_run_tase   = 'Results/Tase/20211203-090555_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes276'
 reference_run_nsr    = 'Results/Nsr/20211120-224642_Tchnlgy3.0_FnnclSrvcs0.75_Bdb_nRes773'
 reference_run_all    = 'Results/All/20211121-225822_Tchnlgy3.0_FnnclSrvcs0.75_A_Bdb_nRes2968'
 reference_run_six    = 'Results/Six/20211113-124102_S_Bdb_nRes26'
 reference_run_st     = 'Results/St/20210915-023602_St_Bdb_nRes130'
 
 new_run_custom       = 'Results/Custom/20210917-201728_Bdb_nRes312_Custom'
-new_run_tase         = 'Results/Tase/20211126-195743_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes276'
+new_run_tase         = 'Results/Tase/20211203-090555_Tase_Tchnlgy3.0_RlEstt1.0_Bdb_nRes276'
 new_run_nsr          = 'Results/Nsr/20211120-224642_Tchnlgy3.0_FnnclSrvcs0.75_Bdb_nRes773'
 new_run_all          = 'Results/All/20211121-225822_Tchnlgy3.0_FnnclSrvcs0.75_A_Bdb_nRes2968'
 new_run_six          = 'Results/Six/20211114-124713_S_Bdb_nRes28'
 new_run_st           = 'Results/St/20210915-023602_St_Bdb_nRes130'
 
-custom_portfolio      = ['GGMC', 'DTST', 'IGZ', 'ZVV']
+custom_portfolio      = ['SKM']
 custom_portfolio_tase = ['APLP', 'ITMR']
 
-research_mode_probe_list = []  # ['TLV:DEDR.L']  # ['MTDS']
+research_mode_probe_list = ['TLV:MISH']  # ['MTDS']
 
