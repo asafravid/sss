@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.99 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.100 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -2395,7 +2395,7 @@ def process_info(json_db, symbol, stock_data, tase_mode, sectors_list, sectors_f
                 stock_data.last_dividend_3 = last_4_dividends[-4]
                 last_dividends_list.insert(0, stock_data.last_dividend_3)
 
-            json_db[stock_data.symbol]["dividends"] = last_dividends_list
+            if last_dividends_list != None: json_db[stock_data.symbol]["dividends"] = last_dividends_list
 
         except Exception as e:
             # if not research_mode: print("Exception in symbol.dividends: {} -> {}".format(e, traceback.format_exc()))
