@@ -29,12 +29,12 @@ ALL_COUNTRY_SYMBOLS_ST  = 3  # Swedish (Stockholm) Stock Exchange
 
 run_custom_tase           = False   # Custom Portfolio
 run_custom                = False
-run_tase                  = False    # Tel Aviv Stock Exchange
+run_tase                  = True    # Tel Aviv Stock Exchange
 run_nsr                   = False   # NASDAQ100+S&P500+RUSSEL1000
-run_all                   = True   # All Nasdaq Stocks
+run_all                   = False   # All Nasdaq Stocks
 run_six                   = False    # All Swiss Stocks
 run_st                    = False    # All (Stockholm) Swedish Stocks
-research_mode             = True     # Research Mode
+research_mode             = False     # Research Mode
 aggregate_only            = False
 research_mode_max_ev      = False   # @JustLearning's suggestion in Telegram: Multi-Dimensional Scan by Max EV Limit rather than Min EV Limit
 use_reference_as_raw_data = False
@@ -62,6 +62,8 @@ new_run_nsr          = 'Results/Nsr/20211205-011557_Tchnlgy3.0_FnnclSrvcs0.75_Bd
 new_run_all          = 'Results/All/20211206-170854_Tchnlgy3.0_FnnclSrvcs0.75_A_Bdb_nRes2960'
 new_run_six          = 'Results/Six/20211114-124713_S_Bdb_nRes28'
 new_run_st           = 'Results/St/20210915-023602_St_Bdb_nRes130'
+
+crash_and_continue_path = None # 'Results/Nsr/20211207-215612_Tchnlgy3.0_FnnclSrvcs0.75_cc'
 
 custom_portfolio      = ['SKM']
 custom_portfolio_tase = ['APLP', 'ITMR']
