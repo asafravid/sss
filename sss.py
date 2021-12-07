@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.101 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.103 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -148,6 +148,8 @@ DIST_FROM_LOW_FACTOR_DAMPER                = 0.001
 DIST_FROM_LOW_FACTOR_HIGHER_THAN_ONE_POWER = 6
 
 EV_TO_EBITDA_MAX_UNKNOWN = 100000
+
+CRASH_AND_CONTINUE_REFRESH_FREQ = 10  # Flush every 10 symbols
 
 #
 # TODO: ASAFR: (https://www.gurufocus.com/letter.php)
@@ -2468,7 +2470,7 @@ def get_stock_data_normalized_from_db_row_compact(row, stock_symbol):
     return StockDataNormalized(symbol=stock_symbol, short_name=row[g_name_index_n], sector=row[g_sector_index_n], country=row[g_country_index_n], sss_value=float(row[g_sss_value_index_n]), sss_value_normalized=float(row[g_sss_value_normalized_index_n]), evr_effective=float(row[g_evr_effective_index_n]), evr_effective_normalized=float(row[g_evr_effective_normalized_index_n]), effective_price_to_earnings=float(row[g_effective_price_to_earnings_index_n]), trailing_12months_price_to_sales=float(row[g_trailing_12months_price_to_sales_index_n]), trailing_12months_price_to_sales_normalized=float(row[g_trailing_12months_price_to_sales_normalized_index_n]), pe_effective=float(row[g_pe_effective_index_n]), pe_effective_normalized=float(row[g_pe_effective_normalized_index_n]), effective_ev_to_ebitda=float(row[g_effective_ev_to_ebitda_index_n]), effective_ev_to_ebitda_normalized=float(row[g_effective_ev_to_ebitda_normalized_index_n]), effective_profit_margin=float(row[g_effective_profit_margin_index_n]), effective_profit_margin_normalized=float(row[g_effective_profit_margin_normalized_index_n]), held_percent_insiders=float(row[g_held_percent_insiders_index_n]), held_percent_insiders_normalized=float(row[g_held_percent_insiders_normalized_index_n]), previous_close=float(row[g_previous_close_index_n]), price_to_book=float(row[g_price_to_book_index_n]), price_to_book_normalized=float(row[g_price_to_book_normalized_index_n]), enterprise_value=int(float(row[g_enterprise_value_index_n])), eqg_factor_effective=float(row[g_eqg_factor_effective_index_n]), eqg_factor_effective_normalized=float(row[g_eqg_factor_effective_normalized_index_n]), rqg_factor_effective=float(row[g_rqg_factor_effective_index_n]), rqg_factor_effective_normalized=float(row[g_rqg_factor_effective_normalized_index_n]), effective_peg_ratio=float(row[g_effective_peg_ratio_index_n]), effective_peg_ratio_normalized=float(row[g_effective_peg_ratio_normalized_index_n]), ev_to_cfo_ratio_effective=float(row[g_ev_to_cfo_ratio_effective_index_n]), ev_to_cfo_ratio_effective_normalized=float(row[g_ev_to_cfo_ratio_effective_normalized_index_n]), debt_to_equity_effective=float(row[g_debt_to_equity_effective_index_n]), debt_to_equity_effective_used=float(row[g_debt_to_equity_effective_used_index_n]), debt_to_equity_effective_used_normalized=float(row[g_debt_to_equity_effective_used_normalized_index_n]), eff_dist_from_low_factor=float(row[g_eff_dist_from_low_factor_index_n]), eff_dist_from_low_factor_normalized=float(row[g_eff_dist_from_low_factor_normalized_index_n]), total_ratio_effective=float(row[g_total_ratio_effective_index_n]), total_current_ratio_effective=float(row[g_total_current_ratio_effective_index_n]), effective_current_ratio=float(row[g_effective_current_ratio_index_n]), effective_current_ratio_normalized=float(row[g_effective_current_ratio_normalized_index_n]), calculated_roa=float(row[g_calculated_roa_index_n]), calculated_roa_normalized=float(row[g_calculated_roa_normalized_index_n]), calculated_roe=float(row[g_calculated_roe_index_n]), calculated_roe_normalized=float(row[g_calculated_roe_normalized_index_n]), altman_z_score_factor=float(row[g_altman_z_score_factor_index_n]), altman_z_score_factor_normalized=float(row[g_altman_z_score_factor_normalized_index_n]))
 
 
-def process_symbols(json_db, symbols, csv_db_data, rows, rows_no_div, rows_only_div, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, diff_rows, db_filename, reference_raw_data=None):
+def process_symbols(date_and_time_crash_and_continue, json_db, symbols, csv_db_data, rows, rows_no_div, rows_only_div, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, diff_rows, db_filename, reference_raw_data=None):
     iteration = 0
     if not research_mode:
         elapsed_time_start_sec = time.time()
@@ -2560,6 +2562,16 @@ def process_symbols(json_db, symbols, csv_db_data, rows, rows_no_div, rows_only_
                 else:
                     rows_no_div.append(  row_to_append)
             csv_db_data.append(                        row_to_append)
+
+            # Save crash-and-continue raw database as json:
+            if date_and_time_crash_and_continue and reference_raw_data is None and iteration%CRASH_AND_CONTINUE_REFRESH_FREQ == 0:
+                json_db_filename = date_and_time_crash_and_continue + '/db.json'
+                os.makedirs(os.path.dirname(json_db_filename), exist_ok=True)
+                print("[DB] Iteration {}, flushing json db to {} ... ".format(iteration, json_db_filename), end="")
+                json_db_file = open(json_db_filename, "w")
+                json.dump(json_db, json_db_file, indent=1)
+                json_db_file.close()
+                print("done")
     else: # DB already present
         for row_index, row in enumerate(csv_db_data):
             iteration += 1
@@ -2879,7 +2891,42 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
         json_db_filename = open(reference_run + '/db.json')
         reference_raw_data = json.load(json_db_filename)
 
-    process_symbols(json_db=json_db if not research_mode else None, symbols=symbols, csv_db_data=csv_db_data, rows=rows, rows_no_div=rows_no_div, rows_only_div=rows_only_div, tase_mode=tase_mode, read_all_country_symbols=read_all_country_symbols, sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, profit_margin_limit=profit_margin_limit, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, debt_to_equity_limit=debt_to_equity_limit, pb_limit=pb_limit, pi_limit=pi_limit, enterprise_value_millions_usd_limit=enterprise_value_millions_usd_limit, research_mode_max_ev=research_mode_max_ev, eqg_min=eqg_min, rqg_min=rqg_min, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, research_mode=research_mode, currency_conversion_tool=currency_conversion_tool if not research_mode else None, currency_conversion_tool_alternative=currency_conversion_tool_alternative if not research_mode else None, currency_conversion_tool_manual=currency_conversion_tool_manual if not research_mode else None, reference_db=reference_db if not research_mode else None, reference_db_title_row=reference_db_title_row if not research_mode else None, diff_rows=rows_diff, db_filename=db_filename, reference_raw_data=reference_raw_data)
+    date_and_time_crash_and_continue = None
+    if not research_mode:
+        mode_str = 'Nsr' # Default is Nasdaq100+S&P500+Russel1000
+        if   read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_US:  mode_str = 'All'
+        elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_SIX: mode_str = 'Six'
+        elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_ST:  mode_str = 'St'
+        elif tase_mode:                                                      mode_str = 'Tase'
+        elif len(custom_portfolio):                                          mode_str = 'Custom'
+
+        tase_str = "_Tase" if tase_mode else ""
+
+        sectors_str = ""
+        if len(sectors_list):
+            if sectors_filter_out: sectors_list += 'FO_'
+            sectors_str += '_' + '_'.join(sectors_list)
+        else:
+            for index, sector in enumerate(favor_sectors):
+                sectors_str += '_{}{}'.format(sector.replace(' ', ''), round(favor_sectors_by[index], NUM_ROUND_DECIMALS))
+
+        countries_str         = ""
+        if len(countries_list):
+            if countries_filter_out: countries_list += 'FO_'
+            countries_str += '_' + '_'.join(countries_list).replace(' ', '')
+
+        all_str               = ""
+        if   read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_US:  all_str  = '_A'
+        elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_SIX: all_str  = '_S'
+        elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_ST:  all_str  = '_St'
+
+        custom_portfolio_str = '_Custom'   if len(custom_portfolio)                else ""
+        custom_sss_value_str = "_CustSssV" if sss_config.custom_sss_value_equation else ""
+
+        # Temporary json for crash-and-continue efficient operation:
+        date_and_time_crash_and_continue = time.strftime("Results/{}/%Y%m%d-%H%M%S{}{}{}{}{}{}_cc".format(mode_str, tase_str, sectors_str.replace(' ','').replace('a', '').replace('e','').replace('i', '').replace('o','').replace('u', ''), countries_str, all_str, custom_portfolio_str, custom_sss_value_str))
+
+    process_symbols(date_and_time_crash_and_continue=date_and_time_crash_and_continue, json_db=json_db if not research_mode else None, symbols=symbols, csv_db_data=csv_db_data, rows=rows, rows_no_div=rows_no_div, rows_only_div=rows_only_div, tase_mode=tase_mode, read_all_country_symbols=read_all_country_symbols, sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, profit_margin_limit=profit_margin_limit, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, debt_to_equity_limit=debt_to_equity_limit, pb_limit=pb_limit, pi_limit=pi_limit, enterprise_value_millions_usd_limit=enterprise_value_millions_usd_limit, research_mode_max_ev=research_mode_max_ev, eqg_min=eqg_min, rqg_min=rqg_min, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, research_mode=research_mode, currency_conversion_tool=currency_conversion_tool if not research_mode else None, currency_conversion_tool_alternative=currency_conversion_tool_alternative if not research_mode else None, currency_conversion_tool_manual=currency_conversion_tool_manual if not research_mode else None, reference_db=reference_db if not research_mode else None, reference_db_title_row=reference_db_title_row if not research_mode else None, diff_rows=rows_diff, db_filename=db_filename, reference_raw_data=reference_raw_data)
 
     # remove (from rows, not from db or diff) rows whose sss_value is irrelevant:
     compact_rows          = []
@@ -2910,43 +2957,9 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
         for sorted_list in sorted_lists_list:
             sorted_list.insert(0, (g_header_row_normalized if "normalized" in db_filename else g_header_row))
 
-        custom_sss_value_str  = "_CustSssV" if sss_config.custom_sss_value_equation else ""
-        tase_str              = ""
-        sectors_str           = ""
-        countries_str         = ""
-        all_str               = ""
-        csv_db_str            = ""
-        custom_portfolio_str  = ""
         num_results_str       = "_nRes{}".format(len(compact_rows))
-        build_csv_db_str      = ""
-        if tase_mode:         tase_str       = "_Tase"
 
-        if len(sectors_list):
-            if sectors_filter_out: sectors_list += 'FO_'
-            sectors_str += '_' + '_'.join(sectors_list)
-        else:
-            for index, sector in enumerate(favor_sectors):
-                sectors_str += '_{}{}'.format(sector.replace(' ', ''), round(favor_sectors_by[index], NUM_ROUND_DECIMALS))
-
-        if len(countries_list):
-            if countries_filter_out: countries_list += 'FO_'
-            countries_str += '_' + '_'.join(countries_list).replace(' ', '')
-
-        mode_str = 'Nsr' # Default is Nasdaq100+S&P500+Russel1000
-        if   read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_US:  mode_str = 'All'
-        elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_SIX: mode_str = 'Six'
-        elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_ST:  mode_str = 'St'
-        elif tase_mode:                                                      mode_str = 'Tase'
-        elif len(custom_portfolio):                                          mode_str = 'Custom'
-
-        if   read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_US:  all_str  = '_A'
-        elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_SIX: all_str  = '_S'
-        elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_ST:  all_str  = '_St'
-
-        if not research_mode:     build_csv_db_str     = '_Bdb'
-        if len(custom_portfolio): custom_portfolio_str = '_Custom'
-
-        date_and_time = time.strftime("Results/{}/%Y%m%d-%H%M%S{}{}{}{}{}{}{}{}{}".format(mode_str, tase_str, sectors_str.replace(' ','').replace('a','').replace('e','').replace('i','').replace('o','').replace('u',''), countries_str, all_str, csv_db_str, build_csv_db_str, num_results_str, custom_portfolio_str, custom_sss_value_str))
+        date_and_time = time.strftime("Results/{}/%Y%m%d-%H%M%S{}{}{}{}{}{}{}".format(mode_str, tase_str, sectors_str.replace(' ','').replace('a','').replace('e','').replace('i','').replace('o','').replace('u',''), countries_str, all_str, num_results_str, custom_portfolio_str, custom_sss_value_str))
         print('\n[DV] Scan Results placed in {}'.format(date_and_time))
 
         filenames_list = sss_filenames.create_filenames_list(date_and_time)
