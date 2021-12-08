@@ -43,6 +43,7 @@ https://bit.ly/MultiDimensionalScan
 - 1: Set the required scanning mode(s) (`custom`/`tase`/`nsr`/`all`) in `sss_config.py` and run `sss_run.py`
 - 2: A Results folder shall be created under `Results/<mode>/` Folder
 - 3: Feed the Results path into the `research_mode` (Multi-Dimensional Scan). A `PDF` and `results_sss_*.csv` files shall be created in the same folder
+- 4: Crash and Continue from crash point - Supported for efficiency.
 
 # Indices Maintenance
 - Download `TASE` latest components via https://info.tase.co.il/eng/MarketData/Stocks/MarketData/Pages/MarketData.aspx into `Indices/Data_TASE.csv` -> This operation is done automatically upon each scan (with `research_mode = False`) via `sss_indices.py`
