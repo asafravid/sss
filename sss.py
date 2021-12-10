@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.104 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.105 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -935,9 +935,9 @@ def get_used_parameters_names_in_core_equation(custom_sss_value_equation):
         numerator_parameters_list   = ["evr_effective", "pe_effective", "trailing_12months_price_to_sales"]  # The lower  the better
         denominator_parameters_list = ["effective_profit_margin",                        ]  # The higher the better
     else:
-      # numerator_parameters_list   = ["eff_dist_from_low_factor", "evr_effective", "pe_effective", "effective_ev_to_ebitda", "trailing_12months_price_to_sales", "price_to_book",        "effective_peg_ratio",   "ev_to_cfo_ratio_effective", "debt_to_equity_effective_used"]  # The lower  the better
+        numerator_parameters_list   = ["eff_dist_from_low_factor", "evr_effective", "pe_effective", "effective_ev_to_ebitda", "trailing_12months_price_to_sales", "price_to_book",        "effective_peg_ratio",   "ev_to_cfo_ratio_effective", "debt_to_equity_effective_used"]  # The lower  the better
       # https://github.com/ranaroussi/yfinance/issues/903 -> TODO: ASAFR: Currently avoid the peg ratio
-        numerator_parameters_list   = ["eff_dist_from_low_factor", "evr_effective", "pe_effective", "effective_ev_to_ebitda", "trailing_12months_price_to_sales", "price_to_book",                                 "ev_to_cfo_ratio_effective", "debt_to_equity_effective_used"]  # The lower  the better
+      # numerator_parameters_list   = ["eff_dist_from_low_factor", "evr_effective", "pe_effective", "effective_ev_to_ebitda", "trailing_12months_price_to_sales", "price_to_book",                                 "ev_to_cfo_ratio_effective", "debt_to_equity_effective_used"]  # The lower  the better
         denominator_parameters_list = ["effective_profit_margin",  "effective_current_ratio",       "calculated_roa",       "calculated_roe",         "eqg_factor_effective",             "rqg_factor_effective", "altman_z_score_factor", "held_percent_insiders"                                     ]  # The higher the better
     return [numerator_parameters_list, denominator_parameters_list]
 
@@ -2905,8 +2905,8 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
 
     date_and_time_crash_and_continue = None
     crash_and_continue_raw_data      = None
+    reference_raw_data               = None
     if not research_mode:
-        reference_raw_data = None
         if sss_config.use_reference_as_raw_data:
             json_db_filename   = open(reference_run + '/db.json')
             reference_raw_data = json.load(json_db_filename)
