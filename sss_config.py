@@ -34,7 +34,7 @@ run_nsr                   = False   # NASDAQ100+S&P500+RUSSEL1000
 run_all                   = False   # All Nasdaq Stocks
 run_six                   = False    # All Swiss Stocks
 run_st                    = False    # All (Stockholm) Swedish Stocks
-research_mode             = True     # Research Mode
+research_mode             = False     # Research Mode
 aggregate_only            = False
 research_mode_max_ev      = False   # @JustLearning's suggestion in Telegram: Multi-Dimensional Scan by Max EV Limit rather than Min EV Limit
 use_reference_as_raw_data = False
@@ -57,7 +57,7 @@ reference_run_six    = 'Results/Six/20211216-001037_S_nRes28'                   
 reference_run_st     = 'Results/St/20210915-023602_St_Bdb_nRes130'
 
 new_run_custom       = 'Results/Custom/20210917-201728_Bdb_nRes312_Custom'
-new_run_tase         = 'Results/Tase/20211217-103246_Tase_Tchnlgy3.0_RlEstt1.0_nRes273'
+new_run_tase         = 'Results/Tase/20211211-182250_Tase_Tchnlgy3.0_RlEstt1.0_nRes280_CustSssV'
 new_run_nsr          = 'Results/Nsr/20211205-011557_Tchnlgy3.0_FnnclSrvcs0.75_Bdb_nRes775_CustSssV'
 new_run_all          = 'Results/All/20211206-170854_Tchnlgy3.0_FnnclSrvcs0.75_A_Bdb_nRes2960'
 new_run_six          = 'Results/Six/20211216-001037_S_nRes28'                                        # '20211216-002301_S_nRes27_CustSssV'
