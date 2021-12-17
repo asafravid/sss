@@ -50,6 +50,7 @@ ALNY,Alnylam Pharmaceuticals
 ALSN,Allison Transmission Holdings
 AM,Antero Midstream Corp
 AMAT,Applied Materials
+AMBP,Ardagh Metal Packaging S.A.
 AMCR,Amcor Plc
 AMD,Adv Micro Devices
 AME,Amtek Inc
@@ -133,7 +134,6 @@ BPOP,Popular Inc
 BR,Broadridge Financial Solutions Llc
 BRK.B,Berkshire Hathaway Cl B
 BRKR,Bruker Corp
-BRKS,Brooks Automation
 BRO,Brown & Brown
 BRX,Brixmor Property Group Inc
 BSX,Boston Scientific Corp
@@ -233,6 +233,7 @@ CSL,Carlisle Companies Inc
 CSX,CSX Corp
 CTAS,Cintas Corp
 CTLT,Catalent Inc
+CTRA,Coterra Energy Inc
 CTSH,Cognizant Tech Sol
 CTVA,Corteva Inc
 CTXS,Citrix Systems Inc
@@ -336,7 +337,7 @@ F,Ford Motor Company
 FAF,First American Corp
 FANG,Diamondback Energy
 FAST,Fastenal Company
-FB,Facebook Inc
+FB,Meta Platforms Inc
 FBHS,Fortune Brands Home & Security
 FCN,Fti Consulting
 FCNCA,First Citizens Bancs
@@ -344,7 +345,7 @@ FCX,Freeport-Mcmoran Inc
 FDS,Factset Research Systems Inc
 FDX,Fedex Corp
 FE,Firstenergy Corp
-FFIV,F5 Networks Inc
+FFIV,F5 Inc
 FHB,First Hawaiian Inc
 FHN,First Horizon Corp
 FICO,Fair Isaac and Company
@@ -434,7 +435,6 @@ HPE,Hewlett Packard Enterprise Comp
 HPP,Hudson Pacific Properties
 HPQ,HP Inc
 HRB,H&R Block
-HRC,Hill-Rom Holdings Inc
 HRL,Hormel Foods Corp
 HSIC,Henry Schein Inc
 HST,Host Marriott Financial Trust
@@ -495,6 +495,7 @@ JNPR,Juniper Networks
 JPM,JP Morgan Chase & Company
 JWN,Nordstrom
 K,Kellogg Company
+KD,Kyndryl Hldgs Inc
 KDP,Keurig Dr Pepper Inc
 KEX,Kirby Corp
 KEY,Keycorp
@@ -512,7 +513,6 @@ KO,Coca-Cola Company
 KR,Kroger Company
 KRC,Kilroy Realty Corp
 KSS,Kohl's Corp
-KSU,Kansas City Southern
 L,Loews Corp
 LAD,Lithia Motors
 LAMR,Lamar Advertis A
@@ -554,6 +554,7 @@ LVS,Las Vegas Sands
 LW,Lamb Weston Holdings Inc
 LYB,Lyondellbasell Industries NV
 LYFT,Lyft Inc Cl A
+LYLT,Loyalty Ventures Inc
 LYV,Live Nation Entertainment
 LZ,Legalzoom.com Inc
 MA,Mastercard Inc
@@ -572,7 +573,6 @@ MCO,Moody's Corp
 MCW,Mister Car Wash Inc
 MCY,Mercury General Corp
 MDB,Mongodb Inc Cl A
-MDLA,Medallia Inc
 MDLZ,Mondelez Intl Inc
 MDT,Medtronic Inc
 MDU,Mdu Res Group Inc
@@ -587,6 +587,7 @@ MKTX,Marketaxess Holdings
 MLM,Martin Marietta Materials
 MMC,Marsh & Mclennan Companies
 MMM,3M Company
+MNDT,Mandiant Inc
 MNST,Monster Beverage Cp
 MO,Altria Group
 MOH,Molina Healthcare Inc
@@ -679,6 +680,7 @@ OLN,Olin Corp
 OMC,Omnicom Group Inc
 OMF,Onemain Holdings Inc
 ON,On Semiconductor
+ONL,Orion Office REIT Inc
 OPEN,Opendoor Technologies Inc
 ORCL,Oracle Corp
 ORI,Old Republic International Corp
@@ -732,7 +734,6 @@ PODD,Insulet Corp
 POOL,Pool Corp
 POST,Post Holdings Inc
 PPC,Pilgrim's Pride
-PPD,Ppd Inc
 PPG,PPG Industries
 PPL,PPL Corp
 PRGO,Perrigo Company
@@ -782,6 +783,7 @@ ROP,Roper Industries
 ROST,Ross Stores Inc
 RPM,RPM International Inc
 RPRX,Royalty Pharma Plc Cl A
+RRX,Regal Rexnord Corp
 RS,Reliance Steel & Aluminum Company
 RSG,Republic Services
 RTX,Raytheon Technologies Corp
@@ -818,6 +820,7 @@ SLB,Schlumberger N.V.
 SLG,SL Green Realty Corp
 SLGN,Silgan Holdings
 SLM,SLM Corp
+SLVM,Sylvamo Corp
 SMAR,Smartsheet Inc Cl A
 SMG,Scotts Miracle-Gro Company
 SNA,Snap-On Inc
@@ -933,7 +936,6 @@ UWMC,Uwm Hldg Corp
 V,Visa Inc
 VAC,Marriot Vacations Worldwide Cor
 VEEV,Veeva Systems Inc
-VER,Vereit Inc
 VFC,V.F. Corp
 VIAC,Viacom CBS Cl B
 VIACA,Viacom CBS Cl A
@@ -980,7 +982,8 @@ WLTW,Willis Towers WT
 WM,Waste Management
 WMB,Williams Companies
 WMS,Advanced Drainage Systems Inc
-WMT,Wal-Mart Stores
+WMT,Walmart Inc
+WOLF,Wolfspeed Inc
 WOOF,Petco Health and Wellness Company Cl A
 WPC,W.P. Carey & Co. Llc
 WRB,W.R. Berkley Corp
@@ -996,6 +999,3 @@ WWD,Woodward Inc
 WWE,World Wrestling Entertainment
 WY,Weyerhaeuser Company
 WYNN,Wynn Resorts Ltd
-X,United States Steel Corp
-XEL,XCEL Energy Inc
-XLNX,Xilinx Inc
