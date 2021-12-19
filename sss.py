@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.105 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.106 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -149,7 +149,7 @@ DIST_FROM_LOW_FACTOR_HIGHER_THAN_ONE_POWER = 6
 
 EV_TO_EBITDA_MAX_UNKNOWN = 100000
 
-CRASH_AND_CONTINUE_REFRESH_FREQ = 10  # Flush every 10 symbols
+CRASH_AND_CONTINUE_REFRESH_FREQ = 100  # Flush every 10 symbols
 
 #
 # TODO: ASAFR: (https://www.gurufocus.com/letter.php)
