@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.9 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.10 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -48,7 +48,7 @@ def process_engine_csv(path) -> object:
         new_column_index = data.columns.get_loc(parameter)
         data.insert(new_column_index+1, parameter+"_normalized",new_column)
         if SSS_VALUE_NORMALIZED_COLUMN_NAME in data:
-            if parameter in numerator_parameters_list_to_calcualte and parameter != "effective_peg_ratio":
+            if parameter in numerator_parameters_list_to_calcualte:  # and parameter != "effective_peg_ratio":
                 data[SSS_VALUE_NORMALIZED_COLUMN_NAME] = data[SSS_VALUE_NORMALIZED_COLUMN_NAME] + data[parameter+"_normalized"]
         else:
             new_column_index = data.columns.get_loc(SSS_VALUE_COLUMN_NAME)
