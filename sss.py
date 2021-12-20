@@ -149,7 +149,7 @@ DIST_FROM_LOW_FACTOR_HIGHER_THAN_ONE_POWER = 6
 
 EV_TO_EBITDA_MAX_UNKNOWN = 100000
 
-CRASH_AND_CONTINUE_REFRESH_FREQ = 100  # Flush every 10 symbols
+CRASH_AND_CONTINUE_REFRESH_FREQ = 100  # Flush every 100 symbols
 
 #
 # TODO: ASAFR: (https://www.gurufocus.com/letter.php)
