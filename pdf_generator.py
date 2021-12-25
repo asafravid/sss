@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.59 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.60 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -31,6 +31,7 @@ from fpdf import FPDF, HTMLMixin
 import csv
 import matplotlib.pyplot as plt; plt.rcdefaults()
 import numpy as np
+import os
 
 
 def csv_to_pdf(csv_filename, output_path, data_time_str, title, limit_num_rows, diff_list_new, tase_mode, db_filename, append_to_pdf, output):
@@ -126,7 +127,6 @@ def csv_to_pdf(csv_filename, output_path, data_time_str, title, limit_num_rows, 
     ax.set_title(title_for_figures, color='blue')
     ax.legend()
 
-    # plt.show()
     plt.savefig(csv_filename+"_fig.png")
 
     if tase_mode:
@@ -174,6 +174,7 @@ def csv_to_pdf(csv_filename, output_path, data_time_str, title, limit_num_rows, 
         pdf.write_html(text=html)
 
     output_filename = output_path+'/'+data_time_str+title.replace('detagergga','aggregated')+("_n" if "normalized" in db_filename else "")+'.pdf'
+    os.remove(csv_filename+"_fig.png")
 
     if output: pdf.output(output_filename, 'F')
     return pdf
