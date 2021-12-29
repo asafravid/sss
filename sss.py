@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.107 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.108 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -68,6 +68,7 @@ from contextlib             import closing
 from dataclasses            import dataclass
 from forex_python.converter import CurrencyRates
 from currency_converter     import CurrencyConverter
+from sys                    import platform
 
 
 VERBOSE_LOGS = 0
@@ -2907,6 +2908,9 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
     reference_raw_data               = None
     if not research_mode:
         if sss_config.use_reference_as_raw_data:
+            if platform == "linux" or platform == "linux2":
+                os.system("tar -jxvf {} --directory {}".format(reference_run + '/db.json.tar.bz2', reference_run))
+
             json_db_filename   = open(reference_run + '/db.json')
             reference_raw_data = json.load(json_db_filename)
 
@@ -2997,6 +3001,12 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
         json_db_file = open(date_and_time+'/db.json', "w")
         json.dump(json_db, json_db_file, indent=1)
         json_db_file.close()
+        if platform == "linux" or platform == "linux2":
+            os.system("tar -jcvf {} --directory {} {}".format(date_and_time+'/db.json.tar.bz2', date_and_time, 'db.json'))
+            os.remove(date_and_time+'/db.json')
+
+            if sss_config.use_reference_as_raw_data:  # Delete the extracted json file to save space
+                os.remove(reference_run + '/db.json')
 
         sss_post_processing.process_engine_csv(date_and_time)
     else:
