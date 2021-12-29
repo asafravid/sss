@@ -2585,6 +2585,13 @@ def process_symbols(crash_and_continue_raw_data, date_and_time_crash_and_continu
                 json.dump(json_db, json_db_file, indent=1)
                 json_db_file.close()
                 print("done")
+
+        # Leave clean folders behind:
+        if date_and_time_crash_and_continue and reference_raw_data is None:
+            json_db_filename = date_and_time_crash_and_continue + '/db.json'
+            os.remove(json_db_filename)
+            os.rmdir(date_and_time_crash_and_continue)
+
     else: # DB already present
         for row_index, row in enumerate(csv_db_data):
             iteration += 1
