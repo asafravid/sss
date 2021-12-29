@@ -36,8 +36,6 @@ DB_FILENAMES = ['sss_engine.csv', 'sss_engine_normalized.csv']  # 'db.csv' -> bu
 
 # TODO: ASAFR: 1. read_csv in pandas, and then .describe() and .quantiles() will provide mean, std and percentiles for all the columns (sss_engine.csv and/or db.csv)
 #              2. Calculate the angle (dericative) of the Profit margin change over years and quarters and apply a bonus relative to the slope
-#              3. Add a column with position number or just #. Symbol
-#              4. Add a a Removed Column reports!
 PDF_NUM_ENTRIES_IN_REPORT       = 49
 RESEARCH_MODE_MIN_ENTRIES_LIMIT = 7
 
@@ -50,7 +48,6 @@ SCAN_MODE_CUSTOM = 5  # All Swedish (Stockholm) Stocks
 
 TITLES = ["_תוצאות_סריקה_עבור_בורסת_תל_אביב", "_Scan_Results_for_Nasdaq100_SNP500_Russel1000", "_Scan_Results_for_All_Nasdaq_Stocks", "_Scan_Results_for_All_Swiss_Stocks", "_Scan_Results_for_All_Swedish_Stocks", "_Scan_Results_for_Custom_Nasdaq_Stocks"]
 
-# TODO: ASAFR: Add dimension to multi-dim-scan: held_percent_insiders (analyze 1st)
 
 # automatic_folder_selection()
 #
@@ -380,7 +377,7 @@ def research_db(sectors_list, sectors_filter_out, countries_list, countries_filt
                     print('\n')
                     for evr_index, enterprise_value_to_revenue_limit in enumerate(evr_range):
                         print('\n')
-                        for pm_index, profit_margin_limit            in enumerate(pm_range):  # TODO: ASAFR: Below 1. Ambiguity of parameters - narrow down. 2. Some magic numbers on ev_to_cfo_ration etc 100.0 and 1000.0 - make order and defines/constants/multi_dim here
+                        for pm_index, profit_margin_limit            in enumerate(pm_range):  # TODO: ASAFR: 1. Some magic numbers on ev_to_cfo_ration etc 100.0 and 1000.0 - make order and defines/constants/multi_dim here
                             num_results_for_pb_pi_ev_pe_evr_and_pm = sss.sss_run(reference_run=[], sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, csv_db_path=csv_db_path, db_filename=db_filename, read_all_country_symbols=read_all_country_symbols, tase_mode=tase_mode, research_mode=1, profit_margin_limit=float(profit_margin_limit)/100.0, pb_limit=pb_limit, pi_limit=pi_limit, enterprise_value_millions_usd_limit=ev_millions_limit, research_mode_max_ev=research_mode_max_ev, ev_to_cfo_ratio_limit=10e9, debt_to_equity_limit=10e9, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, appearance_counter_dict_sss=appearance_counter_dict_sss, appearance_counter_min=appearance_counter_min, appearance_counter_max=appearance_counter_max)
                             if num_results_for_pb_pi_ev_pe_evr_and_pm < appearance_counter_min:
                                 estimated_iterations_left -= (pm_range_len-pm_index)
@@ -529,7 +526,6 @@ def execute():
     ############################
     # main ()
     ###########################
-    # TODO: ASAFR: 1. Export Results to the SSS Google Sheet automatically
 
     run_custom_tase      = sss_config.run_custom_tase       # Custom Portfolio
     run_custom           = sss_config.run_custom
