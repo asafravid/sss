@@ -33,6 +33,7 @@ https://bit.ly/MultiDimensionalScan
     - `pip[3] install pandas`
     - `pip[3] install yfinance`
     - `pip[3] install fpdf`
+    - `pip[3] install pyPdf`
     - `pip[3] install numpy`
     - `pip[3] install forex_python` and/or `pip[3] install forex-python`
     - `pip[3] install CurrencyConverter`
