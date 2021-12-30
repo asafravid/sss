@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.108 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.109 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -22,8 +22,7 @@
 
 
 # TODO: ASAFR:  0. Auto-Update Nasdaq (NSR) Indices as done with TASE
-#               0.1. Add All Swiss   Stocks to A dedicated scan: https://www.six-group.com/en/products-services/the-swiss-stock-exchange/market-data/shares/closing-prices.html, https://www.six-group.com/fqs/closing.csv?select=ShortName,ISIN,ValorSymbol,ValorNumber,ClosingPrice,DailyHighPrice,DailyLowPrice,LatestTradeDate,PreviousClosingPrice,OpeningPrice,OnMarketVolume,OffBookVolume,SwissAtMidVolume,TotalVolume,TradingBaseCurrency,YearlyHighDate,YearlyHighPrice,YearlyLowDate,YearlyLowPrice,FirstTradingDate,LastTradingDate,Exchange,SecTypeCode,GeographicalAreaCode,Tminus1Volume,VWAP60Price&where=ProductLine=BC&orderby=ShortName&page=1&pagesize=9999999
-#               1.0. https://en.wikipedia.org/wiki/Piotroski_F-score
+#               0.1. Add support for https://simfin.com/data/bulk
 #               1.2. https://en.wikipedia.org/wiki/Magic_formula_investing
 #               1.3. https://www.oldschoolvalue.com/investing-strategy/backtest-graham-nnwc-ncav-screen/
 #               2. Back to Investpy to download all Japanese stocks and all swiss stocks (and all swedish stocks!)
