@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.60 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.61 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -23,7 +23,7 @@
 #!/usr/bin/env python
 # -*- coding: utf8 -*-
 
-from fpdf import FPDF, HTMLMixin
+from fpdf import FPDF, HTMLMixin  # pip install pyfpdf fpdf
 
 
 # TODO: ASAFR: Increase the decimal points for light mode results!
