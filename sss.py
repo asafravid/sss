@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.109 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.110 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -65,8 +65,8 @@ import traceback
 
 from contextlib             import closing
 from dataclasses            import dataclass
-from forex_python.converter import CurrencyRates
-from currency_converter     import CurrencyConverter
+from forex_python.converter import CurrencyRates    # pip install forex-python --> pip install git+https://github.com/MicroPyramid/forex-python.git
+from currency_converter     import CurrencyConverter  # pip install CurrencyConverter currency.converter
 from sys                    import platform
 
 
