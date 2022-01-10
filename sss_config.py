@@ -29,12 +29,12 @@ ALL_COUNTRY_SYMBOLS_ST  = 3  # Swedish (Stockholm) Stock Exchange
 
 run_custom_tase           = False    # Custom Portfolio
 run_custom                = False
-run_tase                  = True   # Tel Aviv Stock Exchange
+run_tase                  = False   # Tel Aviv Stock Exchange
 run_nsr                   = False   # NASDAQ100+S&P500+RUSSEL1000
 run_all                   = False   # All Nasdaq Stocks
-run_six                   = False   # All Swiss Stocks
+run_six                   = True   # All Swiss Stocks
 run_st                    = False   # All (Stockholm) Swedish Stocks
-research_mode             = False   # Research Mode
+research_mode             = True   # Research Mode
 aggregate_only            = False
 research_mode_max_ev      = False   # @JustLearning's suggestion in Telegram: Multi-Dimensional Scan by Max EV Limit rather than Min EV Limit
 use_reference_as_raw_data = False
@@ -53,14 +53,14 @@ reference_run_custom = None  # 'Results/Custom/20211109-235448_Bdb_nRes271_Custo
 reference_run_tase   = 'Results/Tase/20220108-223521_Tase_Tchnlgy7.0_RlEstt1.0_nRes274_CustSssV'
 reference_run_nsr    = 'Results/Nsr/20211231-140343_Tchnlgy7.0_FnnclSrvcs1.0_nRes773'
 reference_run_all    = 'Results/All/20220102-020200_Tchnlgy7.0_FnnclSrvcs1.0_A_nRes2950'
-reference_run_six    = 'Results/Six/20211216-001037_S_nRes28'                                        # '20211216-002301_S_nRes27_CustSssV'
+reference_run_six    = 'Results/Six/20220111-002719_S_nRes196'                                        # '20211216-002301_S_nRes27_CustSssV'
 reference_run_st     = 'Results/St/20210915-023602_St_Bdb_nRes130'
 
 new_run_custom       = 'Results/Custom/20210917-201728_Bdb_nRes312_Custom'
 new_run_tase         = 'Results/Tase/20220108-223521_Tase_Tchnlgy7.0_RlEstt1.0_nRes274_CustSssV'
 new_run_nsr          = 'Results/Nsr/20211231-140343_Tchnlgy7.0_FnnclSrvcs1.0_nRes773'
 new_run_all          = 'Results/All/20220102-020200_Tchnlgy7.0_FnnclSrvcs1.0_A_nRes2950'
-new_run_six          = 'Results/Six/20211216-001037_S_nRes28'                                        # '20211216-002301_S_nRes27_CustSssV'
+new_run_six          = 'Results/Six/20220111-002719_S_nRes196'                                        # '20211216-002301_S_nRes27_CustSssV'
 new_run_st           = 'Results/St/20210915-023602_St_Bdb_nRes130'
 
 crash_and_continue_path = None # 'Results/Nsr/20211207-215612_Tchnlgy3.0_FnnclSrvcs0.75_cc'

@@ -618,17 +618,17 @@ def execute():
         if run_six:
             if not sss_config.aggregate_only:
                 for db_filename in DB_FILENAMES:
-                    pb_range_six          = get_range(csv_db_path=new_run_six, db_filename=db_filename, column_name='price_to_book',            num_sections=1, reverse=1, pop_1st_percentile_range=False)
-                    pi_range_six          = get_range(csv_db_path=new_run_six, db_filename=db_filename, column_name='held_percent_insiders',    num_sections=1, reverse=0, pop_1st_percentile_range=False)
-                    ev_range_six          = get_range(csv_db_path=new_run_six, db_filename=db_filename, column_name='enterprise_value',         num_sections=1, reverse=0, pop_1st_percentile_range=False)
-                    pe_range_six          = get_range(csv_db_path=new_run_six, db_filename=db_filename, column_name='pe_effective',             num_sections=1, reverse=1, pop_1st_percentile_range=False)
-                    evr_range_six         = get_range(csv_db_path=new_run_six, db_filename=db_filename, column_name='evr_effective',            num_sections=1, reverse=1, pop_1st_percentile_range=False)
-                    pm_ratios_range_six   = get_range(csv_db_path=new_run_six, db_filename=db_filename, column_name='effective_profit_margin',  num_sections=1, reverse=0, pop_1st_percentile_range=False)
+                    pb_range_six          = get_range(csv_db_path=new_run_six, db_filename=db_filename, column_name='price_to_book',            num_sections=4, reverse=1, pop_1st_percentile_range=False)
+                    pi_range_six          = get_range(csv_db_path=new_run_six, db_filename=db_filename, column_name='held_percent_insiders',    num_sections=2, reverse=0, pop_1st_percentile_range=False)
+                    ev_range_six          = get_range(csv_db_path=new_run_six, db_filename=db_filename, column_name='enterprise_value',         num_sections=3, reverse=0, pop_1st_percentile_range=False)
+                    pe_range_six          = get_range(csv_db_path=new_run_six, db_filename=db_filename, column_name='pe_effective',             num_sections=4, reverse=1, pop_1st_percentile_range=False)
+                    evr_range_six         = get_range(csv_db_path=new_run_six, db_filename=db_filename, column_name='evr_effective',            num_sections=5, reverse=1, pop_1st_percentile_range=False)
+                    pm_ratios_range_six   = get_range(csv_db_path=new_run_six, db_filename=db_filename, column_name='effective_profit_margin',  num_sections=6, reverse=0, pop_1st_percentile_range=False)
 
                     ev_millions_range_six = [int(  ev/1000000                       ) for ev in ev_range_six       ]
                     pm_range_six          = [round(pm*100,    sss.NUM_ROUND_DECIMALS) for pm in pm_ratios_range_six]
 
-                    research_db(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, pb_range=pb_range_six, pi_range=pi_range_six, research_mode_max_ev=research_mode_max_ev, ev_millions_range=ev_millions_range_six, pe_range=pe_range_six, evr_range=evr_range_six, pm_range=pm_range_six, csv_db_path=new_run_six, db_filename=db_filename, read_all_country_symbols=sss_config.ALL_COUNTRY_SYMBOLS_SIX, scan_mode=SCAN_MODE_SIX, appearance_counter_min=RESEARCH_MODE_MIN_ENTRIES_LIMIT/2, appearance_counter_max=50000, favor_sectors=[], favor_sectors_by=[],
+                    research_db(sectors_list=[], sectors_filter_out=0, countries_list=[], countries_filter_out=0, pb_range=pb_range_six, pi_range=pi_range_six, research_mode_max_ev=research_mode_max_ev, ev_millions_range=ev_millions_range_six, pe_range=pe_range_six, evr_range=evr_range_six, pm_range=pm_range_six, csv_db_path=new_run_six, db_filename=db_filename, read_all_country_symbols=sss_config.ALL_COUNTRY_SYMBOLS_SIX, scan_mode=SCAN_MODE_SIX, appearance_counter_min=RESEARCH_MODE_MIN_ENTRIES_LIMIT, appearance_counter_max=50000, favor_sectors=[], favor_sectors_by=[],
                                 newer_path=new_run_six, older_path=reference_run_six, movement_threshold=0, res_length=100)
             aggregate_results(newer_path=new_run_six, older_path=reference_run_six, res_length=1000, scan_mode=SCAN_MODE_SIX)
 
