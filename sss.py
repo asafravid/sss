@@ -2787,8 +2787,8 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
         symbols_st                          = []
         etf_and_nextshares_list             = []
         if read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_SIX:
-            filenames_list     = ['Indices/six_closing.csv']  # https://www.six-group.com/en/products-services/the-swiss-stock-exchange/market-data/shares/closing-prices.html -> https://www.six-group.com/fqs/closing.csv?select=ShortName,ISIN,ValorSymbol,ValorNumber,ClosingPrice,DailyHighPrice,DailyLowPrice,LatestTradeDate,PreviousClosingPrice,OpeningPrice,OnMarketVolume,OffBookVolume,SwissAtMidVolume,TotalVolume,TradingBaseCurrency,YearlyHighDate,YearlyHighPrice,YearlyLowDate,YearlyLowPrice,FirstTradingDate,LastTradingDate,Exchange,SecTypeCode,GeographicalAreaCode,Tminus1Volume,VWAP60Price&where=ProductLine=BC&orderby=ShortName&page=1&pagesize=9999999
-            ticker_column_list = [2                        ]  # six_closing.csv - Column 2 is ValorSymbol
+            filenames_list     = ['Indices/six_closing.csv']  # https://www.six-group.com/en/products-services/the-swiss-stock-exchange/market-data/shares/share-explorer.html -> https://www.six-group.com/fqs/ref.csv?select=ShortName,ValorSymbol,ValorNumber,ISIN,TitleSegmentDesc,BasketMembershipsSymbols,TradingBaseCurrency,ClosingPrice,ClosingPerformance,ClosingDelta,BidVolume,BidPrice,AskPrice,AskVolume,MidSpread,PreviousClosingPrice,LatestTradeDate,LatestTradeTime,OpeningPrice,DailyHighPrice,DailyLowPrice,ClobVolume,OffBookVolume,SwissAtMidVolume,SwissAtMidRatioOnMarket,SwissAtMidRatioTotal,SwissAtMidTurnover,EbboVolume,TotalTurnover,TotalTurnoverCHF,GeographicalAreaDesc,ListingSegmentDesc,SecTypeDesc&where=PortalSegment=EQ&orderby=ShortName&page=1&pagesize=99999
+            ticker_column_list = [1                        ]  # six_closing.csv - Column 2 is ValorSymbol
             for index, filename in enumerate(filenames_list):
                 with open(filename, mode='r', newline='') as engine:
                     reader = csv.reader(engine, delimiter=';')
