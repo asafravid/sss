@@ -2155,13 +2155,13 @@ def process_info(json_db, symbol, stock_data, tase_mode, sectors_list, sectors_f
         if stock_data.two_hundred_day_average                                                      is None: stock_data.two_hundred_day_average = stock_data.previous_close
         if stock_data.previous_close != None and stock_data.previous_close < stock_data.fifty_two_week_low: stock_data.previous_close          = stock_data.fifty_two_week_low
 
-        if stock_data.two_hundred_day_average != None and stock_data.two_hundred_day_average > 0.0: stock_data.previous_close_percentage_from_200d_ma  = 100.0 * ((float(stock_data.previous_close) - float(stock_data.two_hundred_day_average)) / float(stock_data.two_hundred_day_average))
-        if stock_data.fifty_two_week_low      != None and stock_data.fifty_two_week_low      > 0.0: stock_data.previous_close_percentage_from_52w_low  = 100.0 * ((float(stock_data.previous_close) - float(stock_data.fifty_two_week_low)     ) / float(stock_data.fifty_two_week_low)     )
-        if stock_data.fifty_two_week_high     != None and stock_data.fifty_two_week_high     > 0.0: stock_data.previous_close_percentage_from_52w_high = 100.0 * ((float(stock_data.previous_close) - float(stock_data.fifty_two_week_high)    ) / float(stock_data.fifty_two_week_high)    )
-        if stock_data.fifty_two_week_low      != None and stock_data.fifty_two_week_low      > 0.0 and stock_data.fifty_two_week_high > 0.0 and stock_data.previous_close > 0.0:
-            if stock_data.fifty_two_week_high == stock_data.fifty_two_week_low or stock_data.previous_close == 0:  # TODO: ASAFR: Take these values from nasdaq_traded.csv when they are not available temporarily on yfinance
+        if stock_data.two_hundred_day_average != None and stock_data.two_hundred_day_average > 0.0 and stock_data.previous_close != None: stock_data.previous_close_percentage_from_200d_ma  = 100.0 * ((float(stock_data.previous_close) - float(stock_data.two_hundred_day_average)) / float(stock_data.two_hundred_day_average))
+        if stock_data.fifty_two_week_low      != None and stock_data.fifty_two_week_low      > 0.0 and stock_data.previous_close != None: stock_data.previous_close_percentage_from_52w_low  = 100.0 * ((float(stock_data.previous_close) - float(stock_data.fifty_two_week_low)     ) / float(stock_data.fifty_two_week_low)     )
+        if stock_data.fifty_two_week_high     != None and stock_data.fifty_two_week_high     > 0.0 and stock_data.previous_close != None: stock_data.previous_close_percentage_from_52w_high = 100.0 * ((float(stock_data.previous_close) - float(stock_data.fifty_two_week_high)    ) / float(stock_data.fifty_two_week_high)    )
+        if stock_data.fifty_two_week_low      != None and stock_data.fifty_two_week_low      > 0.0 and stock_data.fifty_two_week_high > 0.0 and stock_data.previous_close != None and stock_data.previous_close > 0.0:
+            if stock_data.fifty_two_week_high == stock_data.fifty_two_week_low or (stock_data.previous_close != None and stock_data.previous_close == 0):  # TODO: ASAFR: Take these values from nasdaq_traded.csv when they are not available temporarily on yfinance
                 stock_data.dist_from_low_factor = 1.0  # When there is no range or no previous_close_data, leave as neutral
-            else:
+            elif  stock_data.previous_close != None:
                 stock_data.dist_from_low_factor = float(stock_data.previous_close - stock_data.fifty_two_week_low)/(0.5*float(stock_data.fifty_two_week_high-stock_data.fifty_two_week_low))
             stock_data.eff_dist_from_low_factor = (DIST_FROM_LOW_FACTOR_DAMPER + stock_data.dist_from_low_factor) if stock_data.dist_from_low_factor < 1.0 else (stock_data.dist_from_low_factor**DIST_FROM_LOW_FACTOR_HIGHER_THAN_ONE_POWER)
 
