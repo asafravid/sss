@@ -187,6 +187,8 @@ AIRC|Apartment Income REIT Corp. Common Stock|N|AIRC|N|100|N|AIRC
 AIRI|Air Industries Group Common Stock|A|AIRI|N|100|N|AIRI
 AIT|Applied Industrial Technologies, Inc. Common Stock|N|AIT|N|100|N|AIT
 AIV|Apartment Investment and Management Company Common Stock|N|AIV|N|100|N|AIV
+AIVI|WisdomTree International AI Enhanced Value Fund|P|AIVI|Y|100|N|AIVI
+AIVL|WisdomTree U.S. AI Enhanced Value Fund|P|AIVL|Y|100|N|AIVL
 AIZ|Assurant, Inc. Common Stock|N|AIZ|N|100|N|AIZ
 AIZN|Assurant, Inc. 5.25% Subordinated Notes due 2061|N|AIZN|N|100|N|AIZN
 AJG|Arthur J. Gallagher & Co. Common Stock|N|AJG|N|100|N|AJG
@@ -797,7 +799,6 @@ BRT|BRT Apartments Corp. (MD) Common Stock|N|BRT|N|100|N|BRT
 BRW|Saba Capital Income & Opportunities Fund SBI|N|BRW|N|100|N|BRW
 BRX|Brixmor Property Group Inc. Common Stock|N|BRX|N|100|N|BRX
 BRZU|Direxion Daily Brazil Bull 2X Shares|P|BRZU|Y|100|N|BRZU
-BSA|BrightSphere Investment Group Inc. 5.125% Notes due 2031|N|BSA|N|100|N|BSA
 BSAC|Banco Santander - Chile ADS|N|BSAC|N|100|N|BSAC
 BSAQ|Black Spade Acquisition Co Class A Ordinary Shares|N|BSAQ|N|100|N|BSAQ
 BSAQ.U|Black Spade Acquisition Co Units, each consisting of one Class A ordinary share and one-half of one redeemable warrant|N|BSAQ.U|N|100|N|BSAQ=
@@ -970,7 +971,6 @@ CFG$E|Citizens Financial Group, Inc. Depositary Shares Each Representing 1/40th 
 CFR|Cullen/Frost Bankers, Inc. Common Stock|N|CFR|N|100|N|CFR
 CFR$B|Cullen/Frost Bankers, Inc. Depositary Shares, each representing a 1/40th ownership interest in a share of 4.450% non-cumulative perpetual preferred stock, Series B|N|CFRpB|N|100|N|CFR-B
 CFX|Colfax Corporation Common Stock|N|CFX|N|100|N|CFX
-CFXA|Colfax Corporation 5.75% Tangible Equity Units|N|CFXA|N|100|N|CFXA
 CGA|China Green Agriculture, Inc. Common Stock|N|CGA|N|100|N|CGA
 CGAU|Centerra Gold Inc. Common Shares|N|CGAU|N|100|N|CGAU
 CGW|Invesco S&P Global Water Index ETF|P|CGW|Y|100|N|CGW
@@ -1497,7 +1497,6 @@ DOLE|Dole plc Ordinary Shares|N|DOLE|N|100|N|DOLE
 DOMA|Doma Holdings, Inc. Common Stock|N|DOMA|N|100|N|DOMA
 DOMA.W|Doma Holdings, Inc. Warrants|N|DOMA.WS|N|100|N|DOMA+
 DON|WisdomTree U.S. MidCap Dividend Fund|P|DON|Y|100|N|DON
-DOO|WisdomTree International Dividend Top 100 Fund|P|DOO|Y|100|N|DOO
 DOOR|Masonite International Corporation Ordinary Shares (Canada)|N|DOOR|N|100|N|DOOR
 DOUG|Douglas Elliman Inc. Common Stock|N|DOUG|N|100|N|DOUG
 DOV|Dover Corporation Common Stock|N|DOV|N|100|N|DOV
@@ -1549,7 +1548,6 @@ DTG|DTE Energy Company 2021 Series E 4.375% Junior Subordinated Debentures|N|DTG
 DTH|WisdomTree International High Dividend Fund|P|DTH|Y|100|N|DTH
 DTLA$|Brookfield DTLA Inc. 7.625% Series A Cumulative Redeemable Preferred Stock|N|DTLAp|N|100|N|DTLA-
 DTM|DT Midstream, Inc. Common Stock |N|DTM|N|100|N|DTM
-DTN|WisdomTree U.S. Dividend ex-Financials Fund|P|DTN|Y|100|N|DTN
 DTOX|Amplify Cleaner Living ETF|P|DTOX|Y|100|N|DTOX
 DTP|DTE Energy Company 6.25% Corporate Units|N|DTP|N|100|N|DTP
 DTW|DTE Energy Company 2017 Series E 5.25% Junior Subordinated Debentures due 2077|N|DTW|N|100|N|DTW
@@ -1583,7 +1581,6 @@ DXJ|WisdomTree Japan Hedged Equity Fund|P|DXJ|Y|100|N|DXJ
 DXR|Daxor Corporation Common Stock|A|DXR|N|100|N|DXR
 DY|Dycom Industries, Inc. Common Stock|N|DY|N|100|N|DY
 DYFN|Angel Oak Dynamic Financial Strategies Income Term Trust Common Shares of Beneficial Interest|N|DYFN|N|100|N|DYFN
-DYHG|Direxion Dynamic Hedge ETF|P|DYHG|Y|100|N|DYHG
 DYLD|LeaderShares Dynamic Yield ETF|P|DYLD|Y|100|N|DYLD
 DYNF|BlackRock U.S. Equity Factor Rotation ETF|P|DYNF|Y|100|N|DYNF
 DZZ|DB Gold Double Short ETN due February 15, 2038|P|DZZ|N|100|N|DZZ
@@ -1755,7 +1752,6 @@ ENPC|Executive Network Partnering Corporation Class A Common Stock|N|ENPC|N|100|
 ENPC.U|Executive Network Partnering Corporation Units, each consisting of one share of Class A common stock, and one-quarter of one redeemable warrant|N|ENPC.U|N|100|N|ENPC=
 ENPC.W|Executive Network Partnering Corporation Warrants, each whole warrant exercisable for one share of Class A common stock at an exercise price of $11.50|N|ENPC.WS|N|100|N|ENPC+
 ENR|Energizer Holdings, Inc. Common Stock|N|ENR|N|100|N|ENR
-ENR$A|Energizer Holdings, Inc. 7.50% Series A Mandatory Convertible Preferred Stock|N|ENRpA|N|100|N|ENR-A
 ENS|EnerSys Common Stock|N|ENS|N|100|N|ENS
 ENSV|Enservco Corporation Common Stock|A|ENSV|N|100|N|ENSV
 ENTR|ERShares Entrepreneurs ETF|P|ENTR|Y|100|N|ENTR
@@ -2156,7 +2152,6 @@ FLV|American Century Focused Large Cap Value ETF|Z|FLV|Y|100|N|FLV
 FLYA|SOAR Technology Acquisition Corp. Class A Ordinary Shares|N|FLYA|N|100|N|FLYA
 FLYA.U|SOAR Technology Acquisition Corp. Units, each consisting of one Class A ordinary share and one-third of one redeemable warrant|N|FLYA.U|N|100|N|FLYA=
 FLYA.W|SOAR Technology Acquisition Corp. Warrants, each whole warrant exercisable for one Class A ordinary share at an exercise price of $11.50 per share|N|FLYA.WS|N|100|N|FLYA+
-FLYT|Direxion Flight to Safety Strategy ETF|P|FLYT|Y|100|N|FLYT
 FLZA|Franklin FTSE South Africa ETF|P|FLZA|Y|100|N|FLZA
 FM|iShares MSCI Frontier and Select EM ETF|P|FM|Y|100|N|FM
 FMAC|FirstMark Horizon Acquisition Corp. Class A Common Stock|N|FMAC|N|100|N|FMAC
@@ -3453,7 +3448,6 @@ LAIX|LAIX Inc. American Depositary Shares, each  representing one Class A Ordina
 LAW|CS Disco, Inc. Common Stock|N|LAW|N|100|N|LAW
 LAZ|Lazard LTD. Lazard, LTD. Class A Common Stock|N|LAZ|N|100|N|LAZ
 LBAY|Leatherback Long/Short Alternative Yield ETF|P|LBAY|Y|100|N|LBAY
-LBJ|Direxion Daily Latin America Bull 2X Shares|P|LBJ|Y|100|N|LBJ
 LBRT|Liberty Oilfield Services Inc. Class A Common Stock|N|LBRT|N|100|N|LBRT
 LC|LendingClub Corporation Common Stock|N|LC|N|100|N|LC
 LCG|Sterling Capital Focus Equity ETF|P|LCG|Y|100|N|LCG
@@ -4584,6 +4578,7 @@ PSA$O|Public Storage Depositary Shares Each Representing 1/1,000 of a 3.900% Cum
 PSA$P|Public Storage Depositary Shares Each Representing 1/1,000 of a 4.000% Cumulative Preferred Share of Bene cial Interest, Series P|N|PSApP|N|100|N|PSA-P
 PSA$Q|Public Storage Depositary Shares Each Representing 1/1,000 of a 3.950% Cumulative Preferred Share of Beneficial Interest, Series Q, par value $0.01 per share|N|PSApQ|N|100|N|PSA-Q
 PSA$R|Public Storage Depositary Shares Each Representing 1/1,000 of a 4.00% Cumulative Preferred Share of Bene cial Interest, Series R|N|PSApR|N|100|N|PSA-R
+PSA$S|Public Storage Depositary Shares Each Representing 1/1,000 of a 4.100% Cumulative Preferred Share of Beneficial Interest, Series S|N|PSApS|N|100|N|PSA-S
 PSB|PS Business Parks, Inc. (MD) Common Stock|N|PSB|N|100|N|PSB
 PSB$X|PS Business Parks, Inc. Depositary Shares Each Representing 1/1,000 of a Share of 5.25% Cumulative Preferred Stock, Series X|N|PSBpX|N|100|N|PSB-X
 PSB$Y|PS Business Parks, Inc. 5.20% Cumulative Preferred Stock, Series Y|N|PSBpY|N|100|N|PSB-Y
@@ -5859,7 +5854,6 @@ USAS|Americas Gold and Silver Corporation Common Shares, no par value|A|USAS|N|1
 USB|U.S. Bancorp Common Stock|N|USB|N|100|N|USB
 USB$A|U.S. Bancorp Depositary Shares, Each representing a 1/100th interest in a share of Series A Non-CumulativePerpetual Pfd Stock|N|USBpA|N|100|N|USB-A
 USB$H|U.S. Bancorp Depositary Shares repstg 1/1000th Pfd Ser B|N|USBpH|N|100|N|USB-H
-USB$M|U.S. Bancorp Depositary Shares Representing 1/1000th Interest in a Shares Series F|N|USBpM|N|100|N|USB-M
 USB$P|U.S. Bancorp Depositary Shares each representing a 1/1,000th interest in a share of Series K Non-Cumulative Perpetual Preferred Stock|N|USBpP|N|100|N|USB-P
 USB$Q|U.S. Bancorp Depositary Shares, Each Representing a 1/1,000th Interest in a Share of Series L Non-Cumulative Perpetual Preferred Stock|N|USBpQ|N|100|N|USB-Q
 USB$R|U.S. Bancorp Depositary Shares, Each Representing a 1/1,000th Interest in a Share of Series M Non-Cumulative Perpetual Preferred Stock|N|USBpR|N|100|N|USB-R
@@ -6134,7 +6128,9 @@ WEBS|Direxion Daily Dow Jones Internet Bear 3X Shares|P|WEBS|Y|100|N|WEBS
 WEC|WEC Energy Group, Inc. Common Stock|N|WEC|N|100|N|WEC
 WEI|Weidai Ltd. American depositary shares, each  representing one (1) Class A ordinary share|N|WEI|N|100|N|WEI
 WEIX|Dynamic Shares Trust Dynamic Short Short-Term Volatility Futures ETF|P|WEIX|Y|100|N|WEIX
+WEL|Integrated Wellness Acquisition Corp Class A Ordinary Shares|N|WEL|N|100|N|WEL
 WEL.U|Integrated Wellness Acquisition Corp Units, each consisting of one Class A ordinary share and one-half of one redeemable warrant(|N|WEL.U|N|100|N|WEL=
+WEL.W|Integrated Wellness Acquisition Corp Redeemable Warrants|N|WEL.WS|N|100|N|WEL+
 WELL|Welltower Inc. Common Stock|N|WELL|N|100|N|WELL
 WES|Western Midstream Partners, LP Common Units Representing Limited Partner Interests|N|WES|N|100|N|WES
 WEX|WEX Inc. common stock|N|WEX|N|100|N|WEX
@@ -6391,4 +6387,4 @@ ZVV|NYSE ARCA test stock|P|ZVV|N|100|Y|ZVV
 ZWS|Zurn Water Solutions Corporation Common Stock|N|ZWS|N|100|N|ZWS
 ZXIET|IEX Test Company Test Symbol Three for IEX|V|ZXIET|N|100|Y|ZXIET
 ZYME|Zymeworks Inc. Common Shares|N|ZYME|N|100|N|ZYME
-File Creation Time: 0114202221:31||||||
+File Creation Time: 0118202209:00||||||
