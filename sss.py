@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.110 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.111 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -68,6 +68,8 @@ from dataclasses            import dataclass
 from forex_python.converter import CurrencyRates    # pip install forex-python --> pip install git+https://github.com/MicroPyramid/forex-python.git
 from currency_converter     import CurrencyConverter  # pip install CurrencyConverter currency.converter
 from sys                    import platform
+from datetime import datetime, timedelta
+from dateutil.relativedelta import *
 
 
 VERBOSE_LOGS = 0
@@ -2487,9 +2489,45 @@ def get_yfinance_ticker_wrapper(tase_mode, symb, read_all_country_symbols):
     return symbol
 
 
-def process_symbols(crash_and_continue_raw_data, date_and_time_crash_and_continue, json_db, symbols, csv_db_data, rows, rows_no_div, rows_only_div, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, diff_rows, db_filename, reference_raw_data=None):
+def process_symbols(crash_and_continue_raw_data, date_and_time_crash_and_continue, json_db, symbols, csv_db_data, rows, rows_no_div, rows_only_div, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, diff_rows, db_filename, reference_raw_data=None, scan_close_values=True):
     iteration = 0
     if not research_mode:
+        if scan_close_values:
+            try:
+                date = datetime.now()
+                start_date = date + relativedelta(months=-12)
+                close_values_data = yf.download(symbols, start=start_date)
+
+                for symbol in symbols:
+                    symbol_data = pd.concat([close_values_data['Low'][symbol].fillna(method='ffill').rename('Low'), close_values_data['High'][symbol].fillna(method='ffill').rename('High'), close_values_data['Close'][symbol].fillna(method='ffill').rename('Close')], axis=1)
+                    symbol_data['MA20'] = symbol_data['Close'].rolling(window=20).mean()
+                    symbol_data['MA50'] = symbol_data['Close'].rolling(window=50).mean()
+                    symbol_data['MA150'] = symbol_data['Close'].rolling(window=150).mean()
+
+                    # TODO: ASAFR: Take 150d MA and just the close values above it
+                    #              And 30 Week MA and above it
+                    #              Drop the Nan instead of fill with 0, or just drag last close value!!!!
+                    try:
+                        if symbol_data['MA20' ][-1] > symbol_data['MA20' ][-2] > symbol_data['MA20' ][-3] and \
+                           symbol_data['MA50' ][-1] > symbol_data['MA50' ][-2] > symbol_data['MA50' ][-3] and \
+                           symbol_data['MA150'][-1] > symbol_data['MA150'][-2] > symbol_data['MA150'][-3] and \
+                           symbol_data['MA50' ][-1] > symbol_data['MA150'][-1] and \
+                           symbol_data['MA50' ][-2] > symbol_data['MA150'][-2] and \
+                           symbol_data['MA50' ][-3] > symbol_data['MA150'][-3] and \
+                           symbol_data['MA20' ][-1] > symbol_data['MA50' ][-1] and \
+                           symbol_data['MA20' ][-2] > symbol_data['MA50' ][-2] and \
+                           symbol_data['MA20' ][-3] > symbol_data['MA50' ][-3] and \
+                           symbol_data['Close'][-1] > symbol_data['MA20' ][-1] and \
+                           symbol_data['Close'][-2] > symbol_data['MA20' ][-2] and \
+                           symbol_data['Close'][-3] > symbol_data['MA20' ][-3] and \
+                           date_and_time_crash_and_continue and reference_raw_data is None:
+                            os.makedirs(os.path.dirname(date_and_time_crash_and_continue + '/' + symbol + '.csv'), exist_ok=True)
+                            symbol_data.to_csv(date_and_time_crash_and_continue + '/' + symbol + '.csv')
+                    except Exception as e:
+                        pass
+            except Exception as e:
+                pass
+
         elapsed_time_start_sec = time.time()
         for symb in symbols:
             iteration += 1
