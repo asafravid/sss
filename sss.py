@@ -2507,7 +2507,8 @@ def process_symbols(symbol_to_name_dict, crash_and_continue_raw_data, date_and_t
 
                     # TODO: ASAFR: Take 150d MA and just the close values above it
                     #              And 30 Week MA and above it
-                    #              Drop the Nan instead of fill with 0, or just drag last close value!!!!
+
+                    # Rising:
                     try:
                         if symbol_data['MA20' ][-1] > symbol_data['MA20' ][-2] > symbol_data['MA20' ][-3] and \
                            symbol_data['MA50' ][-1] > symbol_data['MA50' ][-2] > symbol_data['MA50' ][-3] and \
@@ -2522,9 +2523,29 @@ def process_symbols(symbol_to_name_dict, crash_and_continue_raw_data, date_and_t
                            symbol_data['Close'][-2] > symbol_data['MA20' ][-2] and \
                            symbol_data['Close'][-3] > symbol_data['MA20' ][-3] and \
                            date_and_time_crash_and_continue and reference_raw_data is None:
-                            filename_csv = date_and_time_crash_and_continue.replace('_cc','_ma') + '/' + symbol + ' - ' + symbol_to_name_dict[symbol].replace('/','_').replace("\\",'_').replace(",",'_')[0:21] + '.csv'
+                            filename_csv = date_and_time_crash_and_continue.replace('_cc','_ma_rising') + '/' + symbol + ' - ' + symbol_to_name_dict[symbol].replace('/','_').replace("\\",'_').replace(",",'_')[0:21] + '.csv'
                             os.makedirs(os.path.dirname(filename_csv), exist_ok=True)
                             symbol_data.to_csv(filename_csv)
+                        elif symbol_data['MA20' ][-1] < symbol_data['MA20' ][-2] < symbol_data['MA20' ][-3] and \
+                           symbol_data[  'MA50' ][-1] < symbol_data['MA50' ][-2] < symbol_data['MA50' ][-3] and \
+                           symbol_data[  'MA150'][-1] < symbol_data['MA150'][-2] < symbol_data['MA150'][-3] and \
+                           symbol_data[  'MA50' ][-1] < symbol_data['MA150'][-1] and \
+                           symbol_data[  'MA50' ][-2] < symbol_data['MA150'][-2] and \
+                           symbol_data[  'MA50' ][-3] < symbol_data['MA150'][-3] and \
+                           symbol_data[  'MA20' ][-1] < symbol_data['MA50' ][-1] and \
+                           symbol_data[  'MA20' ][-2] < symbol_data['MA50' ][-2] and \
+                           symbol_data[  'MA20' ][-3] < symbol_data['MA50' ][-3] and \
+                           symbol_data[  'Close'][-1] < symbol_data['MA20' ][-1] and \
+                           symbol_data[  'Close'][-2] < symbol_data['MA20' ][-2] and \
+                           symbol_data[  'Close'][-3] < symbol_data['MA20' ][-3] and \
+                           date_and_time_crash_and_continue and reference_raw_data is None:
+                            filename_csv = date_and_time_crash_and_continue.replace('_cc','_ma_falling') + '/' + symbol + ' - ' + symbol_to_name_dict[symbol].replace('/','_').replace("\\",'_').replace(",",'_')[0:21] + '.csv'
+                            os.makedirs(os.path.dirname(filename_csv), exist_ok=True)
+                            symbol_data.to_csv(filename_csv)
+
+
+
+
                     except Exception as e:
                         pass
             except Exception as e:
