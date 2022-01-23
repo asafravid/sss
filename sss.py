@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.111 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.113 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -2489,7 +2489,7 @@ def get_yfinance_ticker_wrapper(tase_mode, symb, read_all_country_symbols):
     return symbol
 
 
-def process_symbols(crash_and_continue_raw_data, date_and_time_crash_and_continue, json_db, symbols, csv_db_data, rows, rows_no_div, rows_only_div, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, diff_rows, db_filename, reference_raw_data=None, scan_close_values=True):
+def process_symbols(symbol_to_name_dict, crash_and_continue_raw_data, date_and_time_crash_and_continue, json_db, symbols, csv_db_data, rows, rows_no_div, rows_only_div, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, diff_rows, db_filename, reference_raw_data=None, scan_close_values=True):
     iteration = 0
     if not research_mode:
         if scan_close_values:
@@ -2499,6 +2499,7 @@ def process_symbols(crash_and_continue_raw_data, date_and_time_crash_and_continu
                 close_values_data = yf.download(symbols, start=start_date)
 
                 for symbol in symbols:
+                    print('[process_symbols] scan_close_values: processing {}'.format(symbol))
                     symbol_data = pd.concat([close_values_data['Low'][symbol].fillna(method='ffill').rename('Low'), close_values_data['High'][symbol].fillna(method='ffill').rename('High'), close_values_data['Close'][symbol].fillna(method='ffill').rename('Close')], axis=1)
                     symbol_data['MA20'] = symbol_data['Close'].rolling(window=20).mean()
                     symbol_data['MA50'] = symbol_data['Close'].rolling(window=50).mean()
@@ -2521,8 +2522,9 @@ def process_symbols(crash_and_continue_raw_data, date_and_time_crash_and_continu
                            symbol_data['Close'][-2] > symbol_data['MA20' ][-2] and \
                            symbol_data['Close'][-3] > symbol_data['MA20' ][-3] and \
                            date_and_time_crash_and_continue and reference_raw_data is None:
-                            os.makedirs(os.path.dirname(date_and_time_crash_and_continue + '/' + symbol + '.csv'), exist_ok=True)
-                            symbol_data.to_csv(date_and_time_crash_and_continue + '/' + symbol + '.csv')
+                            filename_csv = date_and_time_crash_and_continue.replace('_cc','_ma') + '/' + symbol + ' - ' + symbol_to_name_dict[symbol].replace('/','_').replace("\\",'_').replace(",",'_')[0:21] + '.csv'
+                            os.makedirs(os.path.dirname(filename_csv), exist_ok=True)
+                            symbol_data.to_csv(filename_csv)
                     except Exception as e:
                         pass
             except Exception as e:
@@ -2680,6 +2682,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
     symbols_snp500          = []
     symbols_nasdaq_100_csv  = []
     symbols_russel1000_csv  = []
+    symbol_to_name_dict     = {}
 
     if not research_mode:
         # https://en.wikipedia.org/wiki/ISO_4217
@@ -2751,6 +2754,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
                             continue
                         else:
                             symbols_nasdaq_100_csv.append(row[0])
+                            symbol_to_name_dict[row[0]] = row[1]
                             row_index += 1
 
             # s&p500:
@@ -2766,6 +2770,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
                             continue
                         else:
                             symbols_snp500_download_csv.append(row[0])
+                            symbol_to_name_dict[row[0]] = row[1]
                             row_index += 1
 
             symbols_russel1000_csv = []  # TODO: ASAFR: Make a general CSV reading function (with title row and withour, and which component in row to take, etc...
@@ -2780,6 +2785,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
                             continue
                         else:
                             symbols_russel1000_csv.append(row[0])
+                            symbol_to_name_dict[row[0]] = row[1]
                             row_index += 1
 
             symbols_tase     = []
@@ -2799,7 +2805,9 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
                             row_index += 1
                             continue
                         else:
-                            symbols_tase.append(row[1].replace('.','-')+'.TA')
+                            symbol_tase = row[1].replace('.','-')+'.TA'
+                            symbols_tase.append(symbol_tase)
+                            symbol_to_name_dict[symbol_tase] = row[0]
                             row_index += 1
 
             tase_filenames_list = ['Indices/Data_Duals_TASE.csv']
@@ -2839,6 +2847,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
                             row_index += 1
                             stock_symbol = row[ticker_column_list[index]]
                             symbols_six.append(stock_symbol+'.SW')
+                            symbol_to_name_dict[stock_symbol+'.SW'] = row[0]
 
         elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_ST:
             filenames_list     = ['Indices/swedish_stocks_list_filtered.csv']
@@ -2857,10 +2866,12 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
                             stock_symbol = row[ticker_column_list[index]]
                             if '.S.DX' not in stock_symbol: continue
                             symbols_st.append(stock_symbol)
+                            symbol_to_name_dict[stock_symbol] = row[1]
 
         elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_US:
-            nasdaq_filenames_list = ['Indices/nasdaqlisted.csv', 'Indices/otherlisted.csv', 'Indices/nasdaqtraded.csv']  # Checkout http://www.nasdaqtrader.com/trader.aspx?id=symboldirdefs for all symbol definitions (for instance - `$` in stock names, 5-letter stocks ending with `Y`)
-            ticker_column_list    = [0,                          0,                         1                         ]  # nasdaqtraded.csv - 1st column is Y/N (traded or not) - so take row[1] instead!!!
+            nasdaq_filenames_list  = ['Indices/nasdaqlisted.csv', 'Indices/otherlisted.csv', 'Indices/nasdaqtraded.csv']  # Checkout http://www.nasdaqtrader.com/trader.aspx?id=symboldirdefs for all symbol definitions (for instance - `$` in stock names, 5-letter stocks ending with `Y`)
+            ticker_column_list     = [0,                          0,                         1                         ]  # nasdaqtraded.csv - 1st column is Y/N (traded or not) - so take row[1] instead!!!
+            stock_name_column_list = [1,                          1,                         2                         ]  # nasdaqtraded.csv - 1st column is Y/N (traded or not) - so take row[1] instead!!!
             download_ftp_files(nasdaq_filenames_list, 'ftp://ftp.nasdaqtrader.com/SymbolDirectory/')
             for index, filename in enumerate(nasdaq_filenames_list):
                 with open(filename, mode='r', newline='') as engine:
@@ -2901,6 +2912,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
                                 if stock_symbol[5] in ['Y'] and SKIP_5LETTER_Y_STOCK_LISTINGS: # Configurable - harder to buy (from Israel, at least), but not impossible of coure
                                     continue
                             symbols_united_states.append(stock_symbol)
+                            symbol_to_name_dict[stock_symbol] = row[stock_name_column_list[index]]
 
         symbols = symbols_snp500 + symbols_nasdaq_100_csv + symbols_russel1000_csv + symbols_united_states + symbols_six + symbols_st
 
@@ -2995,7 +3007,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
         # Temporary json for crash-and-continue efficient operation:
         date_and_time_crash_and_continue = time.strftime("Results/{}/%Y%m%d-%H%M%S{}{}{}{}{}{}_cc".format(mode_str, tase_str, sectors_str.replace(' ','').replace('a', '').replace('e','').replace('i', '').replace('o','').replace('u', ''), countries_str, all_str, custom_portfolio_str, custom_sss_value_str))
 
-    process_symbols(crash_and_continue_raw_data=crash_and_continue_raw_data, date_and_time_crash_and_continue=date_and_time_crash_and_continue, json_db=json_db if not research_mode else None, symbols=symbols, csv_db_data=csv_db_data, rows=rows, rows_no_div=rows_no_div, rows_only_div=rows_only_div, tase_mode=tase_mode, read_all_country_symbols=read_all_country_symbols, sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, profit_margin_limit=profit_margin_limit, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, debt_to_equity_limit=debt_to_equity_limit, pb_limit=pb_limit, pi_limit=pi_limit, enterprise_value_millions_usd_limit=enterprise_value_millions_usd_limit, research_mode_max_ev=research_mode_max_ev, eqg_min=eqg_min, rqg_min=rqg_min, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, research_mode=research_mode, currency_conversion_tool=currency_conversion_tool if not research_mode else None, currency_conversion_tool_alternative=currency_conversion_tool_alternative if not research_mode else None, currency_conversion_tool_manual=currency_conversion_tool_manual if not research_mode else None, reference_db=reference_db if not research_mode else None, reference_db_title_row=reference_db_title_row if not research_mode else None, diff_rows=rows_diff, db_filename=db_filename, reference_raw_data=reference_raw_data)
+    process_symbols(symbol_to_name_dict=symbol_to_name_dict, crash_and_continue_raw_data=crash_and_continue_raw_data, date_and_time_crash_and_continue=date_and_time_crash_and_continue, json_db=json_db if not research_mode else None, symbols=symbols, csv_db_data=csv_db_data, rows=rows, rows_no_div=rows_no_div, rows_only_div=rows_only_div, tase_mode=tase_mode, read_all_country_symbols=read_all_country_symbols, sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, profit_margin_limit=profit_margin_limit, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, debt_to_equity_limit=debt_to_equity_limit, pb_limit=pb_limit, pi_limit=pi_limit, enterprise_value_millions_usd_limit=enterprise_value_millions_usd_limit, research_mode_max_ev=research_mode_max_ev, eqg_min=eqg_min, rqg_min=rqg_min, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, research_mode=research_mode, currency_conversion_tool=currency_conversion_tool if not research_mode else None, currency_conversion_tool_alternative=currency_conversion_tool_alternative if not research_mode else None, currency_conversion_tool_manual=currency_conversion_tool_manual if not research_mode else None, reference_db=reference_db if not research_mode else None, reference_db_title_row=reference_db_title_row if not research_mode else None, diff_rows=rows_diff, db_filename=db_filename, reference_raw_data=reference_raw_data)
 
     # remove (from rows, not from db or diff) rows whose sss_value is irrelevant:
     compact_rows          = []
