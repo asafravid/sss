@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.113 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.114 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -2538,12 +2538,24 @@ def process_symbols(symbol_to_name_dict, crash_and_continue_raw_data, date_and_t
                            symbol_data['Close'][-3] > symbol_data['MA20' ][-3] and \
                            date_and_time_crash_and_continue and reference_raw_data is None:
                             filename_csv = date_and_time_crash_and_continue.replace('_cc','_ma_rising') + '/' + symbol + ' - ' + symbol_name.replace('/','_').replace("\\",'_').replace(",",'_')[0:21] + '.csv'
-                            os.makedirs(os.path.dirname(filename_csv), exist_ok=True)
-                            symbol_data.to_csv(filename_csv)
+                            #os.makedirs(os.path.dirname(filename_csv), exist_ok=True)
+                            #symbol_data.to_csv(filename_csv)
                             rising_rows.append([symbol, symbol_name.replace('/','_').replace("\\",'_').replace(",",'_')[0:21]])
 
-                            #symbol_data.plot()
-                            #print("plot complete")
+                            x_array       = np.array(list(range(len(list(symbol_data.index)))))
+                            y_array_close = np.array(list(symbol_data['Close']))
+                            y_array_ma20  = np.array(list(symbol_data['MA20']))
+                            y_array_ma50  = np.array(list(symbol_data['MA50']))
+                            y_array_ma150 = np.array(list(symbol_data['MA150']))
+                            fig, ax       = plt.subplots()
+                            plt.plot(x_array, y_array_close, color='blue')
+                            plt.plot(x_array, y_array_ma20,  color='orange')
+                            plt.plot(x_array, y_array_ma50,  color='purple')
+                            plt.plot(x_array, y_array_ma150, color='green')
+                            plt.title(symbol + ' - ' + symbol_name.replace('/','_').replace("\\",'_').replace(",",'_')[0:21])
+                            os.makedirs(os.path.dirname(filename_csv.replace('.csv','.png')), exist_ok=True)
+                            plt.savefig(filename_csv.replace('.csv','.png'))
+                            plt.close('all')
 
                         elif symbol_data['MA20' ][-1] < symbol_data['MA20' ][-2] < symbol_data['MA20' ][-3] and \
                            symbol_data[  'MA50' ][-1] < symbol_data['MA50' ][-2] < symbol_data['MA50' ][-3] and \
@@ -2559,9 +2571,24 @@ def process_symbols(symbol_to_name_dict, crash_and_continue_raw_data, date_and_t
                            symbol_data[  'Close'][-3] < symbol_data['MA20' ][-3] and \
                            date_and_time_crash_and_continue and reference_raw_data is None:
                             filename_csv = date_and_time_crash_and_continue.replace('_cc','_ma_falling') + '/' + symbol + ' - ' + symbol_name.replace('/','_').replace("\\",'_').replace(",",'_')[0:21] + '.csv'
-                            os.makedirs(os.path.dirname(filename_csv), exist_ok=True)
-                            symbol_data.to_csv(filename_csv)
+                            #os.makedirs(os.path.dirname(filename_csv), exist_ok=True)
+                            #symbol_data.to_csv(filename_csv)
                             falling_rows.append([symbol, symbol_name.replace('/','_').replace("\\",'_').replace(",",'_')[0:21]])
+
+                            x_array       = np.array(list(range(len(list(symbol_data.index)))))
+                            y_array_close = np.array(list(symbol_data['Close']))
+                            y_array_ma20  = np.array(list(symbol_data['MA20']))
+                            y_array_ma50  = np.array(list(symbol_data['MA50']))
+                            y_array_ma150 = np.array(list(symbol_data['MA150']))
+                            fig, ax       = plt.subplots()
+                            plt.plot(x_array, y_array_close, color='blue')
+                            plt.plot(x_array, y_array_ma20,  color='orange')
+                            plt.plot(x_array, y_array_ma50,  color='purple')
+                            plt.plot(x_array, y_array_ma150, color='green')
+                            plt.title(symbol + ' - ' + symbol_name.replace('/','_').replace("\\",'_').replace(",",'_')[0:21])
+                            os.makedirs(os.path.dirname(filename_csv.replace('.csv','.png')), exist_ok=True)
+                            plt.savefig(filename_csv.replace('.csv','.png'))
+                            plt.close('all')
 
                     except Exception as e:
                         pass
