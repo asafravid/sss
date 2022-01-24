@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.114 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.115 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -2515,6 +2515,15 @@ def process_symbols(symbol_to_name_dict, crash_and_continue_raw_data, date_and_t
 
                     print('[process_symbols] scan_close_values: processing {}'.format(symbol))
                     symbol_data = pd.concat([close_values_data['Low'][yahoo_symbol].fillna(method='ffill').rename('Low'), close_values_data['High'][yahoo_symbol].fillna(method='ffill').rename('High'), close_values_data['Close'][yahoo_symbol].fillna(method='ffill').rename('Close')], axis=1)
+
+                    # Some values in the columns may be accidentaly divided by 100 by yfinance so fix that:
+                    for row in range(1, len(symbol_data['Close'])):
+                        if symbol_data['Close'][row] < 0.015*symbol_data['Close'][row-1]: symbol_data['Close'][row] *= 100
+                    for row in range(1, len(symbol_data['Close'])):
+                        if symbol_data['Low'][row]   < 0.015*symbol_data['Low'  ][row-1]: symbol_data['Low'  ][row] *= 100
+                    for row in range(1, len(symbol_data['Close'])):
+                        if symbol_data['High'][row]  < 0.015*symbol_data['High' ][row-1]: symbol_data['High' ][row] *= 100
+
                     symbol_data['MA20'] = symbol_data['Close'].rolling(window=20).mean()
                     symbol_data['MA50'] = symbol_data['Close'].rolling(window=50).mean()
                     symbol_data['MA150'] = symbol_data['Close'].rolling(window=150).mean()
