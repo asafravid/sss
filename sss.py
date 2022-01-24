@@ -2498,6 +2498,12 @@ def process_symbols(symbol_to_name_dict, crash_and_continue_raw_data, date_and_t
                 start_date = date + relativedelta(months=-12)
                 close_values_data = yf.download(symbols, start=start_date)
 
+                rising_rows  = []
+                falling_rows = []
+
+                rising_rows.append(['Symbol', 'Name'])
+                falling_rows.append(['Symbol', 'Name'])
+
                 for symbol in symbols:
                     print('[process_symbols] scan_close_values: processing {}'.format(symbol))
                     symbol_data = pd.concat([close_values_data['Low'][symbol].fillna(method='ffill').rename('Low'), close_values_data['High'][symbol].fillna(method='ffill').rename('High'), close_values_data['Close'][symbol].fillna(method='ffill').rename('Close')], axis=1)
@@ -2526,6 +2532,7 @@ def process_symbols(symbol_to_name_dict, crash_and_continue_raw_data, date_and_t
                             filename_csv = date_and_time_crash_and_continue.replace('_cc','_ma_rising') + '/' + symbol + ' - ' + symbol_to_name_dict[symbol].replace('/','_').replace("\\",'_').replace(",",'_')[0:21] + '.csv'
                             os.makedirs(os.path.dirname(filename_csv), exist_ok=True)
                             symbol_data.to_csv(filename_csv)
+                            rising_rows.append([symbol, symbol_to_name_dict[symbol].replace('/','_').replace("\\",'_').replace(",",'_')[0:21]])
                         elif symbol_data['MA20' ][-1] < symbol_data['MA20' ][-2] < symbol_data['MA20' ][-3] and \
                            symbol_data[  'MA50' ][-1] < symbol_data['MA50' ][-2] < symbol_data['MA50' ][-3] and \
                            symbol_data[  'MA150'][-1] < symbol_data['MA150'][-2] < symbol_data['MA150'][-3] and \
@@ -2542,12 +2549,20 @@ def process_symbols(symbol_to_name_dict, crash_and_continue_raw_data, date_and_t
                             filename_csv = date_and_time_crash_and_continue.replace('_cc','_ma_falling') + '/' + symbol + ' - ' + symbol_to_name_dict[symbol].replace('/','_').replace("\\",'_').replace(",",'_')[0:21] + '.csv'
                             os.makedirs(os.path.dirname(filename_csv), exist_ok=True)
                             symbol_data.to_csv(filename_csv)
-
-
-
+                            falling_rows.append([symbol, symbol_to_name_dict[symbol].replace('/','_').replace("\\",'_').replace(",",'_')[0:21]])
 
                     except Exception as e:
                         pass
+
+                os.makedirs(os.path.dirname(date_and_time_crash_and_continue.replace('_cc','_ma_falling') + '/' + 'falling_list.csv'), exist_ok=True)
+                with open(date_and_time_crash_and_continue.replace('_cc','_ma_falling') + '/' + 'falling_list.csv', mode='w', newline='') as engine:
+                    writer = csv.writer(engine)
+                    writer.writerows(falling_rows)
+                os.makedirs(os.path.dirname(date_and_time_crash_and_continue.replace('_cc','_ma_rising') + '/' + 'rising_list.csv'), exist_ok=True)
+                with open(date_and_time_crash_and_continue.replace('_cc','_ma_rising') + '/' + 'rising_list.csv', mode='w', newline='') as engine:
+                    writer = csv.writer(engine)
+                    writer.writerows(rising_rows)
+
             except Exception as e:
                 pass
 
