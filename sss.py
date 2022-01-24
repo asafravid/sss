@@ -68,8 +68,10 @@ from dataclasses            import dataclass
 from forex_python.converter import CurrencyRates    # pip install forex-python --> pip install git+https://github.com/MicroPyramid/forex-python.git
 from currency_converter     import CurrencyConverter  # pip install CurrencyConverter currency.converter
 from sys                    import platform
-from datetime import datetime, timedelta
+from datetime import datetime
 from dateutil.relativedelta import *
+import numpy as np
+import matplotlib.pyplot as plt
 
 
 VERBOSE_LOGS = 0
@@ -2504,9 +2506,15 @@ def process_symbols(symbol_to_name_dict, crash_and_continue_raw_data, date_and_t
                 rising_rows.append(['Symbol', 'Name'])
                 falling_rows.append(['Symbol', 'Name'])
 
-                for symbol in symbols:
+                for yahoo_symbol in symbols:
+                    symbol_name = symbol_to_name_dict[yahoo_symbol]
+                    symbol = yahoo_symbol
+                    if   '.TA' in symbol: symbol = 'TLV:'+symbol.replace('.TA','')
+                    elif '.SW' in symbol: symbol = 'SWX:'+symbol.replace('.SW','')
+                    elif '.ST' in symbol: symbol = 'STO:'+symbol.replace('.ST','')
+
                     print('[process_symbols] scan_close_values: processing {}'.format(symbol))
-                    symbol_data = pd.concat([close_values_data['Low'][symbol].fillna(method='ffill').rename('Low'), close_values_data['High'][symbol].fillna(method='ffill').rename('High'), close_values_data['Close'][symbol].fillna(method='ffill').rename('Close')], axis=1)
+                    symbol_data = pd.concat([close_values_data['Low'][yahoo_symbol].fillna(method='ffill').rename('Low'), close_values_data['High'][yahoo_symbol].fillna(method='ffill').rename('High'), close_values_data['Close'][yahoo_symbol].fillna(method='ffill').rename('Close')], axis=1)
                     symbol_data['MA20'] = symbol_data['Close'].rolling(window=20).mean()
                     symbol_data['MA50'] = symbol_data['Close'].rolling(window=50).mean()
                     symbol_data['MA150'] = symbol_data['Close'].rolling(window=150).mean()
@@ -2529,10 +2537,14 @@ def process_symbols(symbol_to_name_dict, crash_and_continue_raw_data, date_and_t
                            symbol_data['Close'][-2] > symbol_data['MA20' ][-2] and \
                            symbol_data['Close'][-3] > symbol_data['MA20' ][-3] and \
                            date_and_time_crash_and_continue and reference_raw_data is None:
-                            filename_csv = date_and_time_crash_and_continue.replace('_cc','_ma_rising') + '/' + symbol + ' - ' + symbol_to_name_dict[symbol].replace('/','_').replace("\\",'_').replace(",",'_')[0:21] + '.csv'
+                            filename_csv = date_and_time_crash_and_continue.replace('_cc','_ma_rising') + '/' + symbol + ' - ' + symbol_name.replace('/','_').replace("\\",'_').replace(",",'_')[0:21] + '.csv'
                             os.makedirs(os.path.dirname(filename_csv), exist_ok=True)
                             symbol_data.to_csv(filename_csv)
-                            rising_rows.append([symbol, symbol_to_name_dict[symbol].replace('/','_').replace("\\",'_').replace(",",'_')[0:21]])
+                            rising_rows.append([symbol, symbol_name.replace('/','_').replace("\\",'_').replace(",",'_')[0:21]])
+
+                            #symbol_data.plot()
+                            #print("plot complete")
+
                         elif symbol_data['MA20' ][-1] < symbol_data['MA20' ][-2] < symbol_data['MA20' ][-3] and \
                            symbol_data[  'MA50' ][-1] < symbol_data['MA50' ][-2] < symbol_data['MA50' ][-3] and \
                            symbol_data[  'MA150'][-1] < symbol_data['MA150'][-2] < symbol_data['MA150'][-3] and \
@@ -2546,10 +2558,10 @@ def process_symbols(symbol_to_name_dict, crash_and_continue_raw_data, date_and_t
                            symbol_data[  'Close'][-2] < symbol_data['MA20' ][-2] and \
                            symbol_data[  'Close'][-3] < symbol_data['MA20' ][-3] and \
                            date_and_time_crash_and_continue and reference_raw_data is None:
-                            filename_csv = date_and_time_crash_and_continue.replace('_cc','_ma_falling') + '/' + symbol + ' - ' + symbol_to_name_dict[symbol].replace('/','_').replace("\\",'_').replace(",",'_')[0:21] + '.csv'
+                            filename_csv = date_and_time_crash_and_continue.replace('_cc','_ma_falling') + '/' + symbol + ' - ' + symbol_name.replace('/','_').replace("\\",'_').replace(",",'_')[0:21] + '.csv'
                             os.makedirs(os.path.dirname(filename_csv), exist_ok=True)
                             symbol_data.to_csv(filename_csv)
-                            falling_rows.append([symbol, symbol_to_name_dict[symbol].replace('/','_').replace("\\",'_').replace(",",'_')[0:21]])
+                            falling_rows.append([symbol, symbol_name.replace('/','_').replace("\\",'_').replace(",",'_')[0:21]])
 
                     except Exception as e:
                         pass
