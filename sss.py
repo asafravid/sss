@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.116 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.117 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -2635,7 +2635,7 @@ def process_symbols(symbol_to_name_dict, crash_and_continue_raw_data, date_and_t
                 os.makedirs(os.path.dirname(date_and_time_crash_and_continue.replace('_cc','_ma/other') + '/' + 'other_list.csv'), exist_ok=True)
                 with open(date_and_time_crash_and_continue.replace('_cc','_ma/other') + '/' + 'other_list.csv', mode='w', newline='') as engine:
                     writer = csv.writer(engine)
-                    writer.writerows(rising_rows)
+                    writer.writerows(other_rows)
 
             except Exception as e:
                 pass
@@ -2850,6 +2850,9 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
             second_table       = payload[1]
             df                 = first_table
             symbols_snp500     = df['Symbol'].values.tolist()
+
+            for row_index in range(len(symbols_snp500)):
+                symbol_to_name_dict[df['Symbol'][row_index]] = df['Security'][row_index]
 
             # nasdaq100: https://www.nasdaq.com/market-activity/quotes/nasdaq-ndx-index
             symbols_nasdaq_100_csv = [] # nasdaq100.csv
