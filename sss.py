@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.117 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.118 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -2491,6 +2491,28 @@ def get_yfinance_ticker_wrapper(tase_mode, symb, read_all_country_symbols):
     return symbol
 
 
+def append_ma_data(date_and_time_crash_and_continue, group_type, group_type_rows, symbol, symbol_name, symbol_data):
+    filename_csv = date_and_time_crash_and_continue.replace('_cc', f'_ma/{group_type}') + '/' + symbol + ' - ' + symbol_name.replace('/', '_').replace("\\", '_').replace(",", '_')[0:21] + '.csv'
+    # os.makedirs(os.path.dirname(filename_csv), exist_ok=True)
+    # symbol_data.to_csv(filename_csv)
+    group_type_rows.append([symbol, symbol_name.replace('/', '_').replace("\\", '_').replace(",", '_')[0:21]])
+
+    x_array = np.array(list(range(len(list(symbol_data.index)))))
+    y_array_close = np.array(list(symbol_data['Close']))
+    y_array_ma20  = np.array(list(symbol_data['MA20']))
+    y_array_ma50  = np.array(list(symbol_data['MA50']))
+    y_array_ma150 = np.array(list(symbol_data['MA150']))
+    fig, ax = plt.subplots()
+    plt.plot(x_array, y_array_close, color='blue')
+    plt.plot(x_array, y_array_ma20,  color='orange')
+    plt.plot(x_array, y_array_ma50,  color='purple')
+    plt.plot(x_array, y_array_ma150, color='green')
+    plt.title(symbol + ' - ' + symbol_name.replace('/', '_').replace("\\", '_').replace(",", '_')[0:21])
+    os.makedirs(os.path.dirname(filename_csv.replace('.csv', '.png')), exist_ok=True)
+    plt.savefig(filename_csv.replace('.csv', '.png'))
+    plt.close('all')
+
+
 def process_symbols(symbol_to_name_dict, crash_and_continue_raw_data, date_and_time_crash_and_continue, json_db, symbols, csv_db_data, rows, rows_no_div, rows_only_div, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, diff_rows, db_filename, reference_raw_data=None, scan_close_values=True):
     iteration = 0
     if not research_mode:
@@ -2502,11 +2524,11 @@ def process_symbols(symbol_to_name_dict, crash_and_continue_raw_data, date_and_t
 
                 rising_rows  = []
                 falling_rows = []
-                other_rows   = []
+                # other_rows   = []
 
                 rising_rows.append( ['Symbol', 'Name'])
                 falling_rows.append(['Symbol', 'Name'])
-                other_rows.append(  ['Symbol', 'Name'])
+                # other_rows.append(  ['Symbol', 'Name'])
 
                 for yahoo_symbol in symbols:
                     symbol_name = symbol_to_name_dict[yahoo_symbol]
@@ -2548,25 +2570,7 @@ def process_symbols(symbol_to_name_dict, crash_and_continue_raw_data, date_and_t
                            symbol_data['Close'][-2] > symbol_data['MA20' ][-2] and \
                            symbol_data['Close'][-3] > symbol_data['MA20' ][-3] and \
                            date_and_time_crash_and_continue and reference_raw_data is None:
-                            filename_csv = date_and_time_crash_and_continue.replace('_cc','_ma/rising') + '/' + symbol + ' - ' + symbol_name.replace('/','_').replace("\\",'_').replace(",",'_')[0:21] + '.csv'
-                            #os.makedirs(os.path.dirname(filename_csv), exist_ok=True)
-                            #symbol_data.to_csv(filename_csv)
-                            rising_rows.append([symbol, symbol_name.replace('/','_').replace("\\",'_').replace(",",'_')[0:21]])
-
-                            x_array       = np.array(list(range(len(list(symbol_data.index)))))
-                            y_array_close = np.array(list(symbol_data['Close']))
-                            y_array_ma20  = np.array(list(symbol_data['MA20']))
-                            y_array_ma50  = np.array(list(symbol_data['MA50']))
-                            y_array_ma150 = np.array(list(symbol_data['MA150']))
-                            fig, ax       = plt.subplots()
-                            plt.plot(x_array, y_array_close, color='blue')
-                            plt.plot(x_array, y_array_ma20,  color='orange')
-                            plt.plot(x_array, y_array_ma50,  color='purple')
-                            plt.plot(x_array, y_array_ma150, color='green')
-                            plt.title(symbol + ' - ' + symbol_name.replace('/','_').replace("\\",'_').replace(",",'_')[0:21])
-                            os.makedirs(os.path.dirname(filename_csv.replace('.csv','.png')), exist_ok=True)
-                            plt.savefig(filename_csv.replace('.csv','.png'))
-                            plt.close('all')
+                            append_ma_data(date_and_time_crash_and_continue=date_and_time_crash_and_continue, group_type='rising', group_type_rows=rising_rows, symbol=symbol, symbol_name=symbol_name, symbol_data=symbol_data)
 
                         elif symbol_data['MA20' ][-1] < symbol_data['MA20' ][-2] < symbol_data['MA20' ][-3] and \
                            symbol_data[  'MA50' ][-1] < symbol_data['MA50' ][-2] < symbol_data['MA50' ][-3] and \
@@ -2581,46 +2585,11 @@ def process_symbols(symbol_to_name_dict, crash_and_continue_raw_data, date_and_t
                            symbol_data[  'Close'][-2] < symbol_data['MA20' ][-2] and \
                            symbol_data[  'Close'][-3] < symbol_data['MA20' ][-3] and \
                            date_and_time_crash_and_continue and reference_raw_data is None:
-                            filename_csv = date_and_time_crash_and_continue.replace('_cc','_ma/falling') + '/' + symbol + ' - ' + symbol_name.replace('/','_').replace("\\",'_').replace(",",'_')[0:21] + '.csv'
-                            #os.makedirs(os.path.dirname(filename_csv), exist_ok=True)
-                            #symbol_data.to_csv(filename_csv)
-                            falling_rows.append([symbol, symbol_name.replace('/','_').replace("\\",'_').replace(",",'_')[0:21]])
+                            append_ma_data(date_and_time_crash_and_continue=date_and_time_crash_and_continue, group_type='falling', group_type_rows=falling_rows, symbol=symbol, symbol_name=symbol_name, symbol_data=symbol_data)
+                        #else:
+                            # append_ma_data(date_and_time_crash_and_continue=date_and_time_crash_and_continue, group_type='other',   group_type_rows=other_rows,   symbol=symbol, symbol_name=symbol_name, symbol_data=symbol_data)
 
-                            x_array       = np.array(list(range(len(list(symbol_data.index)))))
-                            y_array_close = np.array(list(symbol_data['Close']))
-                            y_array_ma20  = np.array(list(symbol_data['MA20']))
-                            y_array_ma50  = np.array(list(symbol_data['MA50']))
-                            y_array_ma150 = np.array(list(symbol_data['MA150']))
-                            fig, ax       = plt.subplots()
-                            plt.plot(x_array, y_array_close, color='blue')
-                            plt.plot(x_array, y_array_ma20,  color='orange')
-                            plt.plot(x_array, y_array_ma50,  color='purple')
-                            plt.plot(x_array, y_array_ma150, color='green')
-                            plt.title(symbol + ' - ' + symbol_name.replace('/','_').replace("\\",'_').replace(",",'_')[0:21])
-                            os.makedirs(os.path.dirname(filename_csv.replace('.csv','.png')), exist_ok=True)
-                            plt.savefig(filename_csv.replace('.csv','.png'))
-                            plt.close('all')
-                        else:
-                            filename_csv = date_and_time_crash_and_continue.replace('_cc','_ma/other') + '/' + symbol + ' - ' + symbol_name.replace('/','_').replace("\\",'_').replace(",",'_')[0:21] + '.csv'
-                            #os.makedirs(os.path.dirname(filename_csv), exist_ok=True)
-                            #symbol_data.to_csv(filename_csv)
-                            other_rows.append([symbol, symbol_name.replace('/','_').replace("\\",'_').replace(",",'_')[0:21]])
-
-                            x_array       = np.array(list(range(len(list(symbol_data.index)))))
-                            y_array_close = np.array(list(symbol_data['Close']))
-                            y_array_ma20  = np.array(list(symbol_data['MA20']))
-                            y_array_ma50  = np.array(list(symbol_data['MA50']))
-                            y_array_ma150 = np.array(list(symbol_data['MA150']))
-                            fig, ax       = plt.subplots()
-                            plt.plot(x_array, y_array_close, color='blue')
-                            plt.plot(x_array, y_array_ma20,  color='orange')
-                            plt.plot(x_array, y_array_ma50,  color='purple')
-                            plt.plot(x_array, y_array_ma150, color='green')
-                            plt.title(symbol + ' - ' + symbol_name.replace('/','_').replace("\\",'_').replace(",",'_')[0:21])
-                            os.makedirs(os.path.dirname(filename_csv.replace('.csv','.png')), exist_ok=True)
-                            plt.savefig(filename_csv.replace('.csv','.png'))
-                            plt.close('all')
-
+                        # if   read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_US
                     except Exception as e:
                         pass
 
@@ -2632,10 +2601,10 @@ def process_symbols(symbol_to_name_dict, crash_and_continue_raw_data, date_and_t
                 with open(date_and_time_crash_and_continue.replace('_cc','_ma/rising') + '/' + 'rising_list.csv', mode='w', newline='') as engine:
                     writer = csv.writer(engine)
                     writer.writerows(rising_rows)
-                os.makedirs(os.path.dirname(date_and_time_crash_and_continue.replace('_cc','_ma/other') + '/' + 'other_list.csv'), exist_ok=True)
-                with open(date_and_time_crash_and_continue.replace('_cc','_ma/other') + '/' + 'other_list.csv', mode='w', newline='') as engine:
-                    writer = csv.writer(engine)
-                    writer.writerows(other_rows)
+                # os.makedirs(os.path.dirname(date_and_time_crash_and_continue.replace('_cc','_ma/other') + '/' + 'other_list.csv'), exist_ok=True)
+                # with open(date_and_time_crash_and_continue.replace('_cc','_ma/other') + '/' + 'other_list.csv', mode='w', newline='') as engine:
+                #     writer = csv.writer(engine)
+                #     writer.writerows(other_rows)
 
             except Exception as e:
                 pass
