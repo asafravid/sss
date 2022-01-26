@@ -2499,15 +2499,16 @@ def append_ma_data(date_and_time_crash_and_continue, group_type, group_type_rows
 
     x_array = np.array(list(range(len(list(symbol_data.index)))))
     y_array_close = np.array(list(symbol_data['Close']))
-    y_array_ma20  = np.array(list(symbol_data['MA20']))
+    y_array_ma21exp  = np.array(list(symbol_data['MA21exp']))
     y_array_ma50  = np.array(list(symbol_data['MA50']))
     y_array_ma150 = np.array(list(symbol_data['MA150']))
     fig, ax = plt.subplots()
     plt.plot(x_array, y_array_close, color='blue')
-    plt.plot(x_array, y_array_ma20,  color='orange')
+    plt.plot(x_array, y_array_ma21exp,  color='orange')
     plt.plot(x_array, y_array_ma50,  color='purple')
     plt.plot(x_array, y_array_ma150, color='green')
-    plt.title(symbol + ' - ' + symbol_name.replace('/', '_').replace("\\", '_').replace(",", '_')[0:21])
+    plt.title(symbol + ' - ' + symbol_name.replace('/', '_').replace("\\", '_').replace(",", '_')[0:22])
+    plt.legend(['Close', 'MA21exp', 'MA50', 'MA150'])
     os.makedirs(os.path.dirname(filename_csv.replace('.csv', '.png')), exist_ok=True)
     plt.savefig(filename_csv.replace('.csv', '.png'))
     plt.close('all')
@@ -2548,7 +2549,7 @@ def process_symbols(symbol_to_name_dict, crash_and_continue_raw_data, date_and_t
                     for row in range(1, len(symbol_data['Close'])):
                         if symbol_data['High'][row]  < 0.015*symbol_data['High' ][row-1]: symbol_data['High' ][row] *= 100
 
-                    symbol_data['MA20'] = symbol_data['Close'].rolling(window=20).mean()
+                    symbol_data['MA21exp'] = symbol_data['Close'].ewm(span=21, adjust=True).mean()
                     symbol_data['MA50'] = symbol_data['Close'].rolling(window=50).mean()
                     symbol_data['MA150'] = symbol_data['Close'].rolling(window=150).mean()
 
@@ -2557,33 +2558,33 @@ def process_symbols(symbol_to_name_dict, crash_and_continue_raw_data, date_and_t
 
                     # Rising:
                     try:
-                        if symbol_data['MA20' ][-1] > symbol_data['MA20' ][-2] > symbol_data['MA20' ][-3] and \
+                        if symbol_data['MA21exp' ][-1] > symbol_data['MA21exp' ][-2] > symbol_data['MA21exp' ][-3] and \
                            symbol_data['MA50' ][-1] > symbol_data['MA50' ][-2] > symbol_data['MA50' ][-3] and \
                            symbol_data['MA150'][-1] > symbol_data['MA150'][-2] > symbol_data['MA150'][-3] and \
                            symbol_data['MA50' ][-1] > symbol_data['MA150'][-1] and \
                            symbol_data['MA50' ][-2] > symbol_data['MA150'][-2] and \
                            symbol_data['MA50' ][-3] > symbol_data['MA150'][-3] and \
-                           symbol_data['MA20' ][-1] > symbol_data['MA50' ][-1] and \
-                           symbol_data['MA20' ][-2] > symbol_data['MA50' ][-2] and \
-                           symbol_data['MA20' ][-3] > symbol_data['MA50' ][-3] and \
-                           symbol_data['Close'][-1] > symbol_data['MA20' ][-1] and \
-                           symbol_data['Close'][-2] > symbol_data['MA20' ][-2] and \
-                           symbol_data['Close'][-3] > symbol_data['MA20' ][-3] and \
+                           symbol_data['MA21exp' ][-1] > symbol_data['MA50' ][-1] and \
+                           symbol_data['MA21exp' ][-2] > symbol_data['MA50' ][-2] and \
+                           symbol_data['MA21exp' ][-3] > symbol_data['MA50' ][-3] and \
+                           symbol_data['Close'][-1] > symbol_data['MA21exp' ][-1] and \
+                           symbol_data['Close'][-2] > symbol_data['MA21exp' ][-2] and \
+                           symbol_data['Close'][-3] > symbol_data['MA21exp' ][-3] and \
                            date_and_time_crash_and_continue and reference_raw_data is None:
                             append_ma_data(date_and_time_crash_and_continue=date_and_time_crash_and_continue, group_type='rising', group_type_rows=rising_rows, symbol=symbol, symbol_name=symbol_name, symbol_data=symbol_data)
 
-                        elif symbol_data['MA20' ][-1] < symbol_data['MA20' ][-2] < symbol_data['MA20' ][-3] and \
+                        elif symbol_data['MA21exp' ][-1] < symbol_data['MA21exp' ][-2] < symbol_data['MA21exp' ][-3] and \
                            symbol_data[  'MA50' ][-1] < symbol_data['MA50' ][-2] < symbol_data['MA50' ][-3] and \
                            symbol_data[  'MA150'][-1] < symbol_data['MA150'][-2] < symbol_data['MA150'][-3] and \
                            symbol_data[  'MA50' ][-1] < symbol_data['MA150'][-1] and \
                            symbol_data[  'MA50' ][-2] < symbol_data['MA150'][-2] and \
                            symbol_data[  'MA50' ][-3] < symbol_data['MA150'][-3] and \
-                           symbol_data[  'MA20' ][-1] < symbol_data['MA50' ][-1] and \
-                           symbol_data[  'MA20' ][-2] < symbol_data['MA50' ][-2] and \
-                           symbol_data[  'MA20' ][-3] < symbol_data['MA50' ][-3] and \
-                           symbol_data[  'Close'][-1] < symbol_data['MA20' ][-1] and \
-                           symbol_data[  'Close'][-2] < symbol_data['MA20' ][-2] and \
-                           symbol_data[  'Close'][-3] < symbol_data['MA20' ][-3] and \
+                           symbol_data[  'MA21exp' ][-1] < symbol_data['MA50' ][-1] and \
+                           symbol_data[  'MA21exp' ][-2] < symbol_data['MA50' ][-2] and \
+                           symbol_data[  'MA21exp' ][-3] < symbol_data['MA50' ][-3] and \
+                           symbol_data[  'Close'][-1] < symbol_data['MA21exp' ][-1] and \
+                           symbol_data[  'Close'][-2] < symbol_data['MA21exp' ][-2] and \
+                           symbol_data[  'Close'][-3] < symbol_data['MA21exp' ][-3] and \
                            date_and_time_crash_and_continue and reference_raw_data is None:
                             append_ma_data(date_and_time_crash_and_continue=date_and_time_crash_and_continue, group_type='falling', group_type_rows=falling_rows, symbol=symbol, symbol_name=symbol_name, symbol_data=symbol_data)
                         #else:
@@ -3147,6 +3148,10 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
                 os.remove(reference_run + '/db.json')
 
         sss_post_processing.process_engine_csv(date_and_time)
+
+        # Move date_and_time_crash_and_continue _ma to the final results
+        shutil.move(date_and_time_crash_and_continue.replace('_cc','_ma'), date_and_time)
+
     else:
         sorted_list_sss = compact_rows = rows
 
