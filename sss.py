@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.118 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.119 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -2491,7 +2491,7 @@ def get_yfinance_ticker_wrapper(tase_mode, symb, read_all_country_symbols):
     return symbol
 
 
-def append_ma_data(date_and_time_crash_and_continue, group_type, group_type_rows, symbol, symbol_name, symbol_data):
+def append_ma_data(date_and_time_crash_and_continue, group_type, group_type_rows, symbol, symbol_name, symbol_data, scan_close_values_interval):
     filename_csv = date_and_time_crash_and_continue.replace('_cc', f'_ma/{group_type}') + '/' + symbol + ' - ' + symbol_name.replace('/', '_').replace("\\", '_').replace(",", '_')[0:21] + '.csv'
     # os.makedirs(os.path.dirname(filename_csv), exist_ok=True)
     # symbol_data.to_csv(filename_csv)
@@ -2499,116 +2499,211 @@ def append_ma_data(date_and_time_crash_and_continue, group_type, group_type_rows
 
     x_array = np.array(list(range(len(list(symbol_data.index)))))
     y_array_close = np.array(list(symbol_data['Close']))
-    y_array_ma21exp  = np.array(list(symbol_data['MA21exp']))
-    y_array_ma50  = np.array(list(symbol_data['MA50']))
-    y_array_ma150 = np.array(list(symbol_data['MA150']))
+    if   scan_close_values_interval == '1d':
+        y_array_ma21exp  = np.array(list(symbol_data['MA21exp']))
+        y_array_ma50  = np.array(list(symbol_data['MA50']))
+        y_array_ma150 = np.array(list(symbol_data['MA150']))
+    elif scan_close_values_interval == '1wk':
+        y_array_ma30 = np.array(list(symbol_data['MA30']))
+
     fig, ax = plt.subplots()
     plt.plot(x_array, y_array_close, color='blue')
-    plt.plot(x_array, y_array_ma21exp,  color='orange')
-    plt.plot(x_array, y_array_ma50,  color='purple')
-    plt.plot(x_array, y_array_ma150, color='green')
-    plt.title(symbol + ' - ' + symbol_name.replace('/', '_').replace("\\", '_').replace(",", '_')[0:22])
-    plt.legend(['Close', 'MA21exp', 'MA50', 'MA150'])
+
+    if   scan_close_values_interval == '1d':
+        plt.plot(x_array, y_array_ma21exp,  color='orange')
+        plt.plot(x_array, y_array_ma50,  color='purple')
+        plt.plot(x_array, y_array_ma150, color='green')
+        plt.legend(['Close', 'MA21exp (days)', 'MA50 (days)', 'MA150 (days)'])
+    elif scan_close_values_interval == '1wk':
+        plt.plot(x_array, y_array_ma30, color='green')
+        plt.legend(['Close', 'MA30 (weeks)'])
+
+    plt.title(symbol + ' - ' + symbol_name.replace('/', '_').replace("\\", '_').replace(",", '_')[0:22] + ': interval='+scan_close_values_interval)
+
     os.makedirs(os.path.dirname(filename_csv.replace('.csv', '.png')), exist_ok=True)
     plt.savefig(filename_csv.replace('.csv', '.png'))
+    # Clear memory
     plt.close('all')
+    plt.figure().clear()
+    plt.close()
+    plt.cla()
+    plt.clf()
 
 
-def process_symbols(symbol_to_name_dict, crash_and_continue_raw_data, date_and_time_crash_and_continue, json_db, symbols, csv_db_data, rows, rows_no_div, rows_only_div, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, diff_rows, db_filename, reference_raw_data=None, scan_close_values=True):
-    iteration = 0
-    if not research_mode:
-        if scan_close_values:
+def perform_scan_close_values_days(symbols, symbol_to_name_dict, date_and_time_crash_and_continue, scan_close_values_interval):
+    try:
+        date = datetime.now()
+        start_date = date + relativedelta(months=-24)
+        # TODO: ASAFR: 1. use interval of 1 week - consult with Yoav
+        close_values_data = yf.download(symbols, start=start_date, threads=True, auto_adjust=True, interval=scan_close_values_interval, timeout=2.0)
+
+        rising_rows = []
+        falling_rows = []
+        # other_rows   = []
+
+        rising_rows.append(['Symbol', 'Name'])
+        # falling_rows.append(['Symbol', 'Name'])
+        # other_rows.append(  ['Symbol', 'Name'])
+
+        for yahoo_symbol in symbols:
+            symbol_name = symbol_to_name_dict[yahoo_symbol]
+            symbol = yahoo_symbol
+            if   '.TA' in symbol: symbol = 'TLV:' + symbol.replace('.TA', '')
+            elif '.SW' in symbol: symbol = 'SWX:' + symbol.replace('.SW', '')
+            elif '.ST' in symbol: symbol = 'STO:' + symbol.replace('.ST', '')
+
+            symbol_data = pd.concat([#close_values_data['Low'  ][yahoo_symbol].fillna(method='ffill').rename('Low'),
+                                     #close_values_data['High' ][yahoo_symbol].fillna(method='ffill').rename('High'),
+                                     close_values_data['Close'][yahoo_symbol].fillna(method='ffill').rename('Close')], axis=1)
+
+            # Some values in the columns may be accidentaly divided by 100 by yfinance so fix that:
+            for row in range(1, len(symbol_data['Close'])):
+                if symbol_data['Close'][row] < 0.015 * symbol_data['Close'][row - 1]: symbol_data['Close'][row] *= 100
+            # for row in range(1, len(symbol_data['Close'])):
+            #     if symbol_data['Low'  ][row] < 0.015 * symbol_data['Low'  ][row - 1]: symbol_data['Low'  ][row] *= 100
+            # for row in range(1, len(symbol_data['Close'])):
+            #     if symbol_data['High' ][row] < 0.015 * symbol_data['High' ][row - 1]: symbol_data['High' ][row] *= 100
+
+            symbol_data['MA21exp'] = symbol_data['Close'].ewm(span=21, adjust=True).mean()
+            symbol_data['MA50'   ] = symbol_data['Close'].rolling(window=50).mean()
+            symbol_data['MA150'  ] = symbol_data['Close'].rolling(window=150).mean()
+
+            # TODO: ASAFR: Take 150d MA and just the close values above it
+            #              And 30 Week MA and above it
+
+            # Rising/Falling:
             try:
-                date = datetime.now()
-                start_date = date + relativedelta(months=-12)
-                close_values_data = yf.download(symbols, start=start_date)
+                if      symbol_data['MA21exp'][-1] > symbol_data['MA21exp'][-2] > symbol_data['MA21exp'][-3] and \
+                        symbol_data['MA50'   ][-1] > symbol_data['MA50'   ][-2] > symbol_data['MA50'   ][-3] and \
+                        symbol_data['MA150'  ][-1] > symbol_data['MA150'  ][-2] > symbol_data['MA150'  ][-3] and \
+                        symbol_data['MA50'   ][-1] > symbol_data['MA150'  ][-1] and \
+                        symbol_data['MA50'   ][-2] > symbol_data['MA150'  ][-2] and \
+                        symbol_data['MA50'   ][-3] > symbol_data['MA150'  ][-3] and \
+                        symbol_data['MA21exp'][-1] > symbol_data['MA50'   ][-1] and \
+                        symbol_data['MA21exp'][-2] > symbol_data['MA50'   ][-2] and \
+                        symbol_data['MA21exp'][-3] > symbol_data['MA50'   ][-3] and \
+                        symbol_data['Close'  ][-1] > symbol_data['MA21exp'][-1] and \
+                        symbol_data['Close'  ][-2] > symbol_data['MA21exp'][-2] and \
+                        symbol_data['Close'  ][-3] > symbol_data['MA21exp'][-3] and \
+                        date_and_time_crash_and_continue:
+                    print('[perform_scan_close_values_days] processing rising {} ({})'.format(symbol, symbol_name))
+                    append_ma_data(date_and_time_crash_and_continue=date_and_time_crash_and_continue, group_type='rising', group_type_rows=rising_rows, symbol=symbol, symbol_name=symbol_name, symbol_data=symbol_data, scan_close_values_interval=scan_close_values_interval)
 
-                rising_rows  = []
-                falling_rows = []
-                # other_rows   = []
+                # elif    symbol_data['MA21exp'][-1] < symbol_data['MA21exp'][-2] < symbol_data['MA21exp'][-3] and \
+                #         symbol_data['MA50'   ][-1] < symbol_data['MA50'   ][-2] < symbol_data['MA50'   ][-3] and \
+                #         symbol_data['MA150'  ][-1] < symbol_data['MA150'  ][-2] < symbol_data['MA150'  ][-3] and \
+                #         symbol_data['MA50'   ][-1] < symbol_data['MA150'  ][-1] and \
+                #         symbol_data['MA50'   ][-2] < symbol_data['MA150'  ][-2] and \
+                #         symbol_data['MA50'   ][-3] < symbol_data['MA150'  ][-3] and \
+                #         symbol_data['MA21exp'][-1] < symbol_data['MA50'   ][-1] and \
+                #         symbol_data['MA21exp'][-2] < symbol_data['MA50'   ][-2] and \
+                #         symbol_data['MA21exp'][-3] < symbol_data['MA50'   ][-3] and \
+                #         symbol_data['Close'  ][-1] < symbol_data['MA21exp'][-1] and \
+                #         symbol_data['Close'  ][-2] < symbol_data['MA21exp'][-2] and \
+                #         symbol_data['Close'  ][-3] < symbol_data['MA21exp'][-3] and \
+                #         date_and_time_crash_and_continue:
+                #     append_ma_data(date_and_time_crash_and_continue=date_and_time_crash_and_continue, group_type='falling', group_type_rows=falling_rows, symbol=symbol, symbol_name=symbol_name, symbol_data=symbol_data, scan_close_values_interval=scan_close_values_interval)
+                # else:
+                # append_ma_data(date_and_time_crash_and_continue=date_and_time_crash_and_continue, group_type='other',   group_type_rows=other_rows,   symbol=symbol, symbol_name=symbol_name, symbol_data=symbol_data, scan_close_values_interval=scan_close_values_interval)
 
-                rising_rows.append( ['Symbol', 'Name'])
-                falling_rows.append(['Symbol', 'Name'])
-                # other_rows.append(  ['Symbol', 'Name'])
-
-                for yahoo_symbol in symbols:
-                    symbol_name = symbol_to_name_dict[yahoo_symbol]
-                    symbol = yahoo_symbol
-                    if   '.TA' in symbol: symbol = 'TLV:'+symbol.replace('.TA','')
-                    elif '.SW' in symbol: symbol = 'SWX:'+symbol.replace('.SW','')
-                    elif '.ST' in symbol: symbol = 'STO:'+symbol.replace('.ST','')
-
-                    print('[process_symbols] scan_close_values: processing {}'.format(symbol))
-                    symbol_data = pd.concat([close_values_data['Low'][yahoo_symbol].fillna(method='ffill').rename('Low'), close_values_data['High'][yahoo_symbol].fillna(method='ffill').rename('High'), close_values_data['Close'][yahoo_symbol].fillna(method='ffill').rename('Close')], axis=1)
-
-                    # Some values in the columns may be accidentaly divided by 100 by yfinance so fix that:
-                    for row in range(1, len(symbol_data['Close'])):
-                        if symbol_data['Close'][row] < 0.015*symbol_data['Close'][row-1]: symbol_data['Close'][row] *= 100
-                    for row in range(1, len(symbol_data['Close'])):
-                        if symbol_data['Low'][row]   < 0.015*symbol_data['Low'  ][row-1]: symbol_data['Low'  ][row] *= 100
-                    for row in range(1, len(symbol_data['Close'])):
-                        if symbol_data['High'][row]  < 0.015*symbol_data['High' ][row-1]: symbol_data['High' ][row] *= 100
-
-                    symbol_data['MA21exp'] = symbol_data['Close'].ewm(span=21, adjust=True).mean()
-                    symbol_data['MA50'] = symbol_data['Close'].rolling(window=50).mean()
-                    symbol_data['MA150'] = symbol_data['Close'].rolling(window=150).mean()
-
-                    # TODO: ASAFR: Take 150d MA and just the close values above it
-                    #              And 30 Week MA and above it
-
-                    # Rising:
-                    try:
-                        if symbol_data['MA21exp' ][-1] > symbol_data['MA21exp' ][-2] > symbol_data['MA21exp' ][-3] and \
-                           symbol_data['MA50' ][-1] > symbol_data['MA50' ][-2] > symbol_data['MA50' ][-3] and \
-                           symbol_data['MA150'][-1] > symbol_data['MA150'][-2] > symbol_data['MA150'][-3] and \
-                           symbol_data['MA50' ][-1] > symbol_data['MA150'][-1] and \
-                           symbol_data['MA50' ][-2] > symbol_data['MA150'][-2] and \
-                           symbol_data['MA50' ][-3] > symbol_data['MA150'][-3] and \
-                           symbol_data['MA21exp' ][-1] > symbol_data['MA50' ][-1] and \
-                           symbol_data['MA21exp' ][-2] > symbol_data['MA50' ][-2] and \
-                           symbol_data['MA21exp' ][-3] > symbol_data['MA50' ][-3] and \
-                           symbol_data['Close'][-1] > symbol_data['MA21exp' ][-1] and \
-                           symbol_data['Close'][-2] > symbol_data['MA21exp' ][-2] and \
-                           symbol_data['Close'][-3] > symbol_data['MA21exp' ][-3] and \
-                           date_and_time_crash_and_continue and reference_raw_data is None:
-                            append_ma_data(date_and_time_crash_and_continue=date_and_time_crash_and_continue, group_type='rising', group_type_rows=rising_rows, symbol=symbol, symbol_name=symbol_name, symbol_data=symbol_data)
-
-                        elif symbol_data['MA21exp' ][-1] < symbol_data['MA21exp' ][-2] < symbol_data['MA21exp' ][-3] and \
-                           symbol_data[  'MA50' ][-1] < symbol_data['MA50' ][-2] < symbol_data['MA50' ][-3] and \
-                           symbol_data[  'MA150'][-1] < symbol_data['MA150'][-2] < symbol_data['MA150'][-3] and \
-                           symbol_data[  'MA50' ][-1] < symbol_data['MA150'][-1] and \
-                           symbol_data[  'MA50' ][-2] < symbol_data['MA150'][-2] and \
-                           symbol_data[  'MA50' ][-3] < symbol_data['MA150'][-3] and \
-                           symbol_data[  'MA21exp' ][-1] < symbol_data['MA50' ][-1] and \
-                           symbol_data[  'MA21exp' ][-2] < symbol_data['MA50' ][-2] and \
-                           symbol_data[  'MA21exp' ][-3] < symbol_data['MA50' ][-3] and \
-                           symbol_data[  'Close'][-1] < symbol_data['MA21exp' ][-1] and \
-                           symbol_data[  'Close'][-2] < symbol_data['MA21exp' ][-2] and \
-                           symbol_data[  'Close'][-3] < symbol_data['MA21exp' ][-3] and \
-                           date_and_time_crash_and_continue and reference_raw_data is None:
-                            append_ma_data(date_and_time_crash_and_continue=date_and_time_crash_and_continue, group_type='falling', group_type_rows=falling_rows, symbol=symbol, symbol_name=symbol_name, symbol_data=symbol_data)
-                        #else:
-                            # append_ma_data(date_and_time_crash_and_continue=date_and_time_crash_and_continue, group_type='other',   group_type_rows=other_rows,   symbol=symbol, symbol_name=symbol_name, symbol_data=symbol_data)
-
-                        # if   read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_US
-                    except Exception as e:
-                        pass
-
-                os.makedirs(os.path.dirname(date_and_time_crash_and_continue.replace('_cc','_ma/falling') + '/' + 'falling_list.csv'), exist_ok=True)
-                with open(date_and_time_crash_and_continue.replace('_cc','_ma/falling') + '/' + 'falling_list.csv', mode='w', newline='') as engine:
-                    writer = csv.writer(engine)
-                    writer.writerows(falling_rows)
-                os.makedirs(os.path.dirname(date_and_time_crash_and_continue.replace('_cc','_ma/rising') + '/' + 'rising_list.csv'), exist_ok=True)
-                with open(date_and_time_crash_and_continue.replace('_cc','_ma/rising') + '/' + 'rising_list.csv', mode='w', newline='') as engine:
-                    writer = csv.writer(engine)
-                    writer.writerows(rising_rows)
-                # os.makedirs(os.path.dirname(date_and_time_crash_and_continue.replace('_cc','_ma/other') + '/' + 'other_list.csv'), exist_ok=True)
-                # with open(date_and_time_crash_and_continue.replace('_cc','_ma/other') + '/' + 'other_list.csv', mode='w', newline='') as engine:
-                #     writer = csv.writer(engine)
-                #     writer.writerows(other_rows)
-
+                # if   read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_US
             except Exception as e:
                 pass
+
+        # os.makedirs(os.path.dirname(date_and_time_crash_and_continue.replace('_cc', '_ma/falling') + '/' + 'falling_list.csv'), exist_ok=True)
+        # with open(date_and_time_crash_and_continue.replace('_cc', '_ma/falling') + '/' + 'falling_list.csv', mode='w', newline='') as engine:
+        #     writer = csv.writer(engine)
+        #     writer.writerows(falling_rows)
+        os.makedirs(os.path.dirname(date_and_time_crash_and_continue.replace('_cc', '_ma/rising') + '/' + 'rising_list.csv'), exist_ok=True)
+        with open(date_and_time_crash_and_continue.replace('_cc', '_ma/rising') + '/' + 'rising_list.csv', mode='w', newline='') as engine:
+            writer = csv.writer(engine)
+            writer.writerows(rising_rows)
+        # os.makedirs(os.path.dirname(date_and_time_crash_and_continue.replace('_cc','_ma/other') + '/' + 'other_list.csv'), exist_ok=True)
+        # with open(date_and_time_crash_and_continue.replace('_cc','_ma/other') + '/' + 'other_list.csv', mode='w', newline='') as engine:
+        #     writer = csv.writer(engine)
+        #     writer.writerows(other_rows)
+
+    except Exception as e:
+        pass
+
+
+def perform_scan_close_values_weeks(symbols, symbol_to_name_dict, date_and_time_crash_and_continue, scan_close_values_interval):
+    try:
+        date = datetime.now()
+        start_date = date + relativedelta(months=-24)
+        # TODO: ASAFR: 1. use interval of 1 week - consult with Yoav
+        close_values_data = yf.download(symbols, start=start_date, threads=True, auto_adjust=True, interval=scan_close_values_interval, timeout=2.0)
+
+        rising_rows = []
+        falling_rows = []
+
+        rising_rows.append( ['Symbol', 'Name'])
+        falling_rows.append(['Symbol', 'Name'])
+
+        for yahoo_symbol in symbols:
+            symbol_name = symbol_to_name_dict[yahoo_symbol]
+            symbol = yahoo_symbol
+            if   '.TA' in symbol: symbol = 'TLV:' + symbol.replace('.TA', '')
+            elif '.SW' in symbol: symbol = 'SWX:' + symbol.replace('.SW', '')
+            elif '.ST' in symbol: symbol = 'STO:' + symbol.replace('.ST', '')
+
+            print('[perform_scan_close_values_weeks] scan_close_values: processing {}'.format(symbol))
+            symbol_data = pd.concat([close_values_data['Low'  ][yahoo_symbol].fillna(method='ffill').rename('Low'),
+                                     close_values_data['High' ][yahoo_symbol].fillna(method='ffill').rename('High'),
+                                     close_values_data['Close'][yahoo_symbol].fillna(method='ffill').rename('Close')], axis=1)
+
+            # Some values in the columns may be accidentaly divided by 100 by yfinance so fix that:
+            for row in range(1, len(symbol_data['Close'])):
+                if symbol_data['Close'][row] < 0.015 * symbol_data['Close'][row - 1]: symbol_data['Close'][row] *= 100
+            for row in range(1, len(symbol_data['Close'])):
+                if symbol_data['Low'  ][row] < 0.015 * symbol_data['Low'  ][row - 1]: symbol_data['Low'  ][row] *= 100
+            for row in range(1, len(symbol_data['Close'])):
+                if symbol_data['High' ][row] < 0.015 * symbol_data['High' ][row - 1]: symbol_data['High' ][row] *= 100
+
+            symbol_data['MA30'] = symbol_data['Close'].rolling(window=30).mean()
+
+            # Rising/Falling:
+            try:
+                if   symbol_data['MA30' ][-1] > symbol_data['MA30'][-2] > symbol_data['MA30'][-3] and \
+                     symbol_data['Close'][-1] > symbol_data['MA30'][-1] and \
+                     date_and_time_crash_and_continue:
+                    append_ma_data(date_and_time_crash_and_continue=date_and_time_crash_and_continue, group_type='rising', group_type_rows=rising_rows, symbol=symbol, symbol_name=symbol_name, symbol_data=symbol_data, scan_close_values_interval=scan_close_values_interval)
+
+                elif symbol_data['MA30' ][-1] < symbol_data['MA30'][-2] < symbol_data['MA30'  ][-3] and \
+                     symbol_data['Close'][-1] < symbol_data['MA30'][-1] and \
+                     date_and_time_crash_and_continue:
+                    append_ma_data(date_and_time_crash_and_continue=date_and_time_crash_and_continue, group_type='falling', group_type_rows=falling_rows, symbol=symbol, symbol_name=symbol_name, symbol_data=symbol_data, scan_close_values_interval=scan_close_values_interval)
+                # else:
+                # append_ma_data(date_and_time_crash_and_continue=date_and_time_crash_and_continue, group_type='other',   group_type_rows=other_rows,   symbol=symbol, symbol_name=symbol_name, symbol_data=symbol_data, scan_close_values_interval=scan_close_values_interval)
+
+                # if   read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_US
+            except Exception as e:
+                pass
+
+        os.makedirs(os.path.dirname(date_and_time_crash_and_continue.replace('_cc', '_ma/falling') + '/' + 'falling_list.csv'), exist_ok=True)
+        with open(date_and_time_crash_and_continue.replace('_cc', '_ma/falling') + '/' + 'falling_list.csv', mode='w', newline='') as engine:
+            writer = csv.writer(engine)
+            writer.writerows(falling_rows)
+        os.makedirs(os.path.dirname(date_and_time_crash_and_continue.replace('_cc', '_ma/rising') + '/' + 'rising_list.csv'), exist_ok=True)
+        with open(date_and_time_crash_and_continue.replace('_cc', '_ma/rising') + '/' + 'rising_list.csv', mode='w', newline='') as engine:
+            writer = csv.writer(engine)
+            writer.writerows(rising_rows)
+        # os.makedirs(os.path.dirname(date_and_time_crash_and_continue.replace('_cc','_ma/other') + '/' + 'other_list.csv'), exist_ok=True)
+        # with open(date_and_time_crash_and_continue.replace('_cc','_ma/other') + '/' + 'other_list.csv', mode='w', newline='') as engine:
+        #     writer = csv.writer(engine)
+        #     writer.writerows(other_rows)
+
+    except Exception as e:
+        pass
+
+
+def process_symbols(symbol_to_name_dict, crash_and_continue_raw_data, date_and_time_crash_and_continue, json_db, symbols, csv_db_data, rows, rows_no_div, rows_only_div, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, diff_rows, db_filename, reference_raw_data, scan_close_values_interval):
+    iteration = 0
+    if not research_mode:
+        if   scan_close_values_interval == '1d':
+            perform_scan_close_values_days( symbols=symbols, symbol_to_name_dict=symbol_to_name_dict, date_and_time_crash_and_continue=date_and_time_crash_and_continue, scan_close_values_interval=scan_close_values_interval)
+        elif scan_close_values_interval == '1wk':
+            perform_scan_close_values_weeks(symbols=symbols, symbol_to_name_dict=symbol_to_name_dict, date_and_time_crash_and_continue=date_and_time_crash_and_continue, scan_close_values_interval=scan_close_values_interval)
 
         elapsed_time_start_sec = time.time()
         for symb in symbols:
@@ -3090,7 +3185,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
         # Temporary json for crash-and-continue efficient operation:
         date_and_time_crash_and_continue = time.strftime("Results/{}/%Y%m%d-%H%M%S{}{}{}{}{}{}_cc".format(mode_str, tase_str, sectors_str.replace(' ','').replace('a', '').replace('e','').replace('i', '').replace('o','').replace('u', ''), countries_str, all_str, custom_portfolio_str, custom_sss_value_str))
 
-    process_symbols(symbol_to_name_dict=symbol_to_name_dict, crash_and_continue_raw_data=crash_and_continue_raw_data, date_and_time_crash_and_continue=date_and_time_crash_and_continue, json_db=json_db if not research_mode else None, symbols=symbols, csv_db_data=csv_db_data, rows=rows, rows_no_div=rows_no_div, rows_only_div=rows_only_div, tase_mode=tase_mode, read_all_country_symbols=read_all_country_symbols, sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, profit_margin_limit=profit_margin_limit, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, debt_to_equity_limit=debt_to_equity_limit, pb_limit=pb_limit, pi_limit=pi_limit, enterprise_value_millions_usd_limit=enterprise_value_millions_usd_limit, research_mode_max_ev=research_mode_max_ev, eqg_min=eqg_min, rqg_min=rqg_min, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, research_mode=research_mode, currency_conversion_tool=currency_conversion_tool if not research_mode else None, currency_conversion_tool_alternative=currency_conversion_tool_alternative if not research_mode else None, currency_conversion_tool_manual=currency_conversion_tool_manual if not research_mode else None, reference_db=reference_db if not research_mode else None, reference_db_title_row=reference_db_title_row if not research_mode else None, diff_rows=rows_diff, db_filename=db_filename, reference_raw_data=reference_raw_data)
+    process_symbols(symbol_to_name_dict=symbol_to_name_dict, crash_and_continue_raw_data=crash_and_continue_raw_data, date_and_time_crash_and_continue=date_and_time_crash_and_continue, json_db=json_db if not research_mode else None, symbols=symbols, csv_db_data=csv_db_data, rows=rows, rows_no_div=rows_no_div, rows_only_div=rows_only_div, tase_mode=tase_mode, read_all_country_symbols=read_all_country_symbols, sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, profit_margin_limit=profit_margin_limit, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, debt_to_equity_limit=debt_to_equity_limit, pb_limit=pb_limit, pi_limit=pi_limit, enterprise_value_millions_usd_limit=enterprise_value_millions_usd_limit, research_mode_max_ev=research_mode_max_ev, eqg_min=eqg_min, rqg_min=rqg_min, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, research_mode=research_mode, currency_conversion_tool=currency_conversion_tool if not research_mode else None, currency_conversion_tool_alternative=currency_conversion_tool_alternative if not research_mode else None, currency_conversion_tool_manual=currency_conversion_tool_manual if not research_mode else None, reference_db=reference_db if not research_mode else None, reference_db_title_row=reference_db_title_row if not research_mode else None, diff_rows=rows_diff, db_filename=db_filename, reference_raw_data=reference_raw_data, scan_close_values_interval=sss_config.scan_close_values_interval)
 
     # remove (from rows, not from db or diff) rows whose sss_value is irrelevant:
     compact_rows          = []
