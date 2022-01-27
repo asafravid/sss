@@ -67,13 +67,13 @@ def csv_to_pdf(csv_filename, output_path, data_time_str, title, limit_num_rows, 
         if row_index > limit_num_rows: break
         if row_index > 0:  # row 0 is title
             names.append(row[1][0:28])
-            appearances.append(float(row[5]))
+            appearances.append(float(row[6]))
             diffs.append(int(diff_list_new[row_index].replace('new+','').replace('new','0').replace('removed-','-').replace('removed','0')))
         if row_index == 0:
             if tase_mode: # overrwrite to hebrew
-                row = ['#', 'סימבול'[::-1], 'שם החברה'[::-1], 'ענף'[::-1], 'ערך'[::-1], 'סגירה'[::-1], 'ציון'[::-1]]
+                row = ['#', 'סימבול'[::-1], 'שם החברה'[::-1], 'ענף'[::-1], 'ערך'[::-1], 'סגירה'[::-1], 'מ"נ'[::-1], 'ציון'[::-1]]
             else:
-                row = ['#', 'Symbol', 'Name', 'Sector', 'Value', 'Close', 'Rank']
+                row = ['#', 'Symbol', 'Name', 'Sector', 'Value', 'Close', 'MA', 'Rank']
         else:
             row.insert(0, str(row_index))
         for col_index, col in enumerate(row):
@@ -84,7 +84,8 @@ def csv_to_pdf(csv_filename, output_path, data_time_str, title, limit_num_rows, 
             elif col_index == 3: w=33 # Sector
             elif col_index == 4: w=40 # Value
             elif col_index == 5: w=15 # Close
-            elif col_index == 6:
+            elif col_index == 6: w=5  # MA
+            elif col_index == 7:
                 w                = 18 # Rank
                 w_diff           = 5  # Diff
 

@@ -428,12 +428,35 @@ def research_db(sectors_list, sectors_filter_out, countries_list, countries_filt
     result_list_filename_sss_ref_to_read  = older_path +'/results_{}'.format(    db_filename.replace('_engine',''))
     result_list_filename_sss_ref_to_write = csv_db_path+'/results_ref_{}'.format(db_filename.replace('_engine',''))
 
+    # Read the MA rising lists:
+    new_rising_list_symbols = []
+    ref_rising_list_symbols = []
+
+    new_rising_list_filename = csv_db_path + '/rising/rising_list.csv'
+    ref_rising_list_filename = older_path  + '/rising/rising_list.csv'
+
+    with open(new_rising_list_filename, mode='r', newline='') as engine:
+        reader = csv.reader(engine, delimiter=',')
+        row_index = 0
+        for row in reader:
+            row_index += 1
+            if row_index <= 1: continue
+            new_rising_list_symbols.append(row[0])
+
+    with open(ref_rising_list_filename, mode='r', newline='') as engine:
+        reader = csv.reader(engine, delimiter=',')
+        row_index = 0
+        for row in reader:
+            row_index += 1
+            if row_index <= 1: continue
+            ref_rising_list_symbols.append(row[0])
+
     # Create the new results file without yet adding the Diff column
     with open(result_list_filename_sss, 'w') as f:
-        f.write("Symbol,Name,Sector,Value,Close,Grade\n")
+        f.write("Symbol,Name,Sector,Value,Close,MA,Grade\n")
         for key in result_sorted_appearance_counter_dict_sss.keys():
-            #                              Symbol,    Name,                    Sector Value           Close        Grade
-            f.write("%s,%s,%s,%s,%s,%s\n"%(key[0],str(key[1]).replace(',',' '),key[2],round(key[3],5),key[4],round(result_sorted_appearance_counter_dict_sss[  key],4)))
+            #                                 Symbol,    Name,                    Sector Value           Close  MA                                                 Grade
+            f.write("%s,%s,%s,%s,%s,%s,%s\n"%(key[0],str(key[1]).replace(',',' '),key[2],round(key[3],5),key[4],'+' if key[0] in new_rising_list_symbols else ' ', round(result_sorted_appearance_counter_dict_sss[  key],4)))
 
     # Read the reference results file without the Diff column
     ref_rows_no_diff = []
@@ -448,8 +471,8 @@ def research_db(sectors_list, sectors_filter_out, countries_list, countries_filt
     # Create the removed results file without yet adding the Diff column
     with open(result_list_filename_sss_ref_to_write, 'w') as f:
         for row in ref_rows_no_diff:
-            #                                    Symbol, Name,   Sector  Value   Close   Grade
-            f.write("{},{},{},{},{},{}\n".format(row[0], row[1], row[2], row[3], row[4], row[5]))
+            #                                       Symbol, Name,   Sector  Value   Close   MA,     Grade
+            f.write("{},{},{},{},{},{},{}\n".format(row[0], row[1], row[2], row[3], row[4], row[5], row[6]))
 
     if older_path is not None:
         [diff_list_new, diff_list_removed] = sss_diff.run(newer_path=newer_path, older_path=older_path, db_filename=db_filename, movement_threshold=movement_threshold, res_length=res_length, consider_as_new_from=PDF_NUM_ENTRIES_IN_REPORT)
@@ -481,20 +504,20 @@ def aggregate_results(newer_path, older_path, res_length, scan_mode):
                     position = find_symbol_in_aggregated_results(row[0], aggregated_results)
                     if position >= 0:  # Existing Entry:
                         aggregated_results[position][3] += '/' + row[3]
-                        aggregated_results[position][5] += float(row[5])
-                    else:  # New Entry:            Symbol  Name    Sector  sss_value/sss_value_normalized Close   Grade
-                        aggregated_results.append([row[0], row[1], row[2], row[3],                        row[4], float(row[5])])
+                        aggregated_results[position][6] += float(row[6])
+                    else:  # New Entry:            Symbol  Name    Sector  sss_value/sss_value_normalized Close   MA,     Grade
+                        aggregated_results.append([row[0], row[1], row[2], row[3],                        row[4], row[5], float(row[6])])
 
     # Sort the aggregated results by their aggregated Grade:
-    sorted_aggregated_results = sorted(aggregated_results, key=lambda row: row[5], reverse=True)  # Sort by Grade
+    sorted_aggregated_results = sorted(aggregated_results, key=lambda row: row[6], reverse=True)  # Sort by Grade
 
     # Save aggregated_results:
     result_list_filename_sss = newer_path + '/results_sss_aggregated.csv'
     with open(result_list_filename_sss, 'w') as f:
-        f.write("Symbol,Name,Sector,Value,Close,Grade\n")
+        f.write("Symbol,Name,Sector,Value,Close,MA,Grade\n")
         for row in sorted_aggregated_results:
-            #                                    Symbol, Name,   Sector  Value   Close   Grade
-            f.write("{},{},{},{},{},{}\n".format(row[0], row[1], row[2], row[3], row[4], round(row[5],4)))
+            #                                    Symbol, Name,   Sector  Value   Close   MA      Grade
+            f.write("{},{},{},{},{},{},{}\n".format(row[0], row[1], row[2], row[3], row[4], row[5], round(row[6],4)))
 
     # Read reference aggregated_results less the diff column:
     result_list_filename_sss_ref = older_path + '/results_sss_aggregated.csv'
@@ -511,8 +534,8 @@ def aggregate_results(newer_path, older_path, res_length, scan_mode):
     result_list_filename_sss_ref_to_write = newer_path + '/results_ref_sss_aggregated.csv'
     with open(result_list_filename_sss_ref_to_write, 'w') as f:
         for row in ref_rows_no_diff:
-            #                                    Symbol, Name,   Sector  Value   Close   Grade
-            f.write("{},{},{},{},{},{}\n".format(row[0], row[1], row[2], row[3], row[4], row[5]))
+            #                                       Symbol, Name,   Sector  Value   Close   MA      Grade
+            f.write("{},{},{},{},{},{},{}\n".format(row[0], row[1], row[2], row[3], row[4], row[5], row[6]))
 
 
     if older_path is not None:
