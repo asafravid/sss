@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.119 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.120 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -3245,7 +3245,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
         sss_post_processing.process_engine_csv(date_and_time)
 
         # Move date_and_time_crash_and_continue _ma to the final results
-        shutil.move(date_and_time_crash_and_continue.replace('_cc','_ma'), date_and_time)
+        shutil.move(date_and_time_crash_and_continue.replace('_cc','_ma')+'/rising', date_and_time)
 
     else:
         sorted_list_sss = compact_rows = rows
