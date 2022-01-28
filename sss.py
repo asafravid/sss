@@ -21,7 +21,8 @@
 #############################################################################
 
 
-# TODO: ASAFR:  0. Auto-Update Nasdaq (NSR) Indices as done with TASE
+# TODO: ASAFR: -1. Add the MA Column to the db.csv, sss_engine.csv, etc -> for the tabling information!
+#               0. Auto-Update Nasdaq (NSR) Indices as done with TASE
 #               0.1. Add support for https://simfin.com/data/bulk
 #               1.2. https://en.wikipedia.org/wiki/Magic_formula_investing
 #               1.3. https://www.oldschoolvalue.com/investing-strategy/backtest-graham-nnwc-ncav-screen/
