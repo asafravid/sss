@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.58 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.59 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -455,8 +455,8 @@ def research_db(sectors_list, sectors_filter_out, countries_list, countries_filt
     with open(result_list_filename_sss, 'w') as f:
         f.write("Symbol,Name,Sector,Value,Close,MA,Grade\n")
         for key in result_sorted_appearance_counter_dict_sss.keys():
-            #                                 Symbol,    Name,                    Sector Value           Close  MA                                                 Grade
-            f.write("%s,%s,%s,%s,%s,%s,%s\n"%(key[0],str(key[1]).replace(',',' '),key[2],round(key[3],5),key[4],'+' if key[0] in new_rising_list_symbols else ' ', round(result_sorted_appearance_counter_dict_sss[  key],4)))
+            #                                 Symbol,    Name,                    Sector Value           Close  MA                                                  Grade
+            f.write("%s,%s,%s,%s,%s,%s,%s\n"%(key[0],str(key[1]).replace(',',' '),key[2],round(key[3],5),key[4],'r+' if key[0] in new_rising_list_symbols else ' ', round(result_sorted_appearance_counter_dict_sss[  key],4)))
 
     # Read the reference results file without the Diff column
     ref_rows_no_diff = []
