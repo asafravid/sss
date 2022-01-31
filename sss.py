@@ -21,7 +21,8 @@
 #############################################################################
 
 
-# TODO: ASAFR: -1. Add the MA Column to the db.csv, sss_engine.csv, etc -> for the tabling information!
+# TODO: ASAFR: -1. In the re-run (reference_raw_data) - use the exact indices as used previously in the actual raw data creation - to avoid mishaps
+#              -2. In the reference raw data run - allow configurability to DO the scan of download values... for the sake of clarity
 #               0. Auto-Update Nasdaq (NSR) Indices as done with TASE
 #               0.1. Add support for https://simfin.com/data/bulk
 #               1.2. https://en.wikipedia.org/wiki/Magic_formula_investing
