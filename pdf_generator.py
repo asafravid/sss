@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.61 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.62 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -68,7 +68,7 @@ def csv_to_pdf(csv_filename, output_path, data_time_str, title, limit_num_rows, 
         if row_index > 0:  # row 0 is title
             names.append(row[1][0:28])
             appearances.append(float(row[6]))
-            diffs.append(int(diff_list_new[row_index].replace('new+','').replace('new','0').replace('removed-','-').replace('removed','0')))
+            diffs.append(int(diff_list_new[row_index].replace('r+','').replace(' !','').replace(' ?','').replace('new+','').replace('new','0').replace('removed-','-').replace('removed','0')))
         if row_index == 0:
             if tase_mode: # overrwrite to hebrew
                 row = ['#', 'סימבול'[::-1], 'שם החברה'[::-1], 'ענף'[::-1], 'ערך'[::-1], 'סגירה'[::-1], 'מ"נ'[::-1], 'ציון'[::-1]]
