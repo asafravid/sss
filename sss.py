@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.125 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.126 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -25,7 +25,6 @@
 #              -2. In the reference raw data run - allow configurability to DO the scan of download values... for the sake of clarity
 #              -3. Add MorningStarFactor (even squared: adjustedSssValue = sssValue/MorningStarValue)
 #              -4. Add https://github.com/portfolioplus/pytickersymbols support/usage along with https://github.com/portfolioplus/pysymbolscanner
-#              -5. Add Dates on MA Graphs x-axis
 #               0. Auto-Update Nasdaq (NSR) Indices as done with TASE
 #               0.1. Add support for https://simfin.com/data/bulk
 #               1.2. https://en.wikipedia.org/wiki/Magic_formula_investing
@@ -2500,6 +2499,23 @@ def get_yfinance_ticker_wrapper(tase_mode, symb, read_all_country_symbols):
     return symbol
 
 
+def set_list_str_timestamp_elements_special(num_as_is, num_clear, list_to_process, set_value):
+    set_list_to_return = []
+
+    general_index = 0
+    for index, element in enumerate(list_to_process):
+        if general_index < num_as_is:
+            set_list_to_return.append(str(element).replace(' 00:00:00',''))
+        elif general_index < num_as_is+num_clear:
+            set_list_to_return.append(str(set_value))
+
+        general_index += 1
+        if general_index >= num_as_is+num_clear:
+            general_index = 0
+
+    return set_list_to_return
+
+
 def append_ma_data(date_and_time_crash_and_continue, group_type, group_symbols, group_type_rows, symbol, symbol_name, symbol_data, scan_close_values_interval):
     filename_csv = date_and_time_crash_and_continue.replace('_cc', f'_ma/{group_type}') + '/' + symbol + ' - ' + symbol_name.replace('/', '_').replace("\\", '_').replace(",", '_')[0:21] + '.csv'
     # os.makedirs(os.path.dirname(filename_csv), exist_ok=True)
@@ -2508,6 +2524,8 @@ def append_ma_data(date_and_time_crash_and_continue, group_type, group_symbols, 
     group_symbols.append(symbol)
 
     x_array = np.array(list(range(len(list(symbol_data.index)))))
+    x_dates = symbol_data.index.to_list()
+    x_dates = set_list_str_timestamp_elements_special(1, 19, x_dates, '')
     y_array_close = np.array(list(symbol_data['Close']))
     if   scan_close_values_interval == '1d':
         y_array_ma21exp  = np.array(list(symbol_data['MA21exp']))
@@ -2517,6 +2535,8 @@ def append_ma_data(date_and_time_crash_and_continue, group_type, group_symbols, 
         y_array_ma30 = np.array(list(symbol_data['MA30']))
 
     fig, ax = plt.subplots()
+    plt.xticks(x_array, x_dates, rotation=90)
+    plt.tight_layout()
     plt.plot(x_array, y_array_close, color='blue')
 
     if   scan_close_values_interval == '1d':
