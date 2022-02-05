@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.124 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.125 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -2530,8 +2530,8 @@ def append_ma_data(date_and_time_crash_and_continue, group_type, group_symbols, 
 
     plt.title(symbol + ' - ' + symbol_name.replace('/', '_').replace("\\", '_').replace(",", '_')[0:22] + ': interval='+scan_close_values_interval)
 
-    os.makedirs(os.path.dirname(filename_csv.replace('.csv', '.png')), exist_ok=True)
-    plt.savefig(filename_csv.replace('.csv', '.png'))
+    os.makedirs(os.path.dirname(filename_csv.replace(':','-').replace('.csv', '.png')), exist_ok=True)
+    plt.savefig(filename_csv.replace(':','-').replace('.csv', '.png'))
     # Clear memory
     plt.close('all')
     plt.figure().clear()
