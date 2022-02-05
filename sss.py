@@ -25,6 +25,7 @@
 #              -2. In the reference raw data run - allow configurability to DO the scan of download values... for the sake of clarity
 #              -3. Add MorningStarFactor (even squared: adjustedSssValue = sssValue/MorningStarValue)
 #              -4. Add https://github.com/portfolioplus/pytickersymbols support/usage along with https://github.com/portfolioplus/pysymbolscanner
+#              -5. Add the relevant rising files to the PDF
 #               0. Auto-Update Nasdaq (NSR) Indices as done with TASE
 #               0.1. Add support for https://simfin.com/data/bulk
 #               1.2. https://en.wikipedia.org/wiki/Magic_formula_investing

@@ -64,7 +64,7 @@ https://bit.ly/MultiDimensionalScan
 - Use case: `CMRE`'s `yfinance` `earningsQuarterlyGrowth` is `-0.298`, and website shows `-29.80%` so the match yields that `yfinance` reports in direct ratio (not `%`)
 
 # Looking Forward for Contributions
-- Good luck and you are welcome to contribute to this project:
+- You are encouraged to contribute to this project:
   - Add other contries' stock markets
   - Past reccomendations and present results - for proving that the model works (a prototype is ready `sss_results_performance.py`)
   - Multi-Dimensional Scan enhancements (scan over `EQG`s, etc)
