@@ -34,7 +34,7 @@ run_nsr                   = False  # NASDAQ100+S&P500+RUSSEL1000
 run_all                   = False  # All Nasdaq Stocks
 run_six                   = False  # All Swiss Stocks
 run_st                    = False  # All (Stockholm) Swedish Stocks
-research_mode             = True  # Research Mode
+research_mode             = False  # Research Mode
 aggregate_only            = False
 research_mode_max_ev      = False  # @JustLearning's suggestion in Telegram: Multi-Dimensional Scan by Max EV Limit rather than Min EV Limit
 use_reference_as_raw_data = True
@@ -52,7 +52,7 @@ automatic_results_folder_selection = False
 # After 1st ever Run: Recommended to use reference (filter and damper)
 # The research mode shall run on new_run as input (new_run >= reference_run) where > means newer
 reference_run_custom = None  # 'Results/Custom/20211109-235448_Bdb_nRes271_Custom'
-reference_run_tase   = 'Results/Tase/20220128-113807_Tase_Tchnlgy7.0_RlEstt1.0_nRes273_CustSssV'  # 20220204-093429_Tase_Tchnlgy7.0_RlEstt1.0_nRes274
+reference_run_tase   = 'Results/Tase/20220204-093429_Tase_Tchnlgy7.0_RlEstt1.0_nRes274'  # 20220128-113807_Tase_Tchnlgy7.0_RlEstt1.0_nRes273_CustSssV'  # 20220204-093429_Tase_Tchnlgy7.0_RlEstt1.0_nRes274
 reference_run_nsr    = 'Results/Nsr/20220129-230539_Tchnlgy7.0_FnnclSrvcs1.0_nRes792_CustSssV'  # 20220201-041941_Tchnlgy7.0_FnnclSrvcs1.0_nRes792'
 reference_run_all    = 'Results/All/20220118-160553_Tchnlgy7.0_FnnclSrvcs1.0_A_nRes3008_CustSssV'
 reference_run_six    = 'Results/Six/20220111-002719_S_nRes196'                                        # '20211216-002301_S_nRes27_CustSssV'
