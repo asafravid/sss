@@ -26,6 +26,7 @@
 #              -3. Add MorningStarFactor (even squared: adjustedSssValue = sssValue/MorningStarValue)
 #              -4. Add https://github.com/portfolioplus/pytickersymbols support/usage along with https://github.com/portfolioplus/pysymbolscanner
 #              -5. Add Dates on MA Graphs x-axis
+#              -6. Add the relevant rising files to the PDF
 #               0. Auto-Update Nasdaq (NSR) Indices as done with TASE
 #               0.1. Add support for https://simfin.com/data/bulk
 #               1.2. https://en.wikipedia.org/wiki/Magic_formula_investing
