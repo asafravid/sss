@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.126 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.127 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -2500,12 +2500,12 @@ def get_yfinance_ticker_wrapper(tase_mode, symb, read_all_country_symbols):
     return symbol
 
 
-def set_list_str_timestamp_elements_special(num_as_is, num_clear, list_to_process, set_value):
+def set_list_str_timestamp_elements_special(num_as_is, num_clear, list_to_process, set_value, always_keep_last_value=True):
     set_list_to_return = []
 
     general_index = 0
     for index, element in enumerate(list_to_process):
-        if general_index < num_as_is:
+        if general_index < num_as_is or (always_keep_last_value and index+1 == len(list_to_process)):  # Have the last value updated
             set_list_to_return.append(str(element).replace(' 00:00:00',''))
         elif general_index < num_as_is+num_clear:
             set_list_to_return.append(str(set_value))
