@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.128 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.129 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -54,6 +54,8 @@
 
 
 import time
+import gc
+import psutil
 import shutil
 import urllib.request as request
 import pandas         as pd
@@ -2559,6 +2561,7 @@ def append_ma_data(date_and_time_crash_and_continue, group_type, group_symbols, 
     plt.close()
     plt.cla()
     plt.clf()
+    # gc.collect()  # Seems it has no affect whatsoever
 
 
 def perform_scan_close_values_days(reference_raw_data, reference_download_data, symbols, symbol_to_name_dict, date_and_time_crash_and_continue, scan_close_values_interval):
@@ -2589,6 +2592,15 @@ def perform_scan_close_values_days(reference_raw_data, reference_download_data, 
             if   '.TA' in symbol: symbol = 'TLV:' + symbol.replace('.TA', '')
             elif '.SW' in symbol: symbol = 'SWX:' + symbol.replace('.SW', '')
             elif '.ST' in symbol: symbol = 'STO:' + symbol.replace('.ST', '')
+
+            total_free_mem_mb = (psutil.swap_memory().free + psutil.virtual_memory().free) / (1024*1024)
+            if total_free_mem_mb < 1024:  # Less than 1 GB free?
+                print("[perform_scan_close_values_days] Out of memory (total_free_mem_mb={}). Increase swap size:".format(total_free_mem_mb))
+                print("[perform_scan_close_values_days] sudo -s && dd if=/dev/zero of=swapfile_new bs=1024 count=8388608 \n")
+                print("[perform_scan_close_values_days] mkswap swapfile_new \n")
+                print("[perform_scan_close_values_days] swapon -a swapfile_new \n")
+                print("[perform_scan_close_values_days] swapon -s \n")
+                break
 
             if reference_raw_data != None:
                 symbol_data = pd.concat([#close_values_data['Low'  ][yahoo_symbol].fillna(method='ffill').rename('Low'),
@@ -2635,7 +2647,7 @@ def perform_scan_close_values_days(reference_raw_data, reference_download_data, 
                             symbol_data['Close'  ].iloc[-2] > symbol_data['MA21exp'].iloc[-2] and \
                             symbol_data['Close'  ].iloc[-3] > symbol_data['MA21exp'].iloc[-3] and \
                             date_and_time_crash_and_continue:
-                        print('[perform_scan_close_values_days] processing rising {} ({})'.format(symbol, symbol_name))
+                        print('[perform_scan_close_values_days] processing rising {} ({}). total_free_mem_mb={}'.format(symbol, symbol_name, total_free_mem_mb))
                         append_ma_data(date_and_time_crash_and_continue=date_and_time_crash_and_continue, group_type='rising', group_symbols=rising_symbols, group_type_rows=rising_rows, symbol=symbol, symbol_name=symbol_name, symbol_data=symbol_data, scan_close_values_interval=scan_close_values_interval)
                 else:
                     if      symbol_data['MA21exp'][-1] > symbol_data['MA21exp'][-2] > symbol_data['MA21exp'][-3] and \
@@ -2651,7 +2663,7 @@ def perform_scan_close_values_days(reference_raw_data, reference_download_data, 
                             symbol_data['Close'  ][-2] > symbol_data['MA21exp'][-2] and \
                             symbol_data['Close'  ][-3] > symbol_data['MA21exp'][-3] and \
                             date_and_time_crash_and_continue:
-                        print('[perform_scan_close_values_days] processing rising {} ({})'.format(symbol, symbol_name))
+                        print('[perform_scan_close_values_days] processing rising {} ({}). total_free_mem_mb = {}'.format(symbol, symbol_name, total_free_mem_mb))
                         append_ma_data(date_and_time_crash_and_continue=date_and_time_crash_and_continue, group_type='rising', group_symbols=rising_symbols, group_type_rows=rising_rows, symbol=symbol, symbol_name=symbol_name, symbol_data=symbol_data, scan_close_values_interval=scan_close_values_interval)
 
                     # elif    symbol_data['MA21exp'][-1] < symbol_data['MA21exp'][-2] < symbol_data['MA21exp'][-3] and \
