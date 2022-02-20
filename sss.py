@@ -2554,7 +2554,7 @@ def append_ma_data(date_and_time_crash_and_continue, group_type, group_symbols, 
     plt.title(symbol + ' - ' + symbol_name.replace('/', '_').replace("\\", '_').replace(",", '_')[0:22] + ': interval='+scan_close_values_interval)
 
     os.makedirs(os.path.dirname(filename_csv.replace(':','-').replace('.csv', '.png')), exist_ok=True)
-    plt.savefig(filename_csv.replace(':','-').replace('.csv', '.png'))
+    plt.savefig(filename_csv.replace(':','-').replace('?','').replace('!','').replace('.csv', '.png'))
     # Clear memory
     plt.close('all')
     plt.figure().clear()
