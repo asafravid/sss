@@ -558,7 +558,7 @@ def execute():
     run_all              = sss_config.run_all               # All Nasdaq Stocks
     run_six              = sss_config.run_six               # All SIX Stocks
     run_st               = sss_config.run_st                # All (Stockholm) Swedish Stocks
-    research_mode        = sss_config.research_mode         # Research Mode
+    research_mode        = sss_config.multi_dim_scan_mode         # Research Mode
     research_mode_max_ev = sss_config.research_mode_max_ev
     automatic_results_folder_selection = sss_config.automatic_results_folder_selection
 

@@ -1705,7 +1705,7 @@ def process_info(json_db, symbol, stock_data, tase_mode, sectors_list, sectors_f
         [stock_data.quarterized_retained_earnings, stock_data.quarterized_retained_earnings_bonus] = calculate_weighted_stock_data_on_dict(balance_sheets_quarterly, 'balance_sheets_yearly',    'Retained Earnings', NO_WEIGHTS,             stock_data, True, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=1.5, bonus_mon_dec=1.0/1.5, bonus_neg_pres=0.25)
 
         if stock_data.short_name is     None:                       stock_data.short_name = 'None'
-        # if stock_data.short_name != None and not research_mode: print('              {:35}:'.format(stock_data.short_name))
+        # if stock_data.short_name != None and not multi_dim_scan_mode: print('              {:35}:'.format(stock_data.short_name))
 
         if 'quoteType' in info: stock_data.quote_type = info['quoteType']
         if not check_quote_type(stock_data, research_mode):     return_value = False
@@ -2429,7 +2429,7 @@ def process_info(json_db, symbol, stock_data, tase_mode, sectors_list, sectors_f
             if last_dividends_list != None: json_db[stock_data.symbol]["dividends"] = last_dividends_list
 
         except Exception as e:
-            # if not research_mode: print("Exception in symbol.dividends: {} -> {}".format(e, traceback.format_exc()))
+            # if not multi_dim_scan_mode: print("Exception in symbol.dividends: {} -> {}".format(e, traceback.format_exc()))
             json_db[stock_data.symbol]["dividends"] = []
             pass
 
