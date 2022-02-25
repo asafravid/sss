@@ -41,9 +41,11 @@ https://bit.ly/MultiDimensionalScan
     - `pip[3] install currency.converter`
   
 # Run Step-By-Step Instructions
-- 1: Set the required scanning mode(s) (`custom`/`tase`/`nsr`/`all`) in `sss_config.py` and run `sss_run.py`
-- 2: A Results folder shall be created under `Results/<mode>/` Folder
-- 3: Feed the Results path into the `research_mode` (Multi-Dimensional Scan). A `PDF` and `results_sss_*.csv` files shall be created in the same folder
+- 1: Set `multi_dim_scan_mode` to `False` and for 1st time run, you may set `reference_run_<mode>` to `None` (or latest directory in results)
+- 2: Set the required scanning mode(s) (`custom`/`tase`/`nsr`/`all`) in `sss_config.py` and run `sss_run.py`
+- 3: Run `sss_run.py`
+- 2: A Results directory shall be created under `Results/<mode>/` directory
+- 3: Feed the Results path into the `multi_dim_scan_mode = True` (Multi-Dimensional Scan). A `PDF` and `results_sss_*.csv` files shall be created in the same directory
 - 4: Crash and Continue from crash point - Supported for efficiency.
 
 # Indices Maintenance
@@ -51,7 +53,7 @@ https://bit.ly/MultiDimensionalScan
 - Download `NASDAQ100` latest components via https://www.nasdaq.com/market-activity/quotes/nasdaq-ndx-index into `Indices/nasdaq100-components.csv`
 - Download `Russel1000` latest components via https://en.wikipedia.org/wiki/Russell_1000_Index into `russell-1000-index.csv` 
 - Download `S&P500` latest components into `Indices/snp500-components.csv`  (Remove last line indicating creation date)
-- Download `NASDAQ` latest components (`otherlisted.txt`, `nasdaqlisted.txt`, `otherlisted.txt`) via `ftp://ftp.nasdaqtrader.com/symboldirectory/` into the `Indices/` folder (Convert `.txt` to `.csv`) using an FTP Client (such as https://filezilla-project.org/) -> This operation is done automatically upon each scan (with `research_mode = False`)
+- Download `NASDAQ` latest components (`otherlisted.txt`, `nasdaqlisted.txt`, `otherlisted.txt`) via `ftp://ftp.nasdaqtrader.com/symboldirectory/` into the `Indices/` directory (Convert `.txt` to `.csv`) using an FTP Client (such as https://filezilla-project.org/) -> This operation is done automatically upon each scan (with `research_mode = False`)
 - You can also create your own indice/group of stocks by either overriding the above files' contents or simply adding your own indice to the code support. Use Custom Mode, and example in `sss_config.py`
 - Checkout http://www.nasdaqtrader.com/trader.aspx?id=symboldirdefs for all symbol definitions (for instance - `$` in stock names, 5-letter stocks ending with `Y`, etc)
 
