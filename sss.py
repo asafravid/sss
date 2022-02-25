@@ -2593,7 +2593,7 @@ def perform_scan_close_values_days(reference_raw_data, reference_download_data, 
             elif '.SW' in symbol: symbol = 'SWX:' + symbol.replace('.SW', '')
             elif '.ST' in symbol: symbol = 'STO:' + symbol.replace('.ST', '')
 
-            total_free_mem_mb = (psutil.swap_memory().free + psutil.virtual_memory().free) / (1024*1024)
+            total_free_mem_mb = round(float(psutil.swap_memory().free + psutil.virtual_memory().free) / (1024.0*1024.0),0)
             if total_free_mem_mb < 1024:  # Less than 1 GB free?
                 print("[perform_scan_close_values_days] Out of memory (total_free_mem_mb={}). Increase swap size:".format(total_free_mem_mb))
                 print("[perform_scan_close_values_days] sudo -s && dd if=/dev/zero of=swapfile_new bs=1024 count=8388608 \n")
@@ -2794,6 +2794,7 @@ def perform_scan_close_values_weeks(reference_raw_data, reference_download_data,
 def process_symbols(symbol_to_name_dict, crash_and_continue_raw_data, date_and_time_crash_and_continue, json_db, symbols, csv_db_data, rows, rows_no_div, rows_only_div, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, diff_rows, db_filename, reference_raw_data, reference_download_data, scan_close_values_interval):
     iteration = 0
     if not research_mode:
+        rising_symbols = []
         if   scan_close_values_interval == '1d':
             rising_symbols = perform_scan_close_values_days( reference_raw_data=reference_raw_data, reference_download_data=reference_download_data, symbols=symbols, symbol_to_name_dict=symbol_to_name_dict, date_and_time_crash_and_continue=date_and_time_crash_and_continue, scan_close_values_interval=scan_close_values_interval)
         elif scan_close_values_interval == '1wk':
@@ -2825,7 +2826,7 @@ def process_symbols(symbol_to_name_dict, crash_and_continue_raw_data, date_and_t
             elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_SIX and 'SWX:' not in stock_data.symbol: stock_data.symbol = 'SWX:' + stock_data.symbol.replace('.SW', '')  # .replace('.', '-')
             elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_ST  and 'STO:' not in stock_data.symbol: stock_data.symbol = 'STO:' + stock_data.symbol.replace('.ST', '')  # .replace('.', '-')
 
-            if stock_data.symbol in rising_symbols:
+            if scan_close_values_interval != None and stock_data.symbol in rising_symbols:
                 stock_data.ma = 'r+'
             else:
                 stock_data.ma = ' '
@@ -3340,10 +3341,11 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
 
         sss_post_processing.process_engine_csv(date_and_time)
 
-        # Move date_and_time_crash_and_continue _ma to the final results and delete the original _ma directory
-        shutil.move(date_and_time_crash_and_continue.replace('_cc','_ma')+'/rising', date_and_time)
-        shutil.move(date_and_time_crash_and_continue.replace('_cc','_ma/download_data.csv'), date_and_time+'/download_data.csv')
-        shutil.rmtree(date_and_time_crash_and_continue.replace('_cc','_ma'))
+        if sss_config.scan_close_values_interval != None:
+            # Move date_and_time_crash_and_continue _ma to the final results and delete the original _ma directory
+            shutil.move(date_and_time_crash_and_continue.replace('_cc','_ma')+'/rising', date_and_time)
+            shutil.move(date_and_time_crash_and_continue.replace('_cc','_ma/download_data.csv'), date_and_time+'/download_data.csv')
+            shutil.rmtree(date_and_time_crash_and_continue.replace('_cc','_ma'))
 
         if platform == "linux" or platform == "linux2":
             os.system("tar -jcvf {} --directory {} {}".format(date_and_time+'/db.json.tar.bz2', date_and_time, 'db.json'))
