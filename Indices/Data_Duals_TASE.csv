@@ -1,7 +1,7 @@
 Market Data - Dual Listed by Securities Law
-As of (date and time) 03/03/2022 
+As of  03/03/2022 
 
-Name,Symbol ,ISIN,Index Membership,Closing Price,Change (%),Turnover(NIS thousands),Last transaction,Foreign Stock Exchange
+Name,Symbol ,ISIN,Index,Closing Price (0.01 NIS),Change (%),Turnover(NIS thousands),Last Trade,Foreign Stock Exchange
 ALLOT,ALLT,IL0010996549,"TA-SME60, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Dual listing",2619.00,3.97,2155.44,EoD,NASDAQ GSM
 AUDIOCODES,AUDC,IL0010829658,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Industrials, TA-125 Fossil Free, TA-Dual listing",9181.00,1.90,2009.74,EoD,NASDAQ GSM
 BATM,BVC,IL0010849045,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Dual listing",212.50,-4.19,2162.79,EoD,LONDON

@@ -1,7 +1,7 @@
-Market Data - All shares
-As of (date and time) 03/03/2022 
+Market Data - All Shares
+As of  03/03/2022 
 
-Name,Symbol ,ISIN,Index Membership,Closing Price,Change (%),Turnover(NIS thousands),Last transaction
+Name,Symbol ,ISIN,Index,Closing Price (0.01 NIS),Change (%),Turnover(NIS thousands),Last Trade
 ABILITY,ABIL,KYG8789K1242,,89.90,-1.21,16.80,EoD
 ABRA,ABRA,IL0011016669,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon",412.80,0.56,91.95,EoD
 ACCEL,ACCL,IL0007700169,"TA-Growth, TA-AllShare, TA-Rimon",152.10,-0.52,90.52,EoD
