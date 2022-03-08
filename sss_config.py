@@ -65,7 +65,7 @@ new_run_all          = 'Results/All/20220215-195325_Tchnlgy7.0_FnnclSrvcs1.0_A_n
 new_run_six          = 'Results/Six/20220111-002719_S_nRes196'                                        # '20211216-002301_S_nRes27_CustSssV'
 new_run_st           = 'Results/St/20210915-023602_St_Bdb_nRes130'
 
-crash_and_continue_path = 'Results/All/20220224-072145_Tchnlgy7.0_FnnclSrvcs1.0_A_cc'
+crash_and_continue_path = None  # 'Results/All/20220224-072145_Tchnlgy7.0_FnnclSrvcs1.0_A_cc'
 
 custom_portfolio      = ['AAPL', 'AB', 'ABBV', 'ABC', 'ABEV', 'ACGL', 'ACN', 'ADM', 'AEF', 'AFL', 'AGIO', 'AGO', 'AKAM', 'AL', 'ALGN', 'ALL', 'ALLY', 'AM', 'AMAT', 'AMCR', 'AMD']
 custom_portfolio_tase = ['AFRE', 'ITMR']
