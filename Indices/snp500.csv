@@ -29,7 +29,7 @@ ALLE,Allegion Plc
 AMAT,Applied Materials
 AMCR,Amcor Plc
 AMD,Adv Micro Devices
-AME,Amtek Inc
+AME,Ametek Inc
 AMGN,Amgen Inc
 AMP,Ameriprise Financial Services
 AMT,American Tower Corp
@@ -88,6 +88,7 @@ CDAY,Ceridian Hcm Holding Inc
 CDNS,Cadence Design Sys
 CDW,CDW Corp
 CE,Celanese Corp
+CEG,Constellation Energy Corp
 CERN,Cerner Corp
 CF,Cf Industries Holdings
 CFG,Citizens Financial Group Inc/Ri
@@ -113,7 +114,7 @@ COST,Costco Wholesale
 CPB,Campbell Soup Company
 CPRT,Copart Inc
 CRL,Charles River Laboratories Intl
-CRM,Salesforce.com Inc
+CRM,Salesforce Inc
 CSCO,Cisco Systems Inc
 CSX,CSX Corp
 CTAS,Cintas Corp
@@ -127,7 +128,7 @@ CVX,Chevron Corp
 CZR,Caesars Entertainment Inc
 D,Dominion Resources
 DAL,Delta Air Lines Inc
-DD,Du Pont De.Nemours Inc
+DD,Dupont Denemours Inc
 DE,Deere & Company
 DFS,Discover Financial Services
 DG,Dollar General Corp
@@ -162,6 +163,7 @@ EMN,Eastman Chemical Company
 EMR,Emerson Electric Company
 ENPH,Enphase Energy Inc
 EOG,Eog Resources
+EPAM,Epam Systems Inc
 EQIX,Equinix Inc
 EQR,Equity Residential
 ES,Eversource Energy
@@ -181,6 +183,7 @@ FAST,Fastenal Company
 FB,Meta Platforms Inc
 FBHS,Fortune Brands Home & Security
 FCX,Freeport-Mcmoran Inc
+FDS,Factset Research Systems Inc
 FDX,Fedex Corp
 FE,Firstenergy Corp
 FFIV,F5 Inc
@@ -207,14 +210,12 @@ GOOG,Alphabet Cl C
 GOOGL,Alphabet Cl A
 GPC,Genuine Parts Company
 GPN,Global Payments Inc
-GPS,Gap Inc
 GRMN,Garmin Ltd
 GS,Goldman Sachs Group
 GWW,W.W. Grainger
 HAL,Halliburton Company
 HAS,Hasbro Inc
 HBAN,Huntington Bcshs
-HBI,Hanesbrands Inc
 HCA,Hca Holdings Inc
 HD,Home Depot
 HES,Hess Corp
@@ -238,7 +239,6 @@ IEX,Idex Corp
 IFF,International Flavors & Fragrances
 ILMN,Illumina Inc
 INCY,Incyte Corp
-INFO,IHS Markit Ltd
 INTC,Intel Corp
 INTU,Intuit Inc
 IP,International Paper Company
@@ -271,7 +271,6 @@ KO,Coca-Cola Company
 KR,Kroger Company
 L,Loews Corp
 LDOS,Leidos Holdings Inc
-LEG,Leggett & Platt Inc
 LEN,Lennar Corp
 LH,Laboratory Corp of America Holdings
 LHX,L3Harris Technologies Inc
@@ -309,6 +308,7 @@ MMC,Marsh & Mclennan Companies
 MMM,3M Company
 MNST,Monster Beverage Cp
 MO,Altria Group
+MOH,Molina Healthcare Inc
 MOS,Mosaic Company
 MPC,Marathon Petroleum Corp
 MPWR,Monolithic Power Sys
@@ -325,6 +325,7 @@ MTD,Mettler-Toledo International
 MU,Micron Technology
 NCLH,Norwegian Cruise Ord
 NDAQ,Nasdaq Inc
+NDSN,Nordson Corp
 NEE,Nextera Energy
 NEM,Newmont Mining Corp
 NFLX,Netflix Inc
@@ -354,6 +355,7 @@ ORCL,Oracle Corp
 ORLY,O'Reilly Automotive
 OTIS,Otis Worldwide Corp
 OXY,Occidental Petroleum Corp
+PARA,Paramount Global Cl B
 PAYC,Paycom Software Inc
 PAYX,Paychex Inc
 PBCT,People's United Finl
@@ -404,8 +406,10 @@ ROST,Ross Stores Inc
 RSG,Republic Services
 RTX,Raytheon Technologies Corp
 SBAC,SBA Communications
+SBNY,Signature Bank
 SBUX,Starbucks Corp
 SCHW,The Charles Schwab Corp
+SEDG,Solaredge Tech
 SEE,Sealed Air Corp
 SHW,Sherwin-Williams Company
 SIVB,Svb Financial Group
@@ -447,7 +451,7 @@ TSCO,Tractor Supply Company
 TSLA,Tesla Inc
 TSN,Tyson Foods
 TT,Trane Technologies Plc
-TTWO,Take-Two Interacti
+TTWO,Take-Two Interactive
 TWTR,Twitter Inc
 TXN,Texas Instruments
 TXT,Textron Inc
@@ -465,7 +469,6 @@ URI,United Rentals
 USB,U.S. Bancorp
 V,Visa Inc
 VFC,V.F. Corp
-VIAC,Viacom CBS Cl B
 VLO,Valero Energy Corp
 VMC,Vulcan Materials Company
 VNO,Vornado Realty Trust
@@ -483,18 +486,16 @@ WEC,Wisconsin Energy Corp
 WELL,Welltower Inc
 WFC,Wells Fargo & Company
 WHR,Whirlpool Corp
-WLTW,Willis Towers WT
 WM,Waste Management
 WMB,Williams Companies
 WMT,Walmart Inc
 WRB,W.R. Berkley Corp
 WRK,Westrock Company
 WST,West Pharmaceutical Services
-WU,Western Union Company
+WTW,Willis Towers Watson Public Ltd CO
 WY,Weyerhaeuser Company
 WYNN,Wynn Resorts Ltd
 XEL,XCEL Energy Inc
-XLNX,Xilinx Inc
 XOM,Exxon Mobil Corp
 XRAY,Dentsply Sirona Inc
 XYL,Xylem Inc
