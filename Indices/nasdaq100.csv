@@ -1,5 +1,6 @@
 Symbol,Name
 AAPL,Apple Inc
+ABNB,Airbnb Inc Cl A
 ADBE,Adobe Systems Inc
 ADI,Analog Devices
 ADP,Automatic Data Procs
@@ -14,13 +15,12 @@ ANSS,Ansys Inc
 ASML,Asml Holdings NY Reg ADR
 ATVI,Activision Blizzard
 AVGO,Broadcom Ltd
+AZN,Astrazeneca Plc ADR
 BIDU,Baidu Inc ADR
 BIIB,Biogen Inc
 BKNG,Booking Holdings Inc
 CDNS,Cadence Design Sys
-CDW,CDW Corp
-CERN,Cerner Corp
-CHKP,Check Point Software
+CEG,Constellation Energy Corp
 CHTR,Charter Communicatio
 CMCSA,Comcast Corp A
 COST,Costco Wholesale
@@ -30,6 +30,7 @@ CSCO,Cisco Systems Inc
 CSX,CSX Corp
 CTAS,Cintas Corp
 CTSH,Cognizant Tech Sol
+DDOG,Datadog Inc Cl A
 DLTR,Dollar Tree Inc
 DOCU,Docusign Inc
 DXCM,Dexcom
@@ -39,15 +40,13 @@ EXC,Exelon Corp
 FAST,Fastenal Company
 FB,Meta Platforms Inc
 FISV,Fiserv Inc
-FOX,Fox Corp Cl B
-FOXA,Fox Corp Cl A
+FTNT,Fortinet Inc
 GILD,Gilead Sciences Inc
 GOOG,Alphabet Cl C
 GOOGL,Alphabet Cl A
 HON,Honeywell International Inc
 IDXX,Idexx Laboratories
 ILMN,Illumina Inc
-INCY,Incyte Corp
 INTC,Intel Corp
 INTU,Intuit Inc
 ISRG,Intuitive Surg Inc
@@ -55,6 +54,7 @@ JD,Jd.com Inc ADR
 KDP,Keurig Dr Pepper Inc
 KHC,Kraft Heinz Company
 KLAC,K L A-Tencor Corp
+LCID,Lucid Group Inc
 LRCX,Lam Research Corp
 LULU,Lululemon Athletica
 MAR,Marriot Int Cl A
@@ -71,13 +71,14 @@ NFLX,Netflix Inc
 NTES,Netease Inc ADR
 NVDA,Nvidia Corp
 NXPI,Nxp Semiconductors
+ODFL,Old Dominion Freight Line Inc
 OKTA,Okta Inc Cl A
 ORLY,O'Reilly Automotive
+PANW,Palo Alto Networks Inc
 PAYX,Paychex Inc
 PCAR,Paccar Inc
 PDD,Pinduoduo Inc ADR
 PEP,Pepsico Inc
-PTON,Peloton Interactive Inc
 PYPL,Paypal Holdings
 QCOM,Qualcomm Inc
 REGN,Regeneron Pharmaceuticals
@@ -88,7 +89,6 @@ SIRI,Sirius XM Holdings
 SNPS,Synopsys Inc
 SPLK,Splunk Inc
 SWKS,Skyworks Solutions
-TCOM,Trip.com Group Ltd ADR
 TEAM,Atlassian Cls A Ord
 TMUS,T-Mobile US
 TSLA,Tesla Inc
@@ -99,5 +99,5 @@ VRTX,Vertex Pharmaceutic
 WBA,Walgreens Boots Alliance
 WDAY,Workday Inc
 XEL,XCEL Energy Inc
-XLNX,Xilinx Inc
 ZM,Zoom Video Communications Cl A
+ZS,Zscaler Inc
