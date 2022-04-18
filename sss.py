@@ -2585,7 +2585,7 @@ def perform_scan_close_values_days(reference_raw_data, reference_download_data, 
         # other_rows.append(  ['Symbol', 'Name'])
 
         for symbol_index, yahoo_symbol in enumerate(symbols):
-            symbol_name = symbol_to_name_dict[yahoo_symbol]
+            symbol_name = symbol_to_name_dict[yahoo_symbol] if yahoo_symbol in symbol_to_name_dict else ""
             symbol = yahoo_symbol
             # print('[perform_scan_close_values_days] processing {} ({})'.format(symbol, symbol_name))
             if   '.TA' in symbol: symbol = 'TLV:' + symbol.replace('.TA', '')

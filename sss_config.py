@@ -38,7 +38,7 @@ multi_dim_scan_mode       = False # Mult-dimentional scan Mode
 aggregate_only            = False
 research_mode_max_ev      = False  # @JustLearning's suggestion in Telegram: Multi-Dimensional Scan by Max EV Limit rather than Min EV Limit
 use_reference_as_raw_data = False
-custom_sss_value_equation = False
+custom_sss_value_equation = True
 
 scan_close_values_interval      = '1d'
 crash_and_continue_refresh_freq = 10 if run_custom or run_custom_tase else 100 # Flush every 100 symbols (or less for custom)
@@ -52,7 +52,7 @@ automatic_results_folder_selection = False
 # Upon 1st ever run: reference must be set to None
 # After 1st ever Run: Recommended to use reference (filter and damper)
 # The research mode shall run on new_run as input (new_run >= reference_run) where > means newer
-reference_run_custom = None  # 'Results/Custom/20211109-235448_Bdb_nRes271_Custom'
+reference_run_custom = None  # 'Results/Custom/20220419-005911_nRes112_Custom'
 reference_run_tase   = 'Results/Tase/20220304-101914_Tase_Tchnlgy7.0_RlEstt1.0_nRes269'
 reference_run_nsr    = 'Results/Nsr/20220212-180523_Tchnlgy7.0_FnnclSrvcs1.0_nRes793_CustSssV'
 reference_run_all    = 'Results/All/20220131-141318_Tchnlgy7.0_FnnclSrvcs1.0_A_nRes3000_CustSssV'  # 20220214-060241_Tchnlgy7.0_FnnclSrvcs1.0_A_nRes3021'
@@ -68,7 +68,7 @@ new_run_st           = 'Results/St/20210915-023602_St_Bdb_nRes130'
 
 crash_and_continue_path = None  # 'Results/All/20220224-072145_Tchnlgy7.0_FnnclSrvcs1.0_A_cc'
 
-custom_portfolio      = ['ARKG', 'BBH', 'BJK', 'BOTZ', 'ESPO', 'EWL', 'FCOM', 'FDIS', 'FDL', 'FDN', 'FIVG', 'FLCA', 'FLGB', 'GLCN', 'GLD', 'GLTR', 'IBB', 'IDRV', 'IGV', 'IHE', 'IHF', 'IHI', 'INFL', 'ITA', 'ITEQ', 'IYT', 'KBWB', 'KROP', 'LIT', 'LOUP', 'MOO', 'PPH', 'QCLN', 'QQQ', 'ROBT', 'ROKT', 'RTH', 'SFYF', 'SMH', 'SOXX', 'SPEU', 'SPYD', 'TACK', 'TDIV', 'UFO', 'VAW', 'VCR', 'VFH', 'WFH', 'WUGI', 'XBI', 'XLE', 'XLV', 'AAPL', 'ABB', 'ABBV', 'ABMD', 'ADBE', 'ADSK', 'AFL', 'AGO', 'AKAM', 'AL', 'ALLE', 'AMAT', 'AMD', 'AMZN', 'APH', 'AZN', 'BAH', 'BIO', 'BLK', 'BMBL', 'BMRN', 'BP', 'BPOP', 'BRK B', 'BTI', 'BYND', 'CARR', 'CAT', 'CDNS', 'CHKP', 'CNC', 'COST', 'CPRX', 'CRNT', 'CROX', 'CSCO', 'CTRM', 'CUZ', 'DAC', 'DE', 'DFS', 'DG', 'DHI', 'DOX', 'EL', 'ESGR', 'EXC', 'FAST', 'FB', 'FDX', 'FFIV', 'FISV', 'FROG', 'GFI', 'GILD', 'GLBS', 'GM', 'GOOG', 'GPRO', 'HD', 'HIW', 'HUN', 'HZNP', 'ICE', 'INMD', 'INVA', 'JPM', 'KIM', 'KLAC', 'KO', 'LEVI', 'LMT', 'LOGI', 'LPX', 'LRCX', 'MCD', 'MRNA', 'MS', 'MSFT', 'MSTR', 'MTB', 'MU', 'NFLX', 'NOC', 'NOW', 'NUE', 'NVDA', 'NVO', 'ORCL', 'OZK', 'PEP', 'PFE', 'PLTR', 'PM', 'PNFP', 'PYPL', 'QCOM', 'QRVO', 'RADA', 'RBLX', 'RHP', 'RQI', 'SCHW', 'SCI', 'SEDG', 'SNAP', 'SNDR', 'SNPS', 'SONO', 'SONY', 'TER', 'TGT', 'TM', 'TNDM', 'TROW', 'TRTX', 'TSCO', 'TSLA', 'TWTR', 'UAL', 'UHAL', 'UI', 'UPST', 'V', 'WDC', 'WIX', 'WLK', 'WM', 'ZI', 'ZIM', 'ZM']
+custom_portfolio      = ['XLE', 'AAPL', 'ABB', 'ABBV', 'ABMD', 'ADBE', 'ADSK', 'AFL', 'AGO', 'AKAM', 'AL', 'ALLE', 'AMAT', 'AMD', 'AMZN', 'APH', 'AZN', 'BAH', 'BIO', 'BLK', 'BMBL', 'BMRN', 'BP', 'BPOP', 'BRK B', 'BTI', 'BYND', 'CARR', 'CAT', 'CDNS', 'CHKP', 'CNC', 'COST', 'CPRX', 'CRNT', 'CROX', 'CSCO', 'CTRM', 'CUZ', 'DAC', 'DE', 'DFS', 'DG', 'DHI', 'DOX', 'EL', 'ESGR', 'EXC', 'FAST', 'FB', 'FDX', 'FFIV', 'FISV', 'FROG', 'GFI', 'GILD', 'GLBS', 'GM', 'GOOG', 'GPRO', 'HD', 'HIW', 'HUN', 'HZNP', 'ICE', 'INMD', 'INVA', 'JPM', 'KIM', 'KLAC', 'KO', 'LEVI', 'LMT', 'LOGI', 'LPX', 'LRCX', 'MCD', 'MRNA', 'MS', 'MSFT', 'MSTR', 'MTB', 'MU', 'NFLX', 'NOC', 'NOW', 'NUE', 'NVDA', 'NVO', 'ORCL', 'OZK', 'PEP', 'PFE', 'PLTR', 'PM', 'PNFP', 'PYPL', 'QCOM', 'QRVO', 'RADA', 'RBLX', 'RHP', 'RQI', 'SCHW', 'SCI', 'SEDG', 'SNAP', 'SNDR', 'SNPS', 'SONO', 'SONY', 'TER', 'TGT', 'TM', 'TNDM', 'TROW', 'TRTX', 'TSCO', 'TSLA', 'TWTR', 'UAL', 'UHAL', 'UI', 'UPST', 'V', 'WDC', 'WIX', 'WLK', 'WM', 'ZI', 'ZIM', 'ZM']
 custom_portfolio_tase = ['AFRE', 'ITMR']
 
 research_mode_probe_list = ['TLV:MMAN']  # ['TLV:MISH']  # ['MTDS']
