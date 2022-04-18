@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.129 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.130 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -160,7 +160,6 @@ DIST_FROM_LOW_FACTOR_HIGHER_THAN_ONE_POWER = 6
 
 EV_TO_EBITDA_MAX_UNKNOWN = 100000
 
-CRASH_AND_CONTINUE_REFRESH_FREQ = 100  # Flush every 100 symbols
 
 #
 # TODO: ASAFR: (https://www.gurufocus.com/letter.php)
@@ -2891,7 +2890,7 @@ def process_symbols(symbol_to_name_dict, crash_and_continue_raw_data, date_and_t
             csv_db_data.append(                        row_to_append)
 
             # Save crash-and-continue raw database as json:
-            if date_and_time_crash_and_continue and reference_raw_data is None and iteration%CRASH_AND_CONTINUE_REFRESH_FREQ == 0:
+            if date_and_time_crash_and_continue and reference_raw_data is None and iteration%sss_config.crash_and_continue_refresh_freq == 0:
                 json_db_filename = date_and_time_crash_and_continue + '/db.json'
                 os.makedirs(os.path.dirname(json_db_filename), exist_ok=True)
                 print("[DB] Iteration {}, flushing json db to {} ... ".format(iteration, json_db_filename), end="")
@@ -2903,8 +2902,9 @@ def process_symbols(symbol_to_name_dict, crash_and_continue_raw_data, date_and_t
         # Leave clean folders behind:
         if date_and_time_crash_and_continue and reference_raw_data is None:
             json_db_filename = date_and_time_crash_and_continue + '/db.json'
-            os.remove(json_db_filename)
-            os.rmdir(date_and_time_crash_and_continue)
+            if os.path.exists(date_and_time_crash_and_continue):
+                os.remove(json_db_filename)
+                os.rmdir(date_and_time_crash_and_continue)
 
     else: # DB already present
         for row_index, row in enumerate(csv_db_data):
