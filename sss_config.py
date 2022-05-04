@@ -29,12 +29,12 @@ ALL_COUNTRY_SYMBOLS_ST  = 3  # Swedish (Stockholm) Stock Exchange
 
 run_custom_tase           = False  # Custom Portfolio
 run_custom                = False
-run_tase                  = False  # Tel Aviv Stock Exchange
-run_nsr                   = True   # NASDAQ100+S&P500+RUSSEL1000
+run_tase                  = True   # Tel Aviv Stock Exchange
+run_nsr                   = False  # NASDAQ100+S&P500+RUSSEL1000
 run_all                   = False  # All Nasdaq Stocks
 run_six                   = False  # All Swiss Stocks
 run_st                    = False  # All (Stockholm) Swedish Stocks
-multi_dim_scan_mode       = False  # Mult-dimentional scan Mode
+multi_dim_scan_mode       = True   # Mult-dimentional scan Mode
 aggregate_only            = False
 research_mode_max_ev      = False  # @JustLearning's suggestion in Telegram: Multi-Dimensional Scan by Max EV Limit rather than Min EV Limit
 use_reference_as_raw_data = False
@@ -53,15 +53,15 @@ automatic_results_folder_selection = False
 # After 1st ever Run: Recommended to use reference (filter and damper)
 # The research mode shall run on new_run as input (new_run >= reference_run) where > means newer
 reference_run_custom = 'Results/All/20220419-020633_A_nRes112_Custom_CustSssV'
-reference_run_tase   = None  # 'Results/Tase/20220304-101914_Tase_Tchnlgy7.0_RlEstt1.0_nRes269'
-reference_run_nsr    = None  # 'Results/Nsr/20220212-180523_Tchnlgy7.0_FnnclSrvcs1.0_nRes793_CustSssV'
+reference_run_tase   = 'Results/Tase/20220405-214501_Tase_Tchnlgy7.0_RlEstt1.0_nRes286'
+reference_run_nsr    = 'Results/Nsr/20220406-004420_Tchnlgy7.0_FnnclSrvcs1.0_nRes838'
 reference_run_all    = None  # 'Results/All/20220131-141318_Tchnlgy7.0_FnnclSrvcs1.0_A_nRes3000_CustSssV'  # 20220214-060241_Tchnlgy7.0_FnnclSrvcs1.0_A_nRes3021'
 reference_run_six    = 'Results/Six/20220111-002719_S_nRes196'                                        # '20211216-002301_S_nRes27_CustSssV'
 reference_run_st     = 'Results/St/20210915-023602_St_Bdb_nRes130'
 
 new_run_custom       = 'Results/Custom/20210917-201728_Bdb_nRes312_Custom'
-new_run_tase         = 'Results/Tase/20220304-101914_Tase_Tchnlgy7.0_RlEstt1.0_nRes269'  # 20220405-214501_Tase_Tchnlgy7.0_RlEstt1.0_nRes286_debug'  # 'Results/Tase/20220405-214501_Tase_Tchnlgy7.0_RlEstt1.0_nRes286'
-new_run_nsr          = 'Results/Nsr/20220406-220021_Tchnlgy7.0_FnnclSrvcs1.0_nRes835_CustSssV'
+new_run_tase         = 'Results/Tase/20220504-005246_Tase_Tchnlgy7.0_RlEstt1.0_nRes268'  # 20220405-214501_Tase_Tchnlgy7.0_RlEstt1.0_nRes286_debug'  # 'Results/Tase/20220405-214501_Tase_Tchnlgy7.0_RlEstt1.0_nRes286'
+new_run_nsr          = 'Results/Nsr/20220504-120755_Tchnlgy7.0_FnnclSrvcs1.0_nRes807'
 new_run_all          = 'Results/All/20220215-195325_Tchnlgy7.0_FnnclSrvcs1.0_A_nRes3005_CustSssV'  # 20220214-060241_Tchnlgy7.0_FnnclSrvcs1.0_A_nRes3021'
 new_run_six          = 'Results/Six/20220111-002719_S_nRes196'                                        # '20211216-002301_S_nRes27_CustSssV'
 new_run_st           = 'Results/St/20210915-023602_St_Bdb_nRes130'
