@@ -34,7 +34,7 @@ run_nsr                   = False  # NASDAQ100+S&P500+RUSSEL1000
 run_all                   = True   # All Nasdaq Stocks
 run_six                   = False  # All Swiss Stocks
 run_st                    = False  # All (Stockholm) Swedish Stocks
-multi_dim_scan_mode       = False   # Mult-dimentional scan Mode
+multi_dim_scan_mode       = True   # Mult-dimentional scan Mode
 aggregate_only            = False
 research_mode_max_ev      = False  # @JustLearning's suggestion in Telegram: Multi-Dimensional Scan by Max EV Limit rather than Min EV Limit
 use_reference_as_raw_data = False
@@ -55,14 +55,14 @@ automatic_results_folder_selection = False
 reference_run_custom = 'Results/All/20220419-020633_A_nRes112_Custom_CustSssV'
 reference_run_tase   = 'Results/Tase/20220406-213755_Tase_Tchnlgy7.0_RlEstt1.0_nRes280_CustSssV'
 reference_run_nsr    = 'Results/Nsr/20220406-220021_Tchnlgy7.0_FnnclSrvcs1.0_nRes835_CustSssV'
-reference_run_all    = None  # 'Results/All/20220131-141318_Tchnlgy7.0_FnnclSrvcs1.0_A_nRes3000_CustSssV'  # 20220214-060241_Tchnlgy7.0_FnnclSrvcs1.0_A_nRes3021'
+reference_run_all    = 'Results/All/20220214-060241_Tchnlgy7.0_FnnclSrvcs1.0_A_nRes3021'
 reference_run_six    = 'Results/Six/20220111-002719_S_nRes196'                                        # '20211216-002301_S_nRes27_CustSssV'
 reference_run_st     = 'Results/St/20210915-023602_St_Bdb_nRes130'
 
 new_run_custom       = 'Results/Custom/20210917-201728_Bdb_nRes312_Custom'
 new_run_tase         = 'Results/Tase/20220504-170424_Tase_Tchnlgy7.0_RlEstt1.0_nRes267_CustSssV'
 new_run_nsr          = 'Results/Nsr/20220504-171048_Tchnlgy7.0_FnnclSrvcs1.0_nRes804_CustSssV'
-new_run_all          = 'Results/All/20220215-195325_Tchnlgy7.0_FnnclSrvcs1.0_A_nRes3005_CustSssV'  # 20220214-060241_Tchnlgy7.0_FnnclSrvcs1.0_A_nRes3021'
+new_run_all          = 'Results/All/20220507-011303_Tchnlgy7.0_FnnclSrvcs1.0_A_nRes2920'
 new_run_six          = 'Results/Six/20220111-002719_S_nRes196'                                        # '20211216-002301_S_nRes27_CustSssV'
 new_run_st           = 'Results/St/20210915-023602_St_Bdb_nRes130'
 
