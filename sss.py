@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.132 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.133 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -2602,6 +2602,8 @@ def perform_scan_close_values_days(reference_raw_data, reference_download_data, 
                 break
 
             if reference_raw_data != None:
+                if symbol_index and f'Close.{symbol_index}' not in close_values_data:
+                    continue
                 symbol_data = pd.concat([#close_values_data['Low'  ][yahoo_symbol].fillna(method='ffill').rename('Low'),
                                          #close_values_data['High' ][yahoo_symbol].fillna(method='ffill').rename('High'),
                                          close_values_data[f'Close.{symbol_index}' if symbol_index else 'Close'].fillna(method='bfill').rename('Close')], axis=1)
