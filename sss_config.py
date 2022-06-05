@@ -29,12 +29,12 @@ ALL_COUNTRY_SYMBOLS_ST  = 3  # Swedish (Stockholm) Stock Exchange
 
 run_custom_tase           = False  # Custom Portfolio
 run_custom                = False
-run_tase                  = False  # Tel Aviv Stock Exchange
+run_tase                  = True   # Tel Aviv Stock Exchange
 run_nsr                   = False  # NASDAQ100+S&P500+RUSSEL1000
-run_all                   = True   # All Nasdaq Stocks
+run_all                   = False  # All Nasdaq Stocks
 run_six                   = False  # All Swiss Stocks
 run_st                    = False  # All (Stockholm) Swedish Stocks
-multi_dim_scan_mode       = True   # Mult-dimentional scan Mode
+research_mode             = False  # Research Mode
 aggregate_only            = False
 research_mode_max_ev      = False  # @JustLearning's suggestion in Telegram: Multi-Dimensional Scan by Max EV Limit rather than Min EV Limit
 use_reference_as_raw_data = False

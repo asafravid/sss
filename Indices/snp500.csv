@@ -54,6 +54,7 @@ AXP,American Express Company
 AZO,Autozone
 BA,Boeing Company
 BAC,Bank of America Corp
+BALL,Ball Corporation
 BAX,Baxter International Inc
 BBWI,Bath & Body Works Inc
 BBY,Best Buy Company
@@ -66,7 +67,6 @@ BK,Bank of New York Mellon Corp
 BKNG,Booking Holdings Inc
 BKR,Baker Hughes A Ge Co. Cl A
 BLK,Blackrock Inc
-BLL,Ball Corp
 BMY,Bristol-Myers Squibb Company
 BR,Broadridge Financial Solutions Llc
 BRK.B,Berkshire Hathaway Cl B
@@ -113,6 +113,7 @@ COP,Conocophillips
 COST,Costco Wholesale
 CPB,Campbell Soup Company
 CPRT,Copart Inc
+CPT,Camden Property Trust
 CRL,Charles River Laboratories Intl
 CRM,Salesforce Inc
 CSCO,Cisco Systems Inc
@@ -136,8 +137,6 @@ DGX,Quest Diagnostics Inc
 DHI,D.R. Horton
 DHR,Danaher Corp
 DIS,Walt Disney Company
-DISCA,Discovery Comm A
-DISCK,Discovery Comm Inc
 DISH,Dish Network Corp
 DLR,Digital Realty Trust
 DLTR,Dollar Tree Inc
@@ -159,6 +158,7 @@ ED,Consolidated Edison Company of New York
 EFX,Equifax Inc
 EIX,Edison International
 EL,Estee Lauder Companies
+EMBC,Embecta Corp
 EMN,Eastman Chemical Company
 EMR,Emerson Electric Company
 ENPH,Enphase Energy Inc
@@ -358,7 +358,6 @@ OXY,Occidental Petroleum Corp
 PARA,Paramount Global Cl B
 PAYC,Paycom Software Inc
 PAYX,Paychex Inc
-PBCT,People's United Finl
 PCAR,Paccar Inc
 PEAK,Healthpeak Properties Inc
 PEG,Public Service Enterprise Group Inc
@@ -481,6 +480,7 @@ VZ,Verizon Communications Inc
 WAB,Wabtec Corp
 WAT,Waters Corp
 WBA,Walgreens Boots Alliance
+WBD,Discovery Inc Series A
 WDC,Western Digital Cp
 WEC,Wisconsin Energy Corp
 WELL,Welltower Inc

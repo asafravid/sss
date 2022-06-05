@@ -245,7 +245,6 @@ AME|AMETEK, Inc.|N|AME|N|100|N|AME
 AMER|Emles Made in America ETF|Z|AMER|Y|100|N|AMER
 AMG|Affiliated Managers Group, Inc. Common Stock|N|AMG|N|100|N|AMG
 AMH|American Homes 4 Rent Common Shares of Beneficial Interest|N|AMH|N|100|N|AMH
-AMH$F|American Homes 4 Rent 5.875% Series F Cumulative Redeemable Perpetual Preferred Shares|N|AMHpF|N|100|N|AMH-F
 AMH$G|American Homes 4 Rent Series G cumulative redeemable perpetual preferred shares of beneficial interest|N|AMHpG|N|100|N|AMH-G
 AMH$H|American Homes 4 Rent Series H cumulative redeemable perpetual Preferred Shares of Beneficial Interest|N|AMHpH|N|100|N|AMH-H
 AMJ|JPMorgan Chase Capital XVI JP Morgan Alerian MLP ETN|P|AMJ|N|100|N|AMJ
@@ -716,6 +715,7 @@ BKTI|BK Technologies Corporation Common Stock|A|BKTI|N|100|N|BKTI
 BKU|BankUnited, Inc. Common Stock|N|BKU|N|100|N|BKU
 BKUI|BNY Mellon Ultra Short Income ETF|P|BKUI|Y|100|N|BKUI
 BKUS|BNY Mellon ETF Trust BNY Mellon Sustainable US Equity ETF|P|BKUS|Y|100|N|BKUS
+BLCO|Bausch + Lomb Corporation Common Shares|N|BLCO|N|100|N|BLCO
 BLD|TopBuild Corp. Common Stock|N|BLD|N|100|N|BLD
 BLDG|Cambria Global Real Estate ETF|Z|BLDG|Y|100|N|BLDG
 BLDR|Builders FirstSource, Inc. Common Stock|N|BLDR|N|100|N|BLDR
@@ -1539,6 +1539,7 @@ DOV|Dover Corporation Common Stock|N|DOV|N|100|N|DOV
 DOW|Dow Inc. Common Stock |N|DOW|N|100|N|DOW
 DOZR|Direxion Daily US Infrastructure Bull 2X Shares|P|DOZR|Y|100|N|DOZR
 DPG|Duff & Phelps Utility and Infrastructure Fund Inc.|N|DPG|N|100|N|DPG
+DPSI|DecisionPoint Systems, Inc. Common Stock|A|DPSI|N|100|N|DPSI
 DPST|Direxion Daily Regional Banks Bull 3X Shares|P|DPST|Y|100|N|DPST
 DPZ|Domino's Pizza Inc Common Stock|N|DPZ|N|100|N|DPZ
 DQ|DAQO New Energy Corp. American Depositary Shares, each representing five ordinary shares|N|DQ|N|100|N|DQ
@@ -2734,7 +2735,6 @@ HIPO.W|Hippo Holdings Inc. Warrants|N|HIPO.WS|N|100|N|HIPO+
 HIPS|GraniteShares HIPS US High Income ETF|P|HIPS|Y|100|N|HIPS
 HIW|Highwoods Properties, Inc. Common Stock|N|HIW|N|100|N|HIW
 HIX|Western Asset High Income Fund II Inc. Common Stock|N|HIX|N|100|N|HIX
-HIX.R|Western Asset High Income Fund II Inc. Rights (expiring May 6, 2022) Rights|N|HIXr|N|100|N|HIX^
 HJEN|Direxion Hydrogen ETF|P|HJEN|Y|100|N|HJEN
 HJPX|iShares Currency Hedged JPX-Nikkei 400 ETF|P|HJPX|Y|100|N|HJPX
 HKND|Humankind US Stock ETF|P|HKND|Y|100|N|HKND
@@ -3375,8 +3375,8 @@ KBND|KraneShares Bloomberg China Bond Inclusion Index ETF|P|KBND|Y|100|N|KBND
 KBR|KBR, Inc. Common Stock|N|KBR|N|100|N|KBR
 KBUY|KraneShares CICC China Consumer Leaders Index ETF|P|KBUY|Y|100|N|KBUY
 KCA.U|Kensington Capital Acquisition Corp. IV New units, each consisting of one Class A ordinary share and one Class 2 redeemable warrant|N|KCA.U|N|100|N|KCA=
-KCAC.A|Kensington Capital Acquisition Corp. IV Class 1 redeemable warrants, each exercisable for one Class A ordinary share at an exercise price of $11.50|N|KCAC.WS.A|N|100|N|KCAC+A
 KCAC.U|Kensington Capital Acquisition Corp. IV Units, each consisting of one Class A Ordinary Share, one Class 1 redeemable Warrant and one Class 2 redeemable Warrant|N|KCAC.U|N|100|N|KCAC=
+KCAC.W|Kensington Capital Acquisition Corp. IV Class 1 redeemable warrants, each exercisable for one Class A ordinary share at an exercise price of $11.50|N|KCAC.WS|N|100|N|KCAC+
 KCCA|KraneShares California Carbon Allowance Strategy ETF|P|KCCA|Y|100|N|KCCA
 KCE|SPDR S&P Capital Markets ETF|P|KCE|Y|100|N|KCE
 KCGI|Kensington Capital Acquisition Corp. V Class A Ordinary Shares|N|KCGI|N|100|N|KCGI
@@ -3844,6 +3844,7 @@ MOTO|SmartETFs Smart Transportation & Technology ETF|P|MOTO|Y|100|N|MOTO
 MOV|Movado Group Inc. Common Stock|N|MOV|N|100|N|MOV
 MP|MP Materials Corp. Common Stock|N|MP|N|100|N|MP
 MPA|Blackrock MuniYield Pennsylvania Quality Fund Common Stock|N|MPA|N|100|N|MPA
+MPAY|Exchange Listed Funds Trust Akros Monthly Payout ETF|P|MPAY|Y|100|N|MPAY
 MPC|Marathon Petroleum Corporation Common Stock|N|MPC|N|100|N|MPC
 MPLN|MultiPlan Corporation Class A Common Stock|N|MPLN|N|100|N|MPLN
 MPLN.W|MultiPlan Corporation Warrants|N|MPLN.WS|N|100|N|MPLN+
@@ -6482,4 +6483,4 @@ ZVV|NYSE ARCA test stock|P|ZVV|N|100|Y|ZVV
 ZWS|Zurn Water Solutions Corporation Common Stock|N|ZWS|N|100|N|ZWS
 ZXIET|IEX Test Company Test Symbol Three for IEX|V|ZXIET|N|100|Y|ZXIET
 ZYME|Zymeworks Inc. Common Shares|N|ZYME|N|100|N|ZYME
-File Creation Time: 0504202221:30||||||
+File Creation Time: 0506202221:31||||||

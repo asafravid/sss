@@ -101,6 +101,7 @@ AZTA,Azenta Inc
 BA,Boeing Company
 BAC,Bank of America Corp
 BAH,Booz Allen Hamilton Holding Corp
+BALL,Ball Corporation
 BAX,Baxter International Inc
 BBWI,Bath & Body Works Inc
 BBY,Best Buy Company
@@ -112,6 +113,7 @@ BERY,Berry Global Group
 BF.A,Brown Forman Inc Cl A
 BFAM,Bright Horizons Family Solutions Inc
 BF.B,Brown Forman Inc Cl B
+BFH,Bread Financial Hldgs Inc
 BG,Bunge Ltd
 BHF,Brighthouse Financial Inc
 BIIB,Biogen Inc
@@ -124,7 +126,6 @@ BKR,Baker Hughes A Ge Co. Cl A
 BLD,Topbuild Corp
 BLDR,Builders Firstsource
 BLK,Blackrock Inc
-BLL,Ball Corp
 BMRN,Biomarin Pharmaceuticals
 BMY,Bristol-Myers Squibb Company
 BOH,Bank of Hawaii Corp
@@ -172,7 +173,6 @@ CERT,Certara Inc
 CF,Cf Industries Holdings
 CFG,Citizens Financial Group Inc/Ri
 CFR,Cullen/Frost Bankers
-CFX,Colfax Corp
 CG,The Carlyle Group
 CGNX,Cognex Cp
 CHD,Church & Dwight Company
@@ -219,7 +219,7 @@ CPB,Campbell Soup Company
 CPRI,Capri Holdings Ltd
 CPRT,Copart Inc
 CPT,Camden Property Trust
-CR,Crane Company
+CR,Crane Holdings CO
 CRI,Carter's Inc
 CRL,Charles River Laboratories Intl
 CRM,Salesforce Inc
@@ -264,8 +264,6 @@ DHI,D.R. Horton
 DHR,Danaher Corp
 DINO,HF Sinclair Corp
 DIS,Walt Disney Company
-DISCA,Discovery Comm A
-DISCK,Discovery Comm Inc
 DISH,Dish Network Corp
 DKNG,Draftkings Inc
 DKS,Dick's Sporting Goods Inc
@@ -302,8 +300,10 @@ EIX,Edison International
 EL,Estee Lauder Companies
 ELAN,Elanco Animal Health Inc
 ELS,Equity Lifestyle Properties
+EMBC,Embecta Corp
 EMN,Eastman Chemical Company
 EMR,Emerson Electric Company
+ENOV,Enovis Corp
 ENPH,Enphase Energy Inc
 ENTG,Entegris Inc
 EOG,Eog Resources
@@ -315,6 +315,7 @@ EQR,Equity Residential
 EQT,Eqt Corp
 ERIE,Erie Indemnity Company
 ES,Eversource Energy
+ESAB,Esab Corp
 ESI,Element Solutions Inc
 ESS,Essex Property Trust
 ESTC,Elastic N.V.
@@ -382,7 +383,7 @@ G,Genpact Ltd
 GD,General Dynamics Corp
 GDDY,Godaddy Inc
 GE,General Electric Company
-GFS,Globalfoundries Inc Ordinary Share
+GFS,Globalfoundries Inc
 GGG,Graco Inc
 GH,Guardant Health Inc
 GILD,Gilead Sciences Inc
@@ -697,7 +698,6 @@ PARA,Paramount Global Cl B
 PAYC,Paycom Software Inc
 PAYX,Paychex Inc
 PB,Prosperity Bancshares
-PBCT,People's United Finl
 PCAR,Paccar Inc
 PCG,Pacific Gas & Electric Company
 PCOR,Procore Technologies Inc
@@ -752,7 +752,7 @@ PXD,Pioneer Natural Resources Company
 PYCR,Paycor Hcm Inc
 PYPL,Paypal Holdings
 QCOM,Qualcomm Inc
-QDEL,Quidel Cp
+QDEL,Quidelortho Corp
 QGEN,Qiagen N.V.
 QRTEA,Qurate Retail Inc Series A
 QRVO,Qorvo Inc
@@ -769,7 +769,7 @@ RF,Regions Financial Corp
 RGA,Reinsurance Group of America Inc
 RGEN,Repligen Cp
 RGLD,Royal Gold Inc
-RH,Restoration Hardware Holdings
+RH,Rh Common Stock
 RHI,Robert Half International Inc
 RIVN,Rivian Automotive Inc Cl A
 RJF,Raymond James Financial
@@ -964,6 +964,7 @@ WAB,Wabtec Corp
 WAL,Western Alliance Bancorp
 WAT,Waters Corp
 WBA,Walgreens Boots Alliance
+WBD,Discovery Inc Series A
 WBS,Webster Financial Corp
 WDAY,Workday Inc
 WDC,Western Digital Cp
@@ -998,4 +999,3 @@ WWE,World Wrestling Entertainment
 WY,Weyerhaeuser Company
 WYNN,Wynn Resorts Ltd
 X,United States Steel Corp
-XEL,XCEL Energy Inc
