@@ -1,4 +1,5 @@
-# Overview
+# Overview 
+[![visits](https://github-visit-counter.herokuapp.com/asafravid/github-visit-counter/visits.svg)](#)
 * A `yfinance`-based Stock Scanner & Screener Based on a Core Equation of Fundamental Financial Properties, followed by a Multi-dimensional Scan Ranking process.
 * Supports Custom Portfolio and the Israeli, US, Swedish and Swiss Stock Markets (Extendable to other stock markets as well).
 * The stocks scan and sorting is done according to the below documentation (Core Equation and Multi-Dimensional scan) written using Google Documents (https://www.google.com/docs/about/):
