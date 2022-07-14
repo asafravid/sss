@@ -1,556 +1,558 @@
-Market Data - All shares
-As of (date and time) 02/06/2022 
+Market Data - All Shares
+As of  14/07/2022 
 
-Name,Symbol ,ISIN,Index Membership,Closing Price,Change (%),Turnover(NIS thousands),Last transaction
-ABILITY,ABIL,KYG8789K1242,,70.00,3.70,1.06,EoD
-ABRA,ABRA,IL0011016669,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon",383.60,0.60,95.92,EoD
-ACCEL,ACCL,IL0007700169,"TA-Growth, TA-AllShare, TA-Rimon",125.80,-0.24,120.13,EoD
-ACKERSTEIN GRP.,ACKR,IL0011762056,"TA-SME60, TA-AllShare, TA-Rimon, TA-SME150, TA-Industrials",454.80,0.00,14.69,EoD
-ACRO KVUT,ACRO,IL0011849028,"TA-90, TA-125, TA-RealEstate, TA-AllShare, TA-Rimon, TA-SME150, TA-Construction",5982.00,-1.38,44132.32,EoD
-ADGAR INV.,ADGR,IL0018200837,"TA-SME60, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA-Investment Properties Abroad",655.10,-2.36,441.19,EoD
-ADKA,ADKA,IL0011436438,"TA-Growth, TA-AllShare, TA-Retail",179.40,0.50,8.53,EoD
-AERODROME GROUP,ARDM,IL0003630105,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Industrials",69.00,-0.43,252.05,EoD
-AFCON HOLD,AFHL,IL0005780130,"TA-SME60, TA-AllShare, TA-Rimon, TA-SME150",13620.00,-3.47,588.98,EoD
-AFI PROPERTIES,AFPR,IL0010913544,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Investment Properties Abroad",19020.00,0.11,20677.66,EoD
+Name,Symbol ,ISIN,Index,Closing Price (0.01 NIS),Change (%),Turnover(NIS thousands),Last Trade
+ABILITY,ABIL,KYG8789K1242,,73.00,0.00,0.00,EoD
+ABRA,ABRA,IL0011016669,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon",372.00,-0.75,470.91,EoD
+ACCEL,ACCL,IL0007700169,"TA-Growth, TA-AllShare, TA-Rimon",120.00,0.00,156.86,EoD
+ACKERSTEIN GRP.,ACKR,IL0011762056,"TA-SME60, TA-AllShare, TA-Rimon, TA-SME150, TA-Industrials",449.40,0.13,45.32,EoD
+ACRO KVUT,ACRO,IL0011849028,"TA-90, TA-125, TA-RealEstate, TA-AllShare, TA-Rimon, TA-SME150, TA-Construction",5707.00,1.60,4114.41,EoD
+ADGAR INV.,ADGR,IL0018200837,"TA-SME60, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA-Investment Properties Abroad",685.70,1.90,242.63,EoD
+ADKA,ADKA,IL0011436438,"TA-Growth, TA-AllShare, TA-Retail",107.10,-3.51,97.89,EoD
+AERODROME GROUP,ARDM,IL0003630105,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Industrials",59.10,-3.11,178.79,EoD
+AFCON HOLD,AFHL,IL0005780130,"TA-SME60, TA-AllShare, TA-Rimon, TA-SME150",15150.00,-0.26,143.11,EoD
+AFI PROPERTIES,AFPR,IL0010913544,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Investment Properties Abroad",16760.00,1.88,696.87,EoD
 AFRICA INDUST,AFID,IL0008000114,,451.00,0.00,0.00,EoD
-AFRICA RESIDENC,AFRE,IL0010979487,"TA-90, TA-125, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Construction, TA-125 Fossil Free",19510.00,-0.96,2912.38,EoD
-AI SYSTEMS,AICS,IL0001690119,,162.90,-1.27,12.71,EoD
-AIROBOTICS,AIRO,IL0011793739,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Industrials",208.90,6.04,56.99,EoD
-AIRPORT CITY,ARPT,IL0010958358,"TA-35, TA-125, TA-RealEstate, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-Investment Properties in Israel, TA-125 Fossil Free",5985.00,-3.82,12202.95,EoD
-AIRTOUCH,ARTS,IL0011733768,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Industrials",135.70,0.00,3.57,EoD
-ALBAAD,ALBA,IL0006250125,"TA-Maala Index, TA-Growth, TA-AllShare, TA-Rimon, TA-Industrials",2037.00,-0.63,48.55,EoD
-ALLMED SOLUTION,ALMD,IL0011014508,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare",40.60,-0.49,1.47,EoD
-ALLOT,ALLT,IL0010996549,"TA-SME60, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Dual listing",1866.00,5.60,255.43,EoD
-ALMEDA      PU,AMDA,IL0011689622,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare",350.10,0.00,1.67,EoD
-ALMOGIM,ALMA,IL0011368292,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Construction",775.00,-3.25,373.35,EoD
-ALON GAS,ALGS,IL0011176885,"TA-Growth, TA-AllShare, TA Oil & Gas Index",2942.00,0.44,35.83,EoD
-ALONY HETZ,ALHE,IL0003900136,"TA-35, TA-125, TA-RealEstate, TA-Maala Index, Tel-Div Index, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-Investment Properties in Israel, TA-125 Fossil Free",4650.00,-3.17,20861.78,EoD
-ALROV PROPERT,ALRPR,IL0003870198,,19680.00,0.00,0.00,EoD
-ALTSHULER FIN,ALTF,IL0011849366,"TA-90, TA-125, TA-Finance Index, Tel-Div Index, TA-AllShare, TA Insurance-Plus, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free",1099.00,-0.63,6482.16,EoD
-ALUMA INFRASTR',ALUMA,IL0011816431,"TA-Growth, TA-AllShare, TA-Rimon",86.00,-0.35,2.63,EoD
-AMANET,AMAN,IL0006540129,"TA-Growth, TA-AllShare",1999.00,3.52,2.44,EoD
-AMIAD,AMD,IL0010943905,"TA-Growth, TA-AllShare, TA-Industrials",1539.00,-0.97,35.88,EoD
-AMIR MARK.,AMRK,IL0010922040,"TA-Growth, TA-AllShare",4015.00,-1.28,17.91,EoD
-AMOT,AMOT,IL0010972789,"TA-35, TA-125, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-Investment Properties in Israel, TA-125 Fossil Free",2158.00,-2.92,20460.79,EoD
-ANALYST,ANLT,IL0010806136,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus, TA-Rimon",3666.00,1.30,45.76,EoD
-ANGEL SALOMON,ANGL,IL0001800189,"TA-Growth, TA-AllShare, TA-Industrials",3883.00,0.70,96.27,EoD
-APOLLO POWER,APLP,IL0010821143,"TA-SME60, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Energy Utilities, TA-Cleantech",2466.00,0.33,341.11,EoD
-AQUARIUS EN,AQUA,IL0011702409,"TA-SME60, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Industrials",1897.00,2.93,291.07,EoD
-ARAD,ARD,IL0010916513,"TA-SME60, Tel-Div Index, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Industrials",4481.00,-1.71,505.17,EoD
-ARAD INVESTMENT,ARAD,IL0007310183,"TA-90, TA-125, TA-AllShare, TA-Rimon, TA-SME150, TA-125 Fossil Free",38990.00,-1.79,7457.39,EoD
-ARAN,ARAN,IL0010852650,"TA-Growth, TA-AllShare",2200.00,0.00,0.79,EoD
-ARGO PROP.,ARGO,NL0015000D84,"TA-90, TA-125, TA-RealEstate, TA-AllShare, TA-Rimon, TA-SME150, TA-Investment Properties Abroad, TA-125 Fossil Free",9820.00,-0.05,1048.81,EoD
-ARI RAEL ESTATE,ARIN,IL0003660136,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Investment Properties in Israel",386.60,-2.60,2968.05,EoD
-ARYT,ARYT,IL0005870147,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Industrials",118.70,1.02,33.15,EoD
-ASHOT,ASHO,IL0003120172,"TA-Growth, TA-AllShare, TA-Industrials",1540.00,-2.41,27.71,EoD
-ASHTROM GROUP,ASHG,IL0011323156,"TA-35, TA-125, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-Family, TA-Construction, TA-125 Fossil Free",7550.00,-3.59,7329.32,EoD
-ASPEN GROUP,ASGR,IL0003130155,"TA-SME60, TA-RealEstate, TA-Maala Index, TA-AllShare, TA-Rimon, TA-SME150, TA-Investment Properties Abroad",951.10,-1.67,272.61,EoD
-ATREYU CAP,ATRY,IL0010961063,"TA-SME60, TA-Finance Index, Tel-Div Index, TA-AllShare, TA Insurance-Plus, TA-Rimon, TA-SME150",6170.00,-3.85,835.83,EoD
-AUDIOCODES,AUDC,IL0010829658,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Industrials, TA-125 Fossil Free, TA-Dual listing",7646.00,-0.35,6269.00,EoD
-AUGWIND,AUGN,IL0011059073,"TA-SME60, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Energy Utilities, TA-Cleantech",1482.00,-1.00,505.70,EoD
-AURA,AURA,IL0003730194,"TA-90, TA-125, TA-RealEstate, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Construction",593.00,-2.79,5142.67,EoD
-AURA SMART,AUSA,IL0011766198,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Energy Utilities, TA-Cleantech",324.50,1.18,131.04,EoD
-AUSTRALIA ISR,AUIS,IL0010805229,,2100.00,0.00,94.71,EoD
-AUTO BANK SERV,SHVA,IL0011581613,"TA-SME60, TA-Finance Index, TA-AllShare, TA Insurance-Plus, TA-Rimon, TA-SME150",2040.00,-0.15,1040.70,EoD
-AUTOMAX,AMX,IL0011316978,"TA-Growth, TA-AllShare",40.70,1.50,11.38,EoD
-AVERBUCH,AVER,IL0006750173,"TA-Growth, TA-AllShare",3556.00,-0.75,67.60,EoD
-AVGAD,AVGD,IL0011718181,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Construction",1090.00,0.18,582.40,EoD
-AVGOL,AVGL,IL0011009573,"TA-SME60, TA-AllShare, TA-Rimon, TA-SME150, TA-Industrials",219.70,-1.92,53.98,EoD
-AVIATION LINKS,AVIA,IL0004130139,,975.90,2.59,22.16,EoD
-AVIV,AVIV,IL0004440181,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Construction",2059.00,0.88,244.22,EoD
-AVIV ARLON,AVLN,IL0001060131,,204.00,0.00,12.24,EoD
-AVROT,AVRT,IL0002970106,,78.30,0.00,0.00,EoD
-AXILION,AILN,IL0003830184,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon",220.40,0.96,67.68,EoD
-AYALON  HOLD.,AYAL,IL0002090152,"TA-Finance Index, TA-Maala Index, TA-Growth, TA-AllShare, TA Insurance-Plus, TA-Insurance",2185.00,-4.00,1117.78,EoD
-AZORIM,AZRM,IL0007150118,"TA-90, TA-125, TA-RealEstate, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Construction, TA-125 Fossil Free",1341.00,-3.66,5039.14,EoD
-AZRIELI GROUP,AZRG,IL0011194789,"TA-35, TA-125, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-Family, TA-Investment Properties in Israel, TA-125 Fossil Free",24450.00,-3.13,28560.54,EoD
-B COMMUNICATION,BCOM,IL0011076630,"TA-Growth, TA-AllShare, TA-Communication & InformationTechnology",1455.00,0.76,3016.17,EoD
-B.YAIR,BYAR,IL0010972292,,1151.00,0.00,0.00,EoD
-BAIT BAKFAR,BKFR,IL0011836561,"TA-SME60, TA-RealEstate, TA-AllShare, TA-Rimon, TA-SME150, TA-Investment Properties in Israel",1568.00,0.58,2263.94,EoD
-BAIT VEGAG GL,BVGG,IL0011853624,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Rimon, TA-Construction",831.00,-0.22,8431.51,EoD
-BARAN,BRAN,IL0002860133,"TA-Growth, TA-AllShare",1036.00,1.27,143.49,EoD
-BAREKET,BRKT,IL0011782765,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus",221.00,-0.81,15.59,EoD
-BATM,BVC,IL0010849045,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Dual listing",177.40,-1.77,522.65,EoD
-BAZAN,ORL,IL0025902482,"TA-90, TA-125, TA-Maala Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Energy Utilities",135.80,-1.02,38787.95,EoD
-BEEIO HONEY,BHNY,IL0010823461,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite",686.10,1.39,1177.58,EoD
-BET SHEMESH,BSEN,IL0010815616,"TA-SME60, TA-AllShare, TA-Rimon, TA-SME150, TA-Industrials",9690.00,-7.18,2053.63,EoD
-BEYON 3D,BYON,IL0011755613,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Industrials",93.00,-1.17,3.01,EoD
-BEZEQ,BEZQ,IL0002300114,"TA-35, TA-125, TA-AllShare, TA-Communication & InformationTechnology, TA-Rimon, TA Sector-Balance, TA-125 Fossil Free",516.90,0.92,26344.68,EoD
-BIG,BIG,IL0010972607,"TA-35, TA-125, TA-RealEstate, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-Investment Properties in Israel, TA-125 Fossil Free",47200.00,-0.97,8699.63,EoD
-BIG-TECH 50 PU,BIGT,IL0011722951,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index",344.80,0.58,19.01,EoD
-BIKUREY HASHDE,BKRY,IL0011726184,"TA-SME60, TA-AllShare, TA-Rimon, TA-SME150",500.00,-5.27,20.37,EoD
-BIO VIEW,BIOV,IL0010960495,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare",376.30,1.59,273.18,EoD
-BIOLIGHT,BOLT,IL0010952237,,1005.00,0.00,0.00,EoD
-BIOLINE RX,BLRX,IL0011015182,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-Dual listing",33.60,-2.04,105.53,EoD
-BIOMEAT FOOD PU,BIMT,IL0011739054,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon",102.10,-1.64,97.13,EoD
-BIOMX,PHGE,US09090D1037,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-Dual listing",228.30,-0.91,29.92,EoD
-BIRMAN,BIRM,IL0005300145,"TA-Growth, TA-AllShare, TA-Industrials",2615.00,6.34,9.60,EoD
-BLADE RANGER,BLRN,IL0011705139,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Industrials",929.40,-5.59,31.85,EoD
-BLENDER,BLND,IL0011720971,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon",1531.00,-0.65,13.61,EoD
-BLITZ,BLTZ,IL0004240102,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Industrials",165.30,0.49,6.90,EoD
-BLUE SQ REAL ES,BLSR,IL0010985658,"TA-90, TA-125, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Investment Properties in Israel, TA-125 Fossil Free",23620.00,-4.18,7476.36,EoD
-BONEI TICHON,BOTI,IL0005310128,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Construction",4045.00,-3.46,1088.72,EoD
-BONUS BIOGROUP,BONS,IL0004850116,"TA-90, TA-125, TA-Biomed Index, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Industrials, TA-125 Fossil Free",35.30,0.57,879.44,EoD
-BRACK CAPIT N V,BCNV,NL0009690619,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Investment Properties Abroad",39680.00,0.25,23.81,EoD
-BRAINSWAY,BWAY,IL0011007189,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-Dual listing",1129.00,-1.14,201.49,EoD
-BRAM INDUS,BRAM,IL0010945157,"TA-Growth, TA-AllShare, TA-Industrials",255.70,-2.03,11.64,EoD
-BRAND,BRND,IL0005360115,"TA-Growth, TA-AllShare, TA-Industrials",439.10,0.76,6.60,EoD
-BRENMILLER,BNRG,IL0011415309,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Energy Utilities, TA-Cleantech",1009.00,-1.46,643.77,EoD
-BRILL,BRIL,IL0003990145,"TA-Growth, TA-AllShare, TA-Retail",3396.00,-2.75,195.31,EoD
-BRIMAG,BRMG,IL0010942832,"TA-Growth, TA-AllShare",3401.00,1.07,101.53,EoD
-BUFF TECH',BUFT,IL0011790438,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite",6097.00,2.40,2.32,EoD
-BULIGO,BLGO,IL0011805954,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Rimon, TA-Investment Properties Abroad",1232.00,-1.04,145.36,EoD
-BULL TRADING,BULL,IL0011766354,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus",1329.00,-0.89,15.05,EoD
-C I SYSTEMS,CISY,IL0004420126,,928.90,0.00,0.00,EoD
-CAMTEK,CAMT,IL0010952641,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Industrials, TA-125 Fossil Free, TA-Dual listing",9858.00,0.90,10527.93,EoD
-CAN FITE BIO,CANF,IL0010944739,,10.50,-0.94,100.42,EoD
-CANNABOTECH,CNTC,IL0011769085,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Cannabis",3478.00,13.44,93.62,EoD
-CANNASSURE,CSURE,IL0001110134,,30.10,0.33,3.68,EoD
-CANNOMED,CNMD,IL0011181166,,33.70,3.37,10.08,EoD
-CANZON,CNZN,IL0010960073,,502.00,0.00,0.00,EoD
-CAPITAL POINT,CPTP,IL0010971468,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite",88.00,0.00,1.61,EoD
-CARASSO,CRSO,IL0011238503,"TA-90, TA-125, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Family, TA-125 Fossil Free",1736.00,0.81,716.72,EoD
-CARMIT,CRMT,IL0004400169,,1558.00,0.97,0.54,EoD
-CASTRO,CAST,IL0002800162,"TA-Growth, TA-AllShare, TA-Retail",9369.00,-0.83,37.57,EoD
-CELLCOM,CEL,IL0011015349,"TA-90, TA-125, TA-AllShare, TA-Communication & InformationTechnology, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free",1681.00,-1.70,2404.19,EoD
-CHAM,CHAM,IL0003420143,,355.90,3.43,2.14,EoD
-CIPIA VISION,CPIA,IL0011819328,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon",181.80,7.13,21.18,EoD
-CITRUS PLANT 5,CTPL5,IL0007160356,,87250.00,0.00,0.00,EoD
-CITRUS PLANT1,CTPL1,IL0007160190,,29750.00,0.00,0.00,EoD
-CLAL BEVERAGES,CLBV,IL0011476855,"TA-Growth, TA-AllShare, TA-Rimon, TA-Industrials",2791.00,-1.17,90.68,EoD
-CLAL BIOTECH,CBI,IL0011042806,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon",90.30,-0.77,119.94,EoD
-CLAL INSURANCE,CLIS,IL0002240146,"TA-90, TA-125, TA-Finance Index, TA-Maala Index, TA-AllShare, TA Insurance-Plus, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Insurance",6671.00,0.04,17267.01,EoD
-COFIX GROUP,CFX,IL0003890154,"TA-Growth, TA-AllShare, TA-Retail",830.00,-0.05,138.78,EoD
-COHEN DEV,CDEV,IL0008100104,"TA-Growth, TA-AllShare, TA Oil & Gas Index, TA-Rimon",9048.00,0.11,141.95,EoD
-COMPUGEN,CGEN,IL0010852080,"TA-SME60, TA-Biomed Index, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Industrials, TA-Dual listing",615.30,-1.55,553.44,EoD
-COMPULAB,CLAB,IL0011403008,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Industrials",1644.00,-0.30,11.88,EoD
-COMPUTER DIRECT,CMDR,IL0005070128,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite",30000.00,5.34,35.70,EoD
-CONTINUAL,CNTL,IL0011822603,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index",876.20,0.00,6.44,EoD
-CREATIV MEDIA P,CMCT.P,US1255258576,,8931.00,0.00,0.00,EoD
-CREATIVE MEDIA,CMCT,US1255255846,TA-Investment Properties Abroad,2443.00,7.10,1.60,EoD
-D.N.A BIOMED,DNA,IL0011038523,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare",136.30,-3.20,93.51,EoD
-DAN   HOTELS,DANH,IL0008220159,,2854.00,2.22,8.62,EoD
-DANEL,DANE,IL0003140139,"TA-90, TA-125, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free",43110.00,-4.01,8064.70,EoD
-DANYA CEBUS,DNYA,IL0011731374,"TA-90, TA-125, TA-RealEstate, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Construction, TA-125 Fossil Free",8201.00,-2.30,3635.73,EoD
-DECMA CAPITAL,DCMA,IL0011161770,,49.30,0.00,0.00,EoD
-DELEK AUTOMOTIV,DLEA,IL0008290103,"TA-90, TA-125, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance",4200.00,-4.22,7672.09,EoD
-DELEK GROUP,DLEKG,IL0010841281,"TA-90, TA-125, TA-AllShare, TA Oil & Gas Index, TA-Rimon, TA-SME150, TA Sector-Balance",51710.00,-2.80,75480.49,EoD
-DELTA,DELT,IL0006270347,"TA-90, TA-125, TA-Maala Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Industrials, TA-125 Fossil Free",18700.00,-4.15,9686.60,EoD
-DELTA BRANDS,DLTI,IL0011736993,"TA-90, TA-125, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Retail",6189.00,-0.80,261.58,EoD
-DIMRI,DIMRI,IL0010903156,"TA-90, TA-125, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Family, TA-Construction, TA-125 Fossil Free",26950.00,1.70,3825.76,EoD
-DIPLOMAT HOLDI.,DIPL,IL0011734915,"TA-90, TA-125, TA-AllShare, TA-Rimon, TA-SME150, TA-Family, TA-125 Fossil Free",5320.00,-1.86,2534.93,EoD
-DIRECT FINANCE,DIFI,IL0011681868,"TA-90, TA-125, TA-Finance Index, TA-AllShare, TA Insurance-Plus, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free",77260.00,-1.60,3434.16,EoD
-DISCOUNT,DSCT,IL0006912120,"TA-35, TA-125, TA-Finance Index, TA-Maala Index, TA-Banks5, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-125 Fossil Free",1900.00,-1.91,61904.32,EoD
-DISCOUNT INV,DISI,IL0006390137,"TA-Growth, TA-AllShare",785.10,-1.76,350.13,EoD
-DM3,DM3,IL0011775181,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Industrials",906.90,-1.95,13.38,EoD
-DOR ALON,DRAL,IL0010932023,"TA-Growth, TA-AllShare, TA-Energy Utilities",12820.00,3.64,1203.39,EoD
-DORAL ENERGY,DORL,IL0011667685,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Industrials, TA-Energy Utilities, TA-Cleantech, TA-125 Fossil Free",1108.00,0.00,1564.78,EoD
-DORSEL,DRSL,IL0010966765,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Investment Properties in Israel",1534.00,8.79,12.35,EoD
-DUNIEC,DUNI,IL0004000100,"TA-SME60, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA-Family, TA-Construction",20420.00,5.69,2857.66,EoD
-E&M,EMCO,IL0003820102,"TA-SME60, Tel-Div Index, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon, TA-SME150",968.00,-5.00,171.38,EoD
-ECONERGY,ECNR,IL0011783342,"TA-SME60, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Energy Utilities, TA-Cleantech",2027.00,3.84,99.27,EoD
-ECOPPIA,ECPA,IL0011698953,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Industrials",250.30,-1.34,54.84,EoD
-EDRI-EL,EDRL,IL0011051625,,141.50,3.74,3.97,EoD
-EL AL,ELAL,IL0010878242,"TA-Growth, TA-AllShare, TA-Rimon",359.90,-1.18,1563.91,EoD
-ELBIT IMAGING,EMITF,IL0010811169,"TA-Growth, TA-AllShare",624.80,2.90,177.86,EoD
+AFRICA RESIDENC,AFRE,IL0010979487,"TA-90, TA-125, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Construction, TA-125 Fossil Free",16990.00,-3.47,1632.40,EoD
+AI SYSTEMS,AICS,IL0001690119,,88.40,-3.28,14.80,EoD
+AIROBOTICS,AIRO,IL0011793739,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Industrials",191.00,-0.05,71.66,EoD
+AIRPORT CITY,ARPT,IL0010958358,"TA-35, TA-125, TA-RealEstate, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-Investment Properties in Israel, TA-125 Fossil Free",6072.00,-1.01,6590.69,EoD
+AIRTOUCH,ARTS,IL0011733768,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Industrials",123.00,0.00,0.28,EoD
+ALBAAD,ALBA,IL0006250125,"TA-Maala Index, TA-Growth, TA-AllShare, TA-Rimon, TA-Industrials",1940.00,4.02,185.96,EoD
+ALLMED SOLUTION,ALMD,IL0011014508,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare",41.90,2.44,1.53,EoD
+ALLOT,ALLT,IL0010996549,"TA-SME60, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Dual listing",1705.00,-1.04,123.90,EoD
+ALMEDA      PU,AMDA,IL0011689622,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare",333.20,0.03,1.16,EoD
+ALMOGIM,ALMA,IL0011368292,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Construction",754.50,-1.71,76.85,EoD
+ALON GAS,ALGS,IL0011176885,"TA-Growth, TA-AllShare, TA Oil & Gas Index",2802.00,0.47,19.59,EoD
+ALONY HETZ,ALHE,IL0003900136,"TA-35, TA-125, TA-RealEstate, TA-Maala Index, Tel-Div Index, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-Investment Properties in Israel, TA-125 Fossil Free",4712.00,1.51,11208.08,EoD
+ALROV PROPERT,ALRPR,IL0003870198,,19840.00,-1.78,51.90,EoD
+ALTSHULER FIN,ALTF,IL0011849366,"TA-90, TA-125, TA-Finance Index, Tel-Div Index, TA-AllShare, TA Insurance-Plus, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free",925.10,-1.88,1743.09,EoD
+ALUMA INFRASTR',ALUMA,IL0011816431,"TA-Growth, TA-AllShare, TA-Rimon",87.10,-0.68,1.93,EoD
+AMANET,AMAN,IL0006540129,"TA-Growth, TA-AllShare",2012.00,-0.10,2.01,EoD
+AMIAD,AMD,IL0010943905,"TA-Growth, TA-AllShare, TA-Industrials",1491.00,0.00,17.74,EoD
+AMIR MARK.,AMRK,IL0010922040,"TA-Growth, TA-AllShare",3895.00,1.59,55.48,EoD
+AMOT,AMOT,IL0010972789,"TA-35, TA-125, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-Investment Properties in Israel, TA-125 Fossil Free",2160.00,1.22,21368.10,EoD
+ANALYST,ANLT,IL0010806136,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus, TA-Rimon",3596.00,-2.15,39.01,EoD
+ANGEL SALOMON,ANGL,IL0001800189,"TA-Growth, TA-AllShare, TA-Industrials",3708.00,-3.96,227.47,EoD
+APOLLO POWER,APLP,IL0010821143,"TA-SME60, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Energy Utilities, TA-Cleantech",2566.00,-3.13,584.93,EoD
+AQUARIUS EN,AQUA,IL0011702409,"TA-SME60, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Industrials",1079.00,-5.18,365.63,EoD
+ARAD,ARD,IL0010916513,"TA-SME60, Tel-Div Index, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Industrials",4602.00,3.53,859.71,EoD
+ARAD INVESTMENT,ARAD,IL0007310183,"TA-90, TA-125, TA-AllShare, TA-Rimon, TA-SME150, TA-125 Fossil Free",40300.00,-2.26,1091.45,EoD
+ARAN,ARAN,IL0010852650,"TA-Growth, TA-AllShare",2317.00,0.00,0.00,EoD
+ARGO PROP.,ARGO,NL0015000D84,"TA-90, TA-125, TA-RealEstate, TA-AllShare, TA-Rimon, TA-SME150, TA-Investment Properties Abroad, TA-125 Fossil Free",9127.00,-5.56,3438.83,EoD
+ARI RAEL ESTATE,ARIN,IL0003660136,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Investment Properties in Israel",345.60,-0.69,1601.41,EoD
+ARYT,ARYT,IL0005870147,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Industrials",106.10,-0.19,4.60,EoD
+ASHOT,ASHO,IL0003120172,"TA-Growth, TA-AllShare, TA-Industrials",1691.00,-1.63,13.27,EoD
+ASHTROM GROUP,ASHG,IL0011323156,"TA-35, TA-125, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-Family, TA-Construction, TA-125 Fossil Free",7690.00,-1.41,5271.89,EoD
+ASPEN GROUP,ASGR,IL0003130155,"TA-SME60, TA-RealEstate, TA-Maala Index, TA-AllShare, TA-Rimon, TA-SME150, TA-Investment Properties Abroad",895.10,-0.46,397.58,EoD
+ATREYU CAP,ATRY,IL0010961063,"TA-SME60, TA-Finance Index, Tel-Div Index, TA-AllShare, TA Insurance-Plus, TA-Rimon, TA-SME150",5879.00,1.03,332.50,EoD
+AUDIOCODES,AUDC,IL0010829658,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Industrials, TA-125 Fossil Free, TA-Dual listing",7712.00,0.90,1316.05,EoD
+AUGWIND,AUGN,IL0011059073,"TA-SME60, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Energy Utilities, TA-Cleantech",1264.00,-5.74,487.35,EoD
+AURA,AURA,IL0003730194,"TA-90, TA-125, TA-RealEstate, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Construction",598.00,-0.33,1896.60,EoD
+AURA SMART,AUSA,IL0011766198,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Energy Utilities, TA-Cleantech",251.50,-1.37,7.01,EoD
+AUSTRALIA ISR,AUIS,IL0010805229,,1892.00,0.00,0.00,EoD
+AUTO BANK SERV,SHVA,IL0011581613,"TA-SME60, TA-Finance Index, TA-AllShare, TA Insurance-Plus, TA-Rimon, TA-SME150",2080.00,1.32,2006.66,EoD
+AUTOMAX,AMX,IL0011316978,"TA-Growth, TA-AllShare",37.60,2.73,4.14,EoD
+AVERBUCH,AVER,IL0006750173,"TA-Growth, TA-AllShare",3694.00,1.68,71.39,EoD
+AVGAD,AVGD,IL0011718181,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Construction",1169.00,-1.35,80.59,EoD
+AVGOL,AVGL,IL0011009573,"TA-SME60, TA-AllShare, TA-Rimon, TA-SME150, TA-Industrials",196.60,-2.82,74.35,EoD
+AVIATION LINKS,AVIA,IL0004130139,,930.00,0.00,151.53,EoD
+AVIV,AVIV,IL0004440181,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Construction",1950.00,0.00,4.19,EoD
+AVIV ARLON,AVLN,IL0001060131,,212.00,0.00,0.00,EoD
+AVROT,AVRT,IL0002970106,,89.10,0.00,0.00,EoD
+AXILION,AILN,IL0003830184,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon",182.80,-1.14,37.81,EoD
+AYALON  HOLD.,AYAL,IL0002090152,"TA-Finance Index, TA-Maala Index, TA-Growth, TA-AllShare, TA Insurance-Plus, TA-Insurance",2304.00,2.35,417.28,EoD
+AZORIM,AZRM,IL0007150118,"TA-90, TA-125, TA-RealEstate, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Construction, TA-125 Fossil Free",1266.00,-2.01,1387.93,EoD
+AZRIELI GROUP,AZRG,IL0011194789,"TA-35, TA-125, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-Family, TA-Investment Properties in Israel, TA-125 Fossil Free",25500.00,1.67,42132.78,EoD
+B COMMUNICATION,BCOM,IL0011076630,"TA-Growth, TA-AllShare, TA-Communication & InformationTechnology",1606.00,2.16,1422.21,EoD
+BAIT BAKFAR,BKFR,IL0011836561,"TA-SME60, TA-RealEstate, TA-AllShare, TA-Rimon, TA-SME150, TA-Investment Properties in Israel",1308.00,-0.53,90.38,EoD
+BAIT VEGAG GL,BVGG,IL0011853624,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Rimon, TA-Construction",803.00,2.82,1305.00,EoD
+BARAN,BRAN,IL0002860133,"TA-Growth, TA-AllShare",970.00,-1.60,87.86,EoD
+BAREKET,BRKT,IL0011782765,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus",191.70,1.11,8.17,EoD
+BATM,BVC,IL0010849045,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Dual listing",139.30,-4.85,1874.01,EoD
+BAZAN,ORL,IL0025902482,"TA-90, TA-125, TA-Maala Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Energy Utilities",126.30,0.40,7429.15,EoD
+BEEIO HONEY,BHNY,IL0010823461,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite",586.30,-2.15,30.79,EoD
+BET SHEMESH,BSEN,IL0010815616,"TA-SME60, TA-AllShare, TA-Rimon, TA-SME150, TA-Industrials",10910.00,0.83,454.52,EoD
+BEYON 3D,BYON,IL0011755613,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Industrials",101.00,0.00,0.00,EoD
+BEZEQ,BEZQ,IL0002300114,"TA-35, TA-125, TA-AllShare, TA-Communication & InformationTechnology, TA-Rimon, TA Sector-Balance, TA-125 Fossil Free",558.00,1.64,63663.24,EoD
+BIG,BIG,IL0010972607,"TA-35, TA-125, TA-RealEstate, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-Investment Properties in Israel, TA-125 Fossil Free",42100.00,0.67,15867.42,EoD
+BIG-TECH 50 PU,BIGT,IL0011722951,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index",298.00,0.78,37.95,EoD
+BIKUREY HASHDE,BKRY,IL0011726184,"TA-SME60, TA-AllShare, TA-Rimon, TA-SME150",405.10,-2.43,91.18,EoD
+BIO VIEW,BIOV,IL0010960495,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare",386.60,-0.67,28.46,EoD
+BIOLIGHT,BOLT,IL0010952237,,898.00,-0.23,4.50,EoD
+BIOLINE RX,BLRX,IL0011015182,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-Dual listing",32.00,0.95,117.41,EoD
+BIOMEAT FOOD PU,BIMT,IL0011739054,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon",97.80,-0.10,39.85,EoD
+BIOMX,PHGE,US09090D1037,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-Dual listing",318.40,-8.64,153.44,EoD
+BIRMAN,BIRM,IL0005300145,"TA-Growth, TA-AllShare, TA-Industrials",2744.00,0.00,0.55,EoD
+BLADE RANGER,BLRN,IL0011705139,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Industrials",894.50,-0.27,0.19,EoD
+BLENDER,BLND,IL0011720971,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon",1339.00,-0.59,13.46,EoD
+BLITZ,BLTZ,IL0004240102,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Industrials",129.00,-3.30,241.23,EoD
+BLUE SQ REAL ES,BLSR,IL0010985658,"TA-90, TA-125, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Investment Properties in Israel, TA-125 Fossil Free",23550.00,-2.61,974.68,EoD
+BONEI TICHON,BOTI,IL0005310128,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Construction",3894.00,1.78,137.00,EoD
+BONUS BIOGROUP,BONS,IL0004850116,"TA-90, TA-125, TA-Biomed Index, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Industrials, TA-125 Fossil Free",29.40,-5.16,2539.14,EoD
+BRACK CAPIT N V,BCNV,NL0009690619,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Investment Properties Abroad",35550.00,-1.55,51.90,EoD
+BRAINSWAY,BWAY,IL0011007189,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-Dual listing",951.90,0.14,75.75,EoD
+BRAM INDUS,BRAM,IL0010945157,"TA-Growth, TA-AllShare, TA-Industrials",249.10,0.00,0.00,EoD
+BRAND,BRND,IL0005360115,"TA-Growth, TA-AllShare, TA-Industrials",379.00,-3.44,40.66,EoD
+BRENMILLER,BNRG,IL0011415309,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Energy Utilities, TA-Cleantech",1127.00,-2.84,549.22,EoD
+BRILL,BRIL,IL0003990145,"TA-Growth, TA-AllShare, TA-Retail",3537.00,1.11,49.77,EoD
+BRIMAG,BRMG,IL0010942832,"TA-Growth, TA-AllShare",2980.00,-2.61,239.64,EoD
+BUFF TECH',BUFT,IL0011790438,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite",4839.00,0.71,0.54,EoD
+BULIGO,BLGO,IL0011805954,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Rimon, TA-Investment Properties Abroad",1198.00,2.22,71.22,EoD
+BULL TRADING,BULL,IL0011766354,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus",1158.00,0.87,76.61,EoD
+C I SYSTEMS,CISY,IL0004420126,,943.90,0.00,0.00,EoD
+CAMTEK,CAMT,IL0010952641,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Industrials, TA-125 Fossil Free, TA-Dual listing",8834.00,0.06,8124.04,EoD
+CAN FITE BIO,CANF,IL0010944739,,10.30,0.00,88.71,EoD
+CANNABOTECH,CNTC,IL0011769085,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Cannabis",3138.00,4.91,114.58,EoD
+CANNASSURE,CSURE,IL0001110134,,23.70,0.00,0.00,EoD
+CANNOMED,CNMD,IL0011181166,,23.40,-0.85,12.47,EoD
+CANZON,CNZN,IL0010960073,,423.30,0.00,0.00,EoD
+CAPITAL POINT,CPTP,IL0010971468,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite",84.60,0.12,0.17,EoD
+CARASSO,CRSO,IL0011238503,"TA-90, TA-125, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Family, TA-125 Fossil Free",1700.00,0.00,1422.24,EoD
+CARMIT,CRMT,IL0004400169,,1632.00,2.32,3.85,EoD
+CASTRO,CAST,IL0002800162,"TA-Growth, TA-AllShare, TA-Retail",9114.00,0.00,11.39,EoD
+CELLCOM,CEL,IL0011015349,"TA-90, TA-125, TA-AllShare, TA-Communication & InformationTechnology, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free",1693.00,-3.92,7183.05,EoD
+CHAM,CHAM,IL0003420143,,263.10,-2.59,12.71,EoD
+CIPIA VISION,CPIA,IL0011819328,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon",220.80,-6.04,93.99,EoD
+CITRUS PLANT 5,CTPL5,IL0007160356,,87150.00,0.00,0.00,EoD
+CITRUS PLANT1,CTPL1,IL0007160190,,34590.00,0.00,0.00,EoD
+CLAL BEVERAGES,CLBV,IL0011476855,"TA-Growth, TA-AllShare, TA-Rimon, TA-Industrials",2712.00,-3.07,63.62,EoD
+CLAL BIOTECH,CBI,IL0011042806,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon",92.00,0.00,25.68,EoD
+CLAL INSURANCE,CLIS,IL0002240146,"TA-90, TA-125, TA-Finance Index, TA-Maala Index, TA-AllShare, TA Insurance-Plus, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Insurance",6223.00,-3.37,7592.21,EoD
+COFIX GROUP,CFX,IL0003890154,"TA-Growth, TA-AllShare, TA-Retail",800.00,0.13,5.51,EoD
+COHEN DEV,CDEV,IL0008100104,"TA-Growth, TA-AllShare, TA Oil & Gas Index, TA-Rimon",8740.00,0.02,70.15,EoD
+COMPUGEN,CGEN,IL0010852080,"TA-SME60, TA-Biomed Index, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Industrials, TA-Dual listing",677.90,-3.07,489.60,EoD
+COMPULAB,CLAB,IL0011403008,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Industrials",1491.00,0.07,22.69,EoD
+COMPUTER DIRECT,CMDR,IL0005070128,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite",28860.00,-1.67,2.02,EoD
+CONTINUAL,CNTL,IL0011822603,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index",732.20,-2.10,2.59,EoD
+CREATIV MEDIA P,CMCT.P,US1255258576,,8937.00,0.00,0.00,EoD
+CREATIVE MEDIA,CMCT,US1255255846,TA-Investment Properties Abroad,2505.00,7.97,1.61,EoD
+D.N.A BIOMED,DNA,IL0011038523,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare",121.80,1.42,95.53,EoD
+DAN   HOTELS,DANH,IL0008220159,,2886.00,0.00,0.00,EoD
+DANEL,DANE,IL0003140139,"TA-90, TA-125, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free",45000.00,-0.73,4704.08,EoD
+DANYA CEBUS,DNYA,IL0011731374,"TA-90, TA-125, TA-RealEstate, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Construction, TA-125 Fossil Free",7910.00,-0.57,1377.17,EoD
+DECMA CAPITAL,DCMA,IL0011161770,,45.00,-6.83,22.07,EoD
+DELEK AUTOMOTIV,DLEA,IL0008290103,"TA-90, TA-125, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance",4129.00,0.10,3531.25,EoD
+DELEK GROUP,DLEKG,IL0010841281,"TA-90, TA-125, TA-AllShare, TA Oil & Gas Index, TA-Rimon, TA-SME150, TA Sector-Balance",42210.00,-3.19,38434.27,EoD
+DELTA,DELT,IL0006270347,"TA-90, TA-125, TA-Maala Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Industrials, TA-125 Fossil Free",16610.00,-0.54,17383.13,EoD
+DELTA BRANDS,DLTI,IL0011736993,"TA-90, TA-125, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Retail",6394.00,-2.35,1308.67,EoD
+DIMRI,DIMRI,IL0010903156,"TA-90, TA-125, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Family, TA-Construction, TA-125 Fossil Free",25450.00,-2.90,3627.05,EoD
+DIPLOMAT HOLDI.,DIPL,IL0011734915,"TA-90, TA-125, TA-AllShare, TA-Rimon, TA-SME150, TA-Family, TA-125 Fossil Free",5689.00,-0.49,210.85,EoD
+DIRECT FINANCE,DIFI,IL0011681868,"TA-90, TA-125, TA-Finance Index, TA-AllShare, TA Insurance-Plus, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free",77000.00,0.00,839.01,EoD
+DISCOUNT,DSCT,IL0006912120,"TA-35, TA-125, TA-Finance Index, TA-Maala Index, TA-Banks5, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-125 Fossil Free",1855.00,-1.33,45112.93,EoD
+DISCOUNT INV,DISI,IL0006390137,"TA-Growth, TA-AllShare",679.40,-2.57,810.76,EoD
+DM3,DM3,IL0011775181,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Industrials",907.60,2.37,53.03,EoD
+DOR ALON,DRAL,IL0010932023,"TA-Growth, TA-AllShare, TA-Energy Utilities",12680.00,1.52,70.00,EoD
+DORAL ENERGY,DORL,IL0011667685,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Industrials, TA-Energy Utilities, TA-Cleantech, TA-125 Fossil Free",1133.00,-6.13,2587.99,EoD
+DORSEL,DRSL,IL0010966765,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Investment Properties in Israel",1377.00,-0.07,33.74,EoD
+DUNIEC,DUNI,IL0004000100,"TA-SME60, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA-Family, TA-Construction",20100.00,6.91,3977.52,EoD
+E&M,EMCO,IL0003820102,"TA-SME60, Tel-Div Index, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon, TA-SME150",974.40,0.80,33.92,EoD
+ECONERGY,ECNR,IL0011783342,"TA-SME60, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Energy Utilities, TA-Cleantech",2211.00,-2.68,112.27,EoD
+ECOPPIA,ECPA,IL0011698953,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Industrials",209.00,-1.42,144.56,EoD
+EDRI-EL,EDRL,IL0011051625,,158.90,0.00,0.00,EoD
+EL AL,ELAL,IL0010878242,"TA-Growth, TA-AllShare, TA-Rimon",374.70,0.46,1915.84,EoD
+ELBIT IMAGING,EMITF,IL0010811169,"TA-Growth, TA-AllShare",483.30,-1.49,69.62,EoD
 ELBIT MEDITEC-M,EMTC-M,IL0004740150,,141.50,0.00,0.00,EoD
-ELBIT SYSTEMS,ESLT,IL0010811243,"TA-35, TA-125, TA-Maala Index, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA Sector-Balance, TA-Industrials, TA-125 Fossil Free, TA-Dual listing",68200.00,-2.07,32227.32,EoD
-ELCO,ELCO,IL0006940345,"TA-90, TA-125, TA-AllShare, TA-Rimon, TA-SME150, TA-Family",21590.00,-4.00,8105.83,EoD
-ELDAV,ELDAV,IL0010836588,,250.60,-2.45,3.22,EoD
-ELECTRA,ELTR,IL0007390375,"TA-35, TA-125, TA-AllShare, TA-Rimon, TA-Family, TA-125 Fossil Free",181700.00,-0.16,5914.52,EoD
-ELECTRA CO  PR,ECP,IL0050101299,"TA-90, TA-125, TA-Maala Index, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Retail",15000.00,-2.15,8480.06,EoD
-ELECTRA REAL E.,ELCRE,IL0010940448,"TA-90, TA-125, TA-RealEstate, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Investment Properties Abroad, TA-125 Fossil Free",5724.00,-4.44,5072.57,EoD
-ELECTREON,ELWS,IL0003680191,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Industrials, TA-Energy Utilities, TA-Cleantech, TA-125 Fossil Free",8500.00,-2.30,9258.64,EoD
-ELLOMAY,ELLO,IL0010826357,"TA-SME60, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Energy Utilities, TA-Cleantech, TA-Dual listing",7970.00,0.00,489.66,EoD
-ELMOR,ELMR,IL0011424541,"TA-Growth, TA-AllShare, TA-Industrials",1125.00,0.27,6.82,EoD
-ELRON,ELRN,IL0007490779,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon",967.00,-0.53,53.12,EoD
-ELSPEC,ELSPC,IL0010903644,"TA-Growth, TA-AllShare, TA-Industrials",344.30,-1.06,38.43,EoD
-EMILIA DEVEL,EMDV,IL0005890103,"TA-Growth, TA-AllShare",2369.00,0.00,23.76,EoD
-ENDYMED,ENDY,IL0011010217,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare",658.80,3.57,153.39,EoD
-ENERGEAN,ENOG,GB00BG12Y042,"TA-90, TA-125, TA-Maala Index, TA-AllShare, TA Oil & Gas Index, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Dual listing",5380.00,-2.89,34507.90,EoD
-ENERGIX,ENRG,IL0011233553,"TA-35, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA Sector-Balance, TA-Industrials, TA-Energy Utilities, TA-Cleantech, TA-125 Fossil Free",992.30,-1.95,5046.32,EoD
-ENLIGHT ENERGY,ENLT,IL0007200111,"TA-90, TA-125, TA-Maala Index, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Industrials, TA-Energy Utilities, TA-Cleantech, TA-125 Fossil Free",611.10,-1.78,36352.68,EoD
-ENLIVEX,ENLV,IL0011319527,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-Dual listing",1586.00,1.15,1086.59,EoD
-ENVIZION,ENVM,IL0011758195,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite",2119.00,0.05,28.67,EoD
-EPITOMEE MED,EPIT,IL0011825911,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-Industrials",1890.00,3.56,38.11,EoD
-EQUITAL,EQTL,IL0007550176,"TA-90, TA-125, TA-AllShare, TA-Rimon, TA-SME150",11700.00,-3.15,1686.99,EoD
-ERECH FINANCE,EFNC,IL0011201618,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus",2393.00,-0.17,83.93,EoD
-ERIKA B-CURE,BCUR,IL0011789125,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon",149.80,2.18,2.29,EoD
-ETGA GROUP,ETGA,IL0011761140,"TA-Growth, TA-AllShare, TA-Rimon",2607.00,1.16,17.52,EoD
-EVOGENE,EVGN,IL0011050551,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-Dual listing",293.90,-3.16,217.21,EoD
-EXPORT INV,EXPO,IL0007040152,"TA-Growth, TA-AllShare",4278.00,0.00,19.16,EoD
-FATTAL HOLD,FTAL,IL0011434292,"TA-90, TA-125, TA-Maala Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Family, TA-125 Fossil Free",40010.00,-4.42,16340.77,EoD
-FEAT INV PU,FEAT,IL0011731788,,232.00,0.00,0.00,EoD
-FIBI BANK,FIBI,IL0005930388,"TA-35, TA-125, TA-Finance Index, TA-Banks5, Tel-Div Index, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-125 Fossil Free",12840.00,-1.15,30586.86,EoD
-FIBI HOLDINGS,FIBIH,IL0007630119,"TA-90, TA-125, TA-Finance Index, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free",14280.00,-0.42,4557.52,EoD
-FIRE AND GAS,FGAS,IL0011653073,,999.90,0.00,0.00,EoD
-FLYING SPARK,FLYS,IL0011735821,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index",1677.00,-1.35,9.11,EoD
-FMS,FBRT,IL0003150104,"TA-Growth, TA-AllShare, TA-Industrials",10540.00,0.96,79.24,EoD
-FORESIGHT,FRSX,IL0001990188,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Dual listing",52.80,-2.40,362.17,EoD
-FORMULA,FORTY,IL0002560162,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Dual listing",31580.00,1.22,15088.13,EoD
-FOX,FOX,IL0010870223,"TA-90, TA-125, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Family, TA-125 Fossil Free, TA-Retail",41980.00,-2.60,15898.21,EoD
-FRIDENSON,FRDN,IL0011022196,"TA-Growth, TA-AllShare",7878.00,1.01,5.04,EoD
-G 1 SECU,GOSS,IL0011562803,"TA-Maala Index, TA-Growth, TA-AllShare, TA-Rimon",474.80,-0.25,12.35,EoD
-G CITY,GCT,IL0001260111,"TA-90, TA-125, TA-RealEstate, TA-Maala Index, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Family, TA-Investment Properties Abroad, TA-125 Fossil Free",2326.00,-3.53,7487.14,EoD
-G.F.C-L,GFC-L,IL0011226888,,1118.00,0.00,0.00,EoD
-G.P GLOBAL,GPGB,IL0011447815,,1733.00,0.00,0.00,EoD
+ELBIT SYSTEMS,ESLT,IL0010811243,"TA-35, TA-125, TA-Maala Index, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA Sector-Balance, TA-Industrials, TA-125 Fossil Free, TA-Dual listing",77580.00,-2.05,50812.40,EoD
+ELCO,ELCO,IL0006940345,"TA-90, TA-125, TA-AllShare, TA-Rimon, TA-SME150, TA-Family",21670.00,1.74,2984.95,EoD
+ELDAV,ELDAV,IL0010836588,,279.30,1.01,37.08,EoD
+ELECTRA,ELTR,IL0007390375,"TA-35, TA-125, TA-AllShare, TA-Rimon, TA-Family, TA-125 Fossil Free",192060.00,1.52,3976.38,EoD
+ELECTRA CO  PR,ECP,IL0050101299,"TA-90, TA-125, TA-Maala Index, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Retail",15220.00,-1.17,1809.69,EoD
+ELECTRA REAL E.,ELCRE,IL0010940448,"TA-90, TA-125, TA-RealEstate, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Investment Properties Abroad, TA-125 Fossil Free",5401.00,0.47,1891.59,EoD
+ELECTREON,ELWS,IL0003680191,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Industrials, TA-Energy Utilities, TA-Cleantech, TA-125 Fossil Free",8117.00,-6.30,3150.68,EoD
+ELLOMAY,ELLO,IL0010826357,"TA-SME60, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Energy Utilities, TA-Cleantech, TA-Dual listing",8400.00,-0.64,286.79,EoD
+ELMOR,ELMR,IL0011424541,"TA-Growth, TA-AllShare, TA-Industrials",1175.00,-1.18,3.06,EoD
+ELRON,ELRN,IL0007490779,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon",970.00,4.62,823.34,EoD
+ELSPEC,ELSPC,IL0010903644,"TA-Growth, TA-AllShare, TA-Industrials",351.90,1.97,41.44,EoD
+EMILIA DEVEL,EMDV,IL0005890103,"TA-Growth, TA-AllShare",2155.00,0.23,11.23,EoD
+ENDYMED,ENDY,IL0011010217,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare",631.90,0.21,2.48,EoD
+ENERGEAN,ENOG,GB00BG12Y042,"TA-90, TA-125, TA-Maala Index, TA-AllShare, TA Oil & Gas Index, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Dual listing",4190.00,-4.12,8362.07,EoD
+ENERGIX,ENRG,IL0011233553,"TA-35, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA Sector-Balance, TA-Industrials, TA-Energy Utilities, TA-Cleantech, TA-125 Fossil Free",1228.00,-0.81,32184.92,EoD
+ENLIGHT ENERGY,ENLT,IL0007200111,"TA-90, TA-125, TA-Maala Index, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Industrials, TA-Energy Utilities, TA-Cleantech, TA-125 Fossil Free",712.30,-1.59,56268.33,EoD
+ENLIVEX,ENLV,IL0011319527,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-Dual listing",1761.00,-1.07,378.19,EoD
+ENVIZION,ENVM,IL0011758195,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite",2103.00,-5.86,43.72,EoD
+EPITOMEE MED,EPIT,IL0011825911,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-Industrials",2313.00,4.33,447.42,EoD
+EQUITAL,EQTL,IL0007550176,"TA-90, TA-125, TA-AllShare, TA-Rimon, TA-SME150",11000.00,-3.34,3457.52,EoD
+ERECH FINANCE,EFNC,IL0011201618,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus",2101.00,-0.47,49.04,EoD
+ERIKA B-CURE,BCUR,IL0011789125,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon",111.70,-2.19,32.02,EoD
+ETGA GROUP,ETGA,IL0011761140,"TA-Growth, TA-AllShare, TA-Rimon",2486.00,-1.04,8.95,EoD
+EVOGENE,EVGN,IL0011050551,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-Dual listing",270.20,1.39,229.22,EoD
+EXPORT INV,EXPO,IL0007040152,"TA-Growth, TA-AllShare",4107.00,0.00,0.00,EoD
+FATTAL HOLD,FTAL,IL0011434292,"TA-90, TA-125, TA-Maala Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Family, TA-125 Fossil Free",36160.00,-0.96,12116.30,EoD
+FEAT INV PU,FEAT,IL0011731788,,242.80,0.00,0.00,EoD
+FIBI BANK,FIBI,IL0005930388,"TA-35, TA-125, TA-Finance Index, TA-Banks5, Tel-Div Index, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-125 Fossil Free",13930.00,0.00,41474.66,EoD
+FIBI HOLDINGS,FIBIH,IL0007630119,"TA-90, TA-125, TA-Finance Index, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free",15360.00,0.85,6012.45,EoD
+FIRE AND GAS,FGAS,IL0011653073,,990.00,1.93,19.19,EoD
+FLYING SPARK,FLYS,IL0011735821,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index",1509.00,0.00,0.00,EoD
+FMS,FBRT,IL0003150104,"TA-Growth, TA-AllShare, TA-Industrials",10750.00,-0.65,21.28,EoD
+FORESIGHT,FRSX,IL0001990188,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Dual listing",46.30,-3.34,335.80,EoD
+FORMULA,FORTY,IL0002560162,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Dual listing",34280.00,-1.49,2372.66,EoD
+FOX,FOX,IL0010870223,"TA-90, TA-125, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Family, TA-125 Fossil Free, TA-Retail",43150.00,-1.37,5615.58,EoD
+FRIDENSON,FRDN,IL0011022196,"TA-Growth, TA-AllShare",7946.00,0.47,13.11,EoD
+G 1 SECU,GOSS,IL0011562803,"TA-Maala Index, TA-Growth, TA-AllShare, TA-Rimon",427.30,-0.07,23.72,EoD
+G CITY,GCT,IL0001260111,"TA-90, TA-125, TA-RealEstate, TA-Maala Index, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Family, TA-Investment Properties Abroad, TA-125 Fossil Free",2145.00,-1.38,3809.39,EoD
+G.F.C-M,GFC-M,IL0011226888,,1092.00,0.00,0.00,EoD
+G.P GLOBAL,GPGB,IL0011447815,,1628.00,-4.85,29.48,EoD
 GADSDEN PROP,GADS,US36257R1041,,139.30,0.00,0.00,EoD
-GAMA MANAGEMENT,GMA,IL0011774846,"TA-SME60, TA-Finance Index, TA-AllShare, TA Insurance-Plus, TA-Rimon, TA-SME150",1219.00,5.72,105.48,EoD
-GAMLA HAREL,GMLA,IL0011758682,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus, TA-Rimon",405.00,6.66,30.25,EoD
-GAN SHMUEL,GSFI,IL0005320101,"TA-Growth, TA-AllShare, TA-Industrials",1708.00,-0.41,15.00,EoD
-GAON,GAON,IL0011047441,,5623.00,0.00,0.00,EoD
-GAON GROUP,GAGR,IL0004540170,"TA-Growth, TA-AllShare, TA-Industrials",637.00,-2.45,2.70,EoD
-GAV YAM,GVYM,IL0007590198,"TA-RealEstate, Tel-Div Index, TA-Growth, TA-AllShare, TA-Investment Properties in Israel",2971.00,-0.67,7725.08,EoD
-GENCELL,GNCL,IL0011696890,"TA-SME60, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Energy Utilities, TA-Cleantech",520.00,11.56,4602.43,EoD
-GENERATION CAP,GNRS,IL0011569261,"TA-SME60, TA-AllShare, TA-Rimon, TA-SME150",117.80,-1.26,2869.54,EoD
-GIBUI HOLDING,GIBUI,IL0004480195,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus",848.20,-2.28,207.18,EoD
-GILAT,GILT,IL0010825102,"TA-90, TA-125, Tel-Div Index, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Industrials, TA-125 Fossil Free, TA-Dual listing",2221.00,1.42,1263.63,EoD
-GILAT TELECOM,GLTL,IL0010805971,"TA-Growth, TA-AllShare, TA-Communication & InformationTechnology",33.00,-0.60,41.73,EoD
-GINEGAR,GNGR,IL0010958929,"TA-Growth, TA-AllShare, TA-Rimon, TA-Industrials",2020.00,0.00,15.29,EoD
-GIVOT     PU,GIVO,IL0005060228,"TA-Growth, TA-AllShare, TA Oil & Gas Index, TA-Rimon",119.90,7.73,2468.02,EoD
-GIX,GIX,IL0007440113,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index",131.50,2.02,77.30,EoD
-GLASSBOX,GLBX,IL0011762882,"TA-SME60, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150",3983.00,4.35,95.68,EoD
-GLILEO TECH,GLTC,IL0010819832,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index",205.20,1.68,13.35,EoD
-GLOB EXPLOR PU,GLEX,IL0011198335,,26.00,2.77,115.17,EoD
-GLOBAL KNAFAIM,GKL,IL0011413163,"TA-Growth, TA-AllShare",87.60,0.81,2.98,EoD
-GLOBRANDS,GLRS,IL0011474876,"TA-Growth, TA-AllShare, TA-Rimon",35010.00,-0.88,542.69,EoD
-GODM-M,GODM-M,IL0004940131,,125.30,-3.17,45.90,EoD
-GOLAN PLASTIC,GLPL,IL0010919335,"TA-Growth, TA-AllShare, TA-Industrials",967.30,-2.27,1.39,EoD
-GOLD,GOLD,IL0001490130,"TA-Growth, TA-AllShare",14900.00,2.26,15.05,EoD
-GOLDEN HOUSE,GOHO,IL0002350101,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Rimon, TA-Investment Properties in Israel",1269.00,-1.01,27.99,EoD
-GOLF,GOLF,IL0010961485,"TA-Growth, TA-AllShare, TA-Retail",727.30,-3.73,155.33,EoD
-GRACE BREEDING,GRAC,IL0011843658,,2868.00,0.00,5.91,EoD
-GROUP 107,G107,IL0011801813,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index",445.60,1.30,30.61,EoD
+GAMA MANAGEMENT,GMA,IL0011774846,"TA-SME60, TA-Finance Index, TA-AllShare, TA Insurance-Plus, TA-Rimon, TA-SME150",1023.00,2.20,115.96,EoD
+GAMLA HAREL,GMLA,IL0011758682,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus, TA-Rimon",344.60,0.20,202.03,EoD
+GAN SHMUEL,GSFI,IL0005320101,"TA-Growth, TA-AllShare, TA-Industrials",1701.00,-0.70,3.20,EoD
+GAON,GAON,IL0011047441,,6158.00,1.85,1.13,EoD
+GAON GROUP,GAGR,IL0004540170,"TA-Growth, TA-AllShare, TA-Industrials",650.00,-4.03,33.52,EoD
+GAV YAM,GVYM,IL0007590198,"TA-RealEstate, Tel-Div Index, TA-Growth, TA-AllShare, TA-Investment Properties in Israel",3231.00,3.96,47391.91,EoD
+GENCELL,GNCL,IL0011696890,"TA-SME60, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Energy Utilities, TA-Cleantech",340.30,-3.54,551.04,EoD
+GENERATION CAP,GNRS,IL0011569261,"TA-SME60, TA-AllShare, TA-Rimon, TA-SME150",120.90,0.75,4281.34,EoD
+GIBUI HOLDING,GIBUI,IL0004480195,,301.90,4.54,269.31,EoD
+GILAT,GILT,IL0010825102,"TA-90, TA-125, Tel-Div Index, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Industrials, TA-125 Fossil Free, TA-Dual listing",2084.00,-2.02,1082.45,EoD
+GILAT TELECOM,GLTL,IL0010805971,"TA-Growth, TA-AllShare, TA-Communication & InformationTechnology",34.70,2.36,129.88,EoD
+GINEGAR,GNGR,IL0010958929,"TA-Growth, TA-AllShare, TA-Rimon, TA-Industrials",1863.00,-2.51,23.54,EoD
+GIVOT     PU,GIVO,IL0005060228,"TA-Growth, TA-AllShare, TA Oil & Gas Index, TA-Rimon",119.90,3.90,772.85,EoD
+GIX,GIX,IL0007440113,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index",138.20,0.00,0.02,EoD
+GLASSBOX,GLBX,IL0011762882,"TA-SME60, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150",3322.00,-5.41,189.83,EoD
+GLILEO TECH,GLTC,IL0010819832,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index",118.70,1.71,134.99,EoD
+GLOB EXPLOR PU,GLEX,IL0011198335,,21.10,-4.09,20.13,EoD
+GLOBAL KNAFAIM,GKL,IL0011413163,"TA-Growth, TA-AllShare",82.30,0.00,0.00,EoD
+GLOBRANDS,GLRS,IL0011474876,"TA-Growth, TA-AllShare, TA-Rimon",34500.00,0.55,76.31,EoD
+GOLAN PLASTIC,GLPL,IL0010919335,"TA-Growth, TA-AllShare, TA-Industrials",952.30,-1.91,3.37,EoD
+GOLD,GOLD,IL0001490130,"TA-Growth, TA-AllShare",14500.00,0.42,63.19,EoD
+GOLDEN HOUSE,GOHO,IL0002350101,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Rimon, TA-Investment Properties in Israel",1392.00,-6.33,1138.21,EoD
+GOLF,GOLF,IL0010961485,"TA-Growth, TA-AllShare, TA-Retail",674.70,1.83,17.94,EoD
+GOTO,GOTO,IL0011767261,"TA-Growth, TA-AllShare, TA-Rimon",38.80,1.84,13.79,EoD
+GRACE BREEDING,GRAC,IL0011843658,,2740.00,0.00,0.00,EoD
+GROUP 107,G107,IL0011801813,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index",389.10,-0.23,0.18,EoD
 GROUP 11 PU,GR11,KYG4146F1063,,500000.00,0.00,0.00,EoD
-HADASIT BIO,HDST,IL0010954050,,350.30,-0.20,20.18,EoD
-HAGAG,HGG,IL0008230133,"TA-90, TA-125, TA-RealEstate, TA-AllShare, TA-Rimon, TA-SME150, TA-Family, TA-Construction",2470.00,0.00,1955.56,EoD
-HAGAG EURO,HGGE,IL0011436354,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Construction",1092.00,-0.73,501.37,EoD
-HAMAMA,HMAM,IL0011047854,,680.80,0.00,0.01,EoD
-HAMASHBIR 365,MSBI,IL0011049595,"TA-Growth, TA-AllShare, TA-Rimon, TA-Retail",119.10,-3.72,192.22,EoD
-HAMAT,HAMAT,IL0003840167,"TA-SME60, TA-AllShare, TA-Rimon, TA-SME150, TA-Industrials",3274.00,0.86,373.68,EoD
-HANAN MOR,HNMR,IL0011025322,"TA-SME60, TA-RealEstate, TA-AllShare, TA-Rimon, TA-SME150, TA-Construction",4025.00,-5.36,2011.78,EoD
-HAREL,HARL,IL0005850180,"TA-35, TA-125, TA-Finance Index, TA-Maala Index, Tel-Div Index, TA-AllShare, TA Insurance-Plus, TA-Rimon, TA Sector-Balance, TA-Family, TA-125 Fossil Free, TA-Insurance",3625.00,-2.29,11519.35,EoD
-HIGHCON SYSTM,HICN,IL0011699456,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Industrials",202.30,-0.74,65.19,EoD
-HILAN,HLAN,IL0010846983,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free",18870.00,-2.48,6971.46,EoD
-HIPER GLOBAL,HIPR,IL0011849853,"TA-SME60, Tel-Div Index, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon, TA-SME150",1154.00,-1.37,124.06,EoD
-HIRON,HRON,IL0001500110,"TA-Growth, TA-AllShare",222820.00,2.00,4.46,EoD
-HIVE 2040 PU,HIVE,IL0011777658,,429.90,1.66,1.09,EoD
-HOD,HOD,IL0003510158,"TA-Growth, TA-AllShare, TA-Industrials",5900.00,4.00,63.80,EoD
-HOLMES PLACE,HLMS,IL0011425878,"TA-Growth, TA-AllShare, TA-Rimon",374.20,3.43,20.94,EoD
-HOMEBIOGAS,HMGS,IL0011722043,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Energy Utilities, TA-Cleantech",946.10,0.00,35.81,EoD
-HUB,HUB,IL0010840036,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon",412.40,3.13,2817.83,EoD
-HUMAN XT,HUMX,IL0011700007,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon",203.60,-0.54,11.34,EoD
-I ARGENTO PU,IARG,IL0011733438,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index",366.80,0.00,2.52,EoD
-IBI INV HOUSE,IBI,IL0001750186,"TA-Finance Index, TA-Maala Index, TA-Growth, TA-AllShare, TA Insurance-Plus",10240.00,3.84,74.67,EoD
-IBITEC     FUND,IBITEC.F,IL0011425381,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon",83.20,0.48,79.97,EoD
-ICECURE MEDICAL,ICCM,IL0011224156,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Dual listing",620.50,-0.80,347.26,EoD
-ICL,ICL,IL0002810146,"TA-35, TA-125, TA-Maala Index, Tel-Div Index, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-Industrials, TA-Dual listing",3632.00,0.06,106303.28,EoD
-ICON GROUP,ICON,IL0011824849,"TA-Growth, TA-AllShare",1129.00,0.53,31.76,EoD
-IDENTI,IDNT,IL0011774507,,500.00,-3.27,33.10,EoD
-IDI INSUR,IDIN,IL0011295016,"TA-90, TA-125, TA-Finance Index, TA-Maala Index, Tel-Div Index, TA-AllShare, TA Insurance-Plus, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Insurance",9715.00,-1.01,1635.68,EoD
-IDOMOO,IDMO,IL0011763468,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon",675.00,-2.95,11.44,EoD
-IES,IES,IL0004310152,"TA-90, TA-125, TA-RealEstate, TA-AllShare, TA-Rimon, TA-SME150, TA-Family, TA-Investment Properties in Israel, TA-125 Fossil Free",28090.00,-2.57,848.93,EoD
-ILD RENEWAL,ILDR,IL0011214744,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Construction",742.00,-9.07,2412.46,EoD
-ILEX MEDICAL,ILX,IL0010807530,"TA-90, TA-125, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA-Family",12370.00,-1.75,950.20,EoD
-IMAGESAT  I.S.I,ISI,IL0011838138,"TA-SME60, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Industrials",1907.00,-0.26,2160.35,EoD
-IMCO,IMCO,IL0002820129,,1486.00,0.00,0.00,EoD
-IMED PU,IMED,IL0011712309,,290.00,0.00,0.00,EoD
-IMPACX,IMPC,IL0011803066,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon",1028.00,13.20,9.52,EoD
-INFIMER-M,INFR-M,IL0010806888,,588.90,0.02,0.03,EoD
-INFINYA,INFN,IL0006320183,"TA-90, TA-125, TA-Maala Index, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA-Industrials, TA-125 Fossil Free",28820.00,-1.17,3024.92,EoD
-INROM CONST,INRM,IL0011323560,"TA-90, TA-125, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Industrials, TA-125 Fossil Free",1412.00,-0.28,3287.89,EoD
-INTELICANNA,INTL,IL0006730126,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Cannabis",50.10,-7.73,162.86,EoD
-INTER INDSTRIES,ININ,IL0010809288,"TA-Growth, TA-AllShare, TA-Industrials",668.10,0.00,2.66,EoD
-INTERCURE,INCR,IL0011063760,"TA-SME60, TA-Biomed Index, TA Global-BlueTech, TA-AllShare, TA-Rimon, TA-SME150, TA-Cannabis, TA-Dual listing",2167.00,0.46,742.79,EoD
-INTERGAMA,INTR,IL0001740112,,8154.00,0.00,2.77,EoD
-INTERNET GOLD-M,IGLD-M,IL0010834435,,1739.00,0.23,28.75,EoD
-ISPAC 1,ISPC,IL0011795890,,10230.00,0.00,0.00,EoD
-ISRACARD,ISCD,IL0011574030,"TA-90, TA-125, TA-Finance Index, TA-Maala Index, TA-AllShare, TA Insurance-Plus, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free",1415.00,-1.12,7018.32,EoD
-ISRAEL CANADA,ISCN,IL0004340191,"TA-90, TA-125, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Construction, TA-125 Fossil Free",1482.00,-1.46,10947.70,EoD
-ISRAEL CORP,ILCO,IL0005760173,"TA-35, TA-125, TA-AllShare, TA-Rimon",178140.00,-0.48,15671.77,EoD
-ISRAEL OP    PU,ISOP,IL0011199242,,108.40,-7.03,210.45,EoD
-ISRAEL SHIPYARD,ISHI,IL0011685331,"TA-90, TA-125, TA-AllShare, TA-Rimon, TA-SME150, TA-125 Fossil Free",10320.00,-0.77,1137.97,EoD
-ISRAMCO     PU,ISRA,IL0002320179,"TA-90, TA-125, Tel-Div Index, TA-AllShare, TA Oil & Gas Index, TA-Rimon, TA-SME150, TA Sector-Balance",102.00,-0.29,2407.10,EoD
-ISRAS,ISRS,IL0006130343,"TA-90, TA-125, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Investment Properties in Israel, TA-125 Fossil Free",69000.00,-1.36,5088.06,EoD
-ISROTEL,ISRO,IL0010809858,,10270.00,-0.29,13.25,EoD
-ISSTA,ISTA,IL0010810740,"TA-SME60, TA-AllShare, TA-Rimon, TA-SME150",11000.00,-2.57,1750.61,EoD
-JACOB FINANCE,JCFN,IL0011850570,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus, TA-Rimon",1870.00,-1.84,257.66,EoD
-JERUSALEM,JBNK,IL0007260180,"TA-Finance Index, TA-Growth, TA-AllShare",1150.00,1.50,50.77,EoD
-JUNGO,JNGO,IL0011788622,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite",2179.00,-0.95,4.47,EoD
-KADIMASTEM,KDST,IL0011284614,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare",159.20,-2.21,9.26,EoD
-KAFRIT,KAFR,IL0005220111,"TA-SME60, TA-AllShare, TA-Rimon, TA-SME150, TA-Industrials",2626.00,-1.72,11.66,EoD
-KAMADA,KMDA,IL0010941198,"TA-SME60, TA-Biomed Index, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Industrials, TA-Dual listing",1533.00,-0.26,302.51,EoD
-KARDAN N.V.,KRNV,NL0000113652,,5.10,4.08,13.80,EoD
-KARDAN REAL ES,KARE,IL0011184475,"TA-SME60, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA-Construction",383.20,-1.74,1950.11,EoD
-KARDEN ISRAEL,KRDI,IL0012101528,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Construction",265.80,-0.15,187.96,EoD
-KENON,KEN,SG9999012629,"TA-35, TA-125, Tel-Div Index, TA-AllShare, TA-Rimon, TA-Dual listing",18790.00,2.12,12853.73,EoD
-KERUR,KRUR,IL0006210111,"TA-SME60, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA-Industrials",8203.00,0.00,1713.03,EoD
-KEYSTONE REIT,KSTN,IL0011759342,"TA-Growth, TA-AllShare, TA-Rimon",790.00,-0.78,831.65,EoD
-KLIL,KLIL,IL0007970358,"TA-SME60, TA-AllShare, TA-Rimon, TA-SME150, TA-Industrials",27000.00,-1.82,15.39,EoD
-KNAFAIM,KNFM,IL0005430173,"TA-Growth, TA-AllShare",1019.00,-0.68,24.29,EoD
-KVASIR,KVSR,IL0011731457,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index",1208.00,-1.55,18.42,EoD
-LACHISH,LHIS,IL0008260163,,960.00,0.00,0.00,EoD
-LAHAV,LAHAV,IL0001360101,"TA-Growth, TA-AllShare",526.50,-0.60,502.32,EoD
-LAND DEV,ILDC,IL0006120104,"TA-90, TA-125, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA-Family, TA-Investment Properties in Israel, TA-125 Fossil Free",5220.00,-3.40,2613.50,EoD
-LAPIDOT HEL PU,LPHL,IL0010912488,"TA-Growth, TA-AllShare, TA Oil & Gas Index",157.70,2.27,8.86,EoD
-LAPIDOTH   CAP.,LAPD,IL0006420173,"TA-Growth, TA-AllShare",5609.00,0.66,45.16,EoD
-LESICO,LSCO,IL0011409468,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Rimon, TA-Construction",350.00,2.73,532.46,EoD
-LEUMI,LUMI,IL0006046119,"TA-35, TA-125, TA-Finance Index, TA-Maala Index, TA-Banks5, Tel-Div Index, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-125 Fossil Free",3282.00,-2.03,184259.60,EoD
-LEVINSKI OFER,LEOF,IL0002000144,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Construction",72.10,-3.87,281.02,EoD
-LEVINSTEIN ENG,LEVI,IL0005730143,"TA-SME60, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA-Family, TA-Construction",36730.00,-1.50,7857.93,EoD
-LEVINSTEIN PROP,LVPR,IL0011190803,"TA-90, TA-125, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA-Family, TA-Investment Properties in Israel, TA-125 Fossil Free",9320.00,0.94,773.85,EoD
-LIBENTAL,LBTL,IL0005840116,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Construction",1680.00,-5.88,399.61,EoD
-LIBRA,LBRA,IL0011769812,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus, TA-Rimon, TA-Insurance",401.70,-1.35,142.79,EoD
-LINEAGE THERAP,LCTX,US53566P1093,"TA-SME60, TA-Biomed Index, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Industrials, TA-Dual listing",410.00,-2.91,167.56,EoD
-LIVEPERSON,LPSN,US5381461012,"TA-35, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA Sector-Balance, TA-125 Fossil Free, TA-Dual listing",5669.00,0.59,14791.44,EoD
-LODZIA,LODZ,IL0007530129,,3658.00,0.00,0.00,EoD
-LUDAN,LUDN,IL0010814395,"TA-Growth, TA-AllShare, TA-Rimon",1851.00,-1.28,168.74,EoD
-LUZON GROUP,LUZN,IL0004730177,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Construction",220.00,-1.70,2180.12,EoD
-LUZON REAL E.,LZNR,IL0006660166,,80.60,2.94,2.02,EoD
-MAGIC,MGIC,IL0010823123,"TA-90, TA-125, Tel-Div Index, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Dual listing",5797.00,-0.24,1582.65,EoD
-MALAM TEAM,MLTM,IL0001560189,"TA-90, TA-125, TA-Maala Index, Tel-Div Index, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free",7750.00,-4.00,3055.17,EoD
-MAMAN,MMAN,IL0002380140,"TA-Growth, TA-AllShare",1077.00,-4.35,117.06,EoD
-MASLAVI,MSLA,IL0011067498,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Construction",1384.00,-4.16,408.04,EoD
-MASSIVIT,MSVT,IL0011729725,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Industrials",1459.00,4.36,1300.15,EoD
-MATRICELF,MTLF,IL0011767915,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Rimon",624.80,0.47,96.56,EoD
-MATRIX,MTRX,IL0004450156,"TA-90, TA-125, Tel-Div Index, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free",7900.00,-0.85,3809.95,EoD
-MAX STOCK,MAXO,IL0011685588,"TA-90, TA-125, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Retail",647.60,-1.54,639.39,EoD
-MAYTRONICS,MTRN,IL0010910656,"TA-35, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA Sector-Balance, TA-Industrials, TA-125 Fossil Free",6139.00,0.43,13473.69,EoD
-MEDIPOWER 0.1$,MDPR,CY0100361019,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Investment Properties Abroad",759.30,-1.29,22.93,EoD
-MEDIPRSS PU,MPRS,IL0011828980,,133.00,0.00,0.00,EoD
-MEDITR TOWER,MDTR,IL0011315236,"TA-90, TA-125, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA-Investment Properties in Israel, TA-125 Fossil Free",976.00,0.75,1634.86,EoD
-MEGA OR,MGOR,IL0011044885,"TA-90, TA-125, TA-RealEstate, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Investment Properties in Israel, TA-125 Fossil Free",10400.00,-6.89,18354.95,EoD
-MEHADRIN,MEDN,IL0006860147,"TA-Growth, TA-AllShare, TA-Rimon, TA-Industrials",15870.00,0.89,208.84,EoD
-MEITAV DS,MTDS,IL0010818438,"TA-SME60, TA-Finance Index, TA-Maala Index, Tel-Div Index, TA-AllShare, TA Insurance-Plus, TA-Rimon, TA-SME150, TA-Family",1738.00,0.06,802.14,EoD
-MELISRON,MLSR,IL0003230146,"TA-35, TA-125, TA-RealEstate, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-Investment Properties in Israel, TA-125 Fossil Free",23530.00,-1.96,12535.10,EoD
-MENARA PU,MNRA,IL0011784746,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index",595.10,0.00,1.92,EoD
-MENDELSON    IF,MNIN,IL0011294449,"TA-Growth, TA-AllShare, TA-Rimon",1390.00,-2.66,3.02,EoD
-MENIF,MNIF,IL0011708935,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus, TA-Rimon",986.30,0.50,137.10,EoD
-MENIVIM REIT,MNRT,IL0011405730,"TA-90, TA-125, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA-Investment Properties in Israel, TA-125 Fossil Free",182.10,-0.38,1200.31,EoD
-MENORA MIV HLD,MMHD,IL0005660183,"TA-90, TA-125, TA-Finance Index, Tel-Div Index, TA-AllShare, TA Insurance-Plus, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Insurance",7650.00,-1.61,3945.62,EoD
-MER,CMER,IL0003380123,,632.00,2.07,10.12,EoD
-MERCHAVIA HOLD,MRHL,IL0002570146,,48.60,0.00,0.00,EoD
-MESHEK ENERGY,MSKE,IL0011669749,"TA-SME60, TA-AllShare, TA-Rimon, TA-SME150, TA-Energy Utilities",354.30,1.11,339.79,EoD
-MGURIT,MGRT,IL0011391955,"TA-SME60, TA-RealEstate, TA-AllShare, TA-Rimon, TA-SME150, TA-Investment Properties in Israel",723.00,-0.50,658.90,EoD
-MICHLOL FIN,MCLL,IL0011797532,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus, TA-Rimon",971.90,0.00,18.46,EoD
-MICHMAN,MCMN,IL0011723371,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus",24150.00,1.86,28.50,EoD
-MICRONET,MCRNT,IL0010997877,,272.80,3.02,5.46,EoD
-MIGDAL INSUR.,MGDL,IL0010811656,"TA-90, TA-125, TA-Finance Index, TA-Maala Index, TA-AllShare, TA Insurance-Plus, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Insurance",523.80,-3.87,10726.67,EoD
-MIGDALOR,MGDA,IL0011825671,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus, TA-Rimon",238.00,1.67,18.22,EoD
-MILLENNIUM F PU,MIFT,IL0011675019,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index",44.60,-0.67,132.88,EoD
-MIRLAND,MLD,CY0106902113,,28.70,5.90,3.96,EoD
-MISHORIM,MSHR,IL0011051963,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Rimon, TA-Investment Properties Abroad",1096.00,1.58,146.99,EoD
-MIVNE,MVNE,IL0002260193,"TA-35, TA-125, TA-RealEstate, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-Investment Properties in Israel, TA-125 Fossil Free",1041.00,-2.25,13163.52,EoD
-MIVTACH SHAMIR,MISH,IL0001270193,"TA-SME60, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA-Family",9491.00,-2.38,1025.25,EoD
-MIZRAHI TEFAHOT,MZTF,IL0006954379,"TA-35, TA-125, TA-Finance Index, TA-Maala Index, TA-Banks5, Tel-Div Index, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-125 Fossil Free",11660.00,0.95,77498.24,EoD
-MLRN,MLRN,IL0011709503,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus, TA-Rimon",1446.00,0.70,46.07,EoD
-MOBILE MAX-M,MBMX-M,IL0011051393,,105.00,3.65,5.70,EoD
-MODIIN     PU,MDIN,IL0003450173,"TA-Growth, TA-AllShare, TA Oil & Gas Index",575.30,-0.26,64.79,EoD
-MORE INVEST,MRIN,IL0011414641,"TA-SME60, TA-Finance Index, Tel-Div Index, TA-AllShare, TA Insurance-Plus, TA-Rimon, TA-SME150, TA-Family",1175.00,1.47,501.62,EoD
-MORE PENSION,MPP,IL0011843815,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus, TA-Rimon",609.00,-1.04,97.87,EoD
-MULTI RETAIL,MRG,IL0011716698,"TA-Growth, TA-AllShare, TA-Rimon, TA-Retail",1509.00,1.07,17.21,EoD
-MY SIZE,MYSZ,US62844N2080,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Dual listing",78.80,-0.63,7.59,EoD
-MYDAS,MYDS,IL0005440156,,98.70,2.07,50.35,EoD
-NALA DIGITAL,NALA,IL0003410169,"TA-Growth, TA-AllShare",153.00,-4.43,59.86,EoD
-NAPHTHA,NFTA,IL0006430156,"TA-90, TA-125, TA-AllShare, TA Oil & Gas Index, TA-Rimon, TA-SME150, TA Sector-Balance",2580.00,-0.12,2516.41,EoD
-NAVITAS PTRO PU,NVPT,IL0011419699,"TA-90, TA-125, TA-AllShare, TA Oil & Gas Index, TA-Rimon, TA-SME150",2066.00,-1.38,1870.84,EoD
-NAWI,NAWI,IL0002080179,"TA-SME60, TA-Finance Index, TA-AllShare, TA Insurance-Plus, TA-Rimon, TA-SME150, TA-Family",2761.00,0.00,387.55,EoD
-NAYAX,NYAX,IL0011751166,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free",596.10,1.07,702.89,EoD
-NERATECH MEDIA,NRTK,IL0011767261,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Rimon",55.20,-4.83,601.69,EoD
-NETANEL GROUP,NTGR,IL0004210162,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Rimon, TA-Construction",1304.00,-0.61,1439.21,EoD
-NETO,NTO,IL0001680136,"TA-SME60, TA-AllShare, TA-Rimon, TA-SME150, TA-Industrials, TA-Family",20300.00,0.00,751.84,EoD
-NETO MALINDA,NTML,IL0011050973,"TA-90, TA-125, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Family, TA-125 Fossil Free",14200.00,-1.66,2248.05,EoD
-NEWMED ENERG PU,NWMD,IL0004750209,"TA-90, TA-125, Tel-Div Index, TA-AllShare, TA Oil & Gas Index, TA-Rimon, TA-SME150, TA Sector-Balance",912.00,-1.44,21802.76,EoD
-NEXT VISION,NXSN,IL0011765935,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Industrials",811.90,1.63,79.03,EoD
-NEXTAGE,NXTG,IL0004330119,,138.00,1.62,0.71,EoD
-NEXTCOM,NXTM,IL0010957855,"TA-Growth, TA-AllShare",776.20,-1.62,69.07,EoD
-NEXTFERM,NXFR,IL0011719338,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index",528.50,-1.71,14.47,EoD
-NEXTGEN,NXGN,IL0010839301,,109.00,-0.82,213.01,EoD
-NICE,NICE,IL0002730112,"TA-35, TA-125, TA-Maala Index, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA Sector-Balance, TA-125 Fossil Free, TA-Dual listing",66180.00,-1.52,119130.24,EoD
-NISSAN,NISA,IL0006600196,"TA-Growth, TA-AllShare, TA-Rimon, TA-Industrials",1798.00,-0.83,0.87,EoD
-NOFAR ENERGY,NOFR,IL0011708778,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Industrials, TA-Energy Utilities, TA-Cleantech, TA-125 Fossil Free",9020.00,0.00,4075.45,EoD
-NORSTAR,NSTR,PAL0605071A3,"TA-SME60, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA-Family, TA-Investment Properties Abroad",3499.00,-5.38,1520.39,EoD
-NOSTROMO,NOST,VGG826421023,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Energy Utilities, TA-Cleantech",1772.00,0.17,42.98,EoD
-NOVA,NVMI,IL0010845571,"TA-35, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA Sector-Balance, TA-Industrials, TA-125 Fossil Free, TA-Dual listing",35900.00,1.13,25621.28,EoD
-NOVOLOG,NVLG,IL0011401515,"TA-90, TA-125, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free",318.00,-1.88,1524.60,EoD
-NRGENE,NRGN,IL0011720716,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon",698.20,-2.02,64.98,EoD
-NUR,NURI,IL0011757288,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Industrials",4548.00,1.18,27.61,EoD
-O.R.T.,ORTC,IL0010862303,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite",2720.00,-3.13,70.49,EoD
-ONE TECHNOLOGI,ONE,IL0001610182,"TA-90, TA-125, Tel-Div Index, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free",5196.00,-2.15,2846.78,EoD
-OPAL BALANCE,OPAL,IL0010949860,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus, TA-Rimon",305.70,1.33,38.69,EoD
-OPC ENERGY,OPCE,IL0011415713,"TA-35, TA-125, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-Energy Utilities",3298.00,0.70,4165.15,EoD
-OPKO HEALTH,OPK,US68375N1037,"TA-35, TA-125, TA-Biomed Index, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-125 Fossil Free, TA-Dual listing",1000.00,0.20,5417.17,EoD
-ORAD,ORAD,IL0011044968,,63.70,3.24,3.19,EoD
-ORAMED PHARM,ORMP,US68403P2039,"TA-SME60, TA-Biomed Index, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Industrials, TA-Dual listing",1471.00,-4.42,726.48,EoD
-ORBIT,ORBI,IL0002650179,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Industrials",1879.00,0.05,59.76,EoD
-ORIAN,ORIN,IL0011035065,"TA-SME60, TA-AllShare, TA-Rimon, TA-SME150",3443.00,-3.64,33.06,EoD
-ORMAT TECHNO,ORA,US6866881021,"TA-35, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA Sector-Balance, TA-Industrials, TA-Energy Utilities, TA-Cleantech, TA-125 Fossil Free, TA-Dual listing",27550.00,-0.65,28293.51,EoD
-ORON GROUP,ORON,IL0011357063,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Construction",865.00,-3.57,653.32,EoD
-OVERSEAS,OVRS,IL0011396178,"TA-Growth, TA-AllShare, TA-Rimon",443.40,0.00,5.07,EoD
-P.C.B TEC,PCBT,IL0010916851,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Industrials",344.90,7.35,25.22,EoD
-PALRAM,PLRM,IL0006440130,"TA-SME60, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA-Industrials",4504.00,-0.46,413.20,EoD
-PANAXIA ISRAEL,PNAX,IL0011043630,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Cannabis",59.40,2.24,4.61,EoD
-PARTNER,PTNR,IL0010834849,"TA-90, TA-125, TA-Maala Index, TA-AllShare, TA-Communication & InformationTechnology, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Dual listing",2431.00,-2.49,10722.73,EoD
-PAYMENT FINA,PMNT,IL0011808768,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite",518.70,0.08,85.85,EoD
-PAYTON,PAYT,IL0004120155,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Industrials",5200.00,1.80,39.00,EoD
-PAZ OIL,PZOL,IL0011000077,"TA-90, TA-125, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Energy Utilities",44660.00,-2.10,14842.43,EoD
-PENINSULA GROUP,PEN,IL0003330136,"TA-SME60, TA-Finance Index, TA-AllShare, TA Insurance-Plus, TA-Rimon, TA-SME150",247.10,0.61,98.03,EoD
-PENNANTPARK $,PFLT,US70806A1060,,3900.00,0.00,0.00,EoD
-PERION NETWORK,PERI,IL0010958192,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Dual listing",6959.00,3.62,8476.24,EoD
-PETROCHEMICAL-M,PTCH-M,IL0007560159,,82.70,0.00,0.45,EoD
-PETROTX     PU,PTX,IL0010997612,,190.00,5.26,98.47,EoD
-PHARMOCANN,PMCN,IL0010968902,,36.90,0.00,0.02,EoD
-PHINERGY,PNRG,IL0011723603,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Family, TA-Energy Utilities, TA-Cleantech",648.70,-0.02,74.05,EoD
-PHOENIX,PHOE,IL0007670123,"TA-35, TA-125, TA-Finance Index, TA-Maala Index, Tel-Div Index, TA-AllShare, TA Insurance-Plus, TA-Rimon, TA Sector-Balance, TA-125 Fossil Free, TA-Insurance",3510.00,-3.31,25641.00,EoD
-PHOTOMYNE,PHTM,IL0011738551,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite",1891.00,2.44,5.31,EoD
-PLANT ARC,PLNT,IL0011714040,,802.60,0.00,0.04,EoD
-PLASSON INDUS,PLSN,IL0010816036,"TA-90, TA-125, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Industrials, TA-125 Fossil Free",18210.00,-0.55,1163.91,EoD
-PLASTO CARGAL,PLCR,IL0007270163,"TA-Growth, TA-AllShare, TA-Industrials",422.30,-1.95,17.76,EoD
-PLASTOFIL,PPIL,IL0010928401,,602.80,0.00,0.00,EoD
-PLAZA CENTERS-L,PLAZ-L,NL0011882741,,200.00,16.89,10.59,EoD
-PLURISTEM,PSTI,US72940R3003,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-Dual listing",428.50,-2.61,870.09,EoD
-POALIM,POLI,IL0006625771,"TA-35, TA-125, TA-Finance Index, TA-Maala Index, TA-Banks5, Tel-Div Index, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-125 Fossil Free",3083.00,-1.56,163388.00,EoD
-POALIM IBI,PIU,IL0010844822,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus",1191.00,0.59,118.12,EoD
-POLYGON,POLY,IL0007450187,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Investment Properties in Israel",3235.00,0.59,51.75,EoD
-POLYRAM PLS,POLP,IL0011702169,"TA-90, TA-125, TA-AllShare, TA-Rimon, TA-SME150, TA-Industrials",1500.00,1.63,432.12,EoD
-POMVOM,PMVM,IL0011734345,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon",1806.00,0.00,28.14,EoD
-POWERFLEET,PWFL,US73931J1097,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon, TA-Industrials, TA-Dual listing",786.80,3.35,56.37,EoD
-PRASHKOVSKY,PRSK,IL0011021289,"TA-90, TA-125, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Construction",11610.00,-3.73,4638.52,EoD
-PRIME ENERGY,PRIM,IL0011744575,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Energy Utilities, TA-Cleantech",735.40,2.45,13.75,EoD
-PRIMOTEC,PRMG,IL0011754962,"TA-Growth, TA-AllShare, TA-Rimon",1972.00,0.00,3.65,EoD
-PRIORTECH,PRTC,IL0003280133,"TA-SME60, Tel-Div Index, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Industrials",9200.00,1.31,1141.98,EoD
-PROPERT & BUIL,PTBL,IL0006990175,"TA-90, TA-125, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Investment Properties in Israel, TA-125 Fossil Free",26400.00,-2.98,3166.03,EoD
-PROTALIX,PLX,US74365A3095,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-Dual listing",395.50,0.20,171.19,EoD
+HADASIT BIO,HDST,IL0010954050,,325.40,-2.02,9.16,EoD
+HAGAG,HGG,IL0008230133,"TA-90, TA-125, TA-RealEstate, TA-AllShare, TA-Rimon, TA-SME150, TA-Family, TA-Construction",2227.00,0.00,2579.13,EoD
+HAGAG EURO,HGGE,IL0011436354,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Construction",956.20,-8.41,473.82,EoD
+HAMAMA,HMAM,IL0011047854,,682.40,0.35,1.00,EoD
+HAMASHBIR 365,MSBI,IL0011049595,"TA-Growth, TA-AllShare, TA-Rimon, TA-Retail",116.70,-0.09,113.42,EoD
+HAMAT,HAMAT,IL0003840167,"TA-SME60, TA-AllShare, TA-Rimon, TA-SME150, TA-Industrials",3044.00,-0.10,175.64,EoD
+HANAN MOR,HNMR,IL0011025322,"TA-SME60, TA-RealEstate, TA-AllShare, TA-Rimon, TA-SME150, TA-Construction",3599.00,1.15,493.29,EoD
+HAREL,HARL,IL0005850180,"TA-35, TA-125, TA-Finance Index, TA-Maala Index, Tel-Div Index, TA-AllShare, TA Insurance-Plus, TA-Rimon, TA Sector-Balance, TA-Family, TA-125 Fossil Free, TA-Insurance",3353.00,-0.97,9527.45,EoD
+HIGHCON SYSTM,HICN,IL0011699456,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Industrials",173.50,0.70,10.79,EoD
+HILAN,HLAN,IL0010846983,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free",19030.00,-2.01,2709.19,EoD
+HIPER GLOBAL,HIPR,IL0011849853,"TA-SME60, Tel-Div Index, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon, TA-SME150",1261.00,1.12,81.20,EoD
+HIRON,HRON,IL0001500110,"TA-Growth, TA-AllShare",228290.00,0.00,2.28,EoD
+HIVE 2040 PU,HIVE,IL0011777658,,383.10,-3.60,7.24,EoD
+HOD,HOD,IL0003510158,"TA-Growth, TA-AllShare, TA-Industrials",5502.00,0.00,21.40,EoD
+HOLMES PLACE,HLMS,IL0011425878,"TA-Growth, TA-AllShare, TA-Rimon",415.60,1.94,33.32,EoD
+HOMEBIOGAS,HMGS,IL0011722043,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Energy Utilities, TA-Cleantech",897.40,-2.18,32.85,EoD
+HUB,HUB,IL0010840036,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon",408.00,4.62,2948.37,EoD
+HUMAN XT,HUMX,IL0011700007,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon",183.00,-8.36,173.37,EoD
+I ARGENTO PU,IARG,IL0011733438,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index",371.70,0.00,0.00,EoD
+IBI INV HOUSE,IBI,IL0001750186,"TA-Finance Index, TA-Maala Index, TA-Growth, TA-AllShare, TA Insurance-Plus",9201.00,2.87,12.33,EoD
+IBITEC     FUND,IBITEC.F,IL0011425381,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon",76.10,0.40,1.81,EoD
+ICECURE MEDICAL,ICCM,IL0011224156,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Dual listing",594.80,-1.60,609.87,EoD
+ICL,ICL,IL0002810146,"TA-35, TA-125, TA-Maala Index, Tel-Div Index, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-Industrials, TA-Dual listing",3100.00,-6.06,73614.78,EoD
+ICON GROUP,ICON,IL0011824849,"TA-Growth, TA-AllShare",1060.00,-1.49,5.96,EoD
+IDENTI,IDNT,IL0011774507,,500.00,0.00,0.00,EoD
+IDI INSUR,IDIN,IL0011295016,"TA-90, TA-125, TA-Finance Index, TA-Maala Index, Tel-Div Index, TA-AllShare, TA Insurance-Plus, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Insurance",8914.00,0.80,505.49,EoD
+IDOMOO,IDMO,IL0011763468,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon",627.90,0.00,0.66,EoD
+IES,IES,IL0004310152,"TA-90, TA-125, TA-RealEstate, TA-AllShare, TA-Rimon, TA-SME150, TA-Family, TA-Investment Properties in Israel, TA-125 Fossil Free",27860.00,-0.64,609.41,EoD
+ILD RENEWAL,ILDR,IL0011214744,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Construction",780.10,-0.48,21.43,EoD
+ILEX MEDICAL,ILX,IL0010807530,"TA-90, TA-125, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA-Family",12180.00,0.16,276.87,EoD
+IMAGESAT  I.S.I,ISI,IL0011838138,"TA-SME60, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Industrials",1785.00,-5.20,104.11,EoD
+IMCO,IMCO,IL0002820129,,1427.00,0.00,8.52,EoD
+IMED PU,IMED,IL0011712309,,263.10,0.00,0.00,EoD
+IMPACX,IMPC,IL0011803066,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon",950.30,0.21,11.41,EoD
+INFIMER-M,INFR-M,IL0010806888,,552.30,0.00,0.00,EoD
+INFINYA,INFN,IL0006320183,"TA-90, TA-125, TA-Maala Index, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA-Industrials, TA-125 Fossil Free",29050.00,-1.73,2610.15,EoD
+INROM CONST,INRM,IL0011323560,"TA-90, TA-125, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Industrials, TA-125 Fossil Free",1566.00,-1.57,5771.15,EoD
+INTELICANNA,INTL,IL0006730126,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Cannabis",57.80,-4.62,141.30,EoD
+INTER INDSTRIES,ININ,IL0010809288,"TA-Growth, TA-AllShare, TA-Industrials",677.80,0.37,17.09,EoD
+INTERCURE,INCR,IL0011063760,"TA-SME60, TA-Biomed Index, TA Global-BlueTech, TA-AllShare, TA-Rimon, TA-SME150, TA-Cannabis, TA-Dual listing",2000.00,1.06,303.05,EoD
+INTERGAMA,INTR,IL0001740112,,7805.00,0.00,0.00,EoD
+INTERNET GOLD-M,IGLD-M,IL0010834435,,1799.00,0.00,0.00,EoD
+ISPAC 1,ISPC,IL0011795890,,10000.00,0.00,0.00,EoD
+ISRACARD,ISCD,IL0011574030,"TA-90, TA-125, TA-Finance Index, TA-Maala Index, TA-AllShare, TA Insurance-Plus, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free",1191.00,-0.33,11555.57,EoD
+ISRAEL CANADA,ISCN,IL0004340191,"TA-90, TA-125, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Construction, TA-125 Fossil Free",1237.00,-1.12,2788.44,EoD
+ISRAEL CORP,ILCO,IL0005760173,"TA-35, TA-125, TA-AllShare, TA-Rimon",150570.00,-5.72,16176.58,EoD
+ISRAEL OP    PU,ISOP,IL0011199242,,81.10,-0.49,21.40,EoD
+ISRAEL SHIPYARD,ISHI,IL0011685331,"TA-90, TA-125, TA-AllShare, TA-Rimon, TA-SME150, TA-125 Fossil Free",9545.00,-9.01,2246.43,EoD
+ISRAIR GROUP,ISRG,IL0011871949,,122.20,4.62,735.70,EoD
+ISRAMCO     PU,ISRA,IL0002320179,"TA-90, TA-125, Tel-Div Index, TA-AllShare, TA Oil & Gas Index, TA-Rimon, TA-SME150, TA Sector-Balance",103.00,0.10,1844.33,EoD
+ISRAS,ISRS,IL0006130343,"TA-90, TA-125, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Investment Properties in Israel, TA-125 Fossil Free",65000.00,-2.52,1369.59,EoD
+ISROTEL,ISRO,IL0010809858,,9668.00,-0.46,69.31,EoD
+ISSTA,ISTA,IL0010810740,"TA-SME60, TA-AllShare, TA-Rimon, TA-SME150",9260.00,1.30,2645.09,EoD
+JACOB FINANCE,JCFN,IL0011850570,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus, TA-Rimon",1499.00,0.00,3.21,EoD
+JERUSALEM,JBNK,IL0007260180,"TA-Finance Index, TA-Growth, TA-AllShare",1258.00,0.56,53.03,EoD
+JUNGO,JNGO,IL0011788622,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite",1849.00,0.00,0.00,EoD
+KADIMASTEM,KDST,IL0011284614,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare",150.90,0.27,14.80,EoD
+KAFRIT,KAFR,IL0005220111,"TA-SME60, TA-AllShare, TA-Rimon, TA-SME150, TA-Industrials",2588.00,-0.08,28.05,EoD
+KAMADA,KMDA,IL0010941198,"TA-SME60, TA-Biomed Index, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Industrials, TA-Dual listing",1629.00,0.37,593.26,EoD
+KARDAN N.V-M,KRNV-M,NL0000113652,,23.20,11.00,14.34,EoD
+KARDAN REAL ES,KARE,IL0011184475,"TA-SME60, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA-Construction",364.80,-2.01,598.42,EoD
+KARDEN ISRAEL,KRDI,IL0012101528,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Construction",273.90,1.03,32.01,EoD
+KENON,KEN,SG9999012629,"TA-35, TA-125, Tel-Div Index, TA-AllShare, TA-Rimon, TA-Dual listing",13890.00,-1.84,10960.81,EoD
+KERUR,KRUR,IL0006210111,"TA-SME60, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA-Industrials",8330.00,-0.39,137.76,EoD
+KEYSTONE REIT,KSTN,IL0011759342,"TA-Growth, TA-AllShare, TA-Rimon",665.70,-0.86,209.02,EoD
+KLIL,KLIL,IL0007970358,"TA-SME60, TA-AllShare, TA-Rimon, TA-SME150, TA-Industrials",26960.00,1.81,32.62,EoD
+KNAFAIM,KNFM,IL0005430173,"TA-Growth, TA-AllShare",926.70,-2.54,233.27,EoD
+KVASIR,KVSR,IL0011731457,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index",1007.00,0.10,49.63,EoD
+LACHISH,LHIS,IL0008260163,,980.20,0.00,0.00,EoD
+LAHAV,LAHAV,IL0001360101,"TA-Growth, TA-AllShare",495.50,0.14,42.73,EoD
+LAND DEV,ILDC,IL0006120104,"TA-90, TA-125, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA-Family, TA-Investment Properties in Israel, TA-125 Fossil Free",4837.00,-1.79,1384.24,EoD
+LAPIDOT HEL PU,LPHL,IL0010912488,"TA-Growth, TA-AllShare, TA Oil & Gas Index",145.10,0.90,2.24,EoD
+LAPIDOTH   CAP.,LAPD,IL0006420173,"TA-Growth, TA-AllShare",5804.00,-0.82,9.46,EoD
+LESICO,LSCO,IL0011409468,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Rimon, TA-Construction",318.30,-1.24,47.92,EoD
+LEUMI,LUMI,IL0006046119,"TA-35, TA-125, TA-Finance Index, TA-Maala Index, TA-Banks5, Tel-Div Index, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-125 Fossil Free",3135.00,-1.23,90735.64,EoD
+LEVINSKI OFER,LEOF,IL0002000144,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Construction",70.40,-1.68,324.51,EoD
+LEVINSTEIN ENG,LEVI,IL0005730143,"TA-SME60, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA-Family, TA-Construction",27410.00,1.52,1134.04,EoD
+LEVINSTEIN PROP,LVPR,IL0011190803,"TA-90, TA-125, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA-Family, TA-Investment Properties in Israel, TA-125 Fossil Free",9248.00,-2.53,636.59,EoD
+LIBENTAL,LBTL,IL0005840116,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Construction",1979.00,-1.49,94.04,EoD
+LIBRA,LBRA,IL0011769812,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus, TA-Rimon, TA-Insurance",414.60,-0.84,43.68,EoD
+LINEAGE THERAP,LCTX,US53566P1093,"TA-SME60, TA-Biomed Index, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Industrials, TA-Dual listing",557.20,-0.45,132.79,EoD
+LIVEPERSON,LPSN,US5381461012,"TA-35, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA Sector-Balance, TA-125 Fossil Free, TA-Dual listing",4715.00,0.13,5115.73,EoD
+LODZIA,LODZ,IL0007530129,,3572.00,0.00,0.00,EoD
+LUDAN,LUDN,IL0010814395,"TA-Growth, TA-AllShare, TA-Rimon",1714.00,0.76,82.21,EoD
+LUZON GROUP,LUZN,IL0004730177,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Construction",197.10,0.05,537.74,EoD
+MAGIC,MGIC,IL0010823123,"TA-90, TA-125, Tel-Div Index, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Dual listing",6463.00,-1.33,1237.95,EoD
+MALAM TEAM,MLTM,IL0001560189,"TA-90, TA-125, TA-Maala Index, Tel-Div Index, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free",8130.00,-0.50,223.50,EoD
+MAMAN,MMAN,IL0002380140,"TA-Growth, TA-AllShare",903.00,-0.24,1601.97,EoD
+MASLAVI,MSLA,IL0011067498,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Construction",1395.00,3.03,152.89,EoD
+MASSIVIT,MSVT,IL0011729725,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Industrials",1220.00,-11.59,1918.71,EoD
+MATRICELF,MTLF,IL0011767915,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Rimon",618.40,0.15,22.00,EoD
+MATRIX,MTRX,IL0004450156,"TA-90, TA-125, Tel-Div Index, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free",8200.00,-1.20,10237.48,EoD
+MAX STOCK,MAXO,IL0011685588,"TA-90, TA-125, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Retail",639.00,-4.10,1682.80,EoD
+MAYTRONICS,MTRN,IL0010910656,"TA-35, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA Sector-Balance, TA-Industrials, TA-125 Fossil Free",4704.00,-0.86,10689.23,EoD
+MEDIPOWER 0.1$,MDPR,CY0100361019,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Investment Properties Abroad",746.50,-0.21,12.77,EoD
+MEDIPRSS PU,MPRS,IL0011828980,,114.90,0.00,0.00,EoD
+MEDITR TOWER,MDTR,IL0011315236,"TA-90, TA-125, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA-Investment Properties in Israel, TA-125 Fossil Free",960.40,-0.19,447.45,EoD
+MEGA OR,MGOR,IL0011044885,"TA-90, TA-125, TA-RealEstate, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Investment Properties in Israel, TA-125 Fossil Free",10580.00,-3.73,2255.96,EoD
+MEHADRIN,MEDN,IL0006860147,"TA-Growth, TA-AllShare, TA-Rimon, TA-Industrials",16340.00,-0.12,38.40,EoD
+MEITAV DS,MTDS,IL0010818438,"TA-SME60, TA-Finance Index, TA-Maala Index, Tel-Div Index, TA-AllShare, TA Insurance-Plus, TA-Rimon, TA-SME150, TA-Family",1633.00,-0.37,187.70,EoD
+MELISRON,MLSR,IL0003230146,"TA-35, TA-125, TA-RealEstate, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-Investment Properties in Israel, TA-125 Fossil Free",24070.00,0.63,13600.91,EoD
+MENARA PU,MNRA,IL0011784746,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index",644.80,0.00,0.00,EoD
+MENDELSON    IF,MNIN,IL0011294449,"TA-Growth, TA-AllShare, TA-Rimon",1307.00,0.77,23.52,EoD
+MENIF,MNIF,IL0011708935,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus, TA-Rimon",1024.00,-0.49,97.34,EoD
+MENIVIM REIT,MNRT,IL0011405730,"TA-90, TA-125, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA-Investment Properties in Israel, TA-125 Fossil Free",180.30,-2.49,714.23,EoD
+MENORA MIV HLD,MMHD,IL0005660183,"TA-90, TA-125, TA-Finance Index, Tel-Div Index, TA-AllShare, TA Insurance-Plus, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Insurance",6660.00,-0.30,2015.47,EoD
+MER,CMER,IL0003380123,,649.80,0.03,14.55,EoD
+MERCHAVIA HOLD,MRHL,IL0002570146,,43.80,0.00,0.66,EoD
+MESHEK ENERGY,MSKE,IL0011669749,"TA-SME60, TA-AllShare, TA-Rimon, TA-SME150, TA-Energy Utilities",329.20,-1.35,222.00,EoD
+MGURIT,MGRT,IL0011391955,"TA-SME60, TA-RealEstate, TA-AllShare, TA-Rimon, TA-SME150, TA-Investment Properties in Israel",680.70,0.19,180.62,EoD
+MIA DYNAMICS,MIA,IL0004940131,,76.90,-6.33,152.26,EoD
+MICHLOL FIN,MCLL,IL0011797532,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus, TA-Rimon",880.00,0.00,2.03,EoD
+MICHMAN,MCMN,IL0011723371,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus",21980.00,-1.08,31.43,EoD
+MICRONET,MCRNT,IL0010997877,,281.00,-0.25,11.24,EoD
+MIGDAL INSUR.,MGDL,IL0010811656,"TA-90, TA-125, TA-Finance Index, TA-Maala Index, TA-AllShare, TA Insurance-Plus, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Insurance",523.30,0.00,10858.20,EoD
+MIGDALOR,MGDA,IL0011825671,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus, TA-Rimon",224.30,0.00,0.24,EoD
+MILLENNIUM F PU,MIFT,IL0011675019,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index",382.80,-3.26,204.28,EoD
+MIRLAND,MLD,CY0106902113,,27.70,-4.48,7.70,EoD
+MISHORIM,MSHR,IL0011051963,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Rimon, TA-Investment Properties Abroad",946.00,0.69,111.00,EoD
+MIVNE,MVNE,IL0002260193,"TA-35, TA-125, TA-RealEstate, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-Investment Properties in Israel, TA-125 Fossil Free",1050.00,-0.28,8963.39,EoD
+MIVTACH SHAMIR,MISH,IL0001270193,"TA-SME60, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA-Family",8406.00,-0.12,673.96,EoD
+MIZRAHI TEFAHOT,MZTF,IL0006954379,"TA-35, TA-125, TA-Finance Index, TA-Maala Index, TA-Banks5, Tel-Div Index, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-125 Fossil Free",11900.00,-1.16,38234.74,EoD
+MLRN,MLRN,IL0011709503,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus, TA-Rimon",1154.00,-3.51,181.73,EoD
+MOBILE MAX-M,MBMX-M,IL0011051393,,99.20,0.00,0.10,EoD
+MODIIN     PU,MDIN,IL0003450173,"TA-Growth, TA-AllShare, TA Oil & Gas Index",498.40,-2.83,338.29,EoD
+MORE INVEST,MRIN,IL0011414641,"TA-SME60, TA-Finance Index, Tel-Div Index, TA-AllShare, TA Insurance-Plus, TA-Rimon, TA-SME150, TA-Family",1161.00,1.22,158.19,EoD
+MORE PENSION,MPP,IL0011843815,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus, TA-Rimon",529.80,1.67,86.79,EoD
+MULTI RETAIL,MRG,IL0011716698,"TA-Growth, TA-AllShare, TA-Rimon, TA-Retail",1800.00,0.28,93.49,EoD
+MY SIZE,MYSZ,US62844N2080,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Dual listing",74.80,-1.71,23.32,EoD
+MYDAS,MYDS,IL0005440156,,88.90,0.00,0.00,EoD
+NALA DIGITAL,NALA,IL0003410169,"TA-Growth, TA-AllShare",116.60,1.30,7.06,EoD
+NAPHTHA,NFTA,IL0006430156,"TA-90, TA-125, TA-AllShare, TA Oil & Gas Index, TA-Rimon, TA-SME150, TA Sector-Balance",1924.00,3.27,756.94,EoD
+NAVITAS PTRO PU,NVPT,IL0011419699,"TA-90, TA-125, TA-AllShare, TA Oil & Gas Index, TA-Rimon, TA-SME150",1678.00,-3.40,4452.52,EoD
+NAWI,NAWI,IL0002080179,"TA-SME60, TA-Finance Index, TA-AllShare, TA Insurance-Plus, TA-Rimon, TA-SME150, TA-Family",2750.00,0.84,427.94,EoD
+NAYAX,NYAX,IL0011751166,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free",679.10,-1.72,791.31,EoD
+NETANEL GROUP,NTGR,IL0004210162,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Rimon, TA-Construction",1123.00,-0.80,259.36,EoD
+NETO,NTO,IL0001680136,"TA-SME60, TA-AllShare, TA-Rimon, TA-SME150, TA-Industrials, TA-Family",18680.00,0.38,1046.93,EoD
+NETO MALINDA,NTML,IL0011050973,"TA-90, TA-125, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Family, TA-125 Fossil Free",13360.00,-1.62,1844.02,EoD
+NEWMED ENERG PU,NWMD,IL0004750209,"TA-90, TA-125, Tel-Div Index, TA-AllShare, TA Oil & Gas Index, TA-Rimon, TA-SME150, TA Sector-Balance",870.00,-1.08,7815.46,EoD
+NEXT VISION,NXSN,IL0011765935,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Industrials",831.00,0.45,528.32,EoD
+NEXTAGE,NXTG,IL0004330119,,106.40,-1.57,0.77,EoD
+NEXTCOM,NXTM,IL0010957855,"TA-Growth, TA-AllShare",850.60,0.00,0.60,EoD
+NEXTFERM,NXFR,IL0011719338,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index",509.20,0.00,0.54,EoD
+NEXTGEN,NXGN,IL0010839301,,106.50,7.79,2848.42,EoD
+NICE,NICE,IL0002730112,"TA-35, TA-125, TA-Maala Index, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA Sector-Balance, TA-125 Fossil Free, TA-Dual listing",67990.00,1.34,31301.64,EoD
+NISSAN,NISA,IL0006600196,"TA-Growth, TA-AllShare, TA-Rimon, TA-Industrials",1608.00,0.00,0.34,EoD
+NOFAR ENERGY,NOFR,IL0011708778,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Industrials, TA-Energy Utilities, TA-Cleantech, TA-125 Fossil Free",8451.00,-2.36,1911.23,EoD
+NORSTAR,NSTR,PAL0605071A3,"TA-SME60, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA-Family, TA-Investment Properties Abroad",3308.00,-1.19,492.34,EoD
+NOSTROMO,NOST,VGG826421023,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Energy Utilities, TA-Cleantech",1318.00,-4.97,31.80,EoD
+NOVA,NVMI,IL0010845571,"TA-35, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA Sector-Balance, TA-Industrials, TA-125 Fossil Free, TA-Dual listing",30930.00,1.91,12257.97,EoD
+NOVOLOG,NVLG,IL0011401515,"TA-90, TA-125, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free",325.40,-1.36,375.30,EoD
+NRGENE,NRGN,IL0011720716,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon",752.50,0.16,0.89,EoD
+NUR,NURI,IL0011757288,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Industrials",4554.00,0.00,1.96,EoD
+O.R.T.,ORTC,IL0010862303,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite",2597.00,-0.27,0.18,EoD
+ONE TECHNOLOGI,ONE,IL0001610182,"TA-90, TA-125, Tel-Div Index, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free",5374.00,1.11,1961.07,EoD
+OPAL BALANCE,OPAL,IL0010949860,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus, TA-Rimon",265.60,-3.17,314.80,EoD
+OPC ENERGY,OPCE,IL0011415713,"TA-35, TA-125, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-Energy Utilities",3640.00,0.83,5211.58,EoD
+OPKO HEALTH,OPK,US68375N1037,"TA-35, TA-125, TA-Biomed Index, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-125 Fossil Free, TA-Dual listing",929.10,-3.66,3745.08,EoD
+ORAD,ORAD,IL0011044968,,64.00,0.00,0.00,EoD
+ORAMED PHARM,ORMP,US68403P2039,"TA-SME60, TA-Biomed Index, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Industrials, TA-Dual listing",3250.00,20.41,5641.59,EoD
+ORBIT,ORBI,IL0002650179,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Industrials",1994.00,0.71,94.55,EoD
+ORIAN,ORIN,IL0011035065,"TA-SME60, TA-AllShare, TA-Rimon, TA-SME150",3714.00,-2.16,66.51,EoD
+ORMAT TECHNO,ORA,US6866881021,"TA-35, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA Sector-Balance, TA-Industrials, TA-Energy Utilities, TA-Cleantech, TA-125 Fossil Free, TA-Dual listing",26850.00,0.79,10486.24,EoD
+ORON GROUP,ORON,IL0011357063,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Construction",861.20,-1.10,42.73,EoD
+OVERSEAS,OVRS,IL0011396178,"TA-Growth, TA-AllShare, TA-Rimon",453.20,-0.48,36.00,EoD
+P.C.B TEC,PCBT,IL0010916851,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Industrials",363.80,0.00,0.80,EoD
+PALRAM,PLRM,IL0006440130,"TA-SME60, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA-Industrials",4292.00,1.01,191.09,EoD
+PANAXIA ISRAEL,PNAX,IL0011043630,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Cannabis",42.60,-1.62,26.33,EoD
+PARKOMAT,PRKM,IL0011876401,,511.20,2.24,193.21,EoD
+PARTNER,PTNR,IL0010834849,"TA-90, TA-125, TA-Maala Index, TA-AllShare, TA-Communication & InformationTechnology, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Dual listing",2562.00,-2.59,6669.09,EoD
+PAYMENT FINA,PMNT,IL0011808768,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite",484.00,-0.02,0.01,EoD
+PAYTON,PAYT,IL0004120155,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Industrials",4852.00,1.21,29.84,EoD
+PAZ OIL,PZOL,IL0011000077,"TA-90, TA-125, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Energy Utilities",42750.00,1.26,18833.56,EoD
+PENINSULA GROUP,PEN,IL0003330136,"TA-SME60, TA-Finance Index, TA-AllShare, TA Insurance-Plus, TA-Rimon, TA-SME150",225.70,0.45,129.61,EoD
+PENNANTPARK $,PFLT,US70806A1060,,4271.00,0.73,26.31,EoD
+PERION NETWORK,PERI,IL0010958192,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Dual listing",6201.00,-0.18,4093.12,EoD
+PETROCHEMICAL-M,PTCH-M,IL0007560159,,76.10,0.00,0.01,EoD
+PETROTX     PU,PTX,IL0010997612,,174.00,-0.85,9.43,EoD
+PHARMOCANN,PMCN,IL0010968902,,29.40,0.68,3.93,EoD
+PHINERGY,PNRG,IL0011723603,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Family, TA-Energy Utilities, TA-Cleantech",584.00,-5.04,47.48,EoD
+PHOENIX,PHOE,IL0007670123,"TA-35, TA-125, TA-Finance Index, TA-Maala Index, Tel-Div Index, TA-AllShare, TA Insurance-Plus, TA-Rimon, TA Sector-Balance, TA-125 Fossil Free, TA-Insurance",3397.00,-0.56,12800.18,EoD
+PHOTOMYNE,PHTM,IL0011738551,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite",1670.00,0.00,0.25,EoD
+PLANT ARC,PLNT,IL0011714040,,647.20,-4.85,3.26,EoD
+PLASSON INDUS,PLSN,IL0010816036,"TA-90, TA-125, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Industrials, TA-125 Fossil Free",19040.00,-1.30,320.40,EoD
+PLASTO CARGAL,PLCR,IL0007270163,"TA-Growth, TA-AllShare, TA-Industrials",384.80,-2.24,15.71,EoD
+PLASTOFIL,PPIL,IL0010928401,,610.00,1.68,15.01,EoD
+PLAZA CENTERS-L,PLAZ-L,NL0011882741,,204.10,0.00,0.00,EoD
+PLURISTEM,PSTI,US72940R3003,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-Dual listing",378.00,-0.79,207.14,EoD
+POALIM,POLI,IL0006625771,"TA-35, TA-125, TA-Finance Index, TA-Maala Index, TA-Banks5, Tel-Div Index, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-125 Fossil Free",3007.00,-1.09,75344.83,EoD
+POALIM IBI,PIU,IL0010844822,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus",1250.00,-2.57,83.11,EoD
+POLYGON,POLY,IL0007450187,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Investment Properties in Israel",3367.00,-0.47,59.87,EoD
+POLYRAM PLS,POLP,IL0011702169,"TA-90, TA-125, TA-AllShare, TA-Rimon, TA-SME150, TA-Industrials",1529.00,0.59,633.91,EoD
+POMVOM,PMVM,IL0011734345,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon",1386.00,-0.57,95.67,EoD
+POWERFLEET,PWFL,US73931J1097,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon, TA-Industrials, TA-Dual listing",793.60,7.64,18.47,EoD
+PRASHKOVSKY,PRSK,IL0011021289,"TA-90, TA-125, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Construction",10790.00,0.56,1676.33,EoD
+PRIME ENERGY,PRIM,IL0011744575,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Energy Utilities, TA-Cleantech",630.00,-3.54,9.18,EoD
+PRIMOTEC,PRMG,IL0011754962,"TA-Growth, TA-AllShare, TA-Rimon",2044.00,0.00,0.61,EoD
+PRIORTECH,PRTC,IL0003280133,"TA-SME60, Tel-Div Index, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Industrials",8366.00,0.92,2510.74,EoD
+PROPERT & BUIL,PTBL,IL0006990175,"TA-90, TA-125, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Investment Properties in Israel, TA-125 Fossil Free",28920.00,1.08,2210.82,EoD
+PROTALIX,PLX,US74365A3095,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-Dual listing",373.40,-1.53,37.95,EoD
 PSC CAN,PSCG,IL0011765026,,11850.00,0.00,0.00,EoD
-PULSENMORE,PULS,IL0011767006,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-Industrials",1364.00,-2.36,682.60,EoD
-PURPLE BIOTECH,PPBT,IL0007650166,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-Dual listing",97.00,-0.82,17.17,EoD
-QUALITAU,QLTU,IL0010839558,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Industrials",5223.00,5.24,949.23,EoD
-QUEENCO,QNCO,IL0003860116,"TA-Growth, TA-AllShare",499.60,0.00,0.20,EoD
-QUICKLIZARD,QLRD,IL0011728404,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon",2079.00,-3.79,15.80,EoD
-QUIK SUPER,QUIK,IL0011737231,"TA-Growth, TA-AllShare, TA-Retail",143.10,0.00,1.75,EoD
-RADA,RADA,IL0010826506,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Industrials, TA-125 Fossil Free, TA-Dual listing",4048.00,2.27,2337.01,EoD
-RALCO,RLCO,IL0003930174,"TA-Growth, TA-AllShare",5651.00,1.24,41.21,EoD
-RAM ON,RMN,IL0010909435,"TA-Growth, TA-AllShare, TA-Rimon, TA-Industrials",1703.00,3.71,28.67,EoD
-RAMI LEVI,RMLI,IL0011042491,"TA-90, TA-125, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Family, TA-125 Fossil Free, TA-Retail",24860.00,-0.96,4286.55,EoD
-RANI ZIM,RANI,IL0011436198,"TA-SME60, TA-RealEstate, TA-AllShare, TA-Rimon, TA-SME150, TA-Investment Properties in Israel",647.80,1.14,459.61,EoD
-RAPAC,RPAC,IL0007690261,"TA-Growth, TA-AllShare, TA-Rimon",3304.00,2.26,119.55,EoD
-RATIO      PU,RATI,IL0003940157,"TA-90, TA-125, TA-AllShare, TA Oil & Gas Index, TA-Rimon, TA-SME150, TA Sector-Balance",269.50,-1.82,11318.44,EoD
-RATIO PETROL PU,RTPT,IL0011398646,"TA-Growth, TA-AllShare, TA Oil & Gas Index, TA-Rimon",33.70,-1.46,90.68,EoD
-RAV BARIACH,BRIH,IL0011799934,"TA-Growth, TA-AllShare, TA-Rimon, TA-Industrials",120.10,-0.17,20.21,EoD
-RAVAD,RAVD,IL0005260125,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Investment Properties Abroad",891.30,0.53,17.53,EoD
-RAVAL,RVL,IL0011038788,"TA-Growth, TA-AllShare, TA-Rimon, TA-Industrials",560.30,-0.37,26.18,EoD
-RAZOR LABS,RZR,IL0011725277,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite",134.10,-0.67,336.43,EoD
-REIT 1,RIT1,IL0010989205,"TA-90, TA-125, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Investment Properties in Israel, TA-125 Fossil Free",1916.00,-2.24,15964.01,EoD
-REIT AZORIM LIV,AZRT,IL0011627754,"TA-SME60, TA-RealEstate, TA-AllShare, TA-Rimon, TA-SME150, TA-Investment Properties in Israel",1633.00,0.49,132.20,EoD
-REKAH,REKA,IL0010810096,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Industrials",1956.00,-3.02,2.72,EoD
-RETAILORS,RTLS,IL0011754889,"TA-90, TA-125, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Retail",7050.00,-5.11,2837.11,EoD
-RIMON,RMON,IL0011787228,"TA-SME60, TA-RealEstate, TA-AllShare, TA-Rimon, TA-SME150, TA-Construction",3699.00,0.74,8372.75,EoD
-RIMONI,RIMO,IL0010804560,"TA-Growth, TA-AllShare, TA-Industrials",7705.00,-3.43,68.47,EoD
-ROBOGROUP,ROBO,IL0002660152,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Industrials",199.30,-1.68,109.22,EoD
-ROTEM EN REM PU,RTEN,IL0011477507,,38.90,3.73,3.31,EoD
-ROTEM SHANI,RTSN,IL0011715294,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Construction",1650.00,-2.25,333.56,EoD
-ROTSHTEIN,ROTS,IL0005390153,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Construction",3530.00,-2.35,730.34,EoD
-RSL,RSEL,IL0002990161,,502.60,0.00,0.00,EoD
-S.R ACCORD,SRAC,IL0004220146,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus",5665.00,-0.37,133.89,EoD
-SAFE-T GROUP,SFET,IL0010838568,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Dual listing",184.30,-7.34,593.51,EoD
-SANO,SANO1,IL0008130143,"TA-Maala Index, Tel-Div Index, TA-Growth, TA-AllShare, TA-Industrials",30270.00,-0.10,507.72,EoD
-SAPIENS,SPNS,KYG7T16G1039,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Dual listing",8623.00,0.48,3359.48,EoD
-SARFATI,SRFT,IL0004250176,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Rimon, TA-Family, TA-Construction",3021.00,0.00,2185.20,EoD
-SARINE TECH,SARN,IL0010927254,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Industrials, TA-Dual listing",98.90,8.32,62.81,EoD
-SAVER ONE,SAVR,IL0011666935,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon, TA-Industrials",287.10,-5.50,137.48,EoD
-SAVOREAT,SVRT,IL0011699787,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite",4248.00,3.61,12.07,EoD
-SCHNAPP,SHNP,IL0011035719,"TA-Growth, TA-AllShare",2089.00,1.70,24.90,EoD
-SCODIX,SCDX,IL0011784902,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Industrials",381.00,7.93,6.82,EoD
-SCOPE,SCOP,IL0002880198,"TA-SME60, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150",15100.00,0.53,2087.77,EoD
-SEACH MEDICAL,SEMG,IL0002490113,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Cannabis",292.50,-0.20,3.24,EoD
-SELLA REAL EST,SLARL,IL0011096448,"TA-90, TA-125, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA-Investment Properties in Israel, TA-125 Fossil Free",1005.00,-2.05,6966.15,EoD
-SHAGRIR,SHGR,IL0011383796,"TA-Growth, TA-AllShare, TA-Rimon",1999.00,0.00,4.22,EoD
-SHALAG,SALG,IL0010905474,"TA-Growth, TA-AllShare, TA-Industrials",1135.00,-0.53,4.25,EoD
-SHAMAYM,SHMM,IL0011762395,,483.70,0.10,0.49,EoD
-SHANIV,SHAN,IL0010808371,"TA-Growth, TA-AllShare, TA-Industrials",515.00,0.74,2.69,EoD
-SHAPIR      ENG,SPEN,IL0011338758,"TA-35, TA-125, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-Industrials, TA-Family, TA-125 Fossil Free",2645.00,-2.76,6842.57,EoD
-SHEMEN INDUSTRY,SMNIN,IL0006340306,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Investment Properties in Israel",2054.00,-0.29,11.58,EoD
-SHIKUN & BINUI,SKBN,IL0010819428,"TA-35, TA-125, TA-RealEstate, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-Construction",1580.00,-3.72,23306.35,EoD
-SHOHAM BUSINESS,SHOM,IL0010820079,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus, TA-Rimon",829.80,-1.28,120.04,EoD
-SHUFERSAL,SAE,IL0007770378,"TA-35, TA-125, TA-Maala Index, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-125 Fossil Free, TA-Retail",2405.00,-1.19,24541.74,EoD
-SILVER CASTLE,SLCL,IL0010970544,,196.20,-0.41,2.47,EoD
-SKYLINE,SKLN,CA83084Y1007,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Investment Properties Abroad",2700.00,-0.04,4.35,EoD
-SMART AGRO PU,SMAG,IL0011694812,,214.00,1.09,3.75,EoD
-SOFWAVE,SOFW,IL0011754392,"TA-SME60, TA-Biomed Index, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Industrials",1096.00,-1.53,175.99,EoD
-SOLAER,SOLR,IL0011722878,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Family, TA-Energy Utilities, TA-Cleantech",3292.00,4.57,50.56,EoD
-SOLEGREEN,SLGN,IL0011022352,"TA-SME60, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Energy Utilities, TA-Cleantech",1876.00,0.91,138.90,EoD
-SONOVIA,SONO,IL0011705394,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Industrials",459.70,4.41,17.44,EoD
-SPACE COM,SCC,IL0010923451,"TA-Growth, TA-AllShare, TA-Communication & InformationTechnology",387.60,0.52,63.26,EoD
-SPEEDVALUE,SPDV,IL0011782849,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite",630.00,-0.87,7.66,EoD
-SPRING,SPRG,IL0010973449,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite",2225.00,6.56,11.75,EoD
-SPUNTECH,SPNTC,IL0010901176,"TA-Growth, TA-AllShare, TA-Rimon, TA-Industrials",558.70,0.27,96.10,EoD
-STG,STG,IL0005500124,,2838.00,-2.10,5.48,EoD
-STORAGE DROP,STRG,IL0011226540,,368.50,-0.38,32.54,EoD
-STRAUSS GROUP,STRS,IL0007460160,"TA-35, TA-125, TA-Maala Index, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-Industrials, TA-Family, TA-125 Fossil Free",8605.00,-1.99,11155.19,EoD
-SUFRIN,SFRN,IL0011815698,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Construction",930.00,-1.84,499.98,EoD
-SUMMIT,SMT,IL0010816861,"TA-90, TA-125, TA-RealEstate, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Investment Properties Abroad, TA-125 Fossil Free",6470.00,-2.50,4388.23,EoD
-SUNFLOWER,SNFL,IL0010987555,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Energy Utilities, TA-Cleantech",803.90,5.00,4891.77,EoD
-SUNY COMMUN,SNCM,IL0010823537,"TA-Growth, TA-AllShare, TA-Rimon",184.50,0.71,9.68,EoD
-SUPERGAS ENERGY,SPGE,IL0011669178,"TA-SME60, TA-AllShare, TA-Rimon, TA-SME150, TA-Energy Utilities",6299.00,-0.46,25.13,EoD
-SURE TECH PU,STEC,IL0011750903,,84.30,-6.12,8.08,EoD
-SYNEL,SNEL,IL0010849532,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite",4680.00,0.93,15.91,EoD
-TADIRAN GROUP,TDRN,IL0002580129,"TA-90, TA-125, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Family, TA-125 Fossil Free",46210.00,4.55,52961.38,EoD
-TAMAR PET,TMRP,IL0011413577,"Tel-Div Index, TA-Growth, TA-AllShare, TA Oil & Gas Index, TA-Rimon",1025.00,1.49,1201.49,EoD
-TASE,TASE,IL0011590291,"TA-90, TA-125, TA-Finance Index, TA-AllShare, TA Insurance-Plus, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free",1649.00,0.55,2365.29,EoD
-TAT TECHNO,TATT,IL0010827264,"TA-Growth, TA-AllShare, TA-Industrials, TA-Dual listing",1978.00,-0.10,0.61,EoD
-TAYA INV,TAYA,IL0007960110,"TA-Growth, TA-AllShare, TA-Communication & InformationTechnology",6858.00,0.91,10.63,EoD
-TCHNOPLS VENT,TNPV,IL0010834195,,1574.00,2.54,47.65,EoD
-TECTONA,TECT,IL0002160104,,185.00,0.65,204.45,EoD
-TEDEA,TEDE,IL0001420186,"TA-Growth, TA-AllShare",1939.00,0.99,4.85,EoD
-TEFRON,TFRLF,IL0010825854,"TA-Growth, TA-AllShare, TA-Industrials",1884.00,-1.46,218.86,EoD
-TELRAD NETWORKS,TLRD,IL0011409534,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon, TA-Industrials",354.20,-0.14,171.77,EoD
-TELSYS,TLSY,IL0003540197,"TA-SME60, Tel-Div Index, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Industrials, TA-Family",16160.00,0.25,227.24,EoD
-TERA LIGHT,TRLT,IL0011801730,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Energy Utilities, TA-Cleantech",590.70,0.87,70.32,EoD
-TERMINAL X,TRX,IL0011787145,"TA-90, TA-125, TA-AllShare, TA-Rimon, TA-SME150, TA-Retail",744.60,-0.28,326.59,EoD
-TEUZA,TUZA,IL0002900236,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index",65.60,0.92,6.94,EoD
-TEVA,TEVA,IL0006290147,"TA-35, TA-125, TA-Biomed Index, TA-Maala Index, TA Global-BlueTech, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-Industrials, TA-125 Fossil Free, TA-Dual listing",3145.00,3.39,393317.98,EoD
-TGBR,TIGBUR,IL0011050221,"TA-Maala Index, TA-Growth, TA-AllShare",4710.00,1.01,74.84,EoD
-TGI,TGI,IL0010901416,,255.30,-0.66,79.87,EoD
-THIRDEYE,THES,IL0003970188,,314.70,-1.66,38.91,EoD
-TIGI,TIGI,IL0011738718,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Energy Utilities, TA-Cleantech",869.50,3.52,15.70,EoD
-TIKUN OLAM CANB,TKUN,IL0010843675,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Rimon, TA-Cannabis",252.40,-1.21,247.40,EoD
-TIV TAAM,TTAM,IL0001030100,"TA-SME60, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA-Family, TA-Retail",786.40,-1.35,2343.47,EoD
-TOGETHER,TGTR,IL0004620105,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Cannabis",80.30,0.50,38.42,EoD
-TOMER ENERGY,TOEN,IL0011294936,"TA-Growth, TA-AllShare, TA Oil & Gas Index, TA-Rimon",829.90,0.02,46.30,EoD
-TONDO SMART,TNDO,IL0011806861,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Industrials",809.80,1.53,11.02,EoD
-TOP GUM,TPGM,IL0011791428,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon",1079.00,8.38,34.54,EoD
-TOP SYSTEMS,TOPS,IL0010833775,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon",1208.00,0.17,197.93,EoD
-TOWER,TSEM,IL0010823792,"TA-35, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA Sector-Balance, TA-Industrials, TA-125 Fossil Free, TA-Dual listing",16050.00,0.06,37572.65,EoD
-TRENDLINE,TREN,IL0002710155,"TA-Growth, TA-AllShare, TA-Communication & InformationTechnology",1212.00,0.00,27.05,EoD
-TRUCKNET,TRAN,IL0011740938,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite",552.20,0.42,6.95,EoD
-TURBOGEN,TURB,IL0011817421,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Energy Utilities, TA-Cleantech",1318.00,5.86,13.39,EoD
-TURPAZ,TRPZ,IL0011756116,"TA-90, TA-125, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Industrials",2169.00,-6.31,12848.88,EoD
-UMH,UMH,US9030021037,TA-Investment Properties Abroad,6880.00,0.19,12.32,EoD
-UNET CREDIT,UNCR,IL0010806052,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus",712.50,2.87,197.66,EoD
-UNICORN TECH PU,UNCT,IL0011686578,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index",61.70,-2.53,33.89,EoD
-UNIC-TECH PU,UNTC,IL0011748469,,365.90,0.00,0.00,EoD
-UNITRONICS,UNIT,IL0010838311,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Industrials",2307.00,0.00,11.19,EoD
-UNIVO,UNVO,IL0010935588,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Cannabis",140.20,-3.31,10.45,EoD
-UPSELLON BRANDS,UPSL,IL0004560129,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Rimon",103.30,4.98,102.89,EoD
-USERWAY,UWAY,IL0011837486,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon",2302.00,-2.46,299.79,EoD
-UTRON,UTRN,IL0011571143,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Industrials",973.50,-1.21,24.03,EoD
-VALUE CAPITAL,VALU,IL0005990192,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus",165.90,1.04,4149.78,EoD
-VEEV GROUP  C,VEEVC,US9224741010,,400.00,0.00,0.00,EoD
-VERIDIS,VRDS,IL0011763872,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Industrials, TA-Energy Utilities, TA-Cleantech",3810.00,2.04,1173.62,EoD
-VICTORY,VCTR,IL0011237778,"TA-SME60, TA-AllShare, TA-Rimon, TA-SME150, TA-Family, TA-Retail",5182.00,1.63,282.66,EoD
-VILLAR,VILR,IL0004160169,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Investment Properties in Israel",15650.00,-0.82,116.25,EoD
-VISION SIGMA,VISN,IL0003500175,,7312.00,0.00,0.00,EoD
-VITANIA,VTNA,IL0011099665,"TA-SME60, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA-Family, TA-Investment Properties in Israel",2754.00,-1.85,674.33,EoD
-VONETIZE-M,VNTZ-M,CY0106661412,,172.20,-3.10,16.12,EoD
-WESURE GLOBALT,WESR,IL0011732281,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus, TA-Rimon, TA-Insurance",258.40,0.16,109.17,EoD
-WILK,WILK,IL0002780109,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon",167.00,-3.75,702.76,EoD
-WILLI FOOD INTE,WILC,IL0010828585,"TA-SME60, TA-AllShare, TA-Rimon, TA-SME150, TA-Dual listing",5368.00,-1.81,25.77,EoD
-WILLY FOOD,WLFD,IL0003710139,"TA-Growth, TA-AllShare, TA-Rimon",3416.00,-4.29,40.72,EoD
-XTL BIO,XTLB,IL0010854979,,6.20,0.00,0.51,EoD
-YAACOBI GROUP,YAAC,IL0011424210,,61.90,-6.07,36.38,EoD
-YBOX,YBOX,IL0004860271,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Construction",143.90,-0.07,526.09,EoD
-YOCHANANOF,YHNF,IL0011612640,"TA-90, TA-125, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Family, TA-125 Fossil Free, TA-Retail",19630.00,0.31,1140.07,EoD
-ZANLAKOL,ZNKL,IL0001300131,"TA-Growth, TA-AllShare, TA-Industrials",1891.00,0.16,27.25,EoD
-ZMH,ZMH,IL0011040586,"TA-SME60, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA-Family, TA-Construction",2951.00,-1.30,1959.10,EoD
-ZOOZ POWER,ZOOZ,IL0011741845,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Energy Utilities, TA-Cleantech",191.90,6.02,35.78,EoD
-ZUR,ZUR,IL0007300101,"TA-Growth, TA-AllShare, TA-Rimon, TA-Family",1114.00,0.09,111.76,EoD
+PULSENMORE,PULS,IL0011767006,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-Industrials",1324.00,-1.49,13.85,EoD
+PURPLE BIOTECH,PPBT,IL0007650166,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-Dual listing",77.10,1.31,39.33,EoD
+QUALITAU,QLTU,IL0010839558,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Industrials",5131.00,-0.08,37.51,EoD
+QUEENCO,QNCO,IL0003860116,"TA-Growth, TA-AllShare",406.80,0.00,0.33,EoD
+QUICKLIZARD,QLRD,IL0011728404,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon",2022.00,-1.89,5.32,EoD
+QUIK SUPER,QUIK,IL0011737231,"TA-Growth, TA-AllShare, TA-Retail",141.10,12.97,81.33,EoD
+RADA,RADA,IL0010826506,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Industrials, TA-125 Fossil Free, TA-Dual listing",3419.00,-0.12,2254.01,EoD
+RALCO,RLCO,IL0003930174,"TA-Growth, TA-AllShare",5324.00,-4.69,198.39,EoD
+RAM ON,RMN,IL0010909435,"TA-Growth, TA-AllShare, TA-Rimon, TA-Industrials",1601.00,-0.25,100.28,EoD
+RAMI LEVI,RMLI,IL0011042491,"TA-90, TA-125, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Family, TA-125 Fossil Free, TA-Retail",26400.00,0.08,4499.78,EoD
+RANI ZIM,RANI,IL0011436198,"TA-SME60, TA-RealEstate, TA-AllShare, TA-Rimon, TA-SME150, TA-Investment Properties in Israel",523.50,0.93,99.67,EoD
+RAPAC,RPAC,IL0007690261,"TA-Growth, TA-AllShare, TA-Rimon",3399.00,1.16,47.85,EoD
+RATIO      PU,RATI,IL0003940157,"TA-90, TA-125, TA-AllShare, TA Oil & Gas Index, TA-Rimon, TA-SME150, TA Sector-Balance",244.20,-0.73,3276.15,EoD
+RATIO PETROL PU,RTPT,IL0011398646,"TA-Growth, TA-AllShare, TA Oil & Gas Index, TA-Rimon",33.90,0.30,51.73,EoD
+RAV BARIACH,BRIH,IL0011799934,"TA-Growth, TA-AllShare, TA-Rimon, TA-Industrials",92.20,0.00,8.79,EoD
+RAVAD,RAVD,IL0005260125,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Investment Properties Abroad",614.20,1.47,3.87,EoD
+RAVAL,RVL,IL0011038788,"TA-Growth, TA-AllShare, TA-Rimon, TA-Industrials",493.70,1.06,95.02,EoD
+RAZOR LABS,RZR,IL0011725277,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite",103.00,0.10,13.22,EoD
+REIT 1,RIT1,IL0010989205,"TA-90, TA-125, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Investment Properties in Israel, TA-125 Fossil Free",1860.00,0.49,25076.52,EoD
+REIT AZORIM LIV,AZRT,IL0011627754,"TA-SME60, TA-RealEstate, TA-AllShare, TA-Rimon, TA-SME150, TA-Investment Properties in Israel",1309.00,-0.15,161.89,EoD
+REKAH,REKA,IL0010810096,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Industrials",1967.00,-1.65,113.33,EoD
+RETAILORS,RTLS,IL0011754889,"TA-90, TA-125, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Retail",7120.00,4.31,1198.59,EoD
+RIMON,RMON,IL0011787228,"TA-SME60, TA-RealEstate, TA-AllShare, TA-Rimon, TA-SME150, TA-Construction",3299.00,12.29,329.47,EoD
+RIMONI,RIMO,IL0010804560,"TA-Growth, TA-AllShare, TA-Industrials",7775.00,0.00,2.57,EoD
+ROBOGROUP,ROBO,IL0002660152,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Industrials",185.90,2.37,10.09,EoD
+ROTEM EN REM PU,RTEN,IL0011477507,,35.00,-1.41,10.70,EoD
+ROTEM SHANI,RTSN,IL0011715294,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Construction",1496.00,1.77,273.21,EoD
+ROTSHTEIN,ROTS,IL0005390153,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Construction",4400.00,5.90,1221.20,EoD
+RSL,RSEL,IL0002990161,,463.50,0.00,0.10,EoD
+S.R ACCORD,SRAC,IL0004220146,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus",5050.00,0.48,57.12,EoD
+SAFE-T GROUP,SFET,IL0010838568,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Dual listing",190.10,-1.14,45.74,EoD
+SANO,SANO1,IL0008130143,"TA-Maala Index, Tel-Div Index, TA-Growth, TA-AllShare, TA-Industrials",30820.00,-0.06,321.51,EoD
+SAPIENS,SPNS,KYG7T16G1039,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Dual listing",8540.00,-0.21,4828.28,EoD
+SARFATI,SRFT,IL0004250176,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Rimon, TA-Family, TA-Construction",2954.00,-0.97,116.80,EoD
+SARINE TECH,SARN,IL0010927254,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Industrials, TA-Dual listing",105.80,-3.11,5.62,EoD
+SAVER ONE,SVRE,IL0011666935,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon, TA-Industrials",254.00,37.59,3486.08,EoD
+SAVOREAT,SVRT,IL0011699787,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite",3516.00,-0.28,435.47,EoD
+SCHNAPP,SHNP,IL0011035719,"TA-Growth, TA-AllShare",2050.00,0.00,30.79,EoD
+SCODIX,SCDX,IL0011784902,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Industrials",328.40,-2.81,7.45,EoD
+SCOPE,SCOP,IL0002880198,"TA-SME60, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150",15030.00,2.24,4863.13,EoD
+SEACH MEDICAL,SEMG,IL0002490113,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Cannabis",271.30,1.31,1.57,EoD
+SELLA REAL EST,SLARL,IL0011096448,"TA-90, TA-125, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA-Investment Properties in Israel, TA-125 Fossil Free",960.00,1.48,4218.42,EoD
+SHAGRIR,SHGR,IL0011383796,"TA-Growth, TA-AllShare, TA-Rimon",1791.00,-0.39,43.84,EoD
+SHALAG,SALG,IL0010905474,"TA-Growth, TA-AllShare, TA-Industrials",1174.00,0.00,1.70,EoD
+SHAMAYM,SHMM,IL0011762395,,420.00,-0.43,0.50,EoD
+SHANIV,SHAN,IL0010808371,"TA-Growth, TA-AllShare, TA-Industrials",465.10,-1.86,27.71,EoD
+SHAPIR      ENG,SPEN,IL0011338758,"TA-35, TA-125, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-Industrials, TA-Family, TA-125 Fossil Free",2839.00,-1.08,5317.50,EoD
+SHEMEN INDUSTRY,SMNIN,IL0006340306,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Investment Properties in Israel",1721.00,-0.58,61.34,EoD
+SHIKUN & BINUI,SKBN,IL0010819428,"TA-35, TA-125, TA-RealEstate, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-Construction",1475.00,0.00,8225.86,EoD
+SHOHAM BUSINESS,SHOM,IL0010820079,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus, TA-Rimon",752.50,-1.06,257.89,EoD
+SHUFERSAL,SAE,IL0007770378,"TA-35, TA-125, TA-Maala Index, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-125 Fossil Free, TA-Retail",2266.00,0.27,10348.59,EoD
+SILVER CASTLE,SLCL,IL0010970544,,175.10,-0.57,0.67,EoD
+SKYLINE,SKLN,CA83084Y1007,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Investment Properties Abroad",2362.00,0.00,0.17,EoD
+SMART AGRO PU,SMAG,IL0011694812,,201.10,-2.85,4.87,EoD
+SOFWAVE,SOFW,IL0011754392,"TA-SME60, TA-Biomed Index, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Industrials",1113.00,-3.64,177.68,EoD
+SOLAER,SOLR,IL0011722878,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Family, TA-Energy Utilities, TA-Cleantech",3366.00,-0.33,53.11,EoD
+SOLEGREEN,SLGN,IL0011022352,"TA-SME60, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Energy Utilities, TA-Cleantech",1491.00,-2.93,528.84,EoD
+SONOVIA,SONO,IL0011705394,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Industrials",571.40,-3.67,319.97,EoD
+SPACE COM,SCC,IL0010923451,"TA-Growth, TA-AllShare, TA-Communication & InformationTechnology",375.80,1.13,116.00,EoD
+SPEEDVALUE,SPDV,IL0011782849,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite",529.30,-0.19,0.13,EoD
+SPRING,SPRG,IL0010973449,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite",2403.00,-0.29,0.21,EoD
+SPUNTECH,SPNTC,IL0010901176,"TA-Growth, TA-AllShare, TA-Rimon, TA-Industrials",500.20,-0.12,1.50,EoD
+STG,STG,IL0005500124,,2764.00,0.00,0.00,EoD
+STORAGE DROP,STRG,IL0011226540,,257.80,-5.46,65.48,EoD
+STRAUSS GROUP,STRS,IL0007460160,"TA-35, TA-125, TA-Maala Index, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-Industrials, TA-Family, TA-125 Fossil Free",9200.00,1.60,6493.01,EoD
+SUFRIN,SFRN,IL0011815698,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Construction",843.40,-2.29,5.11,EoD
+SUMMIT,SMT,IL0010816861,"TA-90, TA-125, TA-RealEstate, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Investment Properties Abroad, TA-125 Fossil Free",5910.00,0.07,1939.40,EoD
+SUNFLOWER,SNFL,IL0010987555,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Energy Utilities, TA-Cleantech",807.30,-1.46,16.47,EoD
+SUNY COMMUN,SNCM,IL0010823537,"TA-Growth, TA-AllShare, TA-Rimon",174.00,-1.81,239.18,EoD
+SUPERGAS ENERGY,SPGE,IL0011669178,"TA-SME60, TA-AllShare, TA-Rimon, TA-SME150, TA-Energy Utilities",7043.00,1.70,286.24,EoD
+SURE TECH PU,STEC,IL0011750903,,81.00,-2.41,4.59,EoD
+SYNEL,SNEL,IL0010849532,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite",5187.00,1.47,179.07,EoD
+TADIRAN GROUP,TDRN,IL0002580129,"TA-90, TA-125, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Family, TA-125 Fossil Free",47250.00,-0.23,2581.92,EoD
+TAMAR PET,TMRP,IL0011413577,"Tel-Div Index, TA-Growth, TA-AllShare, TA Oil & Gas Index, TA-Rimon",950.00,3.56,939.94,EoD
+TARYA,TRA,IL0006660166,,60.10,0.00,0.40,EoD
+TASE,TASE,IL0011590291,"TA-90, TA-125, TA-Finance Index, TA-AllShare, TA Insurance-Plus, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free",1635.00,0.31,1803.36,EoD
+TAT TECHNO,TATT,IL0010827264,"TA-Growth, TA-AllShare, TA-Industrials, TA-Dual listing",2142.00,0.00,0.02,EoD
+TAYA INV,TAYA,IL0007960110,"TA-Growth, TA-AllShare, TA-Communication & InformationTechnology",7008.00,0.00,0.14,EoD
+TCHNOPLS VENT,TNPV,IL0010834195,,1576.00,1.68,87.02,EoD
+TECTONA,TECT,IL0002160104,,125.90,-2.33,33.83,EoD
+TEDEA,TEDE,IL0001420186,"TA-Growth, TA-AllShare",1851.00,0.27,1.56,EoD
+TEFRON,TFRLF,IL0010825854,"TA-Growth, TA-AllShare, TA-Industrials",1892.00,0.00,5.77,EoD
+TELRAD NETWORKS,TLRD,IL0011409534,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon, TA-Industrials",359.00,-1.10,291.50,EoD
+TELSYS,TLSY,IL0003540197,"TA-SME60, Tel-Div Index, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Industrials, TA-Family",15640.00,0.51,195.47,EoD
+TERA LIGHT,TRLT,IL0011801730,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Energy Utilities, TA-Cleantech",572.80,-1.83,61.34,EoD
+TERMINAL X,TRX,IL0011787145,"TA-90, TA-125, TA-AllShare, TA-Rimon, TA-SME150, TA-Retail",820.00,-4.19,1285.96,EoD
+TEUZA,TUZA,IL0002900236,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index",60.40,-2.42,36.86,EoD
+TEVA,TEVA,IL0006290147,"TA-35, TA-125, TA-Biomed Index, TA-Maala Index, TA Global-BlueTech, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-Industrials, TA-125 Fossil Free, TA-Dual listing",2423.00,1.04,58626.27,EoD
+TGBR,TIGBUR,IL0011050221,"TA-Maala Index, TA-Growth, TA-AllShare",4706.00,0.81,8.99,EoD
+TGI,TGI,IL0010901416,,258.70,0.31,4.69,EoD
+THEMIS,TMIS,IL0010972292,,1146.00,-3.94,48.51,EoD
+THIRDEYE,THES,IL0003970188,,292.30,-7.73,4.61,EoD
+TIGI,TIGI,IL0011738718,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Energy Utilities, TA-Cleantech",691.80,-0.92,34.04,EoD
+TIKUN OLAM CANB,TKUN,IL0010843675,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Rimon, TA-Cannabis",267.80,3.04,31.51,EoD
+TIV TAAM,TTAM,IL0001030100,"TA-SME60, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA-Family, TA-Retail",741.50,-0.90,200.57,EoD
+TOGETHER,TGTR,IL0004620105,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Cannabis",66.70,-0.89,7.99,EoD
+TOMER ENERGY,TOEN,IL0011294936,"TA-Growth, TA-AllShare, TA Oil & Gas Index, TA-Rimon",756.10,0.07,20.62,EoD
+TONDO SMART,TNDO,IL0011806861,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Industrials",804.40,0.32,1.84,EoD
+TOP GUM,TPGM,IL0011791428,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon",1046.00,4.39,264.70,EoD
+TOP SYSTEMS,TOPS,IL0010833775,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon",1207.00,-0.49,22.10,EoD
+TOWER,TSEM,IL0010823792,"TA-35, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA Sector-Balance, TA-Industrials, TA-125 Fossil Free, TA-Dual listing",16160.00,0.56,19145.91,EoD
+TRENDLINE,TREN,IL0002710155,"TA-Growth, TA-AllShare, TA-Communication & InformationTechnology",1212.00,-0.41,48.59,EoD
+TRUCKNET,TRAN,IL0011740938,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite",496.50,-9.56,109.40,EoD
+TURBOGEN,TURB,IL0011817421,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Energy Utilities, TA-Cleantech",1021.00,2.76,258.71,EoD
+TURPAZ,TRPZ,IL0011756116,"TA-90, TA-125, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Industrials",2124.00,-0.47,651.82,EoD
+UMH,UMH,US9030021037,TA-Investment Properties Abroad,6399.00,0.00,0.70,EoD
+UNET CREDIT,UNCR,IL0010806052,,300.00,0.00,0.00,EoD
+UNICORN TECH PU,UNCT,IL0011686578,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index",47.60,-0.42,9.68,EoD
+UNIC-TECH PU,UNTC,IL0011748469,,286.40,0.00,0.00,EoD
+UNITRONICS,UNIT,IL0010838311,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Industrials",2235.00,-1.50,37.35,EoD
+UNIVO,UNVO,IL0010935588,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Cannabis",63.20,1.12,14.59,EoD
+UPSELLON BRANDS,UPSL,IL0004560129,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Rimon",100.60,7.02,216.70,EoD
+USERWAY,UWAY,IL0011837486,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon",2143.00,-1.24,24.84,EoD
+UTRON,UTRN,IL0011571143,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Industrials",805.90,-2.85,197.07,EoD
+VALUE CAPITAL,VALU,IL0005990192,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus",143.80,-0.48,154.51,EoD
+VEEV GROUP  C,VEEVC,US9224741010,,375.00,0.00,0.00,EoD
+VERIDIS,VRDS,IL0011763872,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Industrials, TA-Energy Utilities, TA-Cleantech",3754.00,-5.70,715.87,EoD
+VICTORY,VCTR,IL0011237778,"TA-SME60, TA-AllShare, TA-Rimon, TA-SME150, TA-Family, TA-Retail",4778.00,-2.57,333.89,EoD
+VILLAR,VILR,IL0004160169,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Investment Properties in Israel",15650.00,0.58,111.35,EoD
+VISION SIGMA,VISN,IL0003500175,,7540.00,0.00,0.00,EoD
+VITANIA,VTNA,IL0011099665,"TA-SME60, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA-Family, TA-Investment Properties in Israel",2497.00,1.22,287.91,EoD
+VONETIZE-M,VNTZ-M,CY0106661412,,199.80,0.00,0.00,EoD
+WESURE GLOBALT,WESR,IL0011732281,"TA-Finance Index, TA-Growth, TA-AllShare, TA Insurance-Plus, TA-Rimon, TA-Insurance",240.80,-1.23,172.12,EoD
+WILK,WILK,IL0002780109,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon",173.60,1.94,55.82,EoD
+WILLI FOOD INTE,WILC,IL0010828585,"TA-SME60, TA-AllShare, TA-Rimon, TA-SME150, TA-Dual listing",5574.00,-0.69,127.53,EoD
+WILLY FOOD,WLFD,IL0003710139,"TA-Growth, TA-AllShare, TA-Rimon",3276.00,-0.46,231.08,EoD
+XTL BIO,XTLB,IL0010854979,,5.50,1.85,1.05,EoD
+YAACOBI GROUP,YAAC,IL0011424210,,61.50,0.00,2.31,EoD
+YBOX,YBOX,IL0004860271,"TA-RealEstate, TA-Growth, TA-AllShare, TA-Construction",122.00,1.16,50.12,EoD
+YOCHANANOF,YHNF,IL0011612640,"TA-90, TA-125, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Family, TA-125 Fossil Free, TA-Retail",21440.00,1.28,558.02,EoD
+ZANLAKOL,ZNKL,IL0001300131,"TA-Growth, TA-AllShare, TA-Industrials",1767.00,-1.67,4.10,EoD
+ZMH,ZMH,IL0011040586,"TA-SME60, TA-RealEstate, Tel-Div Index, TA-AllShare, TA-Rimon, TA-SME150, TA-Family, TA-Construction",3151.00,-1.50,694.63,EoD
+ZOOZ POWER,ZOOZ,IL0011741845,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Energy Utilities, TA-Cleantech",210.30,-3.58,43.99,EoD
+ZUR,ZUR,IL0007300101,"TA-Growth, TA-AllShare, TA-Rimon, TA-Family",1026.00,0.69,234.43,EoD
