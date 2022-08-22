@@ -36,7 +36,6 @@ AMT,American Tower Corp
 AMZN,Amazon.com Inc
 ANET,Arista Networks Inc
 ANSS,Ansys Inc
-ANTM,Anthem Inc
 AON,AON Plc
 AOS,Smith A.O. Corp
 APA,Apa Corp
@@ -82,14 +81,13 @@ CAT,Caterpillar Inc
 CB,Chubb Ltd
 CBOE,CBOE Global Markets Inc
 CBRE,CBRE Group Inc
-CCI,Crown Castle International Corp
+CCI,Crown Castle Inc
 CCL,Carnival Corp
 CDAY,Ceridian Hcm Holding Inc
 CDNS,Cadence Design Sys
 CDW,CDW Corp
 CE,Celanese Corp
 CEG,Constellation Energy Corp
-CERN,Cerner Corp
 CF,Cf Industries Holdings
 CFG,Citizens Financial Group Inc/Ri
 CHD,Church & Dwight Company
@@ -150,15 +148,15 @@ DUK,Duke Energy Corp
 DVA,Davita Healthcare Partners Inc
 DVN,Devon Energy Corp
 DXC,Dxc Technology Company
-DXCM,Dexcom
+DXCM,Dexcom Inc
 EA,Electronic Arts Inc
 EBAY,Ebay Inc
 ECL,Ecolab Inc
-ED,Consolidated Edison Company of New York
+ED,Consolidated Edison Company
 EFX,Equifax Inc
 EIX,Edison International
 EL,Estee Lauder Companies
-EMBC,Embecta Corp
+ELV,Elevance Health Inc
 EMN,Eastman Chemical Company
 EMR,Emerson Electric Company
 ENPH,Enphase Energy Inc
@@ -180,7 +178,6 @@ EXR,Extra Space Storage Inc
 F,Ford Motor Company
 FANG,Diamondback Energy
 FAST,Fastenal Company
-FB,Meta Platforms Inc
 FBHS,Fortune Brands Home & Security
 FCX,Freeport-Mcmoran Inc
 FDS,Factset Research Systems Inc
@@ -225,7 +222,7 @@ HLT,Hilton Inc
 HOLX,Hologic Inc
 HON,Honeywell International Inc
 HPE,Hewlett Packard Enterprise Comp
-HPQ,HP Inc
+HPQ,Hp Inc
 HRL,Hormel Foods Corp
 HSIC,Henry Schein Inc
 HST,Host Marriott Financial Trust
@@ -243,7 +240,6 @@ INTC,Intel Corp
 INTU,Intuit Inc
 IP,International Paper Company
 IPG,Interpublic Group of Companies
-IPGP,Ipg Photonics Corp
 IQV,Iqvia Holdings Inc
 IR,Ingersoll Rand Inc
 IRM,Iron Mountain Inc
@@ -259,6 +255,7 @@ JNJ,Johnson & Johnson
 JNPR,Juniper Networks
 JPM,JP Morgan Chase & Company
 K,Kellogg Company
+KDP,Keurig Dr Pepper Inc
 KEY,Keycorp
 KEYS,Keysight Technologies Inc Comm
 KHC,Kraft Heinz Company
@@ -299,6 +296,7 @@ MCO,Moody's Corp
 MDLZ,Mondelez Intl Inc
 MDT,Medtronic Inc
 MET,Metlife Inc
+META,Meta Platforms Inc
 MGM,MGM Resorts International
 MHK,Mohawk Industries
 MKC,Mccormick & Company
@@ -351,6 +349,7 @@ ODFL,Old Dominion Freight Line Inc
 OGN,Organon & CO
 OKE,Oneok Inc
 OMC,Omnicom Group Inc
+ON,On Semiconductor
 ORCL,Oracle Corp
 ORLY,O'Reilly Automotive
 OTIS,Otis Worldwide Corp
@@ -361,7 +360,7 @@ PAYX,Paychex Inc
 PCAR,Paccar Inc
 PEAK,Healthpeak Properties Inc
 PEG,Public Service Enterprise Group Inc
-PENN,Penn Natl Gaming Inc
+PENN,Penn Entertainment Inc
 PEP,Pepsico Inc
 PFE,Pfizer Inc
 PFG,Principal Financial Group Inc
@@ -455,8 +454,6 @@ TWTR,Twitter Inc
 TXN,Texas Instruments
 TXT,Textron Inc
 TYL,Tyler Technologies
-UA,Under Armour Inc Cl C
-UAA,Under Armour
 UAL,United Airlines Holdings Inc
 UDR,United Dominion Realty Trust
 UHS,Universal Health Services
@@ -468,6 +465,7 @@ URI,United Rentals
 USB,U.S. Bancorp
 V,Visa Inc
 VFC,V.F. Corp
+VICI,Vici Properties Inc
 VLO,Valero Energy Corp
 VMC,Vulcan Materials Company
 VNO,Vornado Realty Trust
