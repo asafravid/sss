@@ -1,6 +1,6 @@
 #############################################################################
 #
-# Version 0.2.133 - Author: Asaf Ravid <asaf.rvd@gmail.com>
+# Version 0.2.134 - Author: Asaf Ravid <asaf.rvd@gmail.com>
 #
 #    Stock Screener and Scanner - based on yfinance
 #    Copyright (C) 2021 Asaf Ravid
@@ -2809,7 +2809,7 @@ def process_symbols(symbol_to_name_dict, crash_and_continue_raw_data, date_and_t
             elapsed_time_sec        = round(elapsed_time_sample_sec - elapsed_time_start_sec, 0)
             average_sec_per_symbol  = round(elapsed_time_sec/float(iteration), int(NUM_ROUND_DECIMALS/3.0))
             percentage_complete     = round(100.0*float(iteration)/float(len(symbols)), int(NUM_ROUND_DECIMALS/3.0))
-            print('[DB] {:9} ({:04}/{:04}/{:04} [{:2.2f}%], Diff: {:04}), time/left/avg [sec]: {:5.0f}/{:5.0f}/{:2.2f} -> '.format(symb, len(rows), iteration, len(symbols), percentage_complete, len(diff_rows), elapsed_time_sec, average_sec_per_symbol*(len(symbols)-iteration), average_sec_per_symbol), end='')
+            print('[DB] {:9} ({:04}/{:04}/{:04} [{:2.2f}%], Diff: {:04}), time/left(hours)/avg [sec]: {:5.0f}/{:5.0f}({:3.1f})/{:2.2f} -> '.format(symb, len(rows), iteration, len(symbols), percentage_complete, len(diff_rows), elapsed_time_sec, average_sec_per_symbol*(len(symbols)-iteration), average_sec_per_symbol*(len(symbols)-iteration)/3600.0, average_sec_per_symbol), end='')
 
             if reference_raw_data is None and crash_and_continue_raw_data is None:
                 symbol = get_yfinance_ticker_wrapper(tase_mode, symb, read_all_country_symbols)
