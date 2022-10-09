@@ -9,7 +9,6 @@ ABC,Amerisourcebergen Corp
 ABMD,Abiomed Inc
 ABNB,Airbnb Inc Cl A
 ABT,Abbott Laboratories
-ACC,American Campus Communities Inc
 ACGL,Arch Capital Grp Ltd
 ACHC,Acadia Healthcr Company
 ACI,Albertsons Companies Inc Cl A
@@ -182,7 +181,6 @@ CHDN,Churchill Downs IN
 CHE,Chemed Inc
 CHH,Choice Hotels International
 CHK,Chesapeake Energy Corp
-CHNG,Change Healthcare Inc
 CHPT,Chargepoint Hldgs Inc
 CHRW,C.H. Robinson Ww
 CHTR,Charter Communicatio
@@ -207,6 +205,7 @@ CNM,Core & Main Inc Cl A
 CNP,Centerpoint Energy Inc
 CNXC,Concentrix Corp
 COF,Capital One Financial Corp
+COHR,Coherent Corp
 COIN,Coinbase Global Inc Cl A
 COLD,Americold Realty Trust
 COLM,Columbia Sprtswr
@@ -235,7 +234,6 @@ CTLT,Catalent Inc
 CTRA,Coterra Energy Inc
 CTSH,Cognizant Tech Sol
 CTVA,Corteva Inc
-CTXS,Citrix Systems Inc
 CUBE,Cubesmart
 CUZ,Cousins Properties Inc
 CVNA,Carvana Co. Cl A
@@ -277,7 +275,6 @@ DOV,Dover Corp
 DOW,Dow Inc
 DOX,Amdocs Ltd Ord
 DPZ,Domino's Pizza Inc
-DRE,Duke Realty Corp
 DRI,Darden Restaurants
 DRVN,Driven Brands Holdings Inc
 DT,Dynatrace Inc
@@ -456,7 +453,6 @@ IDA,Idacorp Inc
 IDXX,Idexx Laboratories
 IEX,Idex Corp
 IFF,International Flavors & Fragrances
-IIVI,I I V I Inc
 ILMN,Illumina Inc
 INCY,Incyte Corp
 INFA,Informatica Inc Cl A
@@ -498,7 +494,7 @@ KD,Kyndryl Hldgs Inc
 KDP,Keurig Dr Pepper Inc
 KEX,Kirby Corp
 KEY,Keycorp
-KEYS,Keysight Technologies Inc Comm
+KEYS,Keysight Technologies Inc
 KHC,Kraft Heinz Company
 KIM,Kimco Realty Corp
 KKR,KKR & Co. LP
@@ -586,7 +582,6 @@ MKTX,Marketaxess Holdings
 MLM,Martin Marietta Materials
 MMC,Marsh & Mclennan Companies
 MMM,3M Company
-MNDT,Mandiant Inc
 MNST,Monster Beverage Cp
 MO,Altria Group
 MOH,Molina Healthcare Inc
@@ -769,6 +764,7 @@ RGEN,Repligen Cp
 RGLD,Royal Gold Inc
 RH,Rh Common Stock
 RHI,Robert Half International Inc
+RITM,Rithm Capital Corp
 RIVN,Rivian Automotive Inc Cl A
 RJF,Raymond James Financial
 RKT,Rocket Companies Inc Cl A
@@ -864,7 +860,7 @@ TDC,Teradata Corp
 TDG,Transdigm Group Inc
 TDOC,Teladoc Health Inc
 TDY,Teledyne Technologies Inc
-TEAM,Atlassian Cls A Ord
+TEAM,Atlassian Corp
 TECH,Bio-Techne Cp
 TER,Teradyne Inc
 TFC,Truist Financial Corp
@@ -999,3 +995,7 @@ WWE,World Wrestling Entertainment
 WY,Weyerhaeuser Company
 WYNN,Wynn Resorts Ltd
 X,United States Steel Corp
+XEL,XCEL Energy Inc
+XOM,Exxon Mobil Corp
+XPO,Xpo Logistics Inc
+XRAY,Dentsply Sirona Inc

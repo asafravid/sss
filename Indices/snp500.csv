@@ -115,13 +115,13 @@ CPT,Camden Property Trust
 CRL,Charles River Laboratories Intl
 CRM,Salesforce Inc
 CSCO,Cisco Systems Inc
+CSGP,Costar Group Inc
 CSX,CSX Corp
 CTAS,Cintas Corp
 CTLT,Catalent Inc
 CTRA,Coterra Energy Inc
 CTSH,Cognizant Tech Sol
 CTVA,Corteva Inc
-CTXS,Citrix Systems Inc
 CVS,CVS Corp
 CVX,Chevron Corp
 CZR,Caesars Entertainment Inc
@@ -141,7 +141,6 @@ DLTR,Dollar Tree Inc
 DOV,Dover Corp
 DOW,Dow Inc
 DPZ,Domino's Pizza Inc
-DRE,Duke Realty Corp
 DRI,Darden Restaurants
 DTE,Dte Energy Company
 DUK,Duke Energy Corp
@@ -164,6 +163,7 @@ EOG,Eog Resources
 EPAM,Epam Systems Inc
 EQIX,Equinix Inc
 EQR,Equity Residential
+EQT,Eqt Corp
 ES,Eversource Energy
 ESS,Essex Property Trust
 ETN,Eaton Corp
@@ -238,6 +238,7 @@ ILMN,Illumina Inc
 INCY,Incyte Corp
 INTC,Intel Corp
 INTU,Intuit Inc
+INVH,Invitation Homes Inc
 IP,International Paper Company
 IPG,Interpublic Group of Companies
 IQV,Iqvia Holdings Inc
@@ -257,7 +258,7 @@ JPM,JP Morgan Chase & Company
 K,Kellogg Company
 KDP,Keurig Dr Pepper Inc
 KEY,Keycorp
-KEYS,Keysight Technologies Inc Comm
+KEYS,Keysight Technologies Inc
 KHC,Kraft Heinz Company
 KIM,Kimco Realty Corp
 KLAC,K L A-Tencor Corp
@@ -358,9 +359,9 @@ PARA,Paramount Global Cl B
 PAYC,Paycom Software Inc
 PAYX,Paychex Inc
 PCAR,Paccar Inc
+PCG,Pacific Gas & Electric Company
 PEAK,Healthpeak Properties Inc
 PEG,Public Service Enterprise Group Inc
-PENN,Penn Entertainment Inc
 PEP,Pepsico Inc
 PFE,Pfizer Inc
 PFG,Principal Financial Group Inc
@@ -382,7 +383,6 @@ PRU,Prudential Financial Inc
 PSA,Public Storage
 PSX,Phillips 66
 PTC,Ptc Inc
-PVH,Phillips-Van Heusen Corp
 PWR,Quanta Services
 PXD,Pioneer Natural Resources Company
 PYPL,Paypal Holdings
