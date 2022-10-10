@@ -1,0 +1,66 @@
+Symbol,Name,Sector,Value,Close,MA,Grade
+LEN.B,Lennar Corporation,Consumer Cyclical,-1.60287,67.12, ,47.6327
+DHI,D.R. Horton  Inc.,Consumer Cyclical,-1.02594,74.28, ,37.569
+LEN,Lennar Corporation,Consumer Cyclical,-0.97372,83.84, ,32.6789
+TSN,Tyson Foods  Inc.,Consumer Defensive,-0.98192,81.75, ,18.488
+LYB,LyondellBasell Industries NV,Basic Materials,-1.19732,91.16, ,16.4366
+FOX,Fox Corporation,Communication Services,-0.89424,33.23, ,15.3932
+ACI,Albertsons Companies  Inc.,Consumer Defensive,-0.9746,28.77, ,14.9497
+GOOGL,Alphabet Inc.,Communication Services,-0.90221,120.17, ,13.4808
+AMZN,Amazon.com  Inc.,Consumer Cyclical,-0.58829,142.3, ,12.8678
+FOXA,Fox Corporation,Communication Services,-0.45696,36.02, ,9.6883
+BBY,Best Buy Co.  Inc.,Consumer Cyclical,-0.78671,79.53, ,7.8504
+CG,The Carlyle Group Inc.,Financial Services,-0.77407,34.63, ,6.9888
+TROW,T. Rowe Price Group  Inc.,Financial Services,-0.56209,126.42, ,6.0268
+AFL,AFLAC Incorporated,Financial Services,-0.11437,64.55, ,5.8435
+DISH,DISH Network Corporation,Communication Services,-0.34358,18.45, ,5.3107
+GLW,Corning Incorporated,Technology,-0.72217,36.19, ,5.1936
+SSNC,SS&C Technologies Holdings  Inc,Technology,-0.40653,61.07, ,4.2801
+CLR,Continental Resources  Inc.,Energy,-1.436,69.57, ,3.655
+MS,Morgan Stanley,Financial Services,0.72542,90.01, ,3.335
+CI,Cigna Corporation,Healthcare,0.3476,292.98,r+,2.9982
+PCAR,PACCAR Inc.,Industrials,-0.48467,93.03, ,2.7831
+FDX,FedEx Corporation,Industrials,-0.71805,234.87, ,2.6452
+AGR,Avangrid  Inc.,Utilities,-1.0525,51.3,r+,2.5747
+RJF,Raymond James Financial  Inc.,Financial Services,0.79202,108.89, ,2.5706
+GM,General Motors Company,Consumer Cyclical,-0.31482,39.7, ,2.5075
+SCCO,Southern Copper Corporation,Basic Materials,-1.32795,48.4, ,2.3374
+MET,MetLife  Inc.,Financial Services,-0.36227,67.39, ,2.2182
+FTV,Fortive Corporation,Technology,-0.37608,68.33, ,2.1828
+CHTR,Charter Communications  Inc.,Communication Services,-0.59571,458.07, ,2.024
+WMT,Walmart Inc.,Consumer Defensive,-1.01767,137.02, ,1.7211
+BLK,BlackRock  Inc.,Financial Services,-0.08109,713.85, ,1.5566
+REGN,Regeneron Pharmaceuticals  Inc.,Healthcare,-0.96211,618.36, ,1.4964
+SCHW,Charles Schwab Corporation (The,Financial Services,0.80581,73.86, ,1.4272
+OMF,OneMain Holdings  Inc.,Financial Services,0.31427,37.89, ,1.3312
+COF,Capital One Financial Corporati,Financial Services,0.88543,113.85, ,1.2116
+NTES,NetEase  Inc.,Communication Services,0.46721,84.7, ,1.0415
+DOV,Dover Corporation,Industrials,-0.63092,137.87, ,1.034
+KMI,Kinder Morgan  Inc.,Energy,-0.62113,18.72, ,1.0227
+KDP,Keurig Dr Pepper Inc.,Consumer Defensive,-0.1394,40.03, ,0.9234
+HES,Hess Corporation,Energy,-0.63716,116.9, ,0.9116
+MCHP,Microchip Technology Incorporat,Technology,-0.59185,72.69, ,0.8497
+WAB,Westinghouse Air Brake Technolo,Industrials,-0.40294,93.56, ,0.8478
+ZM,Zoom Video Communications  Inc.,Technology,-0.9265,99.5, ,0.8319
+NFLX,Netflix  Inc.,Communication Services,-0.56352,241.16, ,0.7852
+JBHT,J.B. Hunt Transport Services  I,Industrials,-1.14618,191.82, ,0.6957
+J,Jacobs Engineering Group Inc.,Industrials,-0.69051,135.92, ,0.599
+TDY,Teledyne Technologies Incorpora,Technology,-0.67795,397.11, ,0.4926
+AVGO,Broadcom Inc.,Technology,-0.78805,558.45, ,0.4736
+ICE,Intercontinental Exchange Inc.,Financial Services,0.22564,112.62, ,0.4003
+HZNP,Horizon Therapeutics Public Lim,Healthcare,-0.7228,61.21, ,0.3994
+K,Kellogg Company,Consumer Defensive,0.25654,76.67,r+,0.3727
+HRL,Hormel Foods Corporation,Consumer Defensive,-0.98407,50.96, ,0.3647
+CRM,Salesforce  Inc.,Technology,-0.39969,187.93, ,0.3427
+CPB,Campbell Soup Company,Consumer Defensive,-0.38646,50.79,r+,0.282
+DVA,DaVita Inc.,Healthcare,-0.37401,93.21, ,0.2703
+KKR,KKR & Co. Inc.,Financial Services,0.71013,54.09, ,0.2609
+IBKR,Interactive Brokers Group  Inc.,Financial Services,1.2728,63.95, ,0.2507
+GD,General Dynamics Corporation,Industrials,-0.26449,243.69, ,0.2309
+NDAQ,Nasdaq  Inc.,Financial Services,-0.35671,187.11, ,0.2223
+FLT,FleetCor Technologies  Inc.,Technology,-0.38469,236.31, ,0.189
+BRO,Brown & Brown  Inc.,Financial Services,-0.3202,67.81, ,0.1503
+ALGN,Align Technology  Inc.,Healthcare,-0.54489,281.66, ,0.1292
+MNST,Monster Beverage Corporation,Consumer Defensive,-0.70585,91.26, ,0.0891
+DHR,Danaher Corporation,Healthcare,-0.47741,292.44, ,0.08
+STZ,Constellation Brands  Inc.,Consumer Defensive,-0.14062,251.69,r+,0.0187
