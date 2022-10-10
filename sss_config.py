@@ -29,8 +29,8 @@ ALL_COUNTRY_SYMBOLS_ST  = 3  # Swedish (Stockholm) Stock Exchange
 
 run_custom_tase           = False  # Custom Portfolio
 run_custom                = False
-run_tase                  = True   # Tel Aviv Stock Exchange
-run_nsr                   = False  # NASDAQ100+S&P500+RUSSEL1000
+run_tase                  = False  # Tel Aviv Stock Exchange
+run_nsr                   = True   # NASDAQ100+S&P500+RUSSEL1000
 run_all                   = False  # All Nasdaq Stocks
 run_six                   = False  # All Swiss Stocks
 run_st                    = False  # All (Stockholm) Swedish Stocks
@@ -53,15 +53,15 @@ automatic_results_folder_selection = False
 # After 1st ever Run: Recommended to use reference (filter and damper)
 # The research mode shall run on new_run as input (new_run >= reference_run) where > means newer
 reference_run_custom = 'Results/All/20220419-020633_A_nRes112_Custom_CustSssV'
-reference_run_tase   = 'Results/Tase/20220714-203656_Tase_Tchnlgy3.0_RlEstt1.0_nRes293_CustSssV'
-reference_run_nsr    = 'Results/Nsr/20220605-221926_Tchnlgy3.0_FnnclSrvcs1.0_nRes837'
+reference_run_tase   = 'Results/Tase/20221010-132855_Tchnlgy3.0_FnnclSrvcs1.0_nRes831'
+reference_run_nsr    = 'Results/Nsr/20220606-003533_Tchnlgy3.0_FnnclSrvcs1.0_nRes836_CustSssV'
 reference_run_all    = 'Results/All/20220507-011303_Tchnlgy7.0_FnnclSrvcs1.0_A_nRes2920'
 reference_run_six    = 'Results/Six/20220111-002719_S_nRes196'                                        # '20211216-002301_S_nRes27_CustSssV'
 reference_run_st     = 'Results/St/20210915-023602_St_Bdb_nRes130'
 
 new_run_custom       = 'Results/Custom/20210917-201728_Bdb_nRes312_Custom'
 new_run_tase         = 'Results/Tase/20221010-075445_Tase_Tchnlgy3.0_RlEstt1.0_nRes299_CustSssV'
-new_run_nsr          = 'Results/Nsr/20220823-043826_Tchnlgy3.0_FnnclSrvcs1.0_nRes837'
+new_run_nsr          = 'Results/Nsr/20221010-183259_Tchnlgy3.0_FnnclSrvcs1.0_nRes841_CustSssV'
 new_run_all          = 'Results/All/20220827-133324_Tchnlgy3.0_FnnclSrvcs1.0_A_nRes2980'
 new_run_six          = 'Results/Six/20220111-002719_S_nRes196'                                        # '20211216-002301_S_nRes27_CustSssV'
 new_run_st           = 'Results/St/20210915-023602_St_Bdb_nRes130'
