@@ -83,7 +83,6 @@ ATUS,Altice USA Inc Cl A
 ATVI,Activision Blizzard
 AVB,Avalonbay Communities
 AVGO,Broadcom Ltd
-AVLR,Avalara Inc
 AVT,Avnet Inc
 AVTR,Avantor Inc
 AVY,Avery Dennison Corp
@@ -190,7 +189,6 @@ CINF,Cincinnati Financial
 CL,Colgate-Palmolive Company
 CLF,Cleveland-Cliffs Inc
 CLH,Clean Harbors
-CLR,Continental Resources
 CLVT,Clarivate Analytics Plc
 CLX,Clorox Company
 CMA,Comerica Inc
@@ -377,6 +375,7 @@ G,Genpact Ltd
 GD,General Dynamics Corp
 GDDY,Godaddy Inc
 GE,General Electric Company
+GEN,Gen Digital Inc
 GFS,Globalfoundries Inc
 GGG,Graco Inc
 GH,Guardant Health Inc
@@ -545,7 +544,7 @@ LSTR,Landstar System
 LSXMA,Liberty Srs XM CS A
 LSXMK,Liberty Srs XM CS C
 LULU,Lululemon Athletica
-LUMN,Centurylink
+LUMN,Lumen Technologies Inc
 LUV,Southwest Airlines Company
 LVS,Las Vegas Sands
 LW,Lamb Weston Holdings Inc
@@ -629,8 +628,6 @@ NFG,National Fuel Gas Company
 NFLX,Netflix Inc
 NI,NiSource Inc
 NKE,Nike Inc
-NLOK,Nortonlifelock Inc
-NLSN,Nielsen Holdings Plc
 NLY,Annaly Capital Management Inc
 NNN,National Retail Properties
 NOC,Northrop Grumman Corp
@@ -874,7 +871,6 @@ TJX,TJX Companies
 TKR,Timken Company
 TMO,Thermo Fisher Scientific Inc
 TMUS,T-Mobile US
-TMX,Terminix Global Hldgs Inc
 TNDM,Tandem Diabetes Care
 TNL,Travel + Leisure Co.
 TOL,Toll Brothers Inc
@@ -900,7 +896,6 @@ TTWO,Take-Two Interactive
 TW,Tradeweb Markets Inc
 TWKS,Thoughtworks Holding Inc
 TWLO,Twilio
-TWTR,Twitter Inc
 TXG,10X Genomics Inc
 TXN,Texas Instruments
 TXT,Textron Inc
@@ -912,7 +907,8 @@ UAL,United Airlines Holdings Inc
 UBER,Uber Technologies Inc
 UDR,United Dominion Realty Trust
 UGI,Ugi Corp
-UHAL,A M E R C O
+UHAL,Amerco Inc
+UHALB,Amerco Series N Non-Voting
 UHS,Universal Health Services
 UI,Ubiquiti Networks
 ULTA,Ulta Beauty Inc
@@ -999,3 +995,7 @@ XEL,XCEL Energy Inc
 XOM,Exxon Mobil Corp
 XPO,Xpo Logistics Inc
 XRAY,Dentsply Sirona Inc
+XYL,Xylem Inc
+YETI,Yeti Holdings Inc
+YUM,Yum! Brands
+Z,Zillow Group Cl C
