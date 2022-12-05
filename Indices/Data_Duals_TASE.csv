@@ -1,57 +1,57 @@
 Market Data - Dual Listed by Securities Law
-As of  06/10/2022 
+As of  05/12/2022 
 
 Name,Symbol ,ISIN,Index,Last Price (0.01 NIS),Change (%),Turnover(NIS thousands),Last Trade,Foreign Stock Exchange
-ALLOT,ALLT,IL0010996549,"TA-SME60, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Dual listing",1412.00,0.71,466.95,EoD,NASDAQ GSM
-AUDIOCODES,AUDC,IL0010829658,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Industrials, TA-125 Fossil Free, TA-Dual listing",7638.00,-2.40,6313.87,EoD,NASDAQ GSM
-BATM,BVC,IL0010849045,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Dual listing",110.50,-0.90,478.12,EoD,LONDON
-BIOLINE RX,BLRX,IL0011015182,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-Dual listing",22.40,-2.18,166.74,EoD,NASDAQ-CM
-BRAINSWAY,BWAY,IL0011007189,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-Dual listing",669.90,2.81,81.05,EoD,NASDAQ-GM
-BRENMILLER,BNRG,IL0011415309,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Energy Utilities, TA-Cleantech, TA-Dual listing",1275.00,-1.54,172.14,EoD,NASDAQ-CM
-CAMTEK,CAMT,IL0010952641,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Industrials, TA-125 Fossil Free, TA-Dual listing",8761.00,0.26,14250.85,EoD,NASDAQ-GM
-CAN FITE BIO,CANF,IL0010944739,,9.80,0.00,278.26,EoD,NYSE - AMEX
-COMPUGEN,CGEN,IL0010852080,"TA-SME60, TA-Biomed Index, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Industrials, TA-Dual listing",245.70,-0.73,693.96,EoD,NASDAQ-GM
-CREATIV MEDIA P,CMCT.P,US1255258576,,8750.00,0.00,0.00,EoD,NASDAQ-GM
-CREATIVE MEDIA,CMCT,US1255255846,TA-Investment Properties Abroad,2227.00,0.00,13.01,EoD,NASDAQ-GM
-ELBIT SYSTEMS,ESLT,IL0010811243,"TA-35, TA-125, TA-Maala Index, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA Sector-Balance, TA-Industrials, TA-125 Fossil Free, TA-Dual listing",70800.00,4.39,73307.64,EoD,NASDAQ GSM
-ELLOMAY,ELLO,IL0010826357,"TA-SME60, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Energy Utilities, TA-Cleantech, TA-Dual listing",6931.00,-0.66,581.67,EoD,NYSE - AMEX
-ENERGEAN,ENOG,GB00BG12Y042,"TA-35, TA-125, TA-Maala Index, TA-AllShare, TA Oil & Gas Index, TA-Rimon, TA Sector-Balance, TA-Dual listing",5480.00,-2.11,37681.56,EoD,LONDON
-ENLIVEX,ENLV,IL0011319527,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-Dual listing",1517.00,0.00,356.70,EoD,NASDAQ-CM
-EVOGENE,EVGN,IL0011050551,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-Dual listing",265.80,-5.98,831.38,EoD,NASDAQ-GM
-FORESIGHT,FRSX,IL0001990188,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Dual listing",37.60,-0.79,1023.10,EoD,NASDAQ-CM
-FORMULA,FORTY,IL0002560162,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Dual listing",29120.00,0.21,7513.55,EoD,NASDAQ GSM
-GILAT,GILT,IL0010825102,"TA-90, TA-125, Tel-Div Index, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Industrials, TA-125 Fossil Free, TA-Dual listing",1921.00,-1.23,2223.24,EoD,NASDAQ GSM
-ICECURE MEDICAL,ICCM,IL0011224156,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Dual listing",445.40,-0.76,710.04,EoD,NASDAQ-CM
-ICL,ICL,IL0002810146,"TA-35, TA-125, TA-Maala Index, Tel-Div Index, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-Industrials, TA-Dual listing",2941.00,0.68,76929.83,EoD,NYSE
-INTERCURE,INCR,IL0011063760,"TA-SME60, TA-Biomed Index, TA Global-BlueTech, TA-AllShare, TA-Rimon, TA-SME150, TA-Dual listing",1683.00,-0.65,3036.27,EoD,NASDAQ-GM
-KAMADA,KMDA,IL0010941198,"TA-SME60, TA-Biomed Index, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Industrials, TA-Dual listing",1548.00,-3.37,548.45,EoD,NASDAQ GSM
-KENON,KEN,SG9999012629,"TA-35, TA-125, Tel-Div Index, TA-AllShare, TA-Rimon, TA-Dual listing",12410.00,1.31,9540.55,EoD,NYSE
-LINEAGE THERAP,LCTX,US53566P1093,"TA-SME60, TA-Biomed Index, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Industrials, TA-Dual listing",441.00,8.54,139.66,EoD,NYSE - AMEX
-LIVEPERSON,LPSN,US5381461012,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Dual listing",3763.00,13.28,11194.14,EoD,NASDAQ GSM
-MAGIC,MGIC,IL0010823123,"TA-90, TA-125, Tel-Div Index, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Dual listing",5491.00,-1.65,3507.85,EoD,NASDAQ GSM
-MY SIZE,MYSZ,US62844N2080,,71.30,-1.52,14.76,EoD,NASDAQ-CM
-NAYAX,NYAX,IL0011751166,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Family, TA-125 Fossil Free",7995.00,-4.59,4078.79,EoD,NASDAQ-GM
-NICE,NICE,IL0002730112,"TA-35, TA-125, TA-Maala Index, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA Sector-Balance, TA-125 Fossil Free, TA-Dual listing",70600.00,4.30,85674.86,EoD,NASDAQ GSM
-NOVA,NVMI,IL0010845571,"TA-35, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA Sector-Balance, TA-Industrials, TA-125 Fossil Free, TA-Dual listing",31170.00,0.68,23013.04,EoD,NASDAQ GSM
-OPKO HEALTH,OPK,US68375N1037,"TA-35, TA-125, TA-Biomed Index, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-125 Fossil Free, TA-Dual listing",654.00,-2.32,4524.05,EoD,NASDAQ GSM
-ORAMED PHARM,ORMP,US68403P2039,"TA-SME60, TA-Biomed Index, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Industrials, TA-Dual listing",2369.00,2.47,823.92,EoD,NASDAQ-CM
-ORMAT TECHNO,ORA,US6866881021,"TA-35, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA Sector-Balance, TA-Industrials, TA-Energy Utilities, TA-Cleantech, TA-125 Fossil Free, TA-Dual listing",30320.00,-2.73,122992.33,EoD,NYSE
-PARTNER,PTNR,IL0010834849,"TA-90, TA-125, TA-Maala Index, TA-AllShare, TA-Communication & InformationTechnology, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Dual listing",2600.00,2.00,7787.90,EoD,NASDAQ GSM
-PENNANTPARK $,PFLT,US70806A1060,,3515.00,0.00,0.00,EoD,NYSE
-PERION NETWORK,PERI,IL0010958192,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Dual listing",7661.00,9.55,35290.61,EoD,NASDAQ GSM
-PLAZA CENTERS-L,PLAZ-L,NL0011882741,,249.10,0.00,0.00,EoD,LONDON
-PLURI,PLUR,US72942G1040,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-Dual listing",280.00,3.28,183.34,EoD,NASDAQ-CM
-POWERFLEET,PWFL,US73931J1097,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon, TA-Industrials, TA-Dual listing",1111.00,3.64,154.72,EoD,NASDAQ-GM
-PROTALIX,PLX,US74365A3095,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-Dual listing",378.00,-0.68,226.63,EoD,NYSE - AMEX
-PURPLE BIOTECH,PPBT,IL0007650166,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-Dual listing",73.40,5.46,24.26,EoD,NASDAQ-CM
-RADA,RADA,IL0010826506,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Industrials, TA-125 Fossil Free, TA-Dual listing",3431.00,0.62,3814.88,EoD,NASDAQ-CM
-SAFE-T GROUP,SFET,IL0010838568,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Dual listing",152.90,-0.33,131.32,EoD,NASDAQ-CM
-SAPIENS,SPNS,KYG7T16G1039,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Dual listing",6800.00,-1.96,5475.79,EoD,NASDAQ GSM
-SARINE TECH,SARN,IL0010927254,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Industrials, TA-Dual listing",91.00,1.34,254.66,EoD,SINGAPORE
-SAVER ONE,SVRE,IL0011666935,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA-Industrials, TA-Dual listing",106.70,-1.02,124.15,EoD,NASDAQ-GM
-TAT TECHNO,TATT,IL0010827264,"TA-Growth, TA-AllShare, TA-Industrials, TA-Dual listing",2230.00,2.11,16.01,EoD,NASDAQ-GM
-TEVA,TEVA,IL0006290147,"TA-35, TA-125, TA-Biomed Index, TA-Maala Index, TA Global-BlueTech, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-Industrials, TA-125 Fossil Free, TA-Dual listing",3122.00,5.97,320072.72,EoD,NYSE
-TOWER,TSEM,IL0010823792,"TA-35, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA Sector-Balance, TA-Industrials, TA-125 Fossil Free, TA-Dual listing",15850.00,1.15,33247.40,EoD,NASDAQ GSM
-UMH,UMH,US9030021037,TA-Investment Properties Abroad,5351.00,-13.10,1.40,EoD,NYSE
-WILLI FOOD INTE,WILC,IL0010828585,"TA-Growth, TA-AllShare, TA-Dual listing",4532.00,-0.09,91.27,EoD,NASDAQ-CM
-XTL BIO,XTLB,IL0010854979,,4.40,4.76,47.85,EoD,NASDAQ-CM
+ALLOT,ALLT,IL0010996549,"TA-SME60, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Dual listing",1255.00,-0.87,247.35,EoD,NASDAQ GSM
+AUDIOCODES,AUDC,IL0010829658,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Industrials, TA-125 Fossil Free, TA-Dual listing",6659.00,0.23,1153.54,EoD,NASDAQ GSM
+BATM,BVC,IL0010849045,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Dual listing",103.10,-1.90,360.22,EoD,LONDON
+BIOLINE RX,BLRX,IL0011015182,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-Dual listing",17.00,0.59,42.75,EoD,NASDAQ-CM
+BRAINSWAY,BWAY,IL0011007189,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-Dual listing",326.30,0.52,176.89,EoD,NASDAQ-GM
+BRENMILLER,BNRG,IL0011415309,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Energy Utilities, TA-Cleantech, TA-Dual listing",555.20,8.14,849.59,EoD,NASDAQ-CM
+CAMTEK,CAMT,IL0010952641,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Industrials, TA-125 Fossil Free, TA-Dual listing",8136.00,-1.19,3996.84,EoD,NASDAQ-GM
+CAN FITE BIO,CANF,IL0010944739,,9.80,-1.01,25.95,EoD,NYSE - AMEX
+COMPUGEN,CGEN,IL0010852080,"TA-SME60, TA-Biomed Index, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Industrials, TA-Dual listing",373.30,-4.65,316.90,EoD,NASDAQ-GM
+CREATIV MEDIA P,CMCT.P,US1255258576,,9855.00,0.00,0.00,EoD,NASDAQ-GM
+CREATIVE MEDIA,CMCT,US1255255846,TA-Investment Properties Abroad,1950.00,-2.01,8.35,EoD,NASDAQ-GM
+ELBIT SYSTEMS,ESLT,IL0010811243,"TA-35, TA-125, TA-Maala Index, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA Sector-Balance, TA-Industrials, TA-125 Fossil Free, TA-Dual listing",59790.00,3.64,125386.91,EoD,NASDAQ GSM
+ELLOMAY,ELLO,IL0010826357,"TA-SME60, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Energy Utilities, TA-Cleantech, TA-Dual listing",5124.00,-1.56,288.71,EoD,NYSE - AMEX
+ENERGEAN,ENOG,GB00BG12Y042,"TA-35, TA-125, TA-Maala Index, TA-AllShare, TA Oil & Gas Index, TA-Rimon, TA Sector-Balance, TA-Dual listing",5640.00,-4.21,33021.34,EoD,LONDON
+ENLIVEX,ENLV,IL0011319527,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-Dual listing",1493.00,-1.06,89.42,EoD,NASDAQ-CM
+EVOGENE,EVGN,IL0011050551,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-Dual listing",217.70,0.23,52.01,EoD,NASDAQ-GM
+FORESIGHT,FRSX,IL0001990188,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Dual listing",43.00,0.00,178.35,EoD,NASDAQ-CM
+FORMULA,FORTY,IL0002560162,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Dual listing",27880.00,-2.86,2723.51,EoD,NASDAQ GSM
+GILAT,GILT,IL0010825102,"TA-90, TA-125, Tel-Div Index, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Industrials, TA-125 Fossil Free, TA-Dual listing",2042.00,-1.11,587.21,EoD,NASDAQ GSM
+ICECURE MEDICAL,ICCM,IL0011224156,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Dual listing",360.60,-1.90,364.39,EoD,NASDAQ-CM
+ICL,ICL,IL0002810146,"TA-35, TA-125, TA-Maala Index, Tel-Div Index, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-Industrials, TA-Dual listing",2922.00,2.60,127316.62,EoD,NYSE
+INTERCURE,INCR,IL0011063760,"TA-SME60, TA-Biomed Index, TA Global-BlueTech, TA-AllShare, TA-Rimon, TA-SME150, TA-Dual listing",1609.00,-0.25,394.24,EoD,NASDAQ-GM
+KAMADA,KMDA,IL0010941198,"TA-SME60, TA-Biomed Index, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Industrials, TA-Dual listing",1569.00,0.00,375.57,EoD,NASDAQ GSM
+KENON,KEN,SG9999012629,"TA-35, TA-125, Tel-Div Index, TA-AllShare, TA-Rimon, TA-Dual listing",12160.00,-3.26,13822.31,EoD,NYSE
+LEONARDO DRS,DRS,US52661A1088,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Industrials, TA-125 Fossil Free, TA-Dual listing",3437.00,4.91,3793.55,EoD,NASDAQ-CM
+LINEAGE THERAP,LCTX,US53566P1093,"TA-SME60, TA-Biomed Index, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Industrials, TA-Dual listing",494.10,-1.40,32.60,EoD,NYSE - AMEX
+LIVEPERSON,LPSN,US5381461012,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Dual listing",4183.00,-2.27,2335.24,EoD,NASDAQ GSM
+MAGIC,MGIC,IL0010823123,"TA-90, TA-125, Tel-Div Index, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Dual listing",5927.00,0.25,937.24,EoD,NASDAQ GSM
+MY SIZE,MYSZ,US62844N2080,,55.80,-0.89,18.75,EoD,NASDAQ-CM
+NAYAX,NYAX,IL0011751166,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-Family, TA-125 Fossil Free",6377.00,-3.51,1222.87,EoD,NASDAQ-GM
+NICE,NICE,IL0002730112,"TA-35, TA-125, TA-Maala Index, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA Sector-Balance, TA-125 Fossil Free, TA-Dual listing",66850.00,-1.62,44476.10,EoD,NASDAQ GSM
+NOVA,NVMI,IL0010845571,"TA-35, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA Sector-Balance, TA-Industrials, TA-125 Fossil Free, TA-Dual listing",29450.00,-0.07,7594.50,EoD,NASDAQ GSM
+OPKO HEALTH,OPK,US68375N1037,"TA-35, TA-125, TA-Biomed Index, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-125 Fossil Free, TA-Dual listing",499.10,-1.13,2643.95,EoD,NASDAQ GSM
+ORAMED PHARM,ORMP,US68403P2039,"TA-SME60, TA-Biomed Index, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-SME150, TA-Industrials, TA-Dual listing",2994.00,1.15,472.62,EoD,NASDAQ-CM
+ORMAT TECHNO,ORA,US6866881021,"TA-35, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA Sector-Balance, TA-Industrials, TA-Energy Utilities, TA-Cleantech, TA-125 Fossil Free, TA-Dual listing",30830.00,-1.19,18115.72,EoD,NYSE
+PARTNER,PTNR,IL0010834849,"TA-90, TA-125, TA-Maala Index, TA-AllShare, TA-Communication & InformationTechnology, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Dual listing",2566.00,-3.61,7870.00,EoD,NASDAQ GSM
+PENNANTPARK $,PFLT,US70806A1060,,4100.00,0.00,0.00,EoD,NYSE
+PERION NETWORK,PERI,IL0010958192,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Dual listing",9520.00,0.36,4328.75,EoD,NASDAQ GSM
+PLAZA CENTERS-L,PLAZ-L,NL0011882741,,100.20,0.00,0.00,EoD,LONDON
+PLURI,PLUR,US72942G1040,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-Dual listing",265.70,-3.59,143.21,EoD,NASDAQ-CM
+POWERFLEET,PWFL,US73931J1097,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA Tech - Elite, TA-Rimon, TA-Industrials, TA-Dual listing",831.10,-7.71,28.61,EoD,NASDAQ-GM
+PROTALIX,PLX,US74365A3095,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-Dual listing",394.00,2.90,511.31,EoD,NYSE - AMEX
+PURPLE BIOTECH,PPBT,IL0007650166,"TA-Biomed Index, TA-Growth, TA Global-BlueTech, TA-AllShare, TA Tech - Elite, TA-Rimon, TA-Dual listing",66.30,-5.01,56.44,EoD,NASDAQ-CM
+SAFE-T GROUP,SFET,IL0010838568,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Dual listing",115.80,2.84,48.07,EoD,NASDAQ-CM
+SAPIENS,SPNS,KYG7T16G1039,"TA-90, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-SME150, TA Sector-Balance, TA-125 Fossil Free, TA-Dual listing",6393.00,-0.47,1986.00,EoD,NASDAQ GSM
+SARINE TECH,SARN,IL0010927254,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA-Industrials, TA-Dual listing",103.10,-1.62,3.30,EoD,SINGAPORE
+SAVER ONE,SVRE,IL0011666935,"TA-Growth, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA-Communication & InformationTechnology, TA-Industrials, TA-Dual listing",93.90,0.21,36.31,EoD,NASDAQ-GM
+TAT TECHNO,TATT,IL0010827264,"TA-Growth, TA-AllShare, TA-Industrials, TA-Dual listing",2072.00,-2.45,75.96,EoD,NASDAQ-GM
+TEVA,TEVA,IL0006290147,"TA-35, TA-125, TA-Biomed Index, TA-Maala Index, TA Global-BlueTech, TA-AllShare, TA-Rimon, TA Sector-Balance, TA-Industrials, TA-125 Fossil Free, TA-Dual listing",2985.00,0.00,44443.93,EoD,NYSE
+TOWER,TSEM,IL0010823792,"TA-35, TA-125, TA Global-BlueTech, TA-AllShare, TA-Technology Index, TA Tech - Elite, TA-Rimon, TA Sector-Balance, TA-Industrials, TA-125 Fossil Free, TA-Dual listing",15220.00,0.66,22658.60,EoD,NASDAQ GSM
+UMH,UMH,US9030021037,TA-Investment Properties Abroad,6526.00,0.00,0.00,EoD,NYSE
+WILLI FOOD INTE,WILC,IL0010828585,"TA-Growth, TA-AllShare, TA-Dual listing",5554.00,-2.36,21.94,EoD,NASDAQ-CM
+XTL BIO,XTLB,IL0010854979,,4.20,2.44,12.76,EoD,NASDAQ-CM

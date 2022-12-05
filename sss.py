@@ -2648,7 +2648,7 @@ def perform_scan_close_values_days(reference_raw_data, reference_download_data, 
                             symbol_data['Close'  ].iloc[-2] > symbol_data['MA21exp'].iloc[-2] and \
                             symbol_data['Close'  ].iloc[-3] > symbol_data['MA21exp'].iloc[-3] and \
                             date_and_time_crash_and_continue:
-                        print('[perform_scan_close_values_days] processing rising {:7} ({:70}). total_free_mem_mb={}'.format(symbol, symbol_name, total_free_mem_mb))
+                        print('[perform_scan_close_values_days] processing rising {:11} ({:40}). total_free_mem_mb={}'.format(symbol, symbol_name, total_free_mem_mb))
                         append_ma_data(date_and_time_crash_and_continue=date_and_time_crash_and_continue, group_type='rising', group_symbols=rising_symbols, group_type_rows=rising_rows, symbol=symbol, symbol_name=symbol_name, symbol_data=symbol_data, scan_close_values_interval=scan_close_values_interval)
                 else:
                     if      symbol_data['MA21exp'][-1] > symbol_data['MA21exp'][-2] > symbol_data['MA21exp'][-3] and \
@@ -2664,7 +2664,7 @@ def perform_scan_close_values_days(reference_raw_data, reference_download_data, 
                             symbol_data['Close'  ][-2] > symbol_data['MA21exp'][-2] and \
                             symbol_data['Close'  ][-3] > symbol_data['MA21exp'][-3] and \
                             date_and_time_crash_and_continue:
-                        print('[perform_scan_close_values_days] processing rising {:7} ({:70}). total_free_mem_mb = {}'.format(symbol, symbol_name, total_free_mem_mb))
+                        print('[perform_scan_close_values_days] processing rising {:11} ({:40}). total_free_mem_mb = {}'.format(symbol, symbol_name, total_free_mem_mb))
                         append_ma_data(date_and_time_crash_and_continue=date_and_time_crash_and_continue, group_type='rising', group_symbols=rising_symbols, group_type_rows=rising_rows, symbol=symbol, symbol_name=symbol_name, symbol_data=symbol_data, scan_close_values_interval=scan_close_values_interval)
                     # TODO: ASAFR: 1. Return the falling now with swap memory management working well!
                     #              2. Add Lower Level Rising not requiering 21exp to be rising!
