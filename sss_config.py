@@ -29,12 +29,12 @@ ALL_COUNTRY_SYMBOLS_ST  = 3  # Swedish (Stockholm) Stock Exchange
 
 run_custom_tase           = False  # Custom Portfolio
 run_custom                = False
-run_tase                  = True   # Tel Aviv Stock Exchange
+run_tase                  = False  # Tel Aviv Stock Exchange
 run_nsr                   = False  # NASDAQ100+S&P500+RUSSEL1000
-run_all                   = False  # All Nasdaq Stocks
+run_all                   = True   # All Nasdaq Stocks
 run_six                   = False  # All Swiss Stocks
 run_st                    = False  # All (Stockholm) Swedish Stocks
-multi_dim_scan_mode       = True   # Mult-dimentional scan Mode
+multi_dim_scan_mode       = False  # Mult-dimentional scan Mode
 aggregate_only            = False
 research_mode_max_ev      = False
 use_reference_as_raw_data = False
@@ -54,19 +54,19 @@ automatic_results_folder_selection = False
 # The research mode shall run on new_run as input (new_run >= reference_run) where > means newer
 reference_run_custom = 'Results/All/20220419-020633_A_nRes112_Custom_CustSssV'
 reference_run_tase   = 'Results/Tase/20221010-022443_Tase_Tchnlgy3.0_RlEstt1.0_nRes297'
-reference_run_nsr    = 'Results/Nsr/20220606-003533_Tchnlgy3.0_FnnclSrvcs1.0_nRes836_CustSssV'
-reference_run_all    = 'Results/All/20220507-011303_Tchnlgy7.0_FnnclSrvcs1.0_A_nRes2920'
+reference_run_nsr    = 'Results/Nsr/20221010-132855_Tchnlgy3.0_FnnclSrvcs1.0_nRes831'
+reference_run_all    = None  # 'Results/All/20220507-011303_Tchnlgy7.0_FnnclSrvcs1.0_A_nRes2920'
 reference_run_six    = 'Results/Six/20220111-002719_S_nRes196'                                        # '20211216-002301_S_nRes27_CustSssV'
 reference_run_st     = 'Results/St/20210915-023602_St_Bdb_nRes130'
 
 new_run_custom       = 'Results/Custom/20210917-201728_Bdb_nRes312_Custom'
 new_run_tase         = 'Results/Tase/20221205-213437_Tase_Tchnlgy3.0_RlEstt1.0_nRes303'
-new_run_nsr          = 'Results/Nsr/20221010-183259_Tchnlgy3.0_FnnclSrvcs1.0_nRes841_CustSssV'
+new_run_nsr          = 'Results/Nsr/20221206-040620_Tchnlgy3.0_FnnclSrvcs1.0_nRes834'
 new_run_all          = 'Results/All/20220827-133324_Tchnlgy3.0_FnnclSrvcs1.0_A_nRes2980'
 new_run_six          = 'Results/Six/20220111-002719_S_nRes196'                                        # '20211216-002301_S_nRes27_CustSssV'
 new_run_st           = 'Results/St/20210915-023602_St_Bdb_nRes130'
 
-crash_and_continue_path = None  # 'Results/All/20220825-174216_Tchnlgy3.0_FnnclSrvcs1.0_A_cc'
+crash_and_continue_path = 'Results/All/20221206-080038_Tchnlgy3.0_FnnclSrvcs1.0_A_cc'
 
 custom_portfolio      = ['XLE', 'AAPL', 'ABB', 'ABBV', 'ABMD', 'ADBE', 'ADSK', 'AFL', 'AGO', 'AKAM', 'AL', 'ALLE', 'AMAT', 'AMD', 'AMZN', 'APH', 'AZN', 'BAH', 'BIO', 'BLK', 'BMBL', 'BMRN', 'BP', 'BPOP', 'BRK B', 'BTI', 'BYND', 'CARR', 'CAT', 'CDNS', 'CHKP', 'CNC', 'COST', 'CPRX', 'CRNT', 'CROX', 'CSCO', 'CTRM', 'CUZ', 'DAC', 'DE', 'DFS', 'DG', 'DHI', 'DOX', 'EL', 'ESGR', 'EXC', 'FAST', 'FB', 'FDX', 'FFIV', 'FISV', 'FROG', 'GFI', 'GILD', 'GLBS', 'GM', 'GOOG', 'GPRO', 'HD', 'HIW', 'HUN', 'HZNP', 'ICE', 'INMD', 'INVA', 'JPM', 'KIM', 'KLAC', 'KO', 'LEVI', 'LMT', 'LOGI', 'LPX', 'LRCX', 'MCD', 'MRNA', 'MS', 'MSFT', 'MSTR', 'MTB', 'MU', 'NFLX', 'NOC', 'NOW', 'NUE', 'NVDA', 'NVO', 'ORCL', 'OZK', 'PEP', 'PFE', 'PLTR', 'PM', 'PNFP', 'PYPL', 'QCOM', 'QRVO', 'RADA', 'RBLX', 'RHP', 'RQI', 'SCHW', 'SCI', 'SEDG', 'SNAP', 'SNDR', 'SNPS', 'SONO', 'SONY', 'TER', 'TGT', 'TM', 'TNDM', 'TROW', 'TRTX', 'TSCO', 'TSLA', 'TWTR', 'UAL', 'UHAL', 'UI', 'UPST', 'V', 'WDC', 'WIX', 'WLK', 'WM', 'ZI', 'ZIM', 'ZM']
 custom_portfolio_tase = ['AFRE', 'ITMR']

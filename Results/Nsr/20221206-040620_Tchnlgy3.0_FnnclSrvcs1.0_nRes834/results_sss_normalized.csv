@@ -1,0 +1,67 @@
+Symbol,Name,Sector,Value,Close,MA,Grade
+LEN.B,Lennar Corporation,Consumer Cyclical,-1.48183,72.79, ,46.344
+LEN,Lennar Corporation,Consumer Cyclical,-0.85391,88.3,r+,36.389
+DHI,D.R. Horton  Inc.,Consumer Cyclical,-0.92316,86.33,r+,35.3009
+AMZN,Amazon.com  Inc.,Consumer Cyclical,-0.55396,94.13, ,21.3208
+LYB,LyondellBasell Industries NV,Basic Materials,-1.08888,84.9, ,15.164
+GOOGL,Alphabet Inc.,Communication Services,-0.83359,100.44, ,14.967
+TSN,Tyson Foods  Inc.,Consumer Defensive,-0.49417,66.02, ,12.0133
+FOXA,Fox Corporation,Communication Services,-0.4384,32.55, ,9.5236
+ACI,Albertsons Companies  Inc.,Consumer Defensive,-0.68562,20.98, ,7.3727
+PFG,Principal Financial Group Inc,Financial Services,-0.24631,92.18,r+,7.3658
+BBY,Best Buy Co.  Inc.,Consumer Cyclical,-0.45011,86.6, ,7.144
+SSNC,SS&C Technologies Holdings  Inc,Technology,-0.40927,53.49, ,6.8075
+GM,General Motors Company,Consumer Cyclical,-0.58396,39.9, ,5.6777
+AFL,AFLAC Incorporated,Financial Services,0.481,72.34,r+,5.5967
+DISH,DISH Network Corporation,Communication Services,-0.18905,15.56, ,5.4946
+GLW,Corning Incorporated,Technology,-0.46908,34.0, ,4.8919
+NTES,NetEase  Inc.,Communication Services,-0.50387,70.9, ,4.6947
+FTV,Fortive Corporation,Technology,-0.42615,68.24,r+,4.6353
+ACGL,Arch Capital Group Ltd.,Financial Services,0.80192,60.6,r+,3.9461
+CHTR,Charter Communications  Inc.,Communication Services,-0.6343,392.69, ,3.9361
+AGR,Avangrid  Inc.,Utilities,-1.18022,42.95, ,3.8067
+FDX,FedEx Corporation,Industrials,-0.60269,181.41, ,3.7105
+CI,Cigna Corporation,Healthcare,0.25009,326.08,r+,3.6029
+WRB,W.R. Berkley Corporation,Financial Services,0.19156,75.67,r+,3.043
+TROW,T. Rowe Price Group  Inc.,Financial Services,-0.27112,126.01, ,2.9681
+MS,Morgan Stanley,Financial Services,0.81439,92.1,r+,2.849
+ZM,Zoom Video Communications  Inc.,Technology,-0.85241,74.31, ,2.8433
+COF,Capital One Financial Corporati,Financial Services,0.88327,97.69, ,1.8938
+PCAR,PACCAR Inc.,Industrials,-0.02809,105.79,r+,1.7051
+OMF,OneMain Holdings  Inc.,Financial Services,0.19397,39.49, ,1.5807
+NDAQ,Nasdaq  Inc.,Financial Services,0.15244,68.98,r+,1.4595
+BIDU,Baidu  Inc.,Communication Services,-0.12088,113.8, ,1.3977
+VMW,Vmware  Inc.,Technology,-0.56988,120.84, ,1.3479
+CRM,Salesforce  Inc.,Technology,-0.4264,144.56, ,1.3154
+OMC,Omnicom Group Inc.,Communication Services,-0.45398,78.65,r+,1.2946
+RJF,Raymond James Financial  Inc.,Financial Services,1.01576,119.16, ,1.2548
+KDP,Keurig Dr Pepper Inc.,Consumer Defensive,-0.39379,38.74, ,1.1881
+TTWO,Take-Two Interactive Software  ,Communication Services,-0.28052,108.76, ,1.0258
+MCHP,Microchip Technology Incorporat,Technology,-0.58985,77.31,r+,1.0208
+EPAM,EPAM Systems  Inc.,Technology,-0.75119,369.84, ,0.8929
+BLK,BlackRock  Inc.,Financial Services,-0.06525,712.98, ,0.8889
+DOV,Dover Corporation,Industrials,-0.6192,143.49,r+,0.8602
+FLT,FleetCor Technologies  Inc.,Technology,-0.44659,193.6, ,0.8506
+CPRT,Copart  Inc.,Consumer Cyclical,-0.79906,67.15, ,0.7742
+WMT,Walmart Inc.,Consumer Defensive,-0.7184,153.22,r+,0.7653
+K,Kellogg Company,Consumer Defensive,-0.27091,73.83, ,0.7203
+JBHT,J.B. Hunt Transport Services  I,Industrials,-1.04499,182.88, ,0.7085
+KMI,Kinder Morgan  Inc.,Energy,-0.35368,19.0, ,0.7066
+SCCO,Southern Copper Corporation,Basic Materials,-1.15283,61.97, ,0.7027
+AVGO,Broadcom Inc.,Technology,-0.84908,540.8, ,0.5926
+STLD,Steel Dynamics  Inc.,Basic Materials,-0.04391,109.55,r+,0.5523
+MET,MetLife  Inc.,Financial Services,0.87853,76.91,r+,0.5127
+TDY,Teledyne Technologies Incorpora,Technology,-0.44327,427.19, ,0.4867
+HRL,Hormel Foods Corporation,Consumer Defensive,-1.0366,47.64, ,0.3823
+KKR,KKR & Co. Inc.,Financial Services,0.3733,52.25, ,0.3807
+WAB,Westinghouse Air Brake Technolo,Industrials,0.4817,103.38,r+,0.2682
+DHR,Danaher Corporation,Healthcare,-0.48693,274.23, ,0.2607
+FMC,FMC Corporation,Basic Materials,0.01622,134.36,r+,0.2534
+SCHW,Charles Schwab Corporation (The,Financial Services,0.86967,82.46,r+,0.2495
+BRO,Brown & Brown  Inc.,Financial Services,-0.45313,59.52, ,0.2381
+SJM,J.M. Smucker Company (The) New,Consumer Defensive,0.527,154.45,r+,0.2216
+DVA,DaVita Inc.,Healthcare,-0.14108,74.34, ,0.1705
+MGM,MGM Resorts International,Consumer Cyclical,-0.97757,37.08, ,0.1193
+HES,Hess Corporation,Energy,-0.21024,144.02, ,0.1179
+CPB,Campbell Soup Company,Consumer Defensive,0.31696,54.1,r+,0.0648
+REGN,Regeneron Pharmaceuticals  Inc.,Healthcare,0.54125,766.39,r+,0.0369
