@@ -34,7 +34,7 @@ run_nsr                   = False  # NASDAQ100+S&P500+RUSSEL1000
 run_all                   = True   # All Nasdaq Stocks
 run_six                   = False  # All Swiss Stocks
 run_st                    = False  # All (Stockholm) Swedish Stocks
-multi_dim_scan_mode       = False  # Mult-dimentional scan Mode
+multi_dim_scan_mode       = True   # Mult-dimentional scan Mode
 aggregate_only            = False
 research_mode_max_ev      = False
 use_reference_as_raw_data = False
@@ -55,14 +55,14 @@ automatic_results_folder_selection = False
 reference_run_custom = 'Results/All/20220419-020633_A_nRes112_Custom_CustSssV'
 reference_run_tase   = 'Results/Tase/20221010-022443_Tase_Tchnlgy3.0_RlEstt1.0_nRes297'
 reference_run_nsr    = 'Results/Nsr/20221010-132855_Tchnlgy3.0_FnnclSrvcs1.0_nRes831'
-reference_run_all    = None  # 'Results/All/20220507-011303_Tchnlgy7.0_FnnclSrvcs1.0_A_nRes2920'
+reference_run_all    = 'Results/All/20220827-133324_Tchnlgy3.0_FnnclSrvcs1.0_A_nRes2980'
 reference_run_six    = 'Results/Six/20220111-002719_S_nRes196'                                        # '20211216-002301_S_nRes27_CustSssV'
 reference_run_st     = 'Results/St/20210915-023602_St_Bdb_nRes130'
 
 new_run_custom       = 'Results/Custom/20210917-201728_Bdb_nRes312_Custom'
 new_run_tase         = 'Results/Tase/20221205-213437_Tase_Tchnlgy3.0_RlEstt1.0_nRes303'
 new_run_nsr          = 'Results/Nsr/20221206-040620_Tchnlgy3.0_FnnclSrvcs1.0_nRes834'
-new_run_all          = 'Results/All/20220827-133324_Tchnlgy3.0_FnnclSrvcs1.0_A_nRes2980'
+new_run_all          = 'Results/All/20221208-004305_Tchnlgy3.0_FnnclSrvcs1.0_A_nRes2543'
 new_run_six          = 'Results/Six/20220111-002719_S_nRes196'                                        # '20211216-002301_S_nRes27_CustSssV'
 new_run_st           = 'Results/St/20210915-023602_St_Bdb_nRes130'
 
