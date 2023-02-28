@@ -2508,15 +2508,15 @@ def get_stock_data_normalized_from_db_row_compact(row, stock_symbol):
     return StockDataNormalized(symbol=stock_symbol, short_name=row[g_name_index_n], sector=row[g_sector_index_n], country=row[g_country_index_n], sss_value=float(row[g_sss_value_index_n]), sss_value_normalized=float(row[g_sss_value_normalized_index_n]), evr_effective=float(row[g_evr_effective_index_n]), evr_effective_normalized=float(row[g_evr_effective_normalized_index_n]), effective_price_to_earnings=float(row[g_effective_price_to_earnings_index_n]), trailing_12months_price_to_sales=float(row[g_trailing_12months_price_to_sales_index_n]), trailing_12months_price_to_sales_normalized=float(row[g_trailing_12months_price_to_sales_normalized_index_n]), pe_effective=float(row[g_pe_effective_index_n]), pe_effective_normalized=float(row[g_pe_effective_normalized_index_n]), effective_ev_to_ebitda=float(row[g_effective_ev_to_ebitda_index_n]), effective_ev_to_ebitda_normalized=float(row[g_effective_ev_to_ebitda_normalized_index_n]), effective_profit_margin=float(row[g_effective_profit_margin_index_n]), effective_profit_margin_normalized=float(row[g_effective_profit_margin_normalized_index_n]), held_percent_insiders=float(row[g_held_percent_insiders_index_n]), held_percent_insiders_normalized=float(row[g_held_percent_insiders_normalized_index_n]), previous_close=float(row[g_previous_close_index_n]), price_to_book=float(row[g_price_to_book_index_n]), price_to_book_normalized=float(row[g_price_to_book_normalized_index_n]), enterprise_value=int(float(row[g_enterprise_value_index_n])), eqg_factor_effective=float(row[g_eqg_factor_effective_index_n]), eqg_factor_effective_normalized=float(row[g_eqg_factor_effective_normalized_index_n]), rqg_factor_effective=float(row[g_rqg_factor_effective_index_n]), rqg_factor_effective_normalized=float(row[g_rqg_factor_effective_normalized_index_n]), effective_peg_ratio=float(row[g_effective_peg_ratio_index_n]), effective_peg_ratio_normalized=float(row[g_effective_peg_ratio_normalized_index_n]), ev_to_cfo_ratio_effective=float(row[g_ev_to_cfo_ratio_effective_index_n]), ev_to_cfo_ratio_effective_normalized=float(row[g_ev_to_cfo_ratio_effective_normalized_index_n]), debt_to_equity_effective=float(row[g_debt_to_equity_effective_index_n]), debt_to_equity_effective_used=float(row[g_debt_to_equity_effective_used_index_n]), debt_to_equity_effective_used_normalized=float(row[g_debt_to_equity_effective_used_normalized_index_n]), eff_dist_from_low_factor=float(row[g_eff_dist_from_low_factor_index_n]), eff_dist_from_low_factor_normalized=float(row[g_eff_dist_from_low_factor_normalized_index_n]), total_ratio_effective=float(row[g_total_ratio_effective_index_n]), total_current_ratio_effective=float(row[g_total_current_ratio_effective_index_n]), effective_current_ratio=float(row[g_effective_current_ratio_index_n]), effective_current_ratio_normalized=float(row[g_effective_current_ratio_normalized_index_n]), calculated_roa=float(row[g_calculated_roa_index_n]), calculated_roa_normalized=float(row[g_calculated_roa_normalized_index_n]), calculated_roe=float(row[g_calculated_roe_index_n]), calculated_roe_normalized=float(row[g_calculated_roe_normalized_index_n]), altman_z_score_factor=float(row[g_altman_z_score_factor_index_n]), altman_z_score_factor_normalized=float(row[g_altman_z_score_factor_normalized_index_n]))
 
 
-def get_yfinance_ticker_wrapper(tase_mode, symb, read_all_country_symbols):
+def get_yfinance_ticker_wrapper(yq_mode, tase_mode, symb, read_all_country_symbols):
     if tase_mode:
-        symbol = Ticker(symb)  # yf.Ticker(symb)
+        symbol = Ticker(symb) if yq_mode else yf.Ticker(symb)
     else:
         if read_all_country_symbols not in [sss_config.ALL_COUNTRY_SYMBOLS_SIX, sss_config.ALL_COUNTRY_SYMBOLS_ST]:
-            symbol = Ticker(symb.replace('.U', '-UN').replace('.W', '-WT').replace('.', '-'))   # yf.Ticker(symb.replace('.U', '-UN').replace('.W', '-WT').replace('.', '-'))  # TODO: ASFAR: Sometimes the '.' Is needed, especially for non-US companies. See for instance 5205.kl. In this case the parameter is also case-sensitive! -> https://github.com/pydata/pandas-datareader/issues/810#issuecomment-789684354
+            symbol = Ticker(symb.replace('.U', '-UN').replace('.W', '-WT').replace('.', '-')) if yq_mode else yf.Ticker(symb.replace('.U', '-UN').replace('.W', '-WT').replace('.', '-'))  # TODO: ASFAR: Sometimes the '.' Is needed, especially for non-US companies. See for instance 5205.kl. In this case the parameter is also case-sensitive! -> https://github.com/pydata/pandas-datareader/issues/810#issuecomment-789684354
         else:
             if read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_ST and '.ST' not in symb: symb = symb.replace('.S.DX', '.ST')
-            symbol = Ticker(symb)  # yf.Ticker(symb)
+            symbol = Ticker(symb) if yq_mode else yf.Ticker(symb)
     return symbol
 
 
@@ -2831,7 +2831,7 @@ def process_symbols(yq_mode, symbol_to_name_dict, crash_and_continue_raw_data, d
             print('[DB] {:9} ({:04}/{:04}/{:04} [{:2.2f}%], Diff: {:04}), time/left(hours)/avg [sec]: {:5.0f}/{:5.0f}({:3.1f})/{:2.2f} -> '.format(symb, len(rows), iteration, len(symbols), percentage_complete, len(diff_rows), elapsed_time_sec, average_sec_per_symbol*(len(symbols)-iteration), average_sec_per_symbol*(len(symbols)-iteration)/3600.0, average_sec_per_symbol), end='')
 
             if reference_raw_data is None and crash_and_continue_raw_data is None:
-                symbol = get_yfinance_ticker_wrapper(tase_mode, symb, read_all_country_symbols)
+                symbol = get_yfinance_ticker_wrapper(yq_mode, tase_mode, symb, read_all_country_symbols)
             else:
                 if reference_raw_data != None and symb in reference_raw_data:
                     symbol = reference_raw_data[symb]
@@ -2839,7 +2839,7 @@ def process_symbols(yq_mode, symbol_to_name_dict, crash_and_continue_raw_data, d
                     symbol = crash_and_continue_raw_data[symb]
                 else:
                     # print('[DB] symbol {} is neither in reference_raw_data nor in crash_and_continue_data. Trying to read from yfinance'.format(symb))
-                    symbol = get_yfinance_ticker_wrapper(tase_mode, symb, read_all_country_symbols)
+                    symbol = get_yfinance_ticker_wrapper(yq_mode, tase_mode, symb, read_all_country_symbols)
 
             stock_data = StockData(symbol=symb)
             process_info_result = process_info(yq_mode=yq_mode, json_db=json_db, symbol=symbol, stock_data=stock_data, tase_mode=tase_mode, sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, profit_margin_limit=profit_margin_limit, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, debt_to_equity_limit=debt_to_equity_limit, pb_limit=pb_limit, pi_limit=pi_limit, enterprise_value_millions_usd_limit=enterprise_value_millions_usd_limit, research_mode_max_ev=research_mode_max_ev, eqg_min=eqg_min, rqg_min=rqg_min, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, research_mode=research_mode, currency_conversion_tool=currency_conversion_tool, currency_conversion_tool_alternative=currency_conversion_tool_alternative, currency_conversion_tool_manual=currency_conversion_tool_manual, reference_db=reference_db, reference_db_title_row=reference_db_title_row, db_filename=None)
