@@ -77,6 +77,8 @@ from currency_converter     import CurrencyConverter  # pip install CurrencyConv
 from sys                    import platform
 from datetime import datetime
 from dateutil.relativedelta import *
+from yahooquery import Ticker
+
 import numpy as np
 import matplotlib.pyplot as plt
 
@@ -1485,7 +1487,7 @@ def stringify_keys(d, check_inner):
     return converted_dict
 
 
-def process_info(json_db, symbol, stock_data, tase_mode, sectors_list, sectors_filter_out, countries_list, countries_filter_out, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, db_filename):
+def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, sectors_filter_out, countries_list, countries_filter_out, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, db_filename):
     return_value = True
     if research_mode:
         if   stock_data.previous_close < 1.0:                                                                                                                         return_value = False  # Avoid Penny Stocks
@@ -1528,23 +1530,33 @@ def process_info(json_db, symbol, stock_data, tase_mode, sectors_list, sectors_f
                 earnings_yearly          = symbol['earnings_yearly'         ] if 'earnings_yearly'          in symbol else None
                 earnings_quarterly       = symbol['earnings_quarterly'      ] if 'earnings_quarterly'       in symbol else None
             else:
-                info                     = symbol.get_info()
-                cash_flows_yearly        = symbol.get_cashflow(     as_dict=True, freq="yearly")
-                cash_flows_quarterly     = symbol.get_cashflow(     as_dict=True, freq="quarterly")
-                balance_sheets_yearly    = symbol.get_balance_sheet(as_dict=True, freq="yearly")
-                balance_sheets_quarterly = symbol.get_balance_sheet(as_dict=True, freq="quarterly")
-                earnings_yearly          = symbol.get_earnings(     as_dict=True, freq="yearly")
-                earnings_quarterly       = symbol.get_earnings(     as_dict=True, freq="quarterly")
+                if yq_mode:
+                    stock_data.financial_currency = symbol.financial_data[stock_data.symbol]['financialCurrency']
+                    stock_data.summary_currency = symbol.price[stock_data.symbol]['currency']
 
-                cash_flows_yearly        = stringify_keys(d=cash_flows_yearly,        check_inner=False)
-                cash_flows_quarterly     = stringify_keys(d=cash_flows_quarterly,     check_inner=False)
-                balance_sheets_yearly    = stringify_keys(d=balance_sheets_yearly,    check_inner=False)
-                balance_sheets_quarterly = stringify_keys(d=balance_sheets_quarterly, check_inner=False)
-                earnings_yearly          = stringify_keys(d=earnings_yearly,          check_inner=False)
-                earnings_quarterly       = stringify_keys(d=earnings_quarterly,       check_inner=False)
+                else:
+                    info                     = symbol.get_info()
+                    cash_flows_yearly        = symbol.get_cashflow(     as_dict=True, freq="yearly")
+                    cash_flows_quarterly     = symbol.get_cashflow(     as_dict=True, freq="quarterly")
+                    balance_sheets_yearly    = symbol.get_balance_sheet(as_dict=True, freq="yearly")
+                    balance_sheets_quarterly = symbol.get_balance_sheet(as_dict=True, freq="quarterly")
+                    earnings_yearly          = symbol.get_earnings(     as_dict=True, freq="yearly")
+                    earnings_quarterly       = symbol.get_earnings(     as_dict=True, freq="quarterly")
 
-            if   earnings_yearly    != None: stock_data.financial_currency = earnings_yearly[   'financialCurrency']
-            elif earnings_quarterly != None: stock_data.financial_currency = earnings_quarterly['financialCurrency']
+                    cash_flows_yearly        = stringify_keys(d=cash_flows_yearly,        check_inner=False)
+                    cash_flows_quarterly     = stringify_keys(d=cash_flows_quarterly,     check_inner=False)
+                    balance_sheets_yearly    = stringify_keys(d=balance_sheets_yearly,    check_inner=False)
+                    balance_sheets_quarterly = stringify_keys(d=balance_sheets_quarterly, check_inner=False)
+                    earnings_yearly          = stringify_keys(d=earnings_yearly,          check_inner=False)
+                    earnings_quarterly       = stringify_keys(d=earnings_quarterly,       check_inner=False)
+                    stock_data.financial_currency = 'ILS' if tase_mode else 'USD'  # TODO: ASAFR: handle for if isinstance(symbol, dict)?
+
+            if   earnings_yearly    != None and 'financialCurrency' in earnings_yearly:    stock_data.financial_currency = earnings_yearly[   'financialCurrency']
+            elif earnings_quarterly != None and 'financialCurrency' in earnings_quarterly: stock_data.financial_currency = earnings_quarterly['financialCurrency']
+
+
+            if   earnings_yearly    != None and 'financialCurrency' in earnings_yearly:    stock_data.financial_currency = earnings_yearly[   'financialCurrency']
+            elif earnings_quarterly != None and 'financialCurrency' in earnings_quarterly: stock_data.financial_currency = earnings_quarterly['financialCurrency']
 
             stock_data.summary_currency = info['currency'] if 'currency' in info else stock_data.financial_currency  # Used for market_cap and enterprise_value conversions
 
@@ -1558,7 +1570,7 @@ def process_info(json_db, symbol, stock_data, tase_mode, sectors_list, sectors_f
             # | TASE (<symbol>.TA) |                   |                   |
             # +--------------------+-------------------+-------------------+
 
-            if stock_data.summary_currency == 'ILA':  # Sometimes (in TASE mode) in info['currency'] ILA may show instead of ILS so just substitute
+            if stock_data.summary_currency == 'ILA' or stock_data.summary_currency == 'NIS':  # Sometimes (in TASE mode) in info['currency'] ILA may show instead of ILS so just substitute
                 stock_data.summary_currency = 'ILS'
             if currency_conversion_tool:
                 stock_data.financial_currency_conversion_rate_mult_to_usd = round(1.0/float(currency_conversion_tool[stock_data.financial_currency] if stock_data.financial_currency != None else 1.0), NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
@@ -1575,14 +1587,20 @@ def process_info(json_db, symbol, stock_data, tase_mode, sectors_list, sectors_f
                 stock_data.financial_currency_conversion_rate_mult_to_usd = round(1.0 / float(currency_conversion_tool_manual[stock_data.financial_currency]), NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
                 stock_data.summary_currency_conversion_rate_mult_to_usd   = round(1.0 / float(currency_conversion_tool_manual[stock_data.summary_currency  ]), NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
 
-            if isinstance(symbol, dict):
-                financials_yearly    = symbol['financials_yearly'   ] if 'financials_yearly'    in symbol else None
-                financials_quarterly = symbol['financials_quarterly'] if 'financials_quarterly' in symbol else None
+            if yq_mode:
+                balanceSheetHistory = symbol.all_modules[stock_data.symbol]['balanceSheetHistory']
+                financials_yearly = []
+                for list_element_dict in balanceSheetHistory['balanceSheetStatements']:
+                    financials_yearly.append(list_element_dict['retainedEarnings'])
             else:
-                financials_yearly    = symbol.get_financials(as_dict=True, freq="yearly")
-                financials_quarterly = symbol.get_financials(as_dict=True, freq="quarterly")
-                financials_yearly    = stringify_keys(d=financials_yearly,    check_inner=False)
-                financials_quarterly = stringify_keys(d=financials_quarterly, check_inner=False)
+                if isinstance(symbol, dict):
+                    financials_yearly    = symbol['financials_yearly'   ] if 'financials_yearly'    in symbol else None
+                    financials_quarterly = symbol['financials_quarterly'] if 'financials_quarterly' in symbol else None
+                else:
+                    financials_yearly    = symbol.get_financials(as_dict=True, freq="yearly")
+                    financials_quarterly = symbol.get_financials(as_dict=True, freq="quarterly")
+                    financials_yearly    = stringify_keys(d=financials_yearly,    check_inner=False)
+                    financials_quarterly = stringify_keys(d=financials_quarterly, check_inner=False)
 
 
             if VERBOSE_LOGS:
@@ -2429,7 +2447,8 @@ def process_info(json_db, symbol, stock_data, tase_mode, sectors_list, sectors_f
 
         except Exception as e:
             # if not multi_dim_scan_mode: print("Exception in symbol.dividends: {} -> {}".format(e, traceback.format_exc()))
-            json_db[stock_data.symbol]["dividends"] = []
+            if stock_data.symbol in json_db:
+                json_db[stock_data.symbol]["dividends"] = []
             pass
 
         round_and_avoid_none_values(stock_data)
@@ -2491,13 +2510,13 @@ def get_stock_data_normalized_from_db_row_compact(row, stock_symbol):
 
 def get_yfinance_ticker_wrapper(tase_mode, symb, read_all_country_symbols):
     if tase_mode:
-        symbol = yf.Ticker(symb)
+        symbol = Ticker(symb)  # yf.Ticker(symb)
     else:
         if read_all_country_symbols not in [sss_config.ALL_COUNTRY_SYMBOLS_SIX, sss_config.ALL_COUNTRY_SYMBOLS_ST]:
-            symbol = yf.Ticker(symb.replace('.U', '-UN').replace('.W', '-WT').replace('.', '-'))  # TODO: ASFAR: Sometimes the '.' Is needed, especially for non-US companies. See for instance 5205.kl. In this case the parameter is also case-sensitive! -> https://github.com/pydata/pandas-datareader/issues/810#issuecomment-789684354
+            symbol = Ticker(symb.replace('.U', '-UN').replace('.W', '-WT').replace('.', '-'))   # yf.Ticker(symb.replace('.U', '-UN').replace('.W', '-WT').replace('.', '-'))  # TODO: ASFAR: Sometimes the '.' Is needed, especially for non-US companies. See for instance 5205.kl. In this case the parameter is also case-sensitive! -> https://github.com/pydata/pandas-datareader/issues/810#issuecomment-789684354
         else:
             if read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_ST and '.ST' not in symb: symb = symb.replace('.S.DX', '.ST')
-            symbol = yf.Ticker(symb)
+            symbol = Ticker(symb)  # yf.Ticker(symb)
     return symbol
 
 
@@ -2793,7 +2812,7 @@ def perform_scan_close_values_weeks(reference_raw_data, reference_download_data,
     return rising_symbols
 
 
-def process_symbols(symbol_to_name_dict, crash_and_continue_raw_data, date_and_time_crash_and_continue, json_db, symbols, csv_db_data, rows, rows_no_div, rows_only_div, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, diff_rows, db_filename, reference_raw_data, reference_download_data, scan_close_values_interval):
+def process_symbols(yq_mode, symbol_to_name_dict, crash_and_continue_raw_data, date_and_time_crash_and_continue, json_db, symbols, csv_db_data, rows, rows_no_div, rows_only_div, tase_mode, read_all_country_symbols, sectors_list, sectors_filter_out, countries_list, countries_filter_out, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, diff_rows, db_filename, reference_raw_data, reference_download_data, scan_close_values_interval):
     iteration = 0
     if not research_mode:
         rising_symbols = []
@@ -2823,7 +2842,7 @@ def process_symbols(symbol_to_name_dict, crash_and_continue_raw_data, date_and_t
                     symbol = get_yfinance_ticker_wrapper(tase_mode, symb, read_all_country_symbols)
 
             stock_data = StockData(symbol=symb)
-            process_info_result = process_info(json_db=json_db, symbol=symbol, stock_data=stock_data, tase_mode=tase_mode, sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, profit_margin_limit=profit_margin_limit, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, debt_to_equity_limit=debt_to_equity_limit, pb_limit=pb_limit, pi_limit=pi_limit, enterprise_value_millions_usd_limit=enterprise_value_millions_usd_limit, research_mode_max_ev=research_mode_max_ev, eqg_min=eqg_min, rqg_min=rqg_min, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, research_mode=research_mode, currency_conversion_tool=currency_conversion_tool, currency_conversion_tool_alternative=currency_conversion_tool_alternative, currency_conversion_tool_manual=currency_conversion_tool_manual, reference_db=reference_db, reference_db_title_row=reference_db_title_row, db_filename=None)
+            process_info_result = process_info(yq_mode=yq_mode, json_db=json_db, symbol=symbol, stock_data=stock_data, tase_mode=tase_mode, sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, profit_margin_limit=profit_margin_limit, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, debt_to_equity_limit=debt_to_equity_limit, pb_limit=pb_limit, pi_limit=pi_limit, enterprise_value_millions_usd_limit=enterprise_value_millions_usd_limit, research_mode_max_ev=research_mode_max_ev, eqg_min=eqg_min, rqg_min=rqg_min, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, research_mode=research_mode, currency_conversion_tool=currency_conversion_tool, currency_conversion_tool_alternative=currency_conversion_tool_alternative, currency_conversion_tool_manual=currency_conversion_tool_manual, reference_db=reference_db, reference_db_title_row=reference_db_title_row, db_filename=None)
             if   tase_mode                                                      and 'TLV:' not in stock_data.symbol: stock_data.symbol = 'TLV:' + stock_data.symbol.replace('.TA', '').replace('-', '.')
             elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_SIX and 'SWX:' not in stock_data.symbol: stock_data.symbol = 'SWX:' + stock_data.symbol.replace('.SW', '')  # .replace('.', '-')
             elif read_all_country_symbols == sss_config.ALL_COUNTRY_SYMBOLS_ST  and 'STO:' not in stock_data.symbol: stock_data.symbol = 'STO:' + stock_data.symbol.replace('.ST', '')  # .replace('.', '-')
@@ -2950,7 +2969,7 @@ def download_ftp_files(filenames_list, ftp_path):
 
 # reference_run : Used for identifying anomalies in which some symbol information is completely different from last run. It can be different but only in new quartely reports
 #                 It is sometimes observed that stocks information is wrongly fetched. Is such cases, the last run's reference point shall be used, with a forgetting factor
-def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, countries_filter_out, csv_db_path, db_filename, read_all_country_symbols, tase_mode, research_mode, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, appearance_counter_dict_sss={}, appearance_counter_min=25, appearance_counter_max=35, custom_portfolio=[], num_results_list=[], num_results_list_index=0):
+def sss_run(yq_mode, reference_run, sectors_list, sectors_filter_out, countries_list, countries_filter_out, csv_db_path, db_filename, read_all_country_symbols, tase_mode, research_mode, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, appearance_counter_dict_sss={}, appearance_counter_min=25, appearance_counter_max=35, custom_portfolio=[], num_results_list=[], num_results_list_index=0):
     # Working Parameters:
     eqg_min = EQG_UNKNOWN     # The earnings can decrease but there is still a requirement that price_to_earnings_to_growth_ratio > 0. TODO: ASAFR: Add to multi-dimension
     rqg_min = RQG_UNKNOWN     # The revenue  can decrease there is still a requirement that price_to_earnings_to_growth_ratio > 0. TODO: ASAFR: Add to multi-dimension
@@ -3291,7 +3310,7 @@ def sss_run(reference_run, sectors_list, sectors_filter_out, countries_list, cou
         # Temporary json for crash-and-continue efficient operation:
         date_and_time_crash_and_continue = time.strftime("Results/{}/%Y%m%d-%H%M%S{}{}{}{}{}{}_cc".format(mode_str, tase_str, sectors_str.replace(' ','').replace('a', '').replace('e','').replace('i', '').replace('o','').replace('u', ''), countries_str, all_str, custom_portfolio_str, custom_sss_value_str))
 
-    process_symbols(symbol_to_name_dict=symbol_to_name_dict, crash_and_continue_raw_data=crash_and_continue_raw_data, date_and_time_crash_and_continue=date_and_time_crash_and_continue, json_db=json_db if not research_mode else None, symbols=symbols, csv_db_data=csv_db_data, rows=rows, rows_no_div=rows_no_div, rows_only_div=rows_only_div, tase_mode=tase_mode, read_all_country_symbols=read_all_country_symbols, sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, profit_margin_limit=profit_margin_limit, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, debt_to_equity_limit=debt_to_equity_limit, pb_limit=pb_limit, pi_limit=pi_limit, enterprise_value_millions_usd_limit=enterprise_value_millions_usd_limit, research_mode_max_ev=research_mode_max_ev, eqg_min=eqg_min, rqg_min=rqg_min, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, research_mode=research_mode, currency_conversion_tool=currency_conversion_tool if not research_mode else None, currency_conversion_tool_alternative=currency_conversion_tool_alternative if not research_mode else None, currency_conversion_tool_manual=currency_conversion_tool_manual if not research_mode else None, reference_db=reference_db if not research_mode else None, reference_db_title_row=reference_db_title_row if not research_mode else None, diff_rows=rows_diff, db_filename=db_filename, reference_raw_data=reference_raw_data, reference_download_data=reference_download_data, scan_close_values_interval=sss_config.scan_close_values_interval)
+    process_symbols(yq_mode=yq_mode, symbol_to_name_dict=symbol_to_name_dict, crash_and_continue_raw_data=crash_and_continue_raw_data, date_and_time_crash_and_continue=date_and_time_crash_and_continue, json_db=json_db if not research_mode else None, symbols=symbols, csv_db_data=csv_db_data, rows=rows, rows_no_div=rows_no_div, rows_only_div=rows_only_div, tase_mode=tase_mode, read_all_country_symbols=read_all_country_symbols, sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, profit_margin_limit=profit_margin_limit, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, debt_to_equity_limit=debt_to_equity_limit, pb_limit=pb_limit, pi_limit=pi_limit, enterprise_value_millions_usd_limit=enterprise_value_millions_usd_limit, research_mode_max_ev=research_mode_max_ev, eqg_min=eqg_min, rqg_min=rqg_min, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, research_mode=research_mode, currency_conversion_tool=currency_conversion_tool if not research_mode else None, currency_conversion_tool_alternative=currency_conversion_tool_alternative if not research_mode else None, currency_conversion_tool_manual=currency_conversion_tool_manual if not research_mode else None, reference_db=reference_db if not research_mode else None, reference_db_title_row=reference_db_title_row if not research_mode else None, diff_rows=rows_diff, db_filename=db_filename, reference_raw_data=reference_raw_data, reference_download_data=reference_download_data, scan_close_values_interval=sss_config.scan_close_values_interval)
 
     # remove (from rows, not from db or diff) rows whose sss_value is irrelevant:
     compact_rows          = []
