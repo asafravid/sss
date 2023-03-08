@@ -1588,14 +1588,21 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                 stock_data.summary_currency_conversion_rate_mult_to_usd   = round(1.0 / float(currency_conversion_tool_manual[stock_data.summary_currency  ]), NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
 
             if yq_mode:
-                balanceSheetHistory = symbol.all_modules[stock_data.symbol]['balanceSheetHistory']
+                balanceSheetHistoryYearly = symbol.all_modules[stock_data.symbol]['balanceSheetHistory']
                 balanceSheetHistoryQuarterly = symbol.all_modules[stock_data.symbol]['balanceSheetHistoryQuarterly']
+                defaultKeyStatistics = symbol.all_modules[stock_data.symbol]['defaultKeyStatistics']
                 earnings_yearly_yq = []
                 earnings_quarterly_yq = []
-                for list_element_dict in balanceSheetHistory['balanceSheetStatements']:
+                for list_element_dict in balanceSheetHistoryYearly['balanceSheetStatements']:
                     earnings_yearly_yq.append(list_element_dict['retainedEarnings'])
                 for list_element_dict in balanceSheetHistoryQuarterly['balanceSheetStatements']:
                     earnings_quarterly_yq.append(list_element_dict['retainedEarnings'])
+                enterprise_value_yq = defaultKeyStatistics['enterpriseValue']
+                profit_margins_yq = defaultKeyStatistics['profitMargins']
+                held_percent_insiders_yq = defaultKeyStatistics['heldPercentInsiders']
+                book_value_yq = defaultKeyStatistics['bookValue']
+                enterprise_to_revenue_yq = defaultKeyStatistics['enterpriseToRevenue']
+                enterprise_to_ebitda_yq = defaultKeyStatistics['enterpriseToEbitda']
             else:
                 if isinstance(symbol, dict):
                     financials_yearly    = symbol['financials_yearly'   ] if 'financials_yearly'    in symbol else None
