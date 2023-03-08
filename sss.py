@@ -1589,9 +1589,13 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
 
             if yq_mode:
                 balanceSheetHistory = symbol.all_modules[stock_data.symbol]['balanceSheetHistory']
+                balanceSheetHistoryQuarterly = symbol.all_modules[stock_data.symbol]['balanceSheetHistoryQuarterly']
                 earnings_yearly_yq = []
+                earnings_quarterly_yq = []
                 for list_element_dict in balanceSheetHistory['balanceSheetStatements']:
                     earnings_yearly_yq.append(list_element_dict['retainedEarnings'])
+                for list_element_dict in balanceSheetHistoryQuarterly['balanceSheetStatements']:
+                    earnings_quarterly_yq.append(list_element_dict['retainedEarnings'])
             else:
                 if isinstance(symbol, dict):
                     financials_yearly    = symbol['financials_yearly'   ] if 'financials_yearly'    in symbol else None
