@@ -1591,12 +1591,25 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                 balanceSheetHistoryYearly = symbol.all_modules[stock_data.symbol]['balanceSheetHistory']
                 balanceSheetHistoryQuarterly = symbol.all_modules[stock_data.symbol]['balanceSheetHistoryQuarterly']
                 defaultKeyStatistics = symbol.all_modules[stock_data.symbol]['defaultKeyStatistics']
+                assetProfile = symbol.all_modules[stock_data.symbol]['assetProfile']
+                incomeStatementHistoryYearly = symbol.all_modules[stock_data.symbol]['incomeStatementHistory']
+                incomeStatementHistoryQuarterly = symbol.all_modules[stock_data.symbol]['incomeStatementHistory']
+
                 earnings_yearly_yq = []
                 earnings_quarterly_yq = []
                 for list_element_dict in balanceSheetHistoryYearly['balanceSheetStatements']:
                     earnings_yearly_yq.append(list_element_dict['retainedEarnings'])
                 for list_element_dict in balanceSheetHistoryQuarterly['balanceSheetStatements']:
                     earnings_quarterly_yq.append(list_element_dict['retainedEarnings'])
+
+                total_revenue_yearly_yq = []
+                total_revenue_quarterly_yq = []
+                for list_element_dict in incomeStatementHistoryYearly['incomeStatementHistory']:
+                    total_revenue_yearly_yq.append(list_element_dict['totalRevenue'])
+                for list_element_dict in incomeStatementHistoryQuarterly['incomeStatementHistory']:
+                    total_revenue_quarterly_yq.append(list_element_dict['totalRevenue'])
+
+                stock_data.sector = assetProfile['sector']
                 enterprise_value_yq = defaultKeyStatistics['enterpriseValue']
                 profit_margins_yq = defaultKeyStatistics['profitMargins']
                 held_percent_insiders_yq = defaultKeyStatistics['heldPercentInsiders']
