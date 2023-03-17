@@ -1693,85 +1693,89 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
         if 'shortName' in info: stock_data.short_name = info['shortName']
         else:                   stock_data.short_name = 'None'
 
-        # Balance sheets are listed from newest to oldest, so for the weights, must reverse the dictionary:
-        [stock_data.annualized_total_ratio,          stock_data.annualized_total_ratio_bonus         ] = calculate_weighted_ratio_from_dict(balance_sheets_yearly,    'annualized_total_ratio',          'Total Assets',         'Total Liab',                BALANCE_SHEETS_WEIGHTS, stock_data, 0, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=3.0, bonus_mon_dec=1.0/3.0, bonus_neg_pres=1.0, bonus_mon_inc_num=2.0, bonus_mon_inc_den=0.5, bonus_mon_dec_num=0.5, bonus_mon_dec_den=2.0)
-        [stock_data.annualized_other_current_ratio,  stock_data.annualized_other_current_ratio_bonus ] = calculate_weighted_ratio_from_dict(balance_sheets_yearly,    'annualized_other_current_ratio',  'Other Current Assets', 'Other Current Liab',        BALANCE_SHEETS_WEIGHTS, stock_data, 0, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=3.0, bonus_mon_dec=1.0/3.0, bonus_neg_pres=1.0, bonus_mon_inc_num=2.0, bonus_mon_inc_den=0.5, bonus_mon_dec_num=0.5, bonus_mon_dec_den=2.0)
-        [stock_data.annualized_other_ratio,          stock_data.annualized_other_ratio_bonus         ] = calculate_weighted_ratio_from_dict(balance_sheets_yearly,    'annualized_other_ratio',          'Other Assets',         'Other Liab',                BALANCE_SHEETS_WEIGHTS, stock_data, 0, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=3.0, bonus_mon_dec=1.0/3.0, bonus_neg_pres=1.0, bonus_mon_inc_num=2.0, bonus_mon_inc_den=0.5, bonus_mon_dec_num=0.5, bonus_mon_dec_den=2.0)
-        [stock_data.annualized_total_current_ratio,  stock_data.annualized_total_current_ratio_bonus ] = calculate_weighted_ratio_from_dict(balance_sheets_yearly,    'annualized_total_current_ratio',  'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data, 0, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=3.0, bonus_mon_dec=1.0/3.0, bonus_neg_pres=1.0, bonus_mon_inc_num=2.0, bonus_mon_inc_den=0.5, bonus_mon_dec_num=0.5, bonus_mon_dec_den=2.0)
-
-        [stock_data.quarterized_total_ratio,         stock_data.quarterized_total_ratio_bonus        ] = calculate_weighted_ratio_from_dict(balance_sheets_quarterly, 'quarterized_total_ratio',         'Total Assets',         'Total Liab',                BALANCE_SHEETS_WEIGHTS, stock_data, 0, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5,     bonus_neg_pres=1.0, bonus_mon_inc_num=2.0, bonus_mon_inc_den=0.5, bonus_mon_dec_num=0.5, bonus_mon_dec_den=2.0)
-        [stock_data.quarterized_other_current_ratio, stock_data.quarterized_other_current_ratio_bonus] = calculate_weighted_ratio_from_dict(balance_sheets_quarterly, 'quarterized_other_current_ratio', 'Other Current Assets', 'Other Current Liab',        BALANCE_SHEETS_WEIGHTS, stock_data, 0, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5,     bonus_neg_pres=1.0, bonus_mon_inc_num=2.0, bonus_mon_inc_den=0.5, bonus_mon_dec_num=0.5, bonus_mon_dec_den=2.0)
-        [stock_data.quarterized_other_ratio,         stock_data.quarterized_other_ratio_bonus        ] = calculate_weighted_ratio_from_dict(balance_sheets_quarterly, 'quarterized_other_ratio',         'Other Assets',         'Other Liab',                BALANCE_SHEETS_WEIGHTS, stock_data, 0, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5,     bonus_neg_pres=1.0, bonus_mon_inc_num=2.0, bonus_mon_inc_den=0.5, bonus_mon_dec_num=0.5, bonus_mon_dec_den=2.0)
-        [stock_data.quarterized_total_current_ratio, stock_data.quarterized_total_current_ratio_bonus] = calculate_weighted_ratio_from_dict(balance_sheets_quarterly, 'quarterized_total_current_ratio', 'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data, 0, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5,     bonus_neg_pres=1.0, bonus_mon_inc_num=2.0, bonus_mon_inc_den=0.5, bonus_mon_dec_num=0.5, bonus_mon_dec_den=2.0)
-
-        stock_data.annualized_working_capital      = calculate_weighted_diff_from_dict( balance_sheets_yearly,    'annualized_working_capital',      'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data, 0, True)
-        stock_data.quarterized_working_capital     = calculate_weighted_diff_from_dict( balance_sheets_quarterly, 'quarterized_working_capital',     'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data, 0, True)
-
-        [stock_data.annualized_total_liabilities,  stock_data.annualized_total_liabilities_bonus ]  = calculate_weighted_stock_data_on_dict(balance_sheets_yearly,    'annualized_total_liabilities',  'Total Liab', BALANCE_SHEETS_WEIGHTS, stock_data, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5,     bonus_neg_pres=1.0)
-        [stock_data.quarterized_total_liabilities, stock_data.quarterized_total_liabilities_bonus]  = calculate_weighted_stock_data_on_dict(balance_sheets_quarterly, 'quarterized_total_liabilities', 'Total Liab', BALANCE_SHEETS_WEIGHTS, stock_data, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=1.5, bonus_mon_dec=1.0/1.5, bonus_neg_pres=1.0)
-
-        if stock_data.annualized_total_ratio          == 0.0: stock_data.annualized_total_ratio          = stock_data.quarterized_total_ratio        *QUARTERLY_YEARLY_MISSING_FACTOR
-        if stock_data.quarterized_total_ratio         == 0.0: stock_data.quarterized_total_ratio         = stock_data.annualized_total_ratio         *QUARTERLY_YEARLY_MISSING_FACTOR
-        if stock_data.annualized_other_current_ratio  == 0.0: stock_data.annualized_other_current_ratio  = stock_data.quarterized_other_current_ratio*QUARTERLY_YEARLY_MISSING_FACTOR
-        if stock_data.quarterized_other_current_ratio == 0.0: stock_data.quarterized_other_current_ratio = stock_data.annualized_other_current_ratio *QUARTERLY_YEARLY_MISSING_FACTOR
-        if stock_data.annualized_other_ratio          == 0.0: stock_data.annualized_other_ratio          = stock_data.quarterized_other_ratio        *QUARTERLY_YEARLY_MISSING_FACTOR
-        if stock_data.quarterized_other_ratio         == 0.0: stock_data.quarterized_other_ratio         = stock_data.annualized_other_ratio         *QUARTERLY_YEARLY_MISSING_FACTOR
-        if stock_data.annualized_total_current_ratio  == 0.0: stock_data.annualized_total_current_ratio  = stock_data.quarterized_total_current_ratio*QUARTERLY_YEARLY_MISSING_FACTOR
-        if stock_data.quarterized_total_current_ratio == 0.0: stock_data.quarterized_total_current_ratio = stock_data.annualized_total_current_ratio *QUARTERLY_YEARLY_MISSING_FACTOR
-
-        if stock_data.annualized_working_capital      == 0.0: stock_data.annualized_working_capital  = stock_data.quarterized_working_capital*QUARTERLY_YEARLY_MISSING_FACTOR
-        if stock_data.quarterized_working_capital     == 0.0: stock_data.quarterized_working_capital = stock_data.annualized_working_capital *QUARTERLY_YEARLY_MISSING_FACTOR
-
-        if stock_data.annualized_total_liabilities    is None and stock_data.quarterized_total_liabilities != None: stock_data.annualized_total_liabilities  = stock_data.quarterized_total_liabilities*QUARTERLY_YEARLY_MISSING_FACTOR
-        if stock_data.quarterized_total_liabilities   is None and stock_data.annualized_total_liabilities  != None: stock_data.quarterized_total_liabilities = stock_data.annualized_total_liabilities *QUARTERLY_YEARLY_MISSING_FACTOR
-
-        if VERBOSE_LOGS > 2: print("[{} {}]".format(__name__, 3))
-
-        # The correct methos is the TTM only: avoid (quareterly+annual)/2 - Keep it Simple -> Apply to all calculations
-        # TODO: ASAFR: In the next stage - add the other current and other ratio to a sum of the ratios Investigate prior
-        stock_data.total_ratio_effective         = RATIO_DAMPER+(stock_data.quarterized_total_ratio        ) # Prefer TTM only
-        stock_data.other_current_ratio_effective = RATIO_DAMPER+(stock_data.quarterized_other_current_ratio) # Prefer TTM only
-        stock_data.other_ratio_effective         = RATIO_DAMPER+(stock_data.quarterized_other_ratio        ) # Prefer TTM only
-        stock_data.total_current_ratio_effective = RATIO_DAMPER+(stock_data.quarterized_total_current_ratio) # Prefer TTM only
-        stock_data.effective_current_ratio       = (stock_data.total_ratio_effective + stock_data.total_current_ratio_effective) / 2.0  # TODO: ASAFR: In the next stage - add the other and current other ratios - more information -> more completeness
-
-        stock_data.effective_working_capital     = (stock_data.quarterized_working_capital) # Prefer TTM only
-
-        if stock_data.quarterized_total_liabilities != None:
-            stock_data.effective_total_liabilities = (stock_data.quarterized_total_liabilities) # Prefer TTM only
-
-        # TODO: ASAFR: Add Other Current Liab / Other Stockholder Equity
-        # Balance Sheets are listed from newest to olders, so for proper weight: Reverse required
-        [stock_data.annualized_debt_to_equity,  stock_data.annualized_debt_to_equity_bonus ] = calculate_weighted_ratio_from_dict(balance_sheets_yearly,    'annualized_debt_to_equity',  'Total Liab', 'Total Stockholder Equity', BALANCE_SHEETS_WEIGHTS, stock_data, None, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5, bonus_neg_pres=1.0, bonus_mon_inc_num=0.5, bonus_mon_inc_den=2.0, bonus_mon_dec_num=2.0, bonus_mon_dec_den=0.5)
-        [stock_data.quarterized_debt_to_equity, stock_data.quarterized_debt_to_equity_bonus] = calculate_weighted_ratio_from_dict(balance_sheets_quarterly, 'quarterized_debt_to_equity', 'Total Liab', 'Total Stockholder Equity', BALANCE_SHEETS_WEIGHTS, stock_data, None, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5, bonus_neg_pres=1.0, bonus_mon_inc_num=0.5, bonus_mon_inc_den=2.0, bonus_mon_dec_num=2.0, bonus_mon_dec_den=0.5)
-
-        if stock_data.annualized_debt_to_equity is None and stock_data.quarterized_debt_to_equity is None:
-            stock_data.annualized_debt_to_equity = stock_data.quarterized_debt_to_equity = 1000.0*debt_to_equity_limit
-        else:
-            if   stock_data.annualized_debt_to_equity is None and stock_data.quarterized_debt_to_equity != None:
-                stock_data.annualized_debt_to_equity = stock_data.quarterized_debt_to_equity*QUARTERLY_YEARLY_MISSING_FACTOR
-            elif stock_data.annualized_debt_to_equity != None and stock_data.quarterized_debt_to_equity is None:
-                stock_data.quarterized_debt_to_equity = stock_data.annualized_debt_to_equity * QUARTERLY_YEARLY_MISSING_FACTOR
-
-            stock_data.debt_to_equity_effective = (stock_data.quarterized_debt_to_equity)  # Prefer TTM only
-
-            if stock_data.debt_to_equity_effective < 0.0:
-                stock_data.debt_to_equity_effective_used = (1.0-stock_data.debt_to_equity_effective * NEGATIVE_DEBT_TO_EQUITY_FACTOR)  # (https://www.investopedia.com/terms/d/debtequityratio.asp#:~:text=What%20does%20it%20mean%20for,has%20more%20liabilities%20than%20assets.) What does it mean for debt to equity to be negative? If a company has a negative D/E ratio, this means that the company has negative shareholder equity. In other words, it means that the company has more liabilities than assets
-            else:
-                stock_data.debt_to_equity_effective_used = DEBT_TO_EQUITY_MIN_BASE + math.sqrt(stock_data.debt_to_equity_effective)
-
-        # Cash Flows are listed from newest to oldest, so reverse required for weights:
-        [stock_data.annualized_cash_flow_from_operating_activities,  stock_data.annualized_cash_flow_from_operating_activities_bonus ] = calculate_weighted_stock_data_on_dict(cash_flows_yearly,    'cash_flows_yearly',    'Total Cash From Operating Activities', CASH_FLOW_WEIGHTS, stock_data, True,       bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5,   bonus_neg_pres=0.5)
-        [stock_data.quarterized_cash_flow_from_operating_activities, stock_data.quarterized_cash_flow_from_operating_activities_bonus] = calculate_weighted_stock_data_on_dict(cash_flows_quarterly, 'cash_flows_quarterly', 'Total Cash From Operating Activities', NO_WEIGHTS,        stock_data, True, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=1.5, bonus_mon_dec=1/1.5, bonus_neg_pres=0.5)
-
-        # Balance Sheets are listed from newest to oldest, so reverse required for weights:
-        [stock_data.annualized_total_assets,  stock_data.annualized_total_assets_bonus ]     = calculate_weighted_stock_data_on_dict(balance_sheets_yearly,    'balance_sheets_yearly',    'Total Assets', BALANCE_SHEETS_WEIGHTS, stock_data, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5,   bonus_neg_pres=1.0)
-        [stock_data.quarterized_total_assets, stock_data.quarterized_total_assets_bonus]     = calculate_weighted_stock_data_on_dict(balance_sheets_quarterly, 'balance_sheets_quarterly', 'Total Assets', BALANCE_SHEETS_WEIGHTS, stock_data, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=1.5, bonus_mon_dec=1/1.5, bonus_neg_pres=1.0)
-
-        # Balance Sheets are listed from newest to oldest, so reverse required for weights:
-        [stock_data.annualized_total_stockholder_equity,  stock_data.annualized_total_stockholder_equity_bonus ] = calculate_weighted_stock_data_on_dict(balance_sheets_yearly,    'balance_sheets_yearly',    'Total Stockholder Equity', BALANCE_SHEETS_WEIGHTS, stock_data, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5,     bonus_neg_pres=1.0)
-        [stock_data.quarterized_total_stockholder_equity, stock_data.quarterized_total_stockholder_equity_bonus] = calculate_weighted_stock_data_on_dict(balance_sheets_quarterly, 'balance_sheets_quarterly', 'Total Stockholder Equity', BALANCE_SHEETS_WEIGHTS, stock_data, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=1.5, bonus_mon_dec=1.0/1.5, bonus_neg_pres=1.0)
-
+        # TODO: ASAFR: In yq_mode, Convert to the following structures:
+        #  "balance_sheets_yearly": {
+        #   "2021-12-31 00:00:00": {
+        #    "Intangible Assets": 14000.0,# Balance sheets listed from newest to oldest, so for the weights, must reverse the dictionary:  calculate_weighted_ratio_from_dict(dict_input,               dict_name,                          str_in_dict_numerator, str_in_dict_denominator,     weights,                stock_data, default_return_value, reverse_required, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=1.0, bonus_mon_dec=1.0, bonus_neg_pres=1.0, bonus_mon_inc_num=1.0, bonus_mon_inc_den=1.0, bonus_mon_dec_num=1.0, bonus_mon_dec_den=1.0):
+        #    "Capital Surplus": 33845000.0,[stock_data.annualized_total_ratio,          stock_data.annualized_total_ratio_bonus         ] = calculate_weighted_ratio_from_dict(balance_sheets_yearly,    'annualized_total_ratio',          'Total Assets',         'Total Liab',                BALANCE_SHEETS_WEIGHTS, stock_data, 0, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=3.0, bonus_mon_dec=1.0/3.0, bonus_neg_pres=1.0, bonus_mon_inc_num=2.0, bonus_mon_inc_den=0.5, bonus_mon_dec_num=0.5, bonus_mon_dec_den=2.0)
+        #    "Total Liab": 31004000.0,[stock_data.annualized_other_current_ratio,  stock_data.annualized_other_current_ratio_bonus ] = calculate_weighted_ratio_from_dict(balance_sheets_yearly,    'annualized_other_current_ratio',  'Other Current Assets', 'Other Current Liab',        BALANCE_SHEETS_WEIGHTS, stock_data, 0, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=3.0, bonus_mon_dec=1.0/3.0, bonus_neg_pres=1.0, bonus_mon_inc_num=2.0, bonus_mon_inc_den=0.5, bonus_mon_dec_num=0.5, bonus_mon_dec_den=2.0)
+        #    "Total Stockholder Equity": -16491000.0,[stock_data.annualized_other_ratio,          stock_data.annualized_other_ratio_bonus         ] = calculate_weighted_ratio_from_dict(balance_sheets_yearly,    'annualized_other_ratio',          'Other Assets',         'Other Liab',                BALANCE_SHEETS_WEIGHTS, stock_data, 0, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=3.0, bonus_mon_dec=1.0/3.0, bonus_neg_pres=1.0, bonus_mon_inc_num=2.0, bonus_mon_inc_den=0.5, bonus_mon_dec_num=0.5, bonus_mon_dec_den=2.0)
+        #    "Other Current Liab": 18539000.0,[stock_data.annualized_total_current_ratio,  stock_data.annualized_total_current_ratio_bonus ] = calculate_weighted_ratio_from_dict(balance_sheets_yearly,    'annualized_total_current_ratio',  'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data, 0, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=3.0, bonus_mon_dec=1.0/3.0, bonus_neg_pres=1.0, bonus_mon_inc_num=2.0, bonus_mon_inc_den=0.5, bonus_mon_dec_num=0.5, bonus_mon_dec_den=2.0)
+        #    "Total Assets": 14513000.0,
+        #    "Common Stock": 8000.0,[stock_data.quarterized_total_ratio,         stock_data.quarterized_total_ratio_bonus        ] = calculate_weighted_ratio_from_dict(balance_sheets_quarterly, 'quarterized_total_ratio',         'Total Assets',         'Total Liab',                BALANCE_SHEETS_WEIGHTS, stock_data, 0, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5,     bonus_neg_pres=1.0, bonus_mon_inc_num=2.0, bonus_mon_inc_den=0.5, bonus_mon_dec_num=0.5, bonus_mon_dec_den=2.0)
+        #    "Other Current Assets": 12584000.0,[stock_data.quarterized_other_current_ratio, stock_data.quarterized_other_current_ratio_bonus] = calculate_weighted_ratio_from_dict(balance_sheets_quarterly, 'quarterized_other_current_ratio', 'Other Current Assets', 'Other Current Liab',        BALANCE_SHEETS_WEIGHTS, stock_data, 0, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5,     bonus_neg_pres=1.0, bonus_mon_inc_num=2.0, bonus_mon_inc_den=0.5, bonus_mon_dec_num=0.5, bonus_mon_dec_den=2.0)
+        #    "Retained Earnings": -50344000.0,[stock_data.quarterized_other_ratio,         stock_data.quarterized_other_ratio_bonus        ] = calculate_weighted_ratio_from_dict(balance_sheets_quarterly, 'quarterized_other_ratio',         'Other Assets',         'Other Liab',                BALANCE_SHEETS_WEIGHTS, stock_data, 0, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5,     bonus_neg_pres=1.0, bonus_mon_inc_num=2.0, bonus_mon_inc_den=0.5, bonus_mon_dec_num=0.5, bonus_mon_dec_den=2.0)
+        #    "Other Assets": 80000.0,[stock_data.quarterized_total_current_ratio, stock_data.quarterized_total_current_ratio_bonus] = calculate_weighted_ratio_from_dict(balance_sheets_quarterly, 'quarterized_total_current_ratio', 'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data, 0, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5,     bonus_neg_pres=1.0, bonus_mon_inc_num=2.0, bonus_mon_inc_den=0.5, bonus_mon_dec_num=0.5, bonus_mon_dec_den=2.0)
+        #    "Cash": 1570000.0,
+        #    "Total Current Liabilities": 31004000.0,stock_data.annualized_working_capital      = calculate_weighted_diff_from_dict( balance_sheets_yearly,    'annualized_working_capital',      'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data, 0, True)
+        #    "Property Plant Equipment": 167000.0,stock_data.quarterized_working_capital     = calculate_weighted_diff_from_dict( balance_sheets_quarterly, 'quarterized_working_capital',     'Total Current Assets', 'Total Current Liabilities', BALANCE_SHEETS_WEIGHTS, stock_data, 0, True)
+        #    "Total Current Assets": 14252000.0,
+        #    "Net Tangible Assets": -16505000.0,[stock_data.annualized_total_liabilities,  stock_data.annualized_total_liabilities_bonus ]  = calculate_weighted_stock_data_on_dict(balance_sheets_yearly,    'annualized_total_liabilities',  'Total Liab', BALANCE_SHEETS_WEIGHTS, stock_data, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5,     bonus_neg_pres=1.0)
+        #    "Net Receivables": 98000.0,[stock_data.quarterized_total_liabilities, stock_data.quarterized_total_liabilities_bonus]  = calculate_weighted_stock_data_on_dict(balance_sheets_quarterly, 'quarterized_total_liabilities', 'Total Liab', BALANCE_SHEETS_WEIGHTS, stock_data, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=1.5, bonus_mon_dec=1.0/1.5, bonus_neg_pres=1.0)
+        #    "Accounts Payable": 7097000.0,
+        #    "Other Liab": NaNif stock_data.annualized_total_ratio          == 0.0: stock_data.annualized_total_ratio          = stock_data.quarterized_total_ratio        *QUARTERLY_YEARLY_MISSING_FACTOR
+        #   },if stock_data.quarterized_total_ratio         == 0.0: stock_data.quarterized_total_ratio         = stock_data.annualized_total_ratio         *QUARTERLY_YEARLY_MISSING_FACTOR
+        #   "2020-12-31 00:00:00": {if stock_data.annualized_other_current_ratio  == 0.0: stock_data.annualized_other_current_ratio  = stock_data.quarterized_other_current_ratio*QUARTERLY_YEARLY_MISSING_FACTOR
+        #    "Intangible Assets": 356000.0,if stock_data.quarterized_other_current_ratio == 0.0: stock_data.quarterized_other_current_ratio = stock_data.annualized_other_current_ratio *QUARTERLY_YEARLY_MISSING_FACTOR
+        #    "Capital Surplus": 33487000.0,if stock_data.annualized_other_ratio          == 0.0: stock_data.annualized_other_ratio          = stock_data.quarterized_other_ratio        *QUARTERLY_YEARLY_MISSING_FACTOR
+        #    "Total Liab": 23070000.0,if stock_data.quarterized_other_ratio         == 0.0: stock_data.quarterized_other_ratio         = stock_data.annualized_other_ratio         *QUARTERLY_YEARLY_MISSING_FACTOR
+        #    "Total Stockholder Equity": -9252000.0,if stock_data.annualized_total_current_ratio  == 0.0: stock_data.annualized_total_current_ratio  = stock_data.quarterized_total_current_ratio*QUARTERLY_YEARLY_MISSING_FACTOR
+        #    "Other Current Liab": 15268000.0,if stock_data.quarterized_total_current_ratio == 0.0: stock_data.quarterized_total_current_ratio = stock_data.annualized_total_current_ratio *QUARTERLY_YEARLY_MISSING_FACTOR
+        #    "Total Assets": 13818000.0,
+        #    "Common Stock": 8000.0,if stock_data.annualized_working_capital      == 0.0: stock_data.annualized_working_capital  = stock_data.quarterized_working_capital*QUARTERLY_YEARLY_MISSING_FACTOR
+        #    "Other Current Assets": 12497000.0,if stock_data.quarterized_working_capital     == 0.0: stock_data.quarterized_working_capital = stock_data.annualized_working_capital *QUARTERLY_YEARLY_MISSING_FACTOR
+        #    "Retained Earnings": -42747000.0,
+        #    "Other Assets": NaN,if stock_data.annualized_total_liabilities    is None and stock_data.quarterized_total_liabilities != None: stock_data.annualized_total_liabilities  = stock_data.quarterized_total_liabilities*QUARTERLY_YEARLY_MISSING_FACTOR
+        #    "Cash": 418000.0,if stock_data.quarterized_total_liabilities   is None and stock_data.annualized_total_liabilities  != None: stock_data.quarterized_total_liabilities = stock_data.annualized_total_liabilities *QUARTERLY_YEARLY_MISSING_FACTOR
+        #    "Total Current Liabilities": 22942000.0,
+        #    "Property Plant Equipment": 486000.0,if VERBOSE_LOGS > 2: print("[{} {}]".format(__name__, 3))
+        #    "Total Current Assets": 12976000.0,
+        #    "Net Tangible Assets": -9608000.0,# The correct methos is the TTM only: avoid (quareterly+annual)/2 - Keep it Simple -> Apply to all calculations
+        #    "Net Receivables": 61000.0,# TODO: ASAFR: In the next stage - add the other current and other ratio to a sum of the ratios Investigate prior
+        #    "Accounts Payable": 3384000.0,stock_data.total_ratio_effective         = RATIO_DAMPER+(stock_data.quarterized_total_ratio        ) # Prefer TTM only
+        #    "Other Liab": 52000.0stock_data.other_current_ratio_effective = RATIO_DAMPER+(stock_data.quarterized_other_current_ratio) # Prefer TTM only
+        #   },stock_data.other_ratio_effective         = RATIO_DAMPER+(stock_data.quarterized_other_ratio        ) # Prefer TTM only
+        #   "2019-12-31 00:00:00": {stock_data.total_current_ratio_effective = RATIO_DAMPER+(stock_data.quarterized_total_current_ratio) # Prefer TTM only
+        #    "Intangible Assets": 698000.0,stock_data.effective_current_ratio       = (stock_data.total_ratio_effective + stock_data.total_current_ratio_effective) / 2.0  # TODO: ASAFR: In the next stage - add the other and current other ratios - more information -> more completeness
+        #    "Capital Surplus": 33136000.0,
+        #    "Total Liab": 20080000.0,stock_data.effective_working_capital     = (stock_data.quarterized_working_capital) # Prefer TTM only
+        #    "Total Stockholder Equity": -2894000.0,
+        #    "Other Current Liab": 13812000.0,if stock_data.quarterized_total_liabilities != None:
+        #    "Total Assets": 17186000.0,    stock_data.effective_total_liabilities = (stock_data.quarterized_total_liabilities) # Prefer TTM only
+        #    "Common Stock": 8000.0,
+        #    "Other Current Assets": 12460000.0,# TODO: ASAFR: Add Other Current Liab / Other Stockholder Equity
+        #    "Retained Earnings": -36038000.0,# Balance Sheets are listed from newest to olders, so for proper weight: Reverse required
+        #    "Other Assets": 680000.0,[stock_data.annualized_debt_to_equity,  stock_data.annualized_debt_to_equity_bonus ] = calculate_weighted_ratio_from_dict(balance_sheets_yearly,    'annualized_debt_to_equity',  'Total Liab', 'Total Stockholder Equity', BALANCE_SHEETS_WEIGHTS, stock_data, None, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5, bonus_neg_pres=1.0, bonus_mon_inc_num=0.5, bonus_mon_inc_den=2.0, bonus_mon_dec_num=2.0, bonus_mon_dec_den=0.5)
+        #    "Cash": 433000.0,[stock_data.quarterized_debt_to_equity, stock_data.quarterized_debt_to_equity_bonus] = calculate_weighted_ratio_from_dict(balance_sheets_quarterly, 'quarterized_debt_to_equity', 'Total Liab', 'Total Stockholder Equity', BALANCE_SHEETS_WEIGHTS, stock_data, None, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5, bonus_neg_pres=1.0, bonus_mon_inc_num=0.5, bonus_mon_inc_den=2.0, bonus_mon_dec_num=2.0, bonus_mon_dec_den=0.5)
+        #    "Total Current Liabilities": 19838000.0,
+        #    "Property Plant Equipment": 886000.0,if stock_data.annualized_debt_to_equity is None and stock_data.quarterized_debt_to_equity is None:
+        #    "Total Current Assets": 14922000.0,    stock_data.annualized_debt_to_equity = stock_data.quarterized_debt_to_equity = 1000.0*debt_to_equity_limit
+        #    "Net Tangible Assets": -3592000.0,else:
+        #    "Net Receivables": 2029000.0,    if   stock_data.annualized_debt_to_equity is None and stock_data.quarterized_debt_to_equity != None:
+        #    "Accounts Payable": 2978000.0,        stock_data.annualized_debt_to_equity = stock_data.quarterized_debt_to_equity*QUARTERLY_YEARLY_MISSING_FACTOR
+        #    "Other Liab": 63000.0    elif stock_data.annualized_debt_to_equity != None and stock_data.quarterized_debt_to_equity is None:
+        #   },        stock_data.quarterized_debt_to_equity = stock_data.annualized_debt_to_equity * QUARTERLY_YEARLY_MISSING_FACTOR
+        #   "2018-12-31 00:00:00": {
+        #    "Intangible Assets": NaN,    stock_data.debt_to_equity_effective = (stock_data.quarterized_debt_to_equity)  # Prefer TTM only
+        #    "Capital Surplus": 31704000.0,
+        #    "Total Liab": 21825000.0,    if stock_data.debt_to_equity_effective < 0.0:
+        #    "Total Stockholder Equity": 3549000.0,        stock_data.debt_to_equity_effective_used = (1.0-stock_data.debt_to_equity_effective * NEGATIVE_DEBT_TO_EQUITY_FACTOR)  # (https://www.investopedia.com/terms/d/debtequityratio.asp#:~:text=What%20does%20it%20mean%20for,has%20more%20liabilities%20than%20assets.) What does it mean for debt to equity to be negative? If a company has a negative D/E ratio, this means that the company has negative shareholder equity. In other words, it means that the company has more liabilities than assets
+        #    "Other Current Liab": 14821000.0,    else:
+        #    "Total Assets": 25374000.0,        stock_data.debt_to_equity_effective_used = DEBT_TO_EQUITY_MIN_BASE + math.sqrt(stock_data.debt_to_equity_effective)
+        #    "Common Stock": 6000.0,
+        #    "Other Current Assets": 12331000.0,# Cash Flows are listed from newest to oldest, so reverse required for weights:
+        #    "Retained Earnings": -28161000.0,[stock_data.annualized_cash_flow_from_operating_activities,  stock_data.annualized_cash_flow_from_operating_activities_bonus ] = calculate_weighted_stock_data_on_dict(cash_flows_yearly,    'cash_flows_yearly',    'Total Cash From Operating Activities', CASH_FLOW_WEIGHTS, stock_data, True,       bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5,   bonus_neg_pres=0.5)
+        #    "Other Assets": NaN,[stock_data.quarterized_cash_flow_from_operating_activities, stock_data.quarterized_cash_flow_from_operating_activities_bonus] = calculate_weighted_stock_data_on_dict(cash_flows_quarterly, 'cash_flows_quarterly', 'Total Cash From Operating Activities', NO_WEIGHTS,        stock_data, True, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=1.5, bonus_mon_dec=1/1.5, bonus_neg_pres=0.5)
+        #    "Cash": 9856000.0,
+        #    "Total Current Liabilities": 21658000.0,# Balance Sheets are listed from newest to oldest, so reverse required for weights:
+        #    "Property Plant Equipment": 1016000.0,[stock_data.annualized_total_assets,  stock_data.annualized_total_assets_bonus ]     = calculate_weighted_stock_data_on_dict(balance_sheets_yearly,    'balance_sheets_yearly',    'Total Assets', BALANCE_SHEETS_WEIGHTS, stock_data, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5,   bonus_neg_pres=1.0)
+        #    "Total Current Assets": 24358000.0,[stock_data.quarterized_total_assets, stock_data.quarterized_total_assets_bonus]     = calculate_weighted_stock_data_on_dict(balance_sheets_quarterly, 'balance_sheets_quarterly', 'Total Assets', BALANCE_SHEETS_WEIGHTS, stock_data, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=1.5, bonus_mon_dec=1/1.5, bonus_neg_pres=1.0)
+        #    "Net Tangible Assets": 3549000.0,
+        #    "Net Receivables": 2171000.0,# Balance Sheets are listed from newest to oldest, so reverse required for weights:
+        #    "Accounts Payable": 3910000.0,[stock_data.annualized_total_stockholder_equity,  stock_data.annualized_total_stockholder_equity_bonus ] = calculate_weighted_stock_data_on_dict(balance_sheets_yearly,    'balance_sheets_yearly',    'Total Stockholder Equity', BALANCE_SHEETS_WEIGHTS, stock_data, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5,     bonus_neg_pres=1.0)
+        #    "Other Liab": 167000.0[stock_data.quarterized_total_stockholder_equity, stock_data.quarterized_total_stockholder_equity_bonus] = calculate_weighted_stock_data_on_dict(balance_sheets_quarterly, 'balance_sheets_quarterly', 'Total Stockholder Equity', BALANCE_SHEETS_WEIGHTS, stock_data, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=1.5, bonus_mon_dec=1.0/1.5, bonus_neg_pres=1.0)
+        #   }
+        #  },
         # Balance Sheets are listed from newest to oldest, so reverse required for weights:
         [stock_data.annualized_retained_earnings,  stock_data.annualized_retained_earnings_bonus ] = calculate_weighted_stock_data_on_dict(balance_sheets_yearly,    'balance_sheets_yearly',    'Retained Earnings', BALANCE_SHEETS_WEIGHTS, stock_data, True,       bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5,     bonus_neg_pres=0.25)
         [stock_data.quarterized_retained_earnings, stock_data.quarterized_retained_earnings_bonus] = calculate_weighted_stock_data_on_dict(balance_sheets_quarterly, 'balance_sheets_yearly',    'Retained Earnings', NO_WEIGHTS,             stock_data, True, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=1.5, bonus_mon_dec=1.0/1.5, bonus_neg_pres=0.25)
