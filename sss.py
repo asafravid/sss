@@ -1602,6 +1602,14 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                 for list_element_dict in balanceSheetHistoryQuarterly['balanceSheetStatements']:
                     earnings_quarterly_yq.append(list_element_dict['retainedEarnings'])
 
+                total_assets_yearly_yq = []
+                total_assets_quarterly_yq = []
+
+                for list_element_dict in balanceSheetHistoryYearly['balanceSheetStatements']:
+                    total_assets_yearly_yq.append(list_element_dict['totalCurrentAssets'])
+                for list_element_dict in balanceSheetHistoryQuarterly['balanceSheetStatements']:
+                    total_assets_quarterly_yq.append(list_element_dict['totalCurrentAssets'])
+
                 total_revenue_yearly_yq = []
                 total_revenue_quarterly_yq = []
                 for list_element_dict in incomeStatementHistoryYearly['incomeStatementHistory']:
