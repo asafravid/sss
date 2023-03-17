@@ -1597,18 +1597,42 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
 
                 earnings_yearly_yq = []
                 earnings_quarterly_yq = []
-                for list_element_dict in balanceSheetHistoryYearly['balanceSheetStatements']:
-                    earnings_yearly_yq.append(list_element_dict['retainedEarnings'])
-                for list_element_dict in balanceSheetHistoryQuarterly['balanceSheetStatements']:
-                    earnings_quarterly_yq.append(list_element_dict['retainedEarnings'])
 
+                total_current_assets_yearly_yq = []
                 total_assets_yearly_yq = []
+                total_current_liabilities_yearly_yq = []
+                total_liabilities_yearly_yq = []
+                other_current_assets_yearly_yq = []
+                other_current_liabilities_yearly_yq = []
+                other_assets_yearly_yq = []
+
+                total_current_assets_quarterly_yq = []
                 total_assets_quarterly_yq = []
+                total_current_liabilities_quarterly_yq = []
+                total_liabilities_quarterly_yq = []
+                other_current_assets_quarterly_yq = []
+                other_current_liabilities_quarterly_yq = []
+                other_assets_quarterly_yq = []
 
                 for list_element_dict in balanceSheetHistoryYearly['balanceSheetStatements']:
-                    total_assets_yearly_yq.append(list_element_dict['totalCurrentAssets'])
+                    if 'retainedEarnings'        in list_element_dict: earnings_yearly_yq.append(list_element_dict['retainedEarnings'])
+                    if 'totalCurrentAssets'      in list_element_dict: total_current_assets_yearly_yq.append(list_element_dict['totalCurrentAssets'])
+                    if 'totalAssets'             in list_element_dict: total_assets_yearly_yq.append(list_element_dict['totalAssets'])
+                    if 'totalCurrentLiabilities' in list_element_dict: total_current_liabilities_yearly_yq.append(list_element_dict['totalCurrentLiabilities'])
+                    if 'totalLiab'               in list_element_dict: total_liabilities_yearly_yq.append(list_element_dict['totalLiab'])
+                    if 'otherCurrentAssets'      in list_element_dict: other_current_assets_yearly_yq.append(list_element_dict['otherCurrentAssets'])
+                    if 'otherCurrentLiab'        in list_element_dict: other_current_liabilities_yearly_yq.append(list_element_dict['otherCurrentLiab'])
+                    if 'otherAssets'             in list_element_dict: other_assets_yearly_yq.append(list_element_dict['otherAssets'])
+
                 for list_element_dict in balanceSheetHistoryQuarterly['balanceSheetStatements']:
-                    total_assets_quarterly_yq.append(list_element_dict['totalCurrentAssets'])
+                    if 'retainedEarnings'        in list_element_dict: earnings_quarterly_yq.append(list_element_dict['retainedEarnings'])
+                    if 'totalCurrentAssets'      in list_element_dict: total_current_assets_quarterly_yq.append(list_element_dict['totalCurrentAssets'])
+                    if 'totalAssets'             in list_element_dict: total_assets_quarterly_yq.append(list_element_dict['totalAssets'])
+                    if 'totalCurrentLiabilities' in list_element_dict: total_current_liabilities_quarterly_yq.append(list_element_dict['totalCurrentLiabilities'])
+                    if 'totalLiab'               in list_element_dict: total_liabilities_quarterly_yq.append(list_element_dict['totalLiab'])
+                    if 'otherCurrentAssets'      in list_element_dict: other_current_assets_quarterly_yq.append(list_element_dict['otherCurrentAssets'])
+                    if 'otherCurrentLiab'        in list_element_dict: other_current_liabilities_quarterly_yq.append(list_element_dict['otherCurrentLiab'])
+                    if 'otherAssets'             in list_element_dict: other_assets_quarterly_yq.append(list_element_dict['otherAssets'])
 
                 total_revenue_yearly_yq = []
                 total_revenue_quarterly_yq = []
@@ -1633,7 +1657,6 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                     financials_quarterly = symbol.get_financials(as_dict=True, freq="quarterly")
                     financials_yearly    = stringify_keys(d=financials_yearly,    check_inner=False)
                     financials_quarterly = stringify_keys(d=financials_quarterly, check_inner=False)
-
 
             if VERBOSE_LOGS:
                 print('[DB Debug] Symbol:                   {}'.format(stock_data.symbol))
