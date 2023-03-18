@@ -1614,25 +1614,62 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                 other_current_liabilities_quarterly_yq = []
                 other_assets_quarterly_yq = []
 
+                balance_sheets_yearly_yq = {}
+                balance_sheets_quarterly_yq = {}
+
                 for list_element_dict in balanceSheetHistoryYearly['balanceSheetStatements']:
-                    if 'retainedEarnings'        in list_element_dict: earnings_yearly_yq.append(list_element_dict['retainedEarnings'])
-                    if 'totalCurrentAssets'      in list_element_dict: total_current_assets_yearly_yq.append(list_element_dict['totalCurrentAssets'])
-                    if 'totalAssets'             in list_element_dict: total_assets_yearly_yq.append(list_element_dict['totalAssets'])
-                    if 'totalCurrentLiabilities' in list_element_dict: total_current_liabilities_yearly_yq.append(list_element_dict['totalCurrentLiabilities'])
-                    if 'totalLiab'               in list_element_dict: total_liabilities_yearly_yq.append(list_element_dict['totalLiab'])
-                    if 'otherCurrentAssets'      in list_element_dict: other_current_assets_yearly_yq.append(list_element_dict['otherCurrentAssets'])
-                    if 'otherCurrentLiab'        in list_element_dict: other_current_liabilities_yearly_yq.append(list_element_dict['otherCurrentLiab'])
-                    if 'otherAssets'             in list_element_dict: other_assets_yearly_yq.append(list_element_dict['otherAssets'])
+                    balance_sheets_yearly_yq[list_element_dict['endDate']] = {}
+                    if 'retainedEarnings'        in list_element_dict:
+                        earnings_yearly_yq.append(list_element_dict['retainedEarnings'])
+                        balance_sheets_yearly_yq[list_element_dict['endDate']]['retainedEarnings'] = list_element_dict['retainedEarnings']
+                    if 'totalCurrentAssets'      in list_element_dict:
+                        total_current_assets_yearly_yq.append(list_element_dict['totalCurrentAssets'])
+                        balance_sheets_yearly_yq[list_element_dict['endDate']]['totalCurrentAssets'] = list_element_dict['totalCurrentAssets']
+                    if 'totalAssets'             in list_element_dict:
+                        total_assets_yearly_yq.append(list_element_dict['totalAssets'])
+                        balance_sheets_yearly_yq[list_element_dict['endDate']]['totalAssets'] = list_element_dict['totalAssets']
+                    if 'totalCurrentLiabilities' in list_element_dict:
+                        total_current_liabilities_yearly_yq.append(list_element_dict['totalCurrentLiabilities'])
+                        balance_sheets_yearly_yq[list_element_dict['endDate']]['totalCurrentLiabilities'] = list_element_dict['totalCurrentLiabilities']
+                    if 'totalLiab'               in list_element_dict:
+                        total_liabilities_yearly_yq.append(list_element_dict['totalLiab'])
+                        balance_sheets_yearly_yq[list_element_dict['endDate']]['totalLiab'] = list_element_dict['totalLiab']
+                    if 'otherCurrentAssets'      in list_element_dict:
+                        other_current_assets_yearly_yq.append(list_element_dict['otherCurrentAssets'])
+                        balance_sheets_yearly_yq[list_element_dict['endDate']]['otherCurrentAssets'] = list_element_dict['otherCurrentAssets']
+                    if 'otherCurrentLiab'        in list_element_dict:
+                        other_current_liabilities_yearly_yq.append(list_element_dict['otherCurrentLiab'])
+                        balance_sheets_yearly_yq[list_element_dict['endDate']]['otherCurrentLiab'] = list_element_dict['otherCurrentLiab']
+                    if 'otherAssets'             in list_element_dict:
+                        other_assets_yearly_yq.append(list_element_dict['otherAssets'])
+                        balance_sheets_yearly_yq[list_element_dict['endDate']]['otherAssets'] = list_element_dict['otherAssets']
 
                 for list_element_dict in balanceSheetHistoryQuarterly['balanceSheetStatements']:
-                    if 'retainedEarnings'        in list_element_dict: earnings_quarterly_yq.append(list_element_dict['retainedEarnings'])
-                    if 'totalCurrentAssets'      in list_element_dict: total_current_assets_quarterly_yq.append(list_element_dict['totalCurrentAssets'])
-                    if 'totalAssets'             in list_element_dict: total_assets_quarterly_yq.append(list_element_dict['totalAssets'])
-                    if 'totalCurrentLiabilities' in list_element_dict: total_current_liabilities_quarterly_yq.append(list_element_dict['totalCurrentLiabilities'])
-                    if 'totalLiab'               in list_element_dict: total_liabilities_quarterly_yq.append(list_element_dict['totalLiab'])
-                    if 'otherCurrentAssets'      in list_element_dict: other_current_assets_quarterly_yq.append(list_element_dict['otherCurrentAssets'])
-                    if 'otherCurrentLiab'        in list_element_dict: other_current_liabilities_quarterly_yq.append(list_element_dict['otherCurrentLiab'])
-                    if 'otherAssets'             in list_element_dict: other_assets_quarterly_yq.append(list_element_dict['otherAssets'])
+                    balance_sheets_quarterly_yq[list_element_dict['endDate']] = {}
+                    if 'retainedEarnings'        in list_element_dict:
+                        earnings_quarterly_yq.append(list_element_dict['retainedEarnings'])
+                        balance_sheets_quarterly_yq[list_element_dict['endDate']]['retainedEarnings'] = list_element_dict['retainedEarnings']
+                    if 'totalCurrentAssets'      in list_element_dict:
+                        total_current_assets_quarterly_yq.append(list_element_dict['totalCurrentAssets'])
+                        balance_sheets_quarterly_yq[list_element_dict['endDate']]['totalCurrentAssets'] = list_element_dict['totalCurrentAssets']
+                    if 'totalAssets'             in list_element_dict:
+                        total_assets_quarterly_yq.append(list_element_dict['totalAssets'])
+                        balance_sheets_quarterly_yq[list_element_dict['endDate']]['totalAssets'] = list_element_dict['totalAssets']
+                    if 'totalCurrentLiabilities' in list_element_dict:
+                        total_current_liabilities_quarterly_yq.append(list_element_dict['totalCurrentLiabilities'])
+                        balance_sheets_quarterly_yq[list_element_dict['endDate']]['totalCurrentLiabilities'] = list_element_dict['totalCurrentLiabilities']
+                    if 'totalLiab'               in list_element_dict:
+                        total_liabilities_quarterly_yq.append(list_element_dict['totalLiab'])
+                        balance_sheets_quarterly_yq[list_element_dict['endDate']]['totalLiab'] = list_element_dict['totalLiab']
+                    if 'otherCurrentAssets'      in list_element_dict:
+                        other_current_assets_quarterly_yq.append(list_element_dict['otherCurrentAssets'])
+                        balance_sheets_quarterly_yq[list_element_dict['endDate']]['otherCurrentAssets'] = list_element_dict['otherCurrentAssets']
+                    if 'otherCurrentLiab'        in list_element_dict:
+                        other_current_liabilities_quarterly_yq.append(list_element_dict['otherCurrentLiab'])
+                        balance_sheets_quarterly_yq[list_element_dict['endDate']]['otherCurrentLiab'] = list_element_dict['otherCurrentLiab']
+                    if 'otherAssets'             in list_element_dict:
+                        other_assets_quarterly_yq.append(list_element_dict['otherAssets'])
+                        balance_sheets_quarterly_yq[list_element_dict['endDate']]['otherAssets'] = list_element_dict['otherAssets']
 
                 total_revenue_yearly_yq = []
                 total_revenue_quarterly_yq = []
