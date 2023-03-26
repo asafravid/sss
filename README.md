@@ -32,6 +32,7 @@ https://bit.ly/MultiDimensionalScan
   - Mandatory
     - `pip[3] install pandas`
     - `pip[3] install yfinance`
+    - `pip[3] install yahooquery`
     - `pip[3] install fpdf`
     - `pip[3] install pyPdf`
     - `pip[3] install numpy`
@@ -62,7 +63,7 @@ https://bit.ly/MultiDimensionalScan
 - The Results are merely a basis for Research and Analysis.
 
 # Understanding and Verifying Units of yfinance parameters
-- Units can compared to https://www.macroaxis.com/stock-analysis/CMRE/Costamare (i.e. CMRE can be replaced for any stock ticker/symbol)
+- Units can be compared to https://www.macroaxis.com/stock-analysis/CMRE/Costamare (i.e. CMRE can be replaced for any stock ticker/symbol)
 - Use case: `CMRE`'s `yfinance` `earningsQuarterlyGrowth` is `-0.298`, and website shows `-29.80%` so the match yields that `yfinance` reports in direct ratio (not `%`)
 
 # Looking Forward for Contributions
