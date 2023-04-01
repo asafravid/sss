@@ -1947,6 +1947,39 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
         else:                                stock_data.employees = NUM_EMPLOYEES_UNKNOWN
         if stock_data.employees is None: stock_data.employees = NUM_EMPLOYEES_UNKNOWN
 
+        # TODO: ASAFR: 1. replace all earnings_yearly and earnings_quarterly with _yq suffix (for _yq mode, and with if on it)
+        #              2. restructure _yq with:
+        # "earnings_yearly": {
+        #     "Revenue": {
+        #         "2019": 5163000000,
+        #         "2020": 5339000000,
+        #         "2021": 6319000000,
+        #         "2022": 6848000000
+        #     },
+        #     "Earnings": {
+        #         "2019": 1071000000,
+        #         "2020": 719000000,
+        #         "2021": 1210000000,
+        #         "2022": 1254000000
+        #     },
+        #     "financialCurrency": "USD"
+        # },
+        # "earnings_quarterly": {
+        #     "Revenue": {
+        #         "1Q2022": 1674000000,
+        #         "2Q2022": 1607000000,
+        #         "3Q2022": 1718000000,
+        #         "4Q2022": 1849000000
+        #     },
+        #     "Earnings": {
+        #         "1Q2022": 283000000,
+        #         "2Q2022": 274000000,
+        #         "3Q2022": 329000000,
+        #         "4Q2022": 368000000
+        #     },
+        #     "financialCurrency": "USD"
+        # }
+
         # Oldest is the lower index
         alternative_annual_pm_required = True
         if earnings_yearly != None and 'Revenue' in earnings_yearly and 'Earnings' in earnings_yearly:
