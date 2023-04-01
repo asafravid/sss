@@ -1588,12 +1588,14 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                 stock_data.summary_currency_conversion_rate_mult_to_usd   = round(1.0 / float(currency_conversion_tool_manual[stock_data.summary_currency  ]), NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
 
             if yq_mode:
-                balanceSheetHistoryYearly = symbol.all_modules[stock_data.symbol]['balanceSheetHistory']
-                balanceSheetHistoryQuarterly = symbol.all_modules[stock_data.symbol]['balanceSheetHistoryQuarterly']
-                defaultKeyStatistics = symbol.all_modules[stock_data.symbol]['defaultKeyStatistics']
-                assetProfile = symbol.all_modules[stock_data.symbol]['assetProfile']
-                incomeStatementHistoryYearly = symbol.all_modules[stock_data.symbol]['incomeStatementHistory']
-                incomeStatementHistoryQuarterly = symbol.all_modules[stock_data.symbol]['incomeStatementHistory']
+                balanceSheetHistoryYearly         = symbol.all_modules[stock_data.symbol]['balanceSheetHistory']
+                balanceSheetHistoryQuarterly      = symbol.all_modules[stock_data.symbol]['balanceSheetHistoryQuarterly']
+                cashflowStatementHistoryYearly    = symbol.all_modules[stock_data.symbol]['cashflowStatementHistory']
+                cashflowStatementHistoryQuarterly = symbol.all_modules[stock_data.symbol]['cashflowStatementHistoryQuarterly']
+                defaultKeyStatistics              = symbol.all_modules[stock_data.symbol]['defaultKeyStatistics']
+                assetProfile                      = symbol.all_modules[stock_data.symbol]['assetProfile']
+                incomeStatementHistoryYearly      = symbol.all_modules[stock_data.symbol]['incomeStatementHistory']
+                incomeStatementHistoryQuarterly   = symbol.all_modules[stock_data.symbol]['incomeStatementHistory']
 
                 earnings_yearly_yq = []
                 earnings_quarterly_yq = []
@@ -1621,11 +1623,19 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                 balance_sheets_yearly_yq = {}
                 balance_sheets_quarterly_yq = {}
 
+                total_cash_from_operating_activities_yearly_yq = []
+                total_cash_from_operating_activities_quarterly_yq = []
+                depreciation_yearly_yq = []
+                depreciation_quarterly_yq = []
+
+                cash_flows_yearly_yq = {}
+                cash_flows_quarterly_yq = {}
+
                 for list_element_dict in balanceSheetHistoryYearly['balanceSheetStatements']:
                     balance_sheets_yearly_yq[list_element_dict['endDate']] = {}
                     if 'retainedEarnings'        in list_element_dict:
                         earnings_yearly_yq.append(list_element_dict['retainedEarnings'])
-                        balance_sheets_yearly_yq[list_element_dict['endDate']]['retainedEarnings'] = list_element_dict['retainedEarnings']
+                        balance_sheets_yearly_yq[list_element_dict['endDate']]['Retained Earnings'] = list_element_dict['retainedEarnings']
                     if 'totalStockholderEquity'        in list_element_dict:
                         total_stockholder_equity_yearly_yq.append(list_element_dict['totalStockholderEquity'])
                         balance_sheets_yearly_yq[list_element_dict['endDate']]['Total Stockholder Equity'] = list_element_dict['totalStockholderEquity']
@@ -1658,7 +1668,7 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                     balance_sheets_quarterly_yq[list_element_dict['endDate']] = {}
                     if 'retainedEarnings'        in list_element_dict:
                         earnings_quarterly_yq.append(list_element_dict['retainedEarnings'])
-                        balance_sheets_quarterly_yq[list_element_dict['endDate']]['retainedEarnings'] = list_element_dict['retainedEarnings']
+                        balance_sheets_quarterly_yq[list_element_dict['endDate']]['Retained Earnings'] = list_element_dict['retainedEarnings']
                     if 'totalStockholderEquity'        in list_element_dict:
                         total_stockholder_equity_quarterly_yq.append(list_element_dict['totalStockholderEquity'])
                         balance_sheets_quarterly_yq[list_element_dict['endDate']]['Total Stockholder Equity'] = list_element_dict['totalStockholderEquity']
@@ -1686,6 +1696,26 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                     if 'otherAssets'             in list_element_dict:
                         other_assets_quarterly_yq.append(list_element_dict['otherAssets'])
                         balance_sheets_quarterly_yq[list_element_dict['endDate']]['Other Assets'] = list_element_dict['otherAssets']
+
+                for list_element_dict in cashflowStatementHistoryYearly['cashflowStatements']:
+                    cash_flows_yearly_yq[list_element_dict['endDate']] = {}
+
+                    if 'totalCashFromOperatingActivities' in list_element_dict:
+                        total_cash_from_operating_activities_yearly_yq.append(list_element_dict['totalCashFromOperatingActivities'])
+                        cash_flows_yearly_yq[list_element_dict['endDate']]['Total Cash From Operating Activities'] = list_element_dict['totalCashFromOperatingActivities']
+                    if 'depreciation' in list_element_dict:
+                        depreciation_yearly_yq.append(list_element_dict['depreciation'])
+                        cash_flows_yearly_yq[list_element_dict['endDate']]['Depreciation'] = list_element_dict['depreciation']
+
+                for list_element_dict in cashflowStatementHistoryQuarterly['cashflowStatements']:
+                    cash_flows_quarterly_yq[list_element_dict['endDate']] = {}
+
+                    if 'totalCashFromOperatingActivities' in list_element_dict:
+                        total_cash_from_operating_activities_quarterly_yq.append(list_element_dict['totalCashFromOperatingActivities'])
+                        cash_flows_quarterly_yq[list_element_dict['endDate']]['Total Cash From Operating Activities'] = list_element_dict['totalCashFromOperatingActivities']
+                    if 'depreciation' in list_element_dict:
+                        depreciation_quarterly_yq.append(list_element_dict['depreciation'])
+                        cash_flows_quarterly_yq[list_element_dict['endDate']]['Depreciation'] = list_element_dict['depreciation']
 
                 total_revenue_yearly_yq = []
                 total_revenue_quarterly_yq = []
@@ -1879,8 +1909,8 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                 stock_data.debt_to_equity_effective_used = DEBT_TO_EQUITY_MIN_BASE + math.sqrt(stock_data.debt_to_equity_effective)
 
         # Cash Flows are listed from newest to oldest, so reverse required for weights:
-        [stock_data.annualized_cash_flow_from_operating_activities,  stock_data.annualized_cash_flow_from_operating_activities_bonus ] = calculate_weighted_stock_data_on_dict(cash_flows_yearly,    'cash_flows_yearly',    'Total Cash From Operating Activities', CASH_FLOW_WEIGHTS, stock_data, True,       bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5,   bonus_neg_pres=0.5)
-        [stock_data.quarterized_cash_flow_from_operating_activities, stock_data.quarterized_cash_flow_from_operating_activities_bonus] = calculate_weighted_stock_data_on_dict(cash_flows_quarterly, 'cash_flows_quarterly', 'Total Cash From Operating Activities', NO_WEIGHTS,        stock_data, True, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=1.5, bonus_mon_dec=1/1.5, bonus_neg_pres=0.5)
+        [stock_data.annualized_cash_flow_from_operating_activities,  stock_data.annualized_cash_flow_from_operating_activities_bonus ] = calculate_weighted_stock_data_on_dict(cash_flows_yearly_yq,    'cash_flows_yearly',    'Total Cash From Operating Activities', CASH_FLOW_WEIGHTS, stock_data, True,       bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5,   bonus_neg_pres=0.5)
+        [stock_data.quarterized_cash_flow_from_operating_activities, stock_data.quarterized_cash_flow_from_operating_activities_bonus] = calculate_weighted_stock_data_on_dict(cash_flows_quarterly_yq, 'cash_flows_quarterly', 'Total Cash From Operating Activities', NO_WEIGHTS,        stock_data, True, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=1.5, bonus_mon_dec=1/1.5, bonus_neg_pres=0.5)
 
         # Balance Sheets are listed from newest to oldest, so reverse required for weights:
         [stock_data.annualized_total_assets,  stock_data.annualized_total_assets_bonus ]     = calculate_weighted_stock_data_on_dict(balance_sheets_yearly_yq,    'balance_sheets_yearly',    'Total Assets', BALANCE_SHEETS_WEIGHTS, stock_data, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5,   bonus_neg_pres=1.0)
@@ -2273,8 +2303,8 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
 
         # in order to calculate eibtd, take ebit from finantials and add deprecations from cash_flows to it:
         # Financials and Cash Flows are ordered newest to oldest so reversing is required for weights:
-        stock_data.quarterized_ebitd = calculate_weighted_sum_from_2_dicts(financials_quarterly, 'financials_quarterly', 'Ebit', cash_flows_quarterly, 'cash_flows_quarterly', 'Depreciation', NO_WEIGHTS,       stock_data, 0, True, True, True)
-        stock_data.annualized_ebitd  = calculate_weighted_sum_from_2_dicts(financials_yearly,    'financials_yearly',    'Ebit', cash_flows_yearly,    'cash_flows_yearly',    'Depreciation', EARNINGS_WEIGHTS, stock_data, 0, True, True)
+        stock_data.quarterized_ebitd = calculate_weighted_sum_from_2_dicts(financials_quarterly, 'financials_quarterly', 'Ebit', cash_flows_quarterly_yq, 'cash_flows_quarterly', 'Depreciation', NO_WEIGHTS,       stock_data, 0, True, True, True)
+        stock_data.annualized_ebitd  = calculate_weighted_sum_from_2_dicts(financials_yearly,    'financials_yearly',    'Ebit', cash_flows_yearly_yq,    'cash_flows_yearly',    'Depreciation', EARNINGS_WEIGHTS, stock_data, 0, True, True)
         stock_data.ebitd             = (stock_data.quarterized_ebitd) # Prefer TTM only
 
         # TODO: ASAFR: 1. ebit (within financials) can be used instead of simply taking the earnings
