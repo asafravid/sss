@@ -1596,9 +1596,44 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                 assetProfile                      = symbol.all_modules[stock_data.symbol]['assetProfile']
                 incomeStatementHistoryYearly      = symbol.all_modules[stock_data.symbol]['incomeStatementHistory']
                 incomeStatementHistoryQuarterly   = symbol.all_modules[stock_data.symbol]['incomeStatementHistory']
+                earningsYearly                    = symbol.all_modules[stock_data.symbol]['earnings']['financialsChart']['yearly']
+                earningsQuarterly                 = symbol.all_modules[stock_data.symbol]['earnings']['financialsChart']['quarterly']
 
-                earnings_yearly_yq = []
-                earnings_quarterly_yq = []
+                # TODO: ASAFR: 1. replace all earnings_yearly and earnings_quarterly with _yq suffix (for _yq mode, and with if on it)
+                #              2. restructure _yq with:
+                # "earnings_yearly": {
+                #     "Revenue": {
+                #         "2019": 5163000000,
+                #         "2020": 5339000000,
+                #         "2021": 6319000000,
+                #         "2022": 6848000000
+                #     },
+                #     "Earnings": {
+                #         "2019": 1071000000,
+                #         "2020": 719000000,
+                #         "2021": 1210000000,
+                #         "2022": 1254000000
+                #     },
+                #     "financialCurrency": "USD"
+                # },
+                # "earnings_quarterly": {
+                #     "Revenue": {
+                #         "1Q2022": 1674000000,
+                #         "2Q2022": 1607000000,
+                #         "3Q2022": 1718000000,
+                #         "4Q2022": 1849000000
+                #     },
+                #     "Earnings": {
+                #         "1Q2022": 283000000,
+                #         "2Q2022": 274000000,
+                #         "3Q2022": 329000000,
+                #         "4Q2022": 368000000
+                #     },
+                #     "financialCurrency": "USD"
+                # }
+
+                earnings_yearly_yq = {}
+                earnings_quarterly_yq = {}
 
                 total_stockholder_equity_yearly_yq = []
                 total_stockholder_equity_quarterly_yq = []
@@ -1630,6 +1665,19 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
 
                 cash_flows_yearly_yq = {}
                 cash_flows_quarterly_yq = {}
+
+                earnings_yearly_yq["Earnings"] = {}
+                earnings_yearly_yq["Revenue"] = {}
+                for list_element_dict in earningsYearly:
+                    earnings_yearly_yq["Earnings"][list_element_dict["date"]] = list_element_dict["earnings"]
+                    earnings_yearly_yq["Revenue"][list_element_dict["date"]] = list_element_dict["revenue"]
+
+                earnings_quarterly_yq["Earnings"] = {}
+                earnings_quarterly_yq["Revenue"] = {}
+                for list_element_dict in earningsQuarterly:
+                    earnings_quarterly_yq["Earnings"][list_element_dict["date"]] = list_element_dict["earnings"]
+                    earnings_quarterly_yq["Revenue"][list_element_dict["date"]] = list_element_dict["revenue"]
+
 
                 for list_element_dict in balanceSheetHistoryYearly['balanceSheetStatements']:
                     balance_sheets_yearly_yq[list_element_dict['endDate']] = {}
@@ -1946,39 +1994,6 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
         if 'fullTimeEmployees' in info:      stock_data.employees = info['fullTimeEmployees']
         else:                                stock_data.employees = NUM_EMPLOYEES_UNKNOWN
         if stock_data.employees is None: stock_data.employees = NUM_EMPLOYEES_UNKNOWN
-
-        # TODO: ASAFR: 1. replace all earnings_yearly and earnings_quarterly with _yq suffix (for _yq mode, and with if on it)
-        #              2. restructure _yq with:
-        # "earnings_yearly": {
-        #     "Revenue": {
-        #         "2019": 5163000000,
-        #         "2020": 5339000000,
-        #         "2021": 6319000000,
-        #         "2022": 6848000000
-        #     },
-        #     "Earnings": {
-        #         "2019": 1071000000,
-        #         "2020": 719000000,
-        #         "2021": 1210000000,
-        #         "2022": 1254000000
-        #     },
-        #     "financialCurrency": "USD"
-        # },
-        # "earnings_quarterly": {
-        #     "Revenue": {
-        #         "1Q2022": 1674000000,
-        #         "2Q2022": 1607000000,
-        #         "3Q2022": 1718000000,
-        #         "4Q2022": 1849000000
-        #     },
-        #     "Earnings": {
-        #         "1Q2022": 283000000,
-        #         "2Q2022": 274000000,
-        #         "3Q2022": 329000000,
-        #         "4Q2022": 368000000
-        #     },
-        #     "financialCurrency": "USD"
-        # }
 
         # Oldest is the lower index
         alternative_annual_pm_required = True

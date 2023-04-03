@@ -29,8 +29,8 @@ ALL_COUNTRY_SYMBOLS_ST  = 3  # Swedish (Stockholm) Stock Exchange
 
 run_custom_tase           = False  # Custom Portfolio
 run_custom                = False
-run_tase                  = True   # Tel Aviv Stock Exchange
-run_nsr                   = False  # NASDAQ100+S&P500+RUSSEL1000
+run_tase                  = False  # Tel Aviv Stock Exchange
+run_nsr                   = True   # NASDAQ100+S&P500+RUSSEL1000
 run_all                   = False  # All Nasdaq Stocks
 run_six                   = False  # All Swiss Stocks
 run_st                    = False  # All (Stockholm) Swedish Stocks
