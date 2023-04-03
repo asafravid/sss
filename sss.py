@@ -1997,9 +1997,9 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
 
         # Oldest is the lower index
         alternative_annual_pm_required = True
-        if earnings_yearly != None and 'Revenue' in earnings_yearly and 'Earnings' in earnings_yearly:
-            len_revenue_list  = len(earnings_yearly['Revenue'])
-            len_earnings_list = len(earnings_yearly['Earnings'])
+        if earnings_yearly_yq != None and 'Revenue' in earnings_yearly_yq and 'Earnings' in earnings_yearly_yq:
+            len_revenue_list  = len(earnings_yearly_yq['Revenue'])
+            len_earnings_list = len(earnings_yearly_yq['Earnings'])
             if len_earnings_list == len_revenue_list:
                 weight_index              = 0
                 used_weights              = 0
@@ -2017,10 +2017,10 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                 boost_cont_dec_revenue    = True # Will be set to (a Final Value of) True if there is a continuous increase in the revenue
                 boost_neg_earnings        = False
                 try:
-                    for key in earnings_yearly['Revenue']:
-                        if float(earnings_yearly['Revenue'][key]) >= 0:
-                            earnings = float(          earnings_yearly['Earnings'][key])
-                            revenue  = float(max(MIN_REVENUE_FOR_0_REVENUE_DIV_BY_0_AVOIDANCE,earnings_yearly['Revenue' ][key]))
+                    for key in earnings_yearly_yq['Revenue']:
+                        if float(earnings_yearly_yq['Revenue'][key]) >= 0:
+                            earnings = float(          earnings_yearly_yq['Earnings'][key])
+                            revenue  = float(max(MIN_REVENUE_FOR_0_REVENUE_DIV_BY_0_AVOIDANCE,earnings_yearly_yq['Revenue' ][key]))
                             earnings_to_revenues_list.append((earnings/revenue)*PROFIT_MARGIN_YEARLY_WEIGHTS[weight_index])
                             weights_sum  += PROFIT_MARGIN_YEARLY_WEIGHTS[weight_index]
                             used_weights += 1
@@ -2068,9 +2068,9 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                     pass
         # TODO: ASAFR: This below can be duplicated for usage of total_revenue and net_income. Analyze and implement as/if required:
         alternative_quarterly_pm_required = True
-        if earnings_quarterly != None and 'Revenue' in earnings_quarterly and 'Earnings' in earnings_quarterly:
-            len_revenue_list  = len(earnings_quarterly['Revenue'])
-            len_earnings_list = len(earnings_quarterly['Earnings'])
+        if earnings_quarterly_yq != None and 'Revenue' in earnings_quarterly_yq and 'Earnings' in earnings_quarterly_yq:
+            len_revenue_list  = len(earnings_quarterly_yq['Revenue'])
+            len_earnings_list = len(earnings_quarterly_yq['Earnings'])
             if len_earnings_list == len_revenue_list:
                 weight_index              = 0
                 used_weights              = 0
@@ -2088,10 +2088,10 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                 boost_cont_dec_revenue    = True # Will be set to (Final Value of) True if there is a continuous increase in the revenue
                 boost_neg_earnings        = False
                 try:
-                    for key in earnings_quarterly['Revenue']:
-                        if float(earnings_quarterly['Revenue'][key]) >= 0:
-                            earnings = float(          earnings_quarterly['Earnings'][key])
-                            revenue  = float(max(MIN_REVENUE_FOR_0_REVENUE_DIV_BY_0_AVOIDANCE,earnings_quarterly['Revenue' ][key]))
+                    for key in earnings_quarterly_yq['Revenue']:
+                        if float(earnings_quarterly_yq['Revenue'][key]) >= 0:
+                            earnings = float(          earnings_quarterly_yq['Earnings'][key])
+                            revenue  = float(max(MIN_REVENUE_FOR_0_REVENUE_DIV_BY_0_AVOIDANCE,earnings_quarterly_yq['Revenue' ][key]))
 
                             earnings_to_revenues_list.append((earnings/revenue)*PROFIT_MARGIN_QUARTERLY_WEIGHTS[weight_index])
                             weights_sum  += PROFIT_MARGIN_QUARTERLY_WEIGHTS[weight_index]
@@ -2144,32 +2144,32 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
             [stock_data.quarterized_profit_margin, stock_data.quarterized_profit_margin_boost] = calculate_weighted_ratio_from_dict(financials_quarterly, 'quarterized_profit_margin', 'Net Income', 'Total Revenue', PROFIT_MARGIN_WEIGHTS, stock_data, 0, True, bonus_all_pos=(10.0 if sss_config.custom_sss_value_equation else 1.0), bonus_all_neg=(0.1 if sss_config.custom_sss_value_equation else 1.0), bonus_mon_inc=(10.0 if sss_config.custom_sss_value_equation else 1.0), bonus_mon_dec=(0.1 if sss_config.custom_sss_value_equation else 1.0), bonus_neg_pres=(0.1 if sss_config.custom_sss_value_equation else 1.0), bonus_mon_inc_num=(10.0 if sss_config.custom_sss_value_equation else 4.0), bonus_mon_inc_den=(10.0 if sss_config.custom_sss_value_equation else 4.0), bonus_mon_dec_num=(0.1 if sss_config.custom_sss_value_equation else 0.25), bonus_mon_dec_den=(0.1 if sss_config.custom_sss_value_equation else 0.25))
 
         # Earnings are ordered from oldest to newest so no reversing required for weights:
-        if earnings_yearly != None and 'Revenue' in earnings_yearly: [stock_data.annualized_revenue, stock_data.annualized_revenue_bonus] = calculate_weighted_stock_data_on_dict(earnings_yearly['Revenue'],    'earnings_yearly[Revenue]', None,            REVENUES_WEIGHTS, stock_data, False, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=4.0, bonus_mon_dec=0.25, bonus_neg_pres=1.0)
+        if earnings_yearly_yq != None and 'Revenue' in earnings_yearly_yq: [stock_data.annualized_revenue, stock_data.annualized_revenue_bonus] = calculate_weighted_stock_data_on_dict(earnings_yearly_yq['Revenue'],    'earnings_yearly_yq[Revenue]', None,            REVENUES_WEIGHTS, stock_data, False, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=4.0, bonus_mon_dec=0.25, bonus_neg_pres=1.0)
         else:                                                        stock_data.annualized_revenue = None
 
         # TODO: ASAFR: Add a calculation of net_income_to_total_revenue_list
         # Financials are ordered newest to oldest so reversing is required for weights:
         [stock_data.annualized_total_revenue, stock_data.annualized_total_revenue_bonus] = calculate_weighted_stock_data_on_dict(financials_yearly,             'financials_yearly',        'Total Revenue', REVENUES_WEIGHTS, stock_data, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=4.0, bonus_mon_dec=0.25, bonus_neg_pres=1.0)
 
-        if earnings_yearly != None and 'Earnings' in earnings_yearly:
+        if earnings_yearly_yq != None and 'Earnings' in earnings_yearly_yq:
             weight_index      = 0
             earnings_list     = []
             qeg_list          = []
             weights_sum       = 0
             qeg_weights_sum   = 0
             previous_earnings = None
-            for key in earnings_yearly['Earnings']:
-                earnings_list.append((float(earnings_yearly['Earnings'][key])) * EARNINGS_WEIGHTS[weight_index])
+            for key in earnings_yearly_yq['Earnings']:
+                earnings_list.append((float(earnings_yearly_yq['Earnings'][key])) * EARNINGS_WEIGHTS[weight_index])
                 weights_sum  += EARNINGS_WEIGHTS[weight_index]
                 if weight_index > 0:
-                    current_earnings = earnings_yearly['Earnings'][key]
+                    current_earnings = earnings_yearly_yq['Earnings'][key]
                     if float(previous_earnings) != 0.0 and float(current_earnings) != 0.0: # (this-prev)/(abs(this)+abs(prev))
                         value_to_append = calculate_current_vs_previous_change_ratio(current_earnings, previous_earnings)
                         qeg_list.append(value_to_append*EARNINGS_WEIGHTS[weight_index-1])
                     else:
                         qeg_list.append(0.0) # No change
                     qeg_weights_sum += EARNINGS_WEIGHTS[weight_index-1]
-                previous_earnings = earnings_yearly['Earnings'][key]
+                previous_earnings = earnings_yearly_yq['Earnings'][key]
                 weight_index     += 1
 
             stock_data.annualized_earnings = stock_data.financial_currency_conversion_rate_mult_to_usd*float(sum(earnings_list)) / float(weights_sum)  # Multiplying by the factor to get the valu in USD.
@@ -2181,21 +2181,21 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
             stock_data.eqg_yoy             = None
             stock_data.annualized_earnings = None
 
-        if earnings_yearly != None and 'Revenue' in earnings_yearly:
+        if earnings_yearly_yq != None and 'Revenue' in earnings_yearly_yq:
             weight_index      = 0
             qrg_list          = []
             qrg_weights_sum   = 0
             previous_revenue = None
-            for key in earnings_yearly['Revenue']:
+            for key in earnings_yearly_yq['Revenue']:
                 if weight_index > 0:
-                    current_revenue = earnings_yearly['Revenue'][key]
+                    current_revenue = earnings_yearly_yq['Revenue'][key]
                     if float(previous_revenue) != 0.0 and float(current_revenue) != 0.0: # (this-prev)/(abs(this)+abs(prev))
                         value_to_append = calculate_current_vs_previous_change_ratio(current_revenue, previous_revenue)
                         qrg_list.append(value_to_append*REVENUES_WEIGHTS[weight_index-1])
                     else:
                         qrg_list.append(0.0) # No change
                     qrg_weights_sum += REVENUES_WEIGHTS[weight_index-1]
-                previous_revenue = earnings_yearly['Revenue'][key]
+                previous_revenue = earnings_yearly_yq['Revenue'][key]
                 weight_index     += 1
             if len(qrg_list):
                 stock_data.rqg_yoy = sum(qrg_list) / float(qrg_weights_sum)
@@ -2274,14 +2274,14 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
             stock_data.annualized_net_income = None
 
         # Earnings are ordered from oldest to newest so no reversing required for weights:
-        if earnings_quarterly != None and 'Revenue' in earnings_quarterly: [stock_data.quarterized_revenue, stock_data.quarterized_revenue_bonus]    = calculate_weighted_stock_data_on_dict(earnings_quarterly['Revenue'],   'earnings_quarterly[Revenue]',   None,            NO_WEIGHTS, stock_data, False, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=3.0, bonus_mon_dec=1.0/3.0, bonus_neg_pres=1.0)
+        if earnings_quarterly_yq != None and 'Revenue' in earnings_quarterly_yq: [stock_data.quarterized_revenue, stock_data.quarterized_revenue_bonus]    = calculate_weighted_stock_data_on_dict(earnings_quarterly_yq['Revenue'],   'earnings_quarterly_yq[Revenue]',   None,            NO_WEIGHTS, stock_data, False, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=3.0, bonus_mon_dec=1.0/3.0, bonus_neg_pres=1.0)
         else:                                                              stock_data.quarterized_revenue = None
 
         # Financials are ordered newest to oldest so reversing is required for weights:
         [stock_data.quarterized_total_revenue, stock_data.quarterized_total_revenue_bonus]                                                           = calculate_weighted_stock_data_on_dict(financials_quarterly,            'financials_quarterly',          'Total Revenue', NO_WEIGHTS, stock_data, True,  True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=3.0, bonus_mon_dec=1.0/3.0, bonus_neg_pres=1.0)
 
         # Earnings are ordered from oldest to newest so no reversing required for weights:
-        if earnings_quarterly != None and 'Earnings' in earnings_quarterly: [stock_data.quarterized_earnings, stock_data.quarterized_earnings_bonus] = calculate_weighted_stock_data_on_dict(earnings_quarterly['Earnings'],  'earnings_quarterly[Earnings]',  None,            NO_WEIGHTS, stock_data, False, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5,     bonus_neg_pres=0.25)
+        if earnings_quarterly_yq != None and 'Earnings' in earnings_quarterly_yq: [stock_data.quarterized_earnings, stock_data.quarterized_earnings_bonus] = calculate_weighted_stock_data_on_dict(earnings_quarterly_yq['Earnings'],  'earnings_quarterly_yq[Earnings]',  None,            NO_WEIGHTS, stock_data, False, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5,     bonus_neg_pres=0.25)
         else:                                                               stock_data.quarterized_earnings = None
 
         # TODO: ASAFR: Add a calculation of net_income_to_total_revenue_list
