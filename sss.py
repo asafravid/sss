@@ -1551,14 +1551,15 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                     earnings_quarterly       = stringify_keys(d=earnings_quarterly,       check_inner=False)
                     stock_data.financial_currency = 'ILS' if tase_mode else 'USD'  # TODO: ASAFR: handle for if isinstance(symbol, dict)?
 
-            if   earnings_yearly    != None and 'financialCurrency' in earnings_yearly:    stock_data.financial_currency = earnings_yearly[   'financialCurrency']
-            elif earnings_quarterly != None and 'financialCurrency' in earnings_quarterly: stock_data.financial_currency = earnings_quarterly['financialCurrency']
+            if not yq_mode:
+                if   earnings_yearly    != None and 'financialCurrency' in earnings_yearly:    stock_data.financial_currency = earnings_yearly[   'financialCurrency']
+                elif earnings_quarterly != None and 'financialCurrency' in earnings_quarterly: stock_data.financial_currency = earnings_quarterly['financialCurrency']
 
 
-            if   earnings_yearly    != None and 'financialCurrency' in earnings_yearly:    stock_data.financial_currency = earnings_yearly[   'financialCurrency']
-            elif earnings_quarterly != None and 'financialCurrency' in earnings_quarterly: stock_data.financial_currency = earnings_quarterly['financialCurrency']
+                if   earnings_yearly    != None and 'financialCurrency' in earnings_yearly:    stock_data.financial_currency = earnings_yearly[   'financialCurrency']
+                elif earnings_quarterly != None and 'financialCurrency' in earnings_quarterly: stock_data.financial_currency = earnings_quarterly['financialCurrency']
 
-            stock_data.summary_currency = info['currency'] if 'currency' in info else stock_data.financial_currency  # Used for market_cap and enterprise_value conversions
+                stock_data.summary_currency = info['currency'] if 'currency' in info else stock_data.financial_currency  # Used for market_cap and enterprise_value conversions
 
             # Currency Conversion Rules, per yfinance Data Display Methods:
             #
@@ -1593,6 +1594,7 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                 cashflowStatementHistoryYearly    = symbol.all_modules[stock_data.symbol]['cashflowStatementHistory']
                 cashflowStatementHistoryQuarterly = symbol.all_modules[stock_data.symbol]['cashflowStatementHistoryQuarterly']
                 defaultKeyStatistics              = symbol.all_modules[stock_data.symbol]['defaultKeyStatistics']
+                summaryDetail                     = symbol.all_modules[stock_data.symbol]['summaryDetail']
                 assetProfile                      = symbol.all_modules[stock_data.symbol]['assetProfile']
                 incomeStatementHistoryYearly      = symbol.all_modules[stock_data.symbol]['incomeStatementHistory']
                 incomeStatementHistoryQuarterly   = symbol.all_modules[stock_data.symbol]['incomeStatementHistory']
@@ -1634,6 +1636,9 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
 
                 earnings_yearly_yq = {}
                 earnings_quarterly_yq = {}
+
+                retained_earnings_yearly_yq = []
+                retained_earnings_quarterly_yq = []
 
                 total_stockholder_equity_yearly_yq = []
                 total_stockholder_equity_quarterly_yq = []
@@ -1682,7 +1687,7 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                 for list_element_dict in balanceSheetHistoryYearly['balanceSheetStatements']:
                     balance_sheets_yearly_yq[list_element_dict['endDate']] = {}
                     if 'retainedEarnings'        in list_element_dict:
-                        earnings_yearly_yq.append(list_element_dict['retainedEarnings'])
+                        retained_earnings_yearly_yq.append(list_element_dict['retainedEarnings'])
                         balance_sheets_yearly_yq[list_element_dict['endDate']]['Retained Earnings'] = list_element_dict['retainedEarnings']
                     if 'totalStockholderEquity'        in list_element_dict:
                         total_stockholder_equity_yearly_yq.append(list_element_dict['totalStockholderEquity'])
@@ -1715,7 +1720,7 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                 for list_element_dict in balanceSheetHistoryQuarterly['balanceSheetStatements']:
                     balance_sheets_quarterly_yq[list_element_dict['endDate']] = {}
                     if 'retainedEarnings'        in list_element_dict:
-                        earnings_quarterly_yq.append(list_element_dict['retainedEarnings'])
+                        retained_earnings_quarterly_yq.append(list_element_dict['retainedEarnings'])
                         balance_sheets_quarterly_yq[list_element_dict['endDate']]['Retained Earnings'] = list_element_dict['retainedEarnings']
                     if 'totalStockholderEquity'        in list_element_dict:
                         total_stockholder_equity_quarterly_yq.append(list_element_dict['totalStockholderEquity'])
@@ -1773,12 +1778,20 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                     total_revenue_quarterly_yq.append(list_element_dict['totalRevenue'])
 
                 stock_data.sector = assetProfile['sector']
-                enterprise_value_yq = defaultKeyStatistics['enterpriseValue']
-                profit_margins_yq = defaultKeyStatistics['profitMargins']
-                held_percent_insiders_yq = defaultKeyStatistics['heldPercentInsiders']
-                book_value_yq = defaultKeyStatistics['bookValue']
-                enterprise_to_revenue_yq = defaultKeyStatistics['enterpriseToRevenue']
-                enterprise_to_ebitda_yq = defaultKeyStatistics['enterpriseToEbitda']
+                enterprise_value_yq          = defaultKeyStatistics['enterpriseValue']
+                profit_margins_yq            = defaultKeyStatistics['profitMargins']
+                held_percent_insiders_yq     = defaultKeyStatistics['heldPercentInsiders']
+                book_value_yq                = defaultKeyStatistics['bookValue']
+                price_to_book_yq             = defaultKeyStatistics['priceToBook']
+                enterprise_to_revenue_yq     = defaultKeyStatistics['enterpriseToRevenue']
+                enterprise_to_ebitda_yq      = defaultKeyStatistics['enterpriseToEbitda']
+                earnings_quarterly_growth_yq = defaultKeyStatistics['earningsQuarterlyGrowth']
+                trailing_eps_yq              = defaultKeyStatistics['trailingEps']
+                forward_eps_yq               = defaultKeyStatistics['forwardEps']
+                peg_ratio_yq                 = defaultKeyStatistics['pegRatio']
+                trailing_pe_yq               = summaryDetail['trailingPE']
+                forward_pe_yq                = summaryDetail['forwardPE']
+                market_cap_yq                = summaryDetail['marketCap']
             else:
                 if isinstance(symbol, dict):
                     financials_yearly    = symbol['financials_yearly'   ] if 'financials_yearly'    in symbol else None
@@ -2287,6 +2300,10 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
         # TODO: ASAFR: Add a calculation of net_income_to_total_revenue_list
         # Financials are ordered newest to oldest so reversing is required for weights:
         [stock_data.quarterized_net_income, stock_data.quarterized_net_income_bonus]                                                                 = calculate_weighted_stock_data_on_dict(financials_quarterly,            'financials_quarterly',          'Net Income',    NO_WEIGHTS, stock_data, True,  True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5,     bonus_neg_pres=0.25)
+
+        if yq_mode:
+            info['enterpriseValue'] = enterprise_value_yq
+            info['marketCap']       = market_cap_yq
 
         # At this stage, use the Total Revenue and Net Income as backups for revenues and earnings. TODO: ASAFR: Later on run comparisons and take them into account as well!
         if   stock_data.annualized_net_income  is None and stock_data.quarterized_net_income is None: stock_data.effective_net_income = None
