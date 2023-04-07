@@ -1770,12 +1770,146 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                         depreciation_quarterly_yq.append(list_element_dict['depreciation'])
                         cash_flows_quarterly_yq[list_element_dict['endDate']]['Depreciation'] = list_element_dict['depreciation']
 
+                financials_yearly_yq = {}
+                financials_quarterly_yq = {}
+
                 total_revenue_yearly_yq = []
                 total_revenue_quarterly_yq = []
                 for list_element_dict in incomeStatementHistoryYearly['incomeStatementHistory']:
                     total_revenue_yearly_yq.append(list_element_dict['totalRevenue'])
+                    financials_yearly_yq[list_element_dict["endDate"]] = {}
+                    financials_yearly_yq[list_element_dict["endDate"]]['Income Before Tax']                      = list_element_dict["incomeBeforeTax"]
+                    financials_yearly_yq[list_element_dict["endDate"]]['Net Income']                             = list_element_dict["netIncome"]
+                    financials_yearly_yq[list_element_dict["endDate"]]['Total Revenue']                          = list_element_dict["totalRevenue"]
+                    financials_yearly_yq[list_element_dict["endDate"]]['Cost Of Revenue']                        = list_element_dict["costOfRevenue"]
+                    financials_yearly_yq[list_element_dict["endDate"]]['Gross Profit']                           = list_element_dict["grossProfit"]
+                    financials_yearly_yq[list_element_dict["endDate"]]['Total Operating Expenses']               = list_element_dict["totalOperatingExpenses"]
+                    financials_yearly_yq[list_element_dict["endDate"]]['Operating Income']                       = list_element_dict["operatingIncome"]
+                    financials_yearly_yq[list_element_dict["endDate"]]['Total Other Income Expense Net']         = list_element_dict["totalOtherIncomeExpenseNet"]
+                    financials_yearly_yq[list_element_dict["endDate"]]['Ebit']                                   = list_element_dict["ebit"]
+                    financials_yearly_yq[list_element_dict["endDate"]]['Interest Expense']                       = list_element_dict["interestExpense"]
+                    financials_yearly_yq[list_element_dict["endDate"]]['Income Before Tax']                      = list_element_dict["incomeBeforeTax"]
+                    financials_yearly_yq[list_element_dict["endDate"]]['Income Tax Expense']                     = list_element_dict["incomeTaxExpense"]
+                    financials_yearly_yq[list_element_dict["endDate"]]['Net Income From Continuing Ops']         = list_element_dict["netIncomeFromContinuingOps"]
+                    financials_yearly_yq[list_element_dict["endDate"]]['Net Income Applicable To Common Shares'] = list_element_dict["netIncomeApplicableToCommonShares"]
+
+
                 for list_element_dict in incomeStatementHistoryQuarterly['incomeStatementHistory']:
                     total_revenue_quarterly_yq.append(list_element_dict['totalRevenue'])
+                    financials_quarterly_yq[list_element_dict["endDate"]] = {}
+                    financials_quarterly_yq[list_element_dict["endDate"]]['Income Before Tax']                      = list_element_dict["incomeBeforeTax"]
+                    financials_quarterly_yq[list_element_dict["endDate"]]['Net Income']                             = list_element_dict["netIncome"]
+                    financials_quarterly_yq[list_element_dict["endDate"]]['Total Revenue']                          = list_element_dict["totalRevenue"]
+                    financials_quarterly_yq[list_element_dict["endDate"]]['Cost Of Revenue']                        = list_element_dict["costOfRevenue"]
+                    financials_quarterly_yq[list_element_dict["endDate"]]['Gross Profit']                           = list_element_dict["grossProfit"]
+                    financials_quarterly_yq[list_element_dict["endDate"]]['Total Operating Expenses']               = list_element_dict["totalOperatingExpenses"]
+                    financials_quarterly_yq[list_element_dict["endDate"]]['Operating Income']                       = list_element_dict["operatingIncome"]
+                    financials_quarterly_yq[list_element_dict["endDate"]]['Total Other Income Expense Net']         = list_element_dict["totalOtherIncomeExpenseNet"]
+                    financials_quarterly_yq[list_element_dict["endDate"]]['Ebit']                                   = list_element_dict["ebit"]
+                    financials_quarterly_yq[list_element_dict["endDate"]]['Interest Expense']                       = list_element_dict["interestExpense"]
+                    financials_quarterly_yq[list_element_dict["endDate"]]['Income Before Tax']                      = list_element_dict["incomeBeforeTax"]
+                    financials_quarterly_yq[list_element_dict["endDate"]]['Income Tax Expense']                     = list_element_dict["incomeTaxExpense"]
+                    financials_quarterly_yq[list_element_dict["endDate"]]['Net Income From Continuing Ops']         = list_element_dict["netIncomeFromContinuingOps"]
+                    financials_quarterly_yq[list_element_dict["endDate"]]['Net Income Applicable To Common Shares'] = list_element_dict["netIncomeApplicableToCommonShares"]
+
+                #        "financials_yearly": {
+                #            "2022-10-31 00:00:00": {
+                #                "Research Development": 467000000.0,
+                #                "Effect Of Accounting Charges": null,
+                #                "Income Before Tax": 1504000000.0,
+                #                "Minority Interest": null,
+                #                "Net Income": 1254000000.0,
+                #                "Selling General Administrative": 1637000000.0,
+                #                "Gross Profit": 3722000000.0,
+                #                "Ebit": 1618000000.0,
+                #                "Operating Income": 1618000000.0,
+                #                "Other Operating Expenses": null,
+                #                "Interest Expense": -84000000.0,
+                #                "Extraordinary Items": null,
+                #                "Non Recurring": null,
+                #                "Other Items": null,
+                #                "Income Tax Expense": 250000000.0,
+                #                "Total Revenue": 6848000000.0,
+                #                "Total Operating Expenses": 5230000000.0,
+                #                "Cost Of Revenue": 3126000000.0,
+                #                "Total Other Income Expense Net": -114000000.0,
+                #                "Discontinued Operations": null,
+                #                "Net Income From Continuing Ops": 1254000000.0,
+                #                "Net Income Applicable To Common Shares": 1254000000.0
+                #            },
+                #            "2021-10-31 00:00:00": {
+                #                "Research Development": 441000000.0,
+                #                "Effect Of Accounting Charges": null,
+                #                "Income Before Tax": 1360000000.0,
+                #                "Minority Interest": null,
+                #                "Net Income": 1210000000.0,
+                #                "Selling General Administrative": 1562000000.0,
+                #                "Gross Profit": 3407000000.0,
+                #                "Ebit": 1404000000.0,
+                #                "Operating Income": 1404000000.0,
+                #                "Other Operating Expenses": null,
+                #                "Interest Expense": -81000000.0,
+                #                "Extraordinary Items": null,
+                #                "Non Recurring": null,
+                #                "Other Items": null,
+                #                "Income Tax Expense": 150000000.0,
+                #                "Total Revenue": 6319000000.0,
+                #                "Total Operating Expenses": 4915000000.0,
+                #                "Cost Of Revenue": 2912000000.0,
+                #                "Total Other Income Expense Net": -44000000.0,
+                #                "Discontinued Operations": null,
+                #                "Net Income From Continuing Ops": 1210000000.0,
+                #                "Net Income Applicable To Common Shares": 1210000000.0
+                #            },
+                #            "2020-10-31 00:00:00": {
+                #                "Research Development": 397000000.0,
+                #                "Effect Of Accounting Charges": null,
+                #                "Income Before Tax": 842000000.0,
+                #                "Minority Interest": null,
+                #                "Net Income": 719000000.0,
+                #                "Selling General Administrative": 1395000000.0,
+                #                "Gross Profit": 2837000000.0,
+                #                "Ebit": 1045000000.0,
+                #                "Operating Income": 1045000000.0,
+                #                "Other Operating Expenses": null,
+                #                "Interest Expense": -78000000.0,
+                #                "Extraordinary Items": null,
+                #                "Non Recurring": null,
+                #                "Other Items": null,
+                #                "Income Tax Expense": 123000000.0,
+                #                "Total Revenue": 5339000000.0,
+                #                "Total Operating Expenses": 4294000000.0,
+                #                "Cost Of Revenue": 2502000000.0,
+                #                "Total Other Income Expense Net": -203000000.0,
+                #                "Discontinued Operations": null,
+                #                "Net Income From Continuing Ops": 719000000.0,
+                #                "Net Income Applicable To Common Shares": 719000000.0
+                #            },
+                #            "2019-10-31 00:00:00": {
+                #                "Research Development": 404000000.0,
+                #                "Effect Of Accounting Charges": null,
+                #                "Income Before Tax": 919000000.0,
+                #                "Minority Interest": null,
+                #                "Net Income": 1071000000.0,
+                #                "Selling General Administrative": 1358000000.0,
+                #                "Gross Profit": 2805000000.0,
+                #                "Ebit": 1043000000.0,
+                #                "Operating Income": 1043000000.0,
+                #                "Other Operating Expenses": null,
+                #                "Interest Expense": -74000000.0,
+                #                "Extraordinary Items": null,
+                #                "Non Recurring": null,
+                #                "Other Items": null,
+                #                "Income Tax Expense": -152000000.0,
+                #                "Total Revenue": 5163000000.0,
+                #                "Total Operating Expenses": 4120000000.0,
+                #                "Cost Of Revenue": 2358000000.0,
+                #                "Total Other Income Expense Net": -124000000.0,
+                #                "Discontinued Operations": null,
+                #                "Net Income From Continuing Ops": 1071000000.0,
+                #                "Net Income Applicable To Common Shares": 1071000000.0
+                #            }
+                #        },
 
                 stock_data.sector = assetProfile['sector']
                 enterprise_value_yq          = defaultKeyStatistics['enterpriseValue']
@@ -2217,107 +2351,10 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
         else:
             stock_data.rqg_yoy     = None
 
-# TODO: ASAFR: finacials_yearly and _quarterly must look like so:
-#        "financials_yearly": {
-#            "2022-10-31 00:00:00": {
-#                "Research Development": 467000000.0,
-#                "Effect Of Accounting Charges": null,
-#                "Income Before Tax": 1504000000.0,
-#                "Minority Interest": null,
-#                "Net Income": 1254000000.0,
-#                "Selling General Administrative": 1637000000.0,
-#                "Gross Profit": 3722000000.0,
-#                "Ebit": 1618000000.0,
-#                "Operating Income": 1618000000.0,
-#                "Other Operating Expenses": null,
-#                "Interest Expense": -84000000.0,
-#                "Extraordinary Items": null,
-#                "Non Recurring": null,
-#                "Other Items": null,
-#                "Income Tax Expense": 250000000.0,
-#                "Total Revenue": 6848000000.0,
-#                "Total Operating Expenses": 5230000000.0,
-#                "Cost Of Revenue": 3126000000.0,
-#                "Total Other Income Expense Net": -114000000.0,
-#                "Discontinued Operations": null,
-#                "Net Income From Continuing Ops": 1254000000.0,
-#                "Net Income Applicable To Common Shares": 1254000000.0
-#            },
-#            "2021-10-31 00:00:00": {
-#                "Research Development": 441000000.0,
-#                "Effect Of Accounting Charges": null,
-#                "Income Before Tax": 1360000000.0,
-#                "Minority Interest": null,
-#                "Net Income": 1210000000.0,
-#                "Selling General Administrative": 1562000000.0,
-#                "Gross Profit": 3407000000.0,
-#                "Ebit": 1404000000.0,
-#                "Operating Income": 1404000000.0,
-#                "Other Operating Expenses": null,
-#                "Interest Expense": -81000000.0,
-#                "Extraordinary Items": null,
-#                "Non Recurring": null,
-#                "Other Items": null,
-#                "Income Tax Expense": 150000000.0,
-#                "Total Revenue": 6319000000.0,
-#                "Total Operating Expenses": 4915000000.0,
-#                "Cost Of Revenue": 2912000000.0,
-#                "Total Other Income Expense Net": -44000000.0,
-#                "Discontinued Operations": null,
-#                "Net Income From Continuing Ops": 1210000000.0,
-#                "Net Income Applicable To Common Shares": 1210000000.0
-#            },
-#            "2020-10-31 00:00:00": {
-#                "Research Development": 397000000.0,
-#                "Effect Of Accounting Charges": null,
-#                "Income Before Tax": 842000000.0,
-#                "Minority Interest": null,
-#                "Net Income": 719000000.0,
-#                "Selling General Administrative": 1395000000.0,
-#                "Gross Profit": 2837000000.0,
-#                "Ebit": 1045000000.0,
-#                "Operating Income": 1045000000.0,
-#                "Other Operating Expenses": null,
-#                "Interest Expense": -78000000.0,
-#                "Extraordinary Items": null,
-#                "Non Recurring": null,
-#                "Other Items": null,
-#                "Income Tax Expense": 123000000.0,
-#                "Total Revenue": 5339000000.0,
-#                "Total Operating Expenses": 4294000000.0,
-#                "Cost Of Revenue": 2502000000.0,
-#                "Total Other Income Expense Net": -203000000.0,
-#                "Discontinued Operations": null,
-#                "Net Income From Continuing Ops": 719000000.0,
-#                "Net Income Applicable To Common Shares": 719000000.0
-#            },
-#            "2019-10-31 00:00:00": {
-#                "Research Development": 404000000.0,
-#                "Effect Of Accounting Charges": null,
-#                "Income Before Tax": 919000000.0,
-#                "Minority Interest": null,
-#                "Net Income": 1071000000.0,
-#                "Selling General Administrative": 1358000000.0,
-#                "Gross Profit": 2805000000.0,
-#                "Ebit": 1043000000.0,
-#                "Operating Income": 1043000000.0,
-#                "Other Operating Expenses": null,
-#                "Interest Expense": -74000000.0,
-#                "Extraordinary Items": null,
-#                "Non Recurring": null,
-#                "Other Items": null,
-#                "Income Tax Expense": -152000000.0,
-#                "Total Revenue": 5163000000.0,
-#                "Total Operating Expenses": 4120000000.0,
-#                "Cost Of Revenue": 2358000000.0,
-#                "Total Other Income Expense Net": -124000000.0,
-#                "Discontinued Operations": null,
-#                "Net Income From Continuing Ops": 1071000000.0,
-#                "Net Income Applicable To Common Shares": 1071000000.0
-#            }
-#        },
-
         # Net Income Quarterly Growth Year-Over-Year Calculation:
+        if yq_mode:
+            financials_quarterly = financials_quarterly_yq
+            financials_yearly    = financials_yearly_yq
         if financials_yearly != None and len(financials_yearly):
             qnig_weight_index = 0
             qtrg_weight_index = 0
@@ -2432,6 +2469,7 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
         elif stock_data.quarterized_revenue  is None and stock_data.annualized_revenue   != None: stock_data.effective_revenue  = stock_data.annualized_revenue
         else                                                                                    : stock_data.effective_revenue  = (stock_data.quarterized_revenue ) # Prefer TTM only
 
+        # TODO: ASAFR: Next-Up: country from yq
         if 'country' in info:                stock_data.country = info['country']
         else:                                stock_data.country = 'Unknown'
         if stock_data.country is None: stock_data.country       = 'Unknown'
