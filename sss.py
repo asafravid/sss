@@ -1384,7 +1384,7 @@ def calculate_weighted_sum_from_2_dicts(dict1_input, dict1_name, str_in_dict1, d
             if str_in_dict1 in dict1_input[key] and not math.isnan(dict1_input[key][str_in_dict1]) and str_in_dict2 in dict2_input[key] and not math.isnan(dict2_input[key][str_in_dict2]):
                 weighted_sums_list.append((dict1_input[key][str_in_dict1] + dict2_input[key][str_in_dict2]))
     except Exception as e:
-        print("Exception in {} {} {}: {} -> ".format(stock_data.symbol, dict1_name, dict2_name, e, traceback.format_exc()))
+        print("Exception in {} {} {}: {} -> {} -> quarterly/yearly database mismatch? Check".format(stock_data.symbol, dict1_name, dict2_name, e, traceback.format_exc()))
         pass
     if len(weighted_sums_list): return_value = sum(weighted_sums_list) if force_only_sum else weighted_average(weighted_sums_list, weights[:len(weighted_sums_list)])
 
@@ -1577,7 +1577,11 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
             if stock_data.summary_currency == 'ILA' or stock_data.summary_currency == 'NIS':  # Sometimes (in TASE mode) in info['currency'] ILA may show instead of ILS so just substitute
                 stock_data.summary_currency = 'ILS'
             if currency_conversion_tool:
-                stock_data.financial_currency_conversion_rate_mult_to_usd = round(1.0/float(currency_conversion_tool[stock_data.financial_currency] if stock_data.financial_currency else 1.0), NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
+                if stock_data.financial_currency:
+                    print("stock_data.financial_currency = {}".format(stock_data.financial_currency))
+                    stock_data.financial_currency_conversion_rate_mult_to_usd = round(1.0/float(currency_conversion_tool[stock_data.financial_currency]), NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
+                else:
+                    stock_data.financial_currency_conversion_rate_mult_to_usd = 1.0
                 stock_data.summary_currency_conversion_rate_mult_to_usd   = round(1.0/float(currency_conversion_tool[stock_data.summary_currency  ] if stock_data.summary_currency   else 1.0), NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
             elif currency_conversion_tool_alternative:
                 try:
@@ -1610,7 +1614,7 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                 if 'summaryDetail'                     in symbol.all_modules[stock_data.symbol]: summaryDetail                     = symbol.all_modules[stock_data.symbol]['summaryDetail']
                 if 'assetProfile'                      in symbol.all_modules[stock_data.symbol]: assetProfile                      = symbol.all_modules[stock_data.symbol]['assetProfile']
                 if 'incomeStatementHistory'            in symbol.all_modules[stock_data.symbol]: incomeStatementHistoryYearly      = symbol.all_modules[stock_data.symbol]['incomeStatementHistory']
-                if 'incomeStatementHistory'            in symbol.all_modules[stock_data.symbol]: incomeStatementHistoryQuarterly   = symbol.all_modules[stock_data.symbol]['incomeStatementHistory']
+                if 'incomeStatementHistory'            in symbol.all_modules[stock_data.symbol]: incomeStatementHistoryQuarterly   = symbol.all_modules[stock_data.symbol]['incomeStatementHistoryQuarterly']
 
                 earningsYearly    = None
                 earningsQuarterly = None
@@ -2337,7 +2341,7 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
         if 'heldPercentInsiders' in info:                                                             stock_data.held_percent_insiders     = info['heldPercentInsiders']
         else:                                                                                         stock_data.held_percent_insiders     = PERCENT_HELD_INSIDERS_UNKNOWN
         if stock_data.held_percent_insiders     is None or stock_data.held_percent_insiders == 0:     stock_data.held_percent_insiders     = PERCENT_HELD_INSIDERS_UNKNOWN
-        #-?
+        #-v
         if 'enterpriseToRevenue' in info:
             stock_data.enterprise_value_to_revenue = info['enterpriseToRevenue']
             if stock_data.enterprise_value_to_revenue != None: stock_data.enterprise_value_to_revenue *= stock_data.summary_currency_conversion_rate_mult_to_usd # https://www.investopedia.com/terms/e/ev-revenue-multiple.asp
@@ -2360,11 +2364,13 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
         if yq_mode:
             financials_quarterly = financials_quarterly_yq
             financials_yearly    = financials_yearly_yq
+            cash_flows_quarterly = cash_flows_quarterly_yq
+            cash_flows_yearly    = cash_flows_yearly_yq
 
         # in order to calculate eibtd, take ebit from finantials and add deprecations from cash_flows to it:
-        # Financials and Cash Flows are ordered newest to oldest so reversing is required for weights:
-        stock_data.quarterized_ebitd = calculate_weighted_sum_from_2_dicts(financials_quarterly, 'financials_quarterly', 'Ebit', cash_flows_quarterly_yq, 'cash_flows_quarterly', 'Depreciation', NO_WEIGHTS,       stock_data, 0, True, True, True)
-        stock_data.annualized_ebitd  = calculate_weighted_sum_from_2_dicts(financials_yearly,    'financials_yearly',    'Ebit', cash_flows_yearly_yq,    'cash_flows_yearly',    'Depreciation', EARNINGS_WEIGHTS, stock_data, 0, True, True)
+        #-x Financials and Cash Flows are ordered newest to oldest so reversing is required for weights:
+        stock_data.quarterized_ebitd = calculate_weighted_sum_from_2_dicts(financials_quarterly, 'financials_quarterly', 'Ebit', cash_flows_quarterly, 'cash_flows_quarterly', 'Depreciation', NO_WEIGHTS,       stock_data, 0, True, True, True)
+        stock_data.annualized_ebitd  = calculate_weighted_sum_from_2_dicts(financials_yearly,    'financials_yearly',    'Ebit', cash_flows_yearly,    'cash_flows_yearly',    'Depreciation', EARNINGS_WEIGHTS, stock_data, 0, True, True)
         stock_data.ebitd             = (stock_data.quarterized_ebitd) # Prefer TTM only
 
         # TODO: ASAFR: 1. ebit (within financials) can be used instead of simply taking the earnings
