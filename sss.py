@@ -1603,39 +1603,6 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                 financialData                     = symbol.financial_data[stock_data.symbol]
 
 
-                # TODO: ASAFR: 1. replace all earnings_yearly and earnings_quarterly with _yq suffix (for _yq mode, and with if on it)
-                #              2. restructure _yq with:
-                # "earnings_yearly": {
-                #     "Revenue": {
-                #         "2019": 5163000000,
-                #         "2020": 5339000000,
-                #         "2021": 6319000000,
-                #         "2022": 6848000000
-                #     },
-                #     "Earnings": {
-                #         "2019": 1071000000,
-                #         "2020": 719000000,
-                #         "2021": 1210000000,
-                #         "2022": 1254000000
-                #     },
-                #     "financialCurrency": "USD"
-                # },
-                # "earnings_quarterly": {
-                #     "Revenue": {
-                #         "1Q2022": 1674000000,
-                #         "2Q2022": 1607000000,
-                #         "3Q2022": 1718000000,
-                #         "4Q2022": 1849000000
-                #     },
-                #     "Earnings": {
-                #         "1Q2022": 283000000,
-                #         "2Q2022": 274000000,
-                #         "3Q2022": 329000000,
-                #         "4Q2022": 368000000
-                #     },
-                #     "financialCurrency": "USD"
-                # }
-
                 earnings_yearly_yq = {}
                 earnings_quarterly_yq = {}
 
@@ -1814,122 +1781,21 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                     financials_quarterly_yq[list_element_dict["endDate"]]['Net Income From Continuing Ops']         = list_element_dict["netIncomeFromContinuingOps"]
                     financials_quarterly_yq[list_element_dict["endDate"]]['Net Income Applicable To Common Shares'] = list_element_dict["netIncomeApplicableToCommonShares"]
 
-                #        "financials_yearly": {
-                #            "2022-10-31 00:00:00": {
-                #                "Research Development": 467000000.0,
-                #                "Effect Of Accounting Charges": null,
-                #                "Income Before Tax": 1504000000.0,
-                #                "Minority Interest": null,
-                #                "Net Income": 1254000000.0,
-                #                "Selling General Administrative": 1637000000.0,
-                #                "Gross Profit": 3722000000.0,
-                #                "Ebit": 1618000000.0,
-                #                "Operating Income": 1618000000.0,
-                #                "Other Operating Expenses": null,
-                #                "Interest Expense": -84000000.0,
-                #                "Extraordinary Items": null,
-                #                "Non Recurring": null,
-                #                "Other Items": null,
-                #                "Income Tax Expense": 250000000.0,
-                #                "Total Revenue": 6848000000.0,
-                #                "Total Operating Expenses": 5230000000.0,
-                #                "Cost Of Revenue": 3126000000.0,
-                #                "Total Other Income Expense Net": -114000000.0,
-                #                "Discontinued Operations": null,
-                #                "Net Income From Continuing Ops": 1254000000.0,
-                #                "Net Income Applicable To Common Shares": 1254000000.0
-                #            },
-                #            "2021-10-31 00:00:00": {
-                #                "Research Development": 441000000.0,
-                #                "Effect Of Accounting Charges": null,
-                #                "Income Before Tax": 1360000000.0,
-                #                "Minority Interest": null,
-                #                "Net Income": 1210000000.0,
-                #                "Selling General Administrative": 1562000000.0,
-                #                "Gross Profit": 3407000000.0,
-                #                "Ebit": 1404000000.0,
-                #                "Operating Income": 1404000000.0,
-                #                "Other Operating Expenses": null,
-                #                "Interest Expense": -81000000.0,
-                #                "Extraordinary Items": null,
-                #                "Non Recurring": null,
-                #                "Other Items": null,
-                #                "Income Tax Expense": 150000000.0,
-                #                "Total Revenue": 6319000000.0,
-                #                "Total Operating Expenses": 4915000000.0,
-                #                "Cost Of Revenue": 2912000000.0,
-                #                "Total Other Income Expense Net": -44000000.0,
-                #                "Discontinued Operations": null,
-                #                "Net Income From Continuing Ops": 1210000000.0,
-                #                "Net Income Applicable To Common Shares": 1210000000.0
-                #            },
-                #            "2020-10-31 00:00:00": {
-                #                "Research Development": 397000000.0,
-                #                "Effect Of Accounting Charges": null,
-                #                "Income Before Tax": 842000000.0,
-                #                "Minority Interest": null,
-                #                "Net Income": 719000000.0,
-                #                "Selling General Administrative": 1395000000.0,
-                #                "Gross Profit": 2837000000.0,
-                #                "Ebit": 1045000000.0,
-                #                "Operating Income": 1045000000.0,
-                #                "Other Operating Expenses": null,
-                #                "Interest Expense": -78000000.0,
-                #                "Extraordinary Items": null,
-                #                "Non Recurring": null,
-                #                "Other Items": null,
-                #                "Income Tax Expense": 123000000.0,
-                #                "Total Revenue": 5339000000.0,
-                #                "Total Operating Expenses": 4294000000.0,
-                #                "Cost Of Revenue": 2502000000.0,
-                #                "Total Other Income Expense Net": -203000000.0,
-                #                "Discontinued Operations": null,
-                #                "Net Income From Continuing Ops": 719000000.0,
-                #                "Net Income Applicable To Common Shares": 719000000.0
-                #            },
-                #            "2019-10-31 00:00:00": {
-                #                "Research Development": 404000000.0,
-                #                "Effect Of Accounting Charges": null,
-                #                "Income Before Tax": 919000000.0,
-                #                "Minority Interest": null,
-                #                "Net Income": 1071000000.0,
-                #                "Selling General Administrative": 1358000000.0,
-                #                "Gross Profit": 2805000000.0,
-                #                "Ebit": 1043000000.0,
-                #                "Operating Income": 1043000000.0,
-                #                "Other Operating Expenses": null,
-                #                "Interest Expense": -74000000.0,
-                #                "Extraordinary Items": null,
-                #                "Non Recurring": null,
-                #                "Other Items": null,
-                #                "Income Tax Expense": -152000000.0,
-                #                "Total Revenue": 5163000000.0,
-                #                "Total Operating Expenses": 4120000000.0,
-                #                "Cost Of Revenue": 2358000000.0,
-                #                "Total Other Income Expense Net": -124000000.0,
-                #                "Discontinued Operations": null,
-                #                "Net Income From Continuing Ops": 1071000000.0,
-                #                "Net Income Applicable To Common Shares": 1071000000.0
-                #            }
-                #        },
-
                 stock_data.sector = assetProfile['sector']
-                enterprise_value_yq          = defaultKeyStatistics['enterpriseValue']
-                profit_margins_yq            = defaultKeyStatistics['profitMargins']
-                held_percent_insiders_yq     = defaultKeyStatistics['heldPercentInsiders']
-                held_percent_institutions_yq = defaultKeyStatistics['heldPercentInstitutions']
+                if 'enterpriseValue'         in defaultKeyStatistics: info['enterpriseValue']         = defaultKeyStatistics['enterpriseValue']
+                if 'profitMargins'           in defaultKeyStatistics: info['profitMargins']           = defaultKeyStatistics['profitMargins']
+                if 'heldPercentInsiders'     in defaultKeyStatistics: info['heldPercentInsiders']     = defaultKeyStatistics['heldPercentInsiders']
+                if 'heldPercentInstitutions' in defaultKeyStatistics: info['heldPercentInstitutions'] = defaultKeyStatistics['heldPercentInstitutions']
+                if 'bookValue'               in defaultKeyStatistics: book_value_yq                = defaultKeyStatistics['bookValue']
+                if 'priceToBook'             in defaultKeyStatistics: price_to_book_yq             = defaultKeyStatistics['priceToBook']
+                if 'enterpriseToRevenue'     in defaultKeyStatistics: info['enterpriseToRevenue']  = defaultKeyStatistics['enterpriseToRevenue']
+                if 'enterpriseToEbitda'      in defaultKeyStatistics: info['enterpriseToEbitda']   = defaultKeyStatistics['enterpriseToEbitda']
+                if 'earningsQuarterlyGrowth' in defaultKeyStatistics: earnings_quarterly_growth_yq = defaultKeyStatistics['earningsQuarterlyGrowth']
+                if 'trailingEps'             in defaultKeyStatistics: info['trailingEps']          = defaultKeyStatistics['trailingEps']
+                if 'forwardEps'              in defaultKeyStatistics: info['forwardEps']           = defaultKeyStatistics['forwardEps']
 
-                book_value_yq                = defaultKeyStatistics['bookValue']
-                price_to_book_yq             = defaultKeyStatistics['priceToBook']
-                enterprise_to_revenue_yq     = defaultKeyStatistics['enterpriseToRevenue']
-                enterprise_to_ebitda_yq      = defaultKeyStatistics['enterpriseToEbitda']
-#                earnings_quarterly_growth_yq = defaultKeyStatistics['earningsQuarterlyGrowth']
-                trailing_eps_yq              = defaultKeyStatistics['trailingEps']
-                forward_eps_yq               = defaultKeyStatistics['forwardEps']
-                peg_ratio_yq                 = defaultKeyStatistics['pegRatio']
-                trailing_pe_yq               = summaryDetail['trailingPE']
-                forward_pe_yq                = summaryDetail['forwardPE']
-                market_cap_yq                = summaryDetail['marketCap']
+                if 'marketCap'               in summaryDetail:        info['marketCap'] = summaryDetail['marketCap']
+
             else:
                 if isinstance(symbol, dict):
                     financials_yearly    = symbol['financials_yearly'   ] if 'financials_yearly'    in symbol else None
@@ -1975,70 +1841,6 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
         if 'shortName' in info: stock_data.short_name = info['shortName']
         else:                   stock_data.short_name = 'None'
 
-        # TODO: ASAFR: In yq_mode, Convert to the following structures:
-        # "balance_sheets_yearly": {
-        #     "2021-12-31 00:00:00": {
-        #         "Total Liab": 31004000.0,
-        #         "Total Stockholder Equity": -16491000.0,
-        #         "Other Current Liab": 18539000.0,
-        #         "Total Assets": 14513000.0,
-        #         "Other Current Assets": 12584000.0,
-        #         "Retained Earnings": -50344000.0,
-        #         "Other Assets": 80000.0,
-        #         "Cash": 1570000.0,
-        #         "Total Current Liabilities": 31004000.0,
-        #         "Total Current Assets": 14252000.0,
-        #         "Net Tangible Assets": -16505000.0,
-        #         "Net Receivables": 98000.0,
-        #         "Other Liab": NaN
-        #     },
-        #     "2020-12-31 00:00:00": {
-        #         "Total Liab": 23070000.0,
-        #         "Total Stockholder Equity": -9252000.0,
-        #         "Other Current Liab": 15268000.0,
-        #         "Total Assets": 13818000.0,
-        #         "Other Current Assets": 12497000.0,
-        #         "Retained Earnings": -42747000.0,
-        #         "Other Assets": NaN,
-        #         "Cash": 418000.0,
-        #         "Total Current Liabilities": 22942000.0,
-        #         "Total Current Assets": 12976000.0,
-        #         "Net Tangible Assets": -9608000.0,
-        #         "Net Receivables": 61000.0,
-        #         "Other Liab": 52000.0
-        #     },
-        #     "2019-12-31 00:00:00": {
-        #         "Total Liab": 20080000.0,
-        #         "Total Stockholder Equity": -2894000.0,
-        #         "Other Current Liab": 13812000.0,
-        #         "Total Assets": 17186000.0,
-        #         "Other Current Assets": 12460000.0,
-        #         "Retained Earnings": -36038000.0,
-        #         "Other Assets": 680000.0,
-        #         "Cash": 433000.0,
-        #         "Total Current Liabilities": 19838000.0,
-        #         "Total Current Assets": 14922000.0,
-        #         "Net Tangible Assets": -3592000.0,
-        #         "Net Receivables": 2029000.0,
-        #         "Other Liab": 63000.0
-        #     },
-        #     "2018-12-31 00:00:00": {
-        #         "Total Liab": 21825000.0,
-        #         "Total Stockholder Equity": 3549000.0,
-        #         "Other Current Liab": 14821000.0,
-        #         "Total Assets": 25374000.0,
-        #         "Other Current Assets": 12331000.0,
-        #         "Retained Earnings": -28161000.0,
-        #         "Other Assets": NaN,
-        #         "Cash": 9856000.0,
-        #         "Total Current Liabilities": 21658000.0,
-        #         "Total Current Assets": 24358000.0,
-        #         "Net Tangible Assets": 3549000.0,
-        #         "Net Receivables": 2171000.0,
-        #         "Accounts Payable": 3910000.0,
-        #         "Other Liab": 167000.0
-        #     }
-        # },
 
         # Balance sheets listed from newest to oldest, so for the weights, must reverse the dictionary:  calculate_weighted_ratio_from_dict(dict_input,               dict_name,                          str_in_dict_numerator, str_in_dict_denominator,     weights,                stock_data, default_return_value, reverse_required, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=1.0, bonus_mon_dec=1.0, bonus_neg_pres=1.0, bonus_mon_inc_num=1.0, bonus_mon_inc_den=1.0, bonus_mon_dec_num=1.0, bonus_mon_dec_den=1.0):
         [stock_data.annualized_total_ratio,          stock_data.annualized_total_ratio_bonus         ] = calculate_weighted_ratio_from_dict(balance_sheets_yearly_yq,    'annualized_total_ratio',          'Total Assets',         'Total Liab',                BALANCE_SHEETS_WEIGHTS, stock_data, 0, True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=3.0, bonus_mon_dec=1.0/3.0, bonus_neg_pres=1.0, bonus_mon_inc_num=2.0, bonus_mon_inc_den=0.5, bonus_mon_dec_num=0.5, bonus_mon_dec_den=2.0)
@@ -2442,10 +2244,6 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
         # Financials are ordered newest to oldest so reversing is required for weights:
         [stock_data.quarterized_net_income, stock_data.quarterized_net_income_bonus]                                                                 = calculate_weighted_stock_data_on_dict(financials_quarterly,            'financials_quarterly',          'Net Income',    NO_WEIGHTS, stock_data, True,  True, bonus_all_pos=1.0, bonus_all_neg=1.0, bonus_mon_inc=2.0, bonus_mon_dec=0.5,     bonus_neg_pres=0.25)
 
-        if yq_mode:
-            info['enterpriseValue'] = enterprise_value_yq
-            info['marketCap']       = summaryDetail['marketCap']
-
         # At this stage, use the Total Revenue and Net Income as backups for revenues and earnings. TODO: ASAFR: Later on run comparisons and take them into account as well!
         if   stock_data.annualized_net_income  is None and stock_data.quarterized_net_income is None: stock_data.effective_net_income = None
         elif stock_data.annualized_net_income  is None and stock_data.quarterized_net_income != None: stock_data.effective_net_income = stock_data.quarterized_net_income
@@ -2473,34 +2271,27 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
         elif stock_data.quarterized_revenue  is None and stock_data.annualized_revenue   != None: stock_data.effective_revenue  = stock_data.annualized_revenue
         else                                                                                    : stock_data.effective_revenue  = (stock_data.quarterized_revenue ) # Prefer TTM only
 
-        # TODO: ASAFR: Next-Up: country from yq
         if yq_mode:
-            info['country']                 = assetProfile['country']
-            info['profitMargins']           = profit_margins_yq
-            info['heldPercentInstitutions'] = held_percent_institutions_yq
-            info['heldPercentInsiders']     = held_percent_insiders_yq
-            info['enterpriseToRevenue']     = enterprise_to_revenue_yq
-            info['enterpriseToEbitda']      = enterprise_to_ebitda_yq
-            info['trailingPE']              = trailing_pe_yq
-            info['forwardPE']               = forward_pe_yq
-            info['forwardEps']              = forward_eps_yq
-            info['trailingEps']             = trailing_eps_yq
+            if 'country' in assetProfile: info['country']                 = assetProfile['country']
 
-            info['previousClose']                = summaryDetail['previousClose']
-            info['fiftyTwoWeekLow']              = summaryDetail['fiftyTwoWeekLow']
-            info['fiftyTwoWeekHigh']             = summaryDetail['fiftyTwoWeekHigh']
-            info['twoHundredDayAverage']         = summaryDetail['twoHundredDayAverage']
-            info['priceToSalesTrailing12Months'] = summaryDetail['priceToSalesTrailing12Months']
+            if 'previousClose'                in summaryDetail:        info['previousClose']                = summaryDetail['previousClose']
+            if 'fiftyTwoWeekLow'              in summaryDetail:        info['fiftyTwoWeekLow']              = summaryDetail['fiftyTwoWeekLow']
+            if 'fiftyTwoWeekHigh'             in summaryDetail:        info['fiftyTwoWeekHigh']             = summaryDetail['fiftyTwoWeekHigh']
+            if 'twoHundredDayAverage'         in summaryDetail:        info['twoHundredDayAverage']         = summaryDetail['twoHundredDayAverage']
+            if 'priceToSalesTrailing12Months' in summaryDetail:        info['priceToSalesTrailing12Months'] = summaryDetail['priceToSalesTrailing12Months']
+            if 'trailingPE'                   in summaryDetail:        info['trailingPE']                   = summaryDetail['trailingPE']
+            if 'forwardPE'                    in summaryDetail:        info['forwardPE']                    = summaryDetail['forwardPE']
 
-            info['52WeekChange']            = defaultKeyStatistics['52WeekChange']
-            info['priceToBook']             = defaultKeyStatistics['priceToBook']
-            info['earningsQuarterlyGrowth'] = defaultKeyStatistics['earningsQuarterlyGrowth']
-            info['sharesOutstanding']       = defaultKeyStatistics['sharesOutstanding']
+            if '52WeekChange'                 in defaultKeyStatistics: info['52WeekChange']                 = defaultKeyStatistics['52WeekChange']
+            if 'priceToBook'                  in defaultKeyStatistics: info['priceToBook']                  = defaultKeyStatistics['priceToBook']
+            if 'earningsQuarterlyGrowth'      in defaultKeyStatistics: info['earningsQuarterlyGrowth']      = defaultKeyStatistics['earningsQuarterlyGrowth']
+            if 'sharesOutstanding'            in defaultKeyStatistics: info['sharesOutstanding']            = defaultKeyStatistics['sharesOutstanding']
+            if 'pegRatio'                     in defaultKeyStatistics: info['trailingPegRatio']             = defaultKeyStatistics['pegRatio']
 
-            info['revenueGrowth']           = financialData['revenueGrowth']
+            if 'revenueGrowth'                in financialData:        info['revenueGrowth']                = financialData['revenueGrowth']
 
 
-            # TODO: ASAFR: What about trailingPegRatio and netIncomeToCommon?
+            # TODO: ASAFR: What about and netIncomeToCommon?
 
         if 'country' in info:                stock_data.country = info['country']
         else:                                stock_data.country = 'Unknown'
