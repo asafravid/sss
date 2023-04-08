@@ -1589,18 +1589,29 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                 stock_data.summary_currency_conversion_rate_mult_to_usd   = round(1.0 / float(currency_conversion_tool_manual[stock_data.summary_currency  ]), NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
 
             if yq_mode:
-                balanceSheetHistoryYearly         = symbol.all_modules[stock_data.symbol]['balanceSheetHistory']
-                balanceSheetHistoryQuarterly      = symbol.all_modules[stock_data.symbol]['balanceSheetHistoryQuarterly']
-                cashflowStatementHistoryYearly    = symbol.all_modules[stock_data.symbol]['cashflowStatementHistory']
-                cashflowStatementHistoryQuarterly = symbol.all_modules[stock_data.symbol]['cashflowStatementHistoryQuarterly']
-                defaultKeyStatistics              = symbol.all_modules[stock_data.symbol]['defaultKeyStatistics']
-                summaryDetail                     = symbol.all_modules[stock_data.symbol]['summaryDetail']
-                assetProfile                      = symbol.all_modules[stock_data.symbol]['assetProfile']
-                incomeStatementHistoryYearly      = symbol.all_modules[stock_data.symbol]['incomeStatementHistory']
-                incomeStatementHistoryQuarterly   = symbol.all_modules[stock_data.symbol]['incomeStatementHistory']
-                earningsYearly                    = symbol.all_modules[stock_data.symbol]['earnings']['financialsChart']['yearly']
-                earningsQuarterly                 = symbol.all_modules[stock_data.symbol]['earnings']['financialsChart']['quarterly']
-                financialData                     = symbol.financial_data[stock_data.symbol]
+                balanceSheetHistoryYearly         = None
+                balanceSheetHistoryQuarterly      = None
+                cashflowStatementHistoryYearly    = None
+                cashflowStatementHistoryQuarterly = None
+                defaultKeyStatistics              = None
+                summaryDetail                     = None
+                assetProfile                      = None
+                incomeStatementHistoryYearly      = None
+                incomeStatementHistoryQuarterly   = None
+
+                if 'balanceSheetHistory'               in symbol.all_modules[stock_data.symbol]: balanceSheetHistoryYearly         = symbol.all_modules[stock_data.symbol]['balanceSheetHistory']
+                if 'balanceSheetHistoryQuarterly'      in symbol.all_modules[stock_data.symbol]: balanceSheetHistoryQuarterly      = symbol.all_modules[stock_data.symbol]['balanceSheetHistoryQuarterly']
+                if 'cashflowStatementHistory'          in symbol.all_modules[stock_data.symbol]: cashflowStatementHistoryYearly    = symbol.all_modules[stock_data.symbol]['cashflowStatementHistory']
+                if 'cashflowStatementHistoryQuarterly' in symbol.all_modules[stock_data.symbol]: cashflowStatementHistoryQuarterly = symbol.all_modules[stock_data.symbol]['cashflowStatementHistoryQuarterly']
+                if 'defaultKeyStatistics'              in symbol.all_modules[stock_data.symbol]: defaultKeyStatistics              = symbol.all_modules[stock_data.symbol]['defaultKeyStatistics']
+                if 'summaryDetail'                     in symbol.all_modules[stock_data.symbol]: summaryDetail                     = symbol.all_modules[stock_data.symbol]['summaryDetail']
+                if 'assetProfile'                      in symbol.all_modules[stock_data.symbol]: assetProfile                      = symbol.all_modules[stock_data.symbol]['assetProfile']
+                if 'incomeStatementHistory'            in symbol.all_modules[stock_data.symbol]: incomeStatementHistoryYearly      = symbol.all_modules[stock_data.symbol]['incomeStatementHistory']
+                if 'incomeStatementHistory'            in symbol.all_modules[stock_data.symbol]: incomeStatementHistoryQuarterly   = symbol.all_modules[stock_data.symbol]['incomeStatementHistory']
+
+                earningsYearly    = symbol.all_modules[stock_data.symbol]['earnings']['financialsChart']['yearly']
+                earningsQuarterly = symbol.all_modules[stock_data.symbol]['earnings']['financialsChart']['quarterly']
+                financialData     = symbol.financial_data[stock_data.symbol]
 
 
                 earnings_yearly_yq = {}
@@ -1781,7 +1792,7 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                     financials_quarterly_yq[list_element_dict["endDate"]]['Net Income From Continuing Ops']         = list_element_dict["netIncomeFromContinuingOps"]
                     financials_quarterly_yq[list_element_dict["endDate"]]['Net Income Applicable To Common Shares'] = list_element_dict["netIncomeApplicableToCommonShares"]
 
-                stock_data.sector = assetProfile['sector']
+                if assetProfile: stock_data.sector = assetProfile['sector']
                 if 'enterpriseValue'         in defaultKeyStatistics: info['enterpriseValue']         = defaultKeyStatistics['enterpriseValue']
                 if 'profitMargins'           in defaultKeyStatistics: info['profitMargins']           = defaultKeyStatistics['profitMargins']
                 if 'heldPercentInsiders'     in defaultKeyStatistics: info['heldPercentInsiders']     = defaultKeyStatistics['heldPercentInsiders']
