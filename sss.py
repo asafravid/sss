@@ -1609,10 +1609,11 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                 if 'incomeStatementHistory'            in symbol.all_modules[stock_data.symbol]: incomeStatementHistoryYearly      = symbol.all_modules[stock_data.symbol]['incomeStatementHistory']
                 if 'incomeStatementHistory'            in symbol.all_modules[stock_data.symbol]: incomeStatementHistoryQuarterly   = symbol.all_modules[stock_data.symbol]['incomeStatementHistory']
 
-                earningsYearly    = symbol.all_modules[stock_data.symbol]['earnings']['financialsChart']['yearly']
-                earningsQuarterly = symbol.all_modules[stock_data.symbol]['earnings']['financialsChart']['quarterly']
-                financialData     = symbol.financial_data[stock_data.symbol]
+                if 'earnings' in symbol.all_modules[stock_data.symbol]:
+                    earningsYearly    = symbol.all_modules[stock_data.symbol]['earnings']['financialsChart']['yearly']
+                    earningsQuarterly = symbol.all_modules[stock_data.symbol]['earnings']['financialsChart']['quarterly']
 
+                financialData     = symbol.financial_data[stock_data.symbol]
 
                 earnings_yearly_yq = {}
                 earnings_quarterly_yq = {}
@@ -1793,17 +1794,18 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                     financials_quarterly_yq[list_element_dict["endDate"]]['Net Income Applicable To Common Shares'] = list_element_dict["netIncomeApplicableToCommonShares"]
 
                 if assetProfile: stock_data.sector = assetProfile['sector']
-                if 'enterpriseValue'         in defaultKeyStatistics: info['enterpriseValue']         = defaultKeyStatistics['enterpriseValue']
-                if 'profitMargins'           in defaultKeyStatistics: info['profitMargins']           = defaultKeyStatistics['profitMargins']
-                if 'heldPercentInsiders'     in defaultKeyStatistics: info['heldPercentInsiders']     = defaultKeyStatistics['heldPercentInsiders']
-                if 'heldPercentInstitutions' in defaultKeyStatistics: info['heldPercentInstitutions'] = defaultKeyStatistics['heldPercentInstitutions']
-                if 'bookValue'               in defaultKeyStatistics: book_value_yq                = defaultKeyStatistics['bookValue']
-                if 'priceToBook'             in defaultKeyStatistics: price_to_book_yq             = defaultKeyStatistics['priceToBook']
-                if 'enterpriseToRevenue'     in defaultKeyStatistics: info['enterpriseToRevenue']  = defaultKeyStatistics['enterpriseToRevenue']
-                if 'enterpriseToEbitda'      in defaultKeyStatistics: info['enterpriseToEbitda']   = defaultKeyStatistics['enterpriseToEbitda']
-                if 'earningsQuarterlyGrowth' in defaultKeyStatistics: earnings_quarterly_growth_yq = defaultKeyStatistics['earningsQuarterlyGrowth']
-                if 'trailingEps'             in defaultKeyStatistics: info['trailingEps']          = defaultKeyStatistics['trailingEps']
-                if 'forwardEps'              in defaultKeyStatistics: info['forwardEps']           = defaultKeyStatistics['forwardEps']
+                if defaultKeyStatistics:
+                    if 'enterpriseValue'         in defaultKeyStatistics: info['enterpriseValue']         = defaultKeyStatistics['enterpriseValue']
+                    if 'profitMargins'           in defaultKeyStatistics: info['profitMargins']           = defaultKeyStatistics['profitMargins']
+                    if 'heldPercentInsiders'     in defaultKeyStatistics: info['heldPercentInsiders']     = defaultKeyStatistics['heldPercentInsiders']
+                    if 'heldPercentInstitutions' in defaultKeyStatistics: info['heldPercentInstitutions'] = defaultKeyStatistics['heldPercentInstitutions']
+                    if 'bookValue'               in defaultKeyStatistics: book_value_yq                = defaultKeyStatistics['bookValue']
+                    if 'priceToBook'             in defaultKeyStatistics: price_to_book_yq             = defaultKeyStatistics['priceToBook']
+                    if 'enterpriseToRevenue'     in defaultKeyStatistics: info['enterpriseToRevenue']  = defaultKeyStatistics['enterpriseToRevenue']
+                    if 'enterpriseToEbitda'      in defaultKeyStatistics: info['enterpriseToEbitda']   = defaultKeyStatistics['enterpriseToEbitda']
+                    if 'earningsQuarterlyGrowth' in defaultKeyStatistics: earnings_quarterly_growth_yq = defaultKeyStatistics['earningsQuarterlyGrowth']
+                    if 'trailingEps'             in defaultKeyStatistics: info['trailingEps']          = defaultKeyStatistics['trailingEps']
+                    if 'forwardEps'              in defaultKeyStatistics: info['forwardEps']           = defaultKeyStatistics['forwardEps']
 
                 if 'marketCap'               in summaryDetail:        info['marketCap'] = summaryDetail['marketCap']
 
@@ -2169,9 +2171,6 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
             stock_data.rqg_yoy     = None
 
         # Net Income Quarterly Growth Year-Over-Year Calculation:
-        if yq_mode:
-            financials_quarterly = financials_quarterly_yq
-            financials_yearly    = financials_yearly_yq
         if financials_yearly != None and len(financials_yearly):
             qnig_weight_index = 0
             qtrg_weight_index = 0
@@ -2283,23 +2282,27 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
         else                                                                                    : stock_data.effective_revenue  = (stock_data.quarterized_revenue ) # Prefer TTM only
 
         if yq_mode:
-            if 'country' in assetProfile: info['country']                 = assetProfile['country']
+            if assetProfile:
+                if 'country' in assetProfile: info['country']                 = assetProfile['country']
 
-            if 'previousClose'                in summaryDetail:        info['previousClose']                = summaryDetail['previousClose']
-            if 'fiftyTwoWeekLow'              in summaryDetail:        info['fiftyTwoWeekLow']              = summaryDetail['fiftyTwoWeekLow']
-            if 'fiftyTwoWeekHigh'             in summaryDetail:        info['fiftyTwoWeekHigh']             = summaryDetail['fiftyTwoWeekHigh']
-            if 'twoHundredDayAverage'         in summaryDetail:        info['twoHundredDayAverage']         = summaryDetail['twoHundredDayAverage']
-            if 'priceToSalesTrailing12Months' in summaryDetail:        info['priceToSalesTrailing12Months'] = summaryDetail['priceToSalesTrailing12Months']
-            if 'trailingPE'                   in summaryDetail:        info['trailingPE']                   = summaryDetail['trailingPE']
-            if 'forwardPE'                    in summaryDetail:        info['forwardPE']                    = summaryDetail['forwardPE']
+            if summaryDetail:
+                if 'previousClose'                in summaryDetail:        info['previousClose']                = summaryDetail['previousClose']
+                if 'fiftyTwoWeekLow'              in summaryDetail:        info['fiftyTwoWeekLow']              = summaryDetail['fiftyTwoWeekLow']
+                if 'fiftyTwoWeekHigh'             in summaryDetail:        info['fiftyTwoWeekHigh']             = summaryDetail['fiftyTwoWeekHigh']
+                if 'twoHundredDayAverage'         in summaryDetail:        info['twoHundredDayAverage']         = summaryDetail['twoHundredDayAverage']
+                if 'priceToSalesTrailing12Months' in summaryDetail:        info['priceToSalesTrailing12Months'] = summaryDetail['priceToSalesTrailing12Months']
+                if 'trailingPE'                   in summaryDetail:        info['trailingPE']                   = summaryDetail['trailingPE']
+                if 'forwardPE'                    in summaryDetail:        info['forwardPE']                    = summaryDetail['forwardPE']
 
-            if '52WeekChange'                 in defaultKeyStatistics: info['52WeekChange']                 = defaultKeyStatistics['52WeekChange']
-            if 'priceToBook'                  in defaultKeyStatistics: info['priceToBook']                  = defaultKeyStatistics['priceToBook']
-            if 'earningsQuarterlyGrowth'      in defaultKeyStatistics: info['earningsQuarterlyGrowth']      = defaultKeyStatistics['earningsQuarterlyGrowth']
-            if 'sharesOutstanding'            in defaultKeyStatistics: info['sharesOutstanding']            = defaultKeyStatistics['sharesOutstanding']
-            if 'pegRatio'                     in defaultKeyStatistics: info['trailingPegRatio']             = defaultKeyStatistics['pegRatio']
+            if defaultKeyStatistics:
+                if '52WeekChange'                 in defaultKeyStatistics: info['52WeekChange']                 = defaultKeyStatistics['52WeekChange']
+                if 'priceToBook'                  in defaultKeyStatistics: info['priceToBook']                  = defaultKeyStatistics['priceToBook']
+                if 'earningsQuarterlyGrowth'      in defaultKeyStatistics: info['earningsQuarterlyGrowth']      = defaultKeyStatistics['earningsQuarterlyGrowth']
+                if 'sharesOutstanding'            in defaultKeyStatistics: info['sharesOutstanding']            = defaultKeyStatistics['sharesOutstanding']
+                if 'pegRatio'                     in defaultKeyStatistics: info['trailingPegRatio']             = defaultKeyStatistics['pegRatio']
 
-            if 'revenueGrowth'                in financialData:        info['revenueGrowth']                = financialData['revenueGrowth']
+            if financialData:
+                if 'revenueGrowth'                in financialData:        info['revenueGrowth']                = financialData['revenueGrowth']
 
 
             # TODO: ASAFR: What about and netIncomeToCommon?
@@ -2318,7 +2321,7 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
         if 'heldPercentInsiders' in info:                                                             stock_data.held_percent_insiders     = info['heldPercentInsiders']
         else:                                                                                         stock_data.held_percent_insiders     = PERCENT_HELD_INSIDERS_UNKNOWN
         if stock_data.held_percent_insiders     is None or stock_data.held_percent_insiders == 0:     stock_data.held_percent_insiders     = PERCENT_HELD_INSIDERS_UNKNOWN
-
+        #-?
         if 'enterpriseToRevenue' in info:
             stock_data.enterprise_value_to_revenue = info['enterpriseToRevenue']
             if stock_data.enterprise_value_to_revenue != None: stock_data.enterprise_value_to_revenue *= stock_data.summary_currency_conversion_rate_mult_to_usd # https://www.investopedia.com/terms/e/ev-revenue-multiple.asp
@@ -2338,6 +2341,10 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
         elif stock_data.market_cap is None or stock_data.market_cap <= 0:
             stock_data.market_cap = stock_data.enterprise_value
 
+        if yq_mode:
+            financials_quarterly = financials_quarterly_yq
+            financials_yearly    = financials_yearly_yq
+
         # in order to calculate eibtd, take ebit from finantials and add deprecations from cash_flows to it:
         # Financials and Cash Flows are ordered newest to oldest so reversing is required for weights:
         stock_data.quarterized_ebitd = calculate_weighted_sum_from_2_dicts(financials_quarterly, 'financials_quarterly', 'Ebit', cash_flows_quarterly_yq, 'cash_flows_quarterly', 'Depreciation', NO_WEIGHTS,       stock_data, 0, True, True, True)
@@ -2349,7 +2356,7 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
         #              1.2. There is a similar field (same value different name) besides ebit - see if it is always the same? Low priority
         #              1.3. If enterpriseToEbitda is available (for most stocks it is? Check), then EBITDA = EV/enterpriseToEbitda
         #              1.3.1. But if EV is negative for some stocks... then Market Capital might be used...
-        #              1.4. Suggestion: take average such that EBITDA = (EV/enterpriseToEbitda + CalculatedEbitFromFinancialsAndCashFlows)/2
+        #-x            1.4. Suggestion: take average such that EBITDA = (EV/enterpriseToEbitda + CalculatedEbitFromFinancialsAndCashFlows)/2
         if 'enterpriseToEbitda' in info:
             stock_data.enterprise_value_to_ebitda = info['enterpriseToEbitda']
             if stock_data.enterprise_value_to_ebitda != None:
@@ -2376,6 +2383,7 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
             stock_data.trailing_price_to_earnings = float(stock_data.market_cap)       / float(stock_data.effective_earnings) # Calculate manually.
         elif stock_data.effective_net_income != None and stock_data.effective_net_income != 0 and stock_data.enterprise_value != None:
             stock_data.trailing_price_to_earnings = float(stock_data.enterprise_value) / float(stock_data.effective_net_income)  # Calculate manually.
+        #-x
         if isinstance(stock_data.trailing_price_to_earnings,str):  stock_data.trailing_price_to_earnings  = MAX_UNKNOWN_PE # Mark as None, so as to try and calculate manually.
 
         if 'forwardPE' in info:
@@ -2400,7 +2408,7 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
             if   stock_data.forward_price_to_earnings   < 0: stock_data.forward_price_to_earnings  = -NEGATIVE_EARNINGS_FACTOR/float(stock_data.forward_price_to_earnings)
             elif stock_data.forward_price_to_earnings  == 0: stock_data.forward_price_to_earnings  =  NEGATIVE_EARNINGS_FACTOR
 
-        # Calculate the weighted average of the forward and trailing P/E:
+        #-x Calculate the weighted average of the forward and trailing P/E:
         if (stock_data.trailing_price_to_earnings != None and stock_data.forward_price_to_earnings != None):
             stock_data.effective_price_to_earnings = (stock_data.trailing_price_to_earnings*TRAILING_PRICE_TO_EARNINGS_WEIGHT+stock_data.forward_price_to_earnings*FORWARD_PRICE_TO_EARNINGS_WEIGHT)
 
