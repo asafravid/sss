@@ -1531,8 +1531,11 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                 earnings_quarterly       = symbol['earnings_quarterly'      ] if 'earnings_quarterly'       in symbol else None
             else:
                 if yq_mode:
-                    stock_data.financial_currency = symbol.financial_data[stock_data.symbol]['financialCurrency']
-                    stock_data.summary_currency = symbol.price[stock_data.symbol]['currency']
+                    if 'financialCurrency' in symbol.financial_data[stock_data.symbol]:
+                        stock_data.financial_currency = symbol.financial_data[stock_data.symbol]['financialCurrency']
+
+                    if 'currency' in symbol.price[stock_data.symbol]:
+                        stock_data.summary_currency = symbol.price[stock_data.symbol]['currency']
 
                 else:
                     info                     = symbol.get_info()
@@ -1574,8 +1577,8 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
             if stock_data.summary_currency == 'ILA' or stock_data.summary_currency == 'NIS':  # Sometimes (in TASE mode) in info['currency'] ILA may show instead of ILS so just substitute
                 stock_data.summary_currency = 'ILS'
             if currency_conversion_tool:
-                stock_data.financial_currency_conversion_rate_mult_to_usd = round(1.0/float(currency_conversion_tool[stock_data.financial_currency] if stock_data.financial_currency != None else 1.0), NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
-                stock_data.summary_currency_conversion_rate_mult_to_usd   = round(1.0/float(currency_conversion_tool[stock_data.summary_currency  ] if stock_data.summary_currency   != None else 1.0), NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
+                stock_data.financial_currency_conversion_rate_mult_to_usd = round(1.0/float(currency_conversion_tool[stock_data.financial_currency] if stock_data.financial_currency else 1.0), NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
+                stock_data.summary_currency_conversion_rate_mult_to_usd   = round(1.0/float(currency_conversion_tool[stock_data.summary_currency  ] if stock_data.summary_currency   else 1.0), NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
             elif currency_conversion_tool_alternative:
                 try:
                     stock_data.financial_currency_conversion_rate_mult_to_usd = round(float(currency_conversion_tool_alternative.convert(1.0, stock_data.financial_currency, 'USD')), NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
