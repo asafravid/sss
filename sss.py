@@ -1600,6 +1600,8 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                 incomeStatementHistoryQuarterly   = symbol.all_modules[stock_data.symbol]['incomeStatementHistory']
                 earningsYearly                    = symbol.all_modules[stock_data.symbol]['earnings']['financialsChart']['yearly']
                 earningsQuarterly                 = symbol.all_modules[stock_data.symbol]['earnings']['financialsChart']['quarterly']
+                financialData                     = symbol.financial_data[stock_data.symbol]
+
 
                 # TODO: ASAFR: 1. replace all earnings_yearly and earnings_quarterly with _yq suffix (for _yq mode, and with if on it)
                 #              2. restructure _yq with:
@@ -1915,11 +1917,13 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                 enterprise_value_yq          = defaultKeyStatistics['enterpriseValue']
                 profit_margins_yq            = defaultKeyStatistics['profitMargins']
                 held_percent_insiders_yq     = defaultKeyStatistics['heldPercentInsiders']
+                held_percent_institutions_yq = defaultKeyStatistics['heldPercentInstitutions']
+
                 book_value_yq                = defaultKeyStatistics['bookValue']
                 price_to_book_yq             = defaultKeyStatistics['priceToBook']
                 enterprise_to_revenue_yq     = defaultKeyStatistics['enterpriseToRevenue']
                 enterprise_to_ebitda_yq      = defaultKeyStatistics['enterpriseToEbitda']
-                earnings_quarterly_growth_yq = defaultKeyStatistics['earningsQuarterlyGrowth']
+#                earnings_quarterly_growth_yq = defaultKeyStatistics['earningsQuarterlyGrowth']
                 trailing_eps_yq              = defaultKeyStatistics['trailingEps']
                 forward_eps_yq               = defaultKeyStatistics['forwardEps']
                 peg_ratio_yq                 = defaultKeyStatistics['pegRatio']
@@ -2440,7 +2444,7 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
 
         if yq_mode:
             info['enterpriseValue'] = enterprise_value_yq
-            info['marketCap']       = market_cap_yq
+            info['marketCap']       = summaryDetail['marketCap']
 
         # At this stage, use the Total Revenue and Net Income as backups for revenues and earnings. TODO: ASAFR: Later on run comparisons and take them into account as well!
         if   stock_data.annualized_net_income  is None and stock_data.quarterized_net_income is None: stock_data.effective_net_income = None
@@ -2470,6 +2474,34 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
         else                                                                                    : stock_data.effective_revenue  = (stock_data.quarterized_revenue ) # Prefer TTM only
 
         # TODO: ASAFR: Next-Up: country from yq
+        if yq_mode:
+            info['country']                 = assetProfile['country']
+            info['profitMargins']           = profit_margins_yq
+            info['heldPercentInstitutions'] = held_percent_institutions_yq
+            info['heldPercentInsiders']     = held_percent_insiders_yq
+            info['enterpriseToRevenue']     = enterprise_to_revenue_yq
+            info['enterpriseToEbitda']      = enterprise_to_ebitda_yq
+            info['trailingPE']              = trailing_pe_yq
+            info['forwardPE']               = forward_pe_yq
+            info['forwardEps']              = forward_eps_yq
+            info['trailingEps']             = trailing_eps_yq
+
+            info['previousClose']                = summaryDetail['previousClose']
+            info['fiftyTwoWeekLow']              = summaryDetail['fiftyTwoWeekLow']
+            info['fiftyTwoWeekHigh']             = summaryDetail['fiftyTwoWeekHigh']
+            info['twoHundredDayAverage']         = summaryDetail['twoHundredDayAverage']
+            info['priceToSalesTrailing12Months'] = summaryDetail['priceToSalesTrailing12Months']
+
+            info['52WeekChange']            = defaultKeyStatistics['52WeekChange']
+            info['priceToBook']             = defaultKeyStatistics['priceToBook']
+            info['earningsQuarterlyGrowth'] = defaultKeyStatistics['earningsQuarterlyGrowth']
+            info['sharesOutstanding']       = defaultKeyStatistics['sharesOutstanding']
+
+            info['revenueGrowth']           = financialData['revenueGrowth']
+
+
+            # TODO: ASAFR: What about trailingPegRatio and netIncomeToCommon?
+
         if 'country' in info:                stock_data.country = info['country']
         else:                                stock_data.country = 'Unknown'
         if stock_data.country is None: stock_data.country       = 'Unknown'
@@ -2826,30 +2858,31 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
         try:  # It is important to note that: 1. latest value is in index 0. 2. For the actual value in USD, need to translate the date of the dividend to the value of share at that time, because the dividends[] are pare share
             # if sss_config.custom_sss_value_equation:
             #     dividends =
-            if isinstance(symbol, dict):
-                dividends = symbol['dividends'] if 'dividends' in symbol else None
-            else:
-                dividends = symbol.get_dividends()
+            if not yq_mode:
+                if isinstance(symbol, dict):
+                    dividends = symbol['dividends'] if 'dividends' in symbol else None
+                else:
+                    dividends = symbol.get_dividends()
 
-            last_dividends_list = []
-            if len(dividends) > 0:
-                last_4_dividends = dividends[-1:]
-                stock_data.last_dividend_0 = last_4_dividends[-1] # Latest
-                last_dividends_list.insert(0, stock_data.last_dividend_0)
-            if len(dividends) > 1:
-                last_4_dividends = dividends[-2:]
-                stock_data.last_dividend_1 = last_4_dividends[-2] # One before latest
-                last_dividends_list.insert(0, stock_data.last_dividend_1)
-            if len(dividends) > 2:
-                last_4_dividends = dividends[-3:]
-                stock_data.last_dividend_2 = last_4_dividends[-3] # 2 before latest, etc
-                last_dividends_list.insert(0, stock_data.last_dividend_2)
-            if len(dividends) > 3:
-                last_4_dividends = dividends[-4:]
-                stock_data.last_dividend_3 = last_4_dividends[-4]
-                last_dividends_list.insert(0, stock_data.last_dividend_3)
+                last_dividends_list = []
+                if len(dividends) > 0:
+                    last_4_dividends = dividends[-1:]
+                    stock_data.last_dividend_0 = last_4_dividends[-1] # Latest
+                    last_dividends_list.insert(0, stock_data.last_dividend_0)
+                if len(dividends) > 1:
+                    last_4_dividends = dividends[-2:]
+                    stock_data.last_dividend_1 = last_4_dividends[-2] # One before latest
+                    last_dividends_list.insert(0, stock_data.last_dividend_1)
+                if len(dividends) > 2:
+                    last_4_dividends = dividends[-3:]
+                    stock_data.last_dividend_2 = last_4_dividends[-3] # 2 before latest, etc
+                    last_dividends_list.insert(0, stock_data.last_dividend_2)
+                if len(dividends) > 3:
+                    last_4_dividends = dividends[-4:]
+                    stock_data.last_dividend_3 = last_4_dividends[-4]
+                    last_dividends_list.insert(0, stock_data.last_dividend_3)
 
-            if last_dividends_list != None: json_db[stock_data.symbol]["dividends"] = last_dividends_list
+                if last_dividends_list != None: json_db[stock_data.symbol]["dividends"] = last_dividends_list
 
         except Exception as e:
             # if not multi_dim_scan_mode: print("Exception in symbol.dividends: {} -> {}".format(e, traceback.format_exc()))
