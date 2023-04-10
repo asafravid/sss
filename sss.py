@@ -1604,6 +1604,7 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                 assetProfile                      = None
                 incomeStatementHistoryYearly      = None
                 incomeStatementHistoryQuarterly   = None
+                quoteType                         = None
 
                 if 'balanceSheetHistory'               in symbol.all_modules[stock_data.symbol]: balanceSheetHistoryYearly         = symbol.all_modules[stock_data.symbol]['balanceSheetHistory']
                 if 'balanceSheetHistoryQuarterly'      in symbol.all_modules[stock_data.symbol]: balanceSheetHistoryQuarterly      = symbol.all_modules[stock_data.symbol]['balanceSheetHistoryQuarterly']
@@ -1614,6 +1615,7 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                 if 'assetProfile'                      in symbol.all_modules[stock_data.symbol]: assetProfile                      = symbol.all_modules[stock_data.symbol]['assetProfile']
                 if 'incomeStatementHistory'            in symbol.all_modules[stock_data.symbol]: incomeStatementHistoryYearly      = symbol.all_modules[stock_data.symbol]['incomeStatementHistory']
                 if 'incomeStatementHistory'            in symbol.all_modules[stock_data.symbol]: incomeStatementHistoryQuarterly   = symbol.all_modules[stock_data.symbol]['incomeStatementHistoryQuarterly']
+                if 'quoteType'                         in symbol.all_modules[stock_data.symbol]: quoteType                         = symbol.all_modules[stock_data.symbol]['quoteType']
 
                 earningsYearly    = None
                 earningsQuarterly = None
@@ -1869,6 +1871,16 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
         except Exception as e:
             if not research_mode: print("              Exception in {} symbol.get_info(): {} -> {}".format(stock_data.symbol, e, traceback.format_exc()))
             pass
+
+        if yq_mode:
+            if quoteType['shortName'] and quoteType['shortName'] != 'None':
+                info['shortName'] = quoteType['shortName']
+            else:
+                info['shortName'] = quoteType['longName']
+
+            info['quoteType'] = quoteType['quoteType']
+            info['country']   = assetProfile['country']
+
 
         if 'shortName' in info: stock_data.short_name = info['shortName']
         else:                   stock_data.short_name = 'None'
@@ -3212,7 +3224,7 @@ def process_symbols(yq_mode, symbol_to_name_dict, crash_and_continue_raw_data, d
                     else:
                         row[fix_row_index] = 0
             stock_data = get_stock_data_normalized_from_db_row_compact(row, symbol) if "normalized" in db_filename else get_stock_data_from_db_row_compact(row, symbol)
-            if not process_info(json_db=None, symbol=symbol, stock_data=stock_data, tase_mode=tase_mode, sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, profit_margin_limit=profit_margin_limit, pb_limit=pb_limit, pi_limit=pi_limit, enterprise_value_millions_usd_limit=enterprise_value_millions_usd_limit, research_mode_max_ev=research_mode_max_ev, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, debt_to_equity_limit=debt_to_equity_limit, eqg_min=eqg_min, rqg_min=rqg_min, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, research_mode=research_mode, currency_conversion_tool=currency_conversion_tool, currency_conversion_tool_alternative=currency_conversion_tool_alternative, currency_conversion_tool_manual=currency_conversion_tool_manual, reference_db=reference_db, reference_db_title_row=reference_db_title_row, db_filename=db_filename):
+            if not process_info(yq_mode=False, json_db=None, symbol=symbol, stock_data=stock_data, tase_mode=tase_mode, sectors_list=sectors_list, sectors_filter_out=sectors_filter_out, countries_list=countries_list, countries_filter_out=countries_filter_out, profit_margin_limit=profit_margin_limit, pb_limit=pb_limit, pi_limit=pi_limit, enterprise_value_millions_usd_limit=enterprise_value_millions_usd_limit, research_mode_max_ev=research_mode_max_ev, ev_to_cfo_ratio_limit=ev_to_cfo_ratio_limit, debt_to_equity_limit=debt_to_equity_limit, eqg_min=eqg_min, rqg_min=rqg_min, price_to_earnings_limit=price_to_earnings_limit, enterprise_value_to_revenue_limit=enterprise_value_to_revenue_limit, favor_sectors=favor_sectors, favor_sectors_by=favor_sectors_by, research_mode=research_mode, currency_conversion_tool=currency_conversion_tool, currency_conversion_tool_alternative=currency_conversion_tool_alternative, currency_conversion_tool_manual=currency_conversion_tool_manual, reference_db=reference_db, reference_db_title_row=reference_db_title_row, db_filename=db_filename):
                 if research_mode: continue
 
             dividends_sum = stock_data.last_dividend_0 + stock_data.last_dividend_1 + stock_data.last_dividend_2 + stock_data.last_dividend_3
