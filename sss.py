@@ -1577,8 +1577,7 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
             if stock_data.summary_currency == 'ILA' or stock_data.summary_currency == 'NIS':  # Sometimes (in TASE mode) in info['currency'] ILA may show instead of ILS so just substitute
                 stock_data.summary_currency = 'ILS'
             if currency_conversion_tool:
-                if stock_data.financial_currency:
-                    print("stock_data.financial_currency = {}".format(stock_data.financial_currency))
+                if stock_data.financial_currency and stock_data.financial_currency != 'None':
                     stock_data.financial_currency_conversion_rate_mult_to_usd = round(1.0/float(currency_conversion_tool[stock_data.financial_currency]), NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
                 else:
                     stock_data.financial_currency_conversion_rate_mult_to_usd = 1.0
