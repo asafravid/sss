@@ -1873,13 +1873,14 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
             pass
 
         if yq_mode:
-            if quoteType['shortName'] and quoteType['shortName'] != 'None':
+            if quoteType and 'shortName' in quoteType and quoteType['shortName'] and quoteType['shortName'] != 'None':
                 info['shortName'] = quoteType['shortName']
             else:
                 info['shortName'] = quoteType['longName']
 
             info['quoteType'] = quoteType['quoteType']
-            info['country']   = assetProfile['country']
+            if assetProfile:
+                if 'country' in assetProfile: info['country'] = assetProfile['country']
 
 
         if 'shortName' in info: stock_data.short_name = info['shortName']
@@ -2408,10 +2409,12 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
 
         if 'trailingPE' in info:
             stock_data.trailing_price_to_earnings  = info['trailingPE']  # https://www.investopedia.com/terms/t/trailingpe.asp
-            if tase_mode and stock_data.trailing_price_to_earnings != None:
+            if tase_mode and stock_data.trailing_price_to_earnings != None and not isinstance(stock_data.trailing_price_to_earnings, str):
                 stock_data.trailing_price_to_earnings /= 100.0  # In TLV stocks, yfinance multiplies trailingPE by a factor of 100, so compensate
                 if stock_data.symbol in g_symbols_tase_duals:  # TODO: ASAFR: Do research and add this condition to all relevant cases in other fundamental parameters
                     stock_data.trailing_price_to_earnings *= stock_data.summary_currency_conversion_rate_mult_to_usd # Additionally, in TLV DUAL stocks this ratio is mistakenly calculated using PriceInNis/EarningsInUSD -> so Compensate
+            else:
+                stock_data.trailing_price_to_earnings = MAX_UNKNOWN_PE
         elif stock_data.effective_earnings != None and stock_data.effective_earnings != 0 and stock_data.market_cap != None:
             stock_data.trailing_price_to_earnings = float(stock_data.market_cap)       / float(stock_data.effective_earnings) # Calculate manually.
         elif stock_data.effective_net_income != None and stock_data.effective_net_income != 0 and stock_data.enterprise_value != None:
