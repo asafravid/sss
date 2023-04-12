@@ -1890,6 +1890,8 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
             earnings_yearly          = earnings_yearly_yq
             earnings_quarterly       = earnings_quarterly_yq
 
+            financials_quarterly = financials_quarterly_yq
+            financials_yearly    = financials_yearly_yq
         if 'shortName' in info: stock_data.short_name = info['shortName']
         else:                   stock_data.short_name = 'None'
 
@@ -2379,10 +2381,6 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                 stock_data.enterprise_value = int(info['marketCap']*stock_data.summary_currency_conversion_rate_mult_to_usd)
         elif stock_data.market_cap is None or stock_data.market_cap <= 0:
             stock_data.market_cap = stock_data.enterprise_value
-
-        if yq_mode:
-            financials_quarterly = financials_quarterly_yq
-            financials_yearly    = financials_yearly_yq
 
         # in order to calculate eibtd, take ebit from finantials and add deprecations from cash_flows to it:
         #-x Financials and Cash Flows are ordered newest to oldest so reversing is required for weights:
@@ -2957,7 +2955,7 @@ def perform_scan_close_values_days(reference_raw_data, reference_download_data, 
                             symbol_data['Close'  ].iloc[-2] > symbol_data['MA21exp'].iloc[-2] and \
                             symbol_data['Close'  ].iloc[-3] > symbol_data['MA21exp'].iloc[-3] and \
                             date_and_time_crash_and_continue:
-                        print('[perform_scan_close_values_days] processing rising {:11} ({:40}). ({:4}/{:4} [{:2.2%]) total_free_mem_mb={:5}'.format(symbol, symbol_name, len(rising_symbols)+1, len(symbols), 100*(len(rising_symbols)+1)/(len(symbols)), total_free_mem_mb))
+                        print('[perform_scan_close_values_days] processing rising {:11} ({:40}). ({:4}/{:4} [{:2.2f%]) total_free_mem_mb={:5}'.format(symbol, symbol_name, len(rising_symbols)+1, len(symbols), 100*(len(rising_symbols)+1)/(len(symbols)), total_free_mem_mb))
                         append_ma_data(date_and_time_crash_and_continue=date_and_time_crash_and_continue, group_type='rising', group_symbols=rising_symbols, group_type_rows=rising_rows, symbol=symbol, symbol_name=symbol_name, symbol_data=symbol_data, scan_close_values_interval=scan_close_values_interval)
                 else:
                     if      symbol_data['MA21exp'][-1] > symbol_data['MA21exp'][-2] > symbol_data['MA21exp'][-3] and \
@@ -2973,7 +2971,7 @@ def perform_scan_close_values_days(reference_raw_data, reference_download_data, 
                             symbol_data['Close'  ][-2] > symbol_data['MA21exp'][-2] and \
                             symbol_data['Close'  ][-3] > symbol_data['MA21exp'][-3] and \
                             date_and_time_crash_and_continue:
-                        print('[perform_scan_close_values_days] processing rising {:11} ({:40}). ({:4}/{:4} [{:2.2}%]) total_free_mem_mb = {:5}'.format(symbol, symbol_name, len(rising_symbols) + 1, len(symbols),100 * (len(rising_symbols) + 1) / (len(symbols)), total_free_mem_mb))
+                        print('[perform_scan_close_values_days] processing rising {:11} ({:40}). ({:4}/{:4} [{:2.2f}%]) total_free_mem_mb = {:5}'.format(symbol, symbol_name, len(rising_symbols) + 1, len(symbols),100 * (len(rising_symbols) + 1) / (len(symbols)), total_free_mem_mb))
                         append_ma_data(date_and_time_crash_and_continue=date_and_time_crash_and_continue, group_type='rising', group_symbols=rising_symbols, group_type_rows=rising_rows, symbol=symbol, symbol_name=symbol_name, symbol_data=symbol_data, scan_close_values_interval=scan_close_values_interval)
                     # TODO: ASAFR: 1. Return the falling now with swap memory management working well!
                     #              2. Add Lower Level Rising not requiering 21exp to be rising!
