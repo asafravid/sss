@@ -1531,11 +1531,11 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                 earnings_quarterly       = symbol['earnings_quarterly'      ] if 'earnings_quarterly'       in symbol else None
             else:
                 if yq_mode:
-                    if 'financialCurrency' in symbol.financial_data[stock_data.symbol]:
-                        stock_data.financial_currency = symbol.financial_data[stock_data.symbol]['financialCurrency']
+                    if 'financialCurrency' in symbol.financial_data[stock_data.symbol.replace('.','-')]:
+                        stock_data.financial_currency = symbol.financial_data[stock_data.symbol.replace('.','-')]['financialCurrency']
 
-                    if 'currency' in symbol.price[stock_data.symbol]:
-                        stock_data.summary_currency = symbol.price[stock_data.symbol]['currency']
+                    if 'currency' in symbol.price[stock_data.symbol.replace('.','-')]:
+                        stock_data.summary_currency = symbol.price[stock_data.symbol.replace('.','-')]['currency']
 
                 else:
                     info                     = symbol.get_info()
@@ -1606,24 +1606,24 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                 incomeStatementHistoryQuarterly   = None
                 quoteType                         = None
 
-                if 'balanceSheetHistory'               in symbol.all_modules[stock_data.symbol]: balanceSheetHistoryYearly         = symbol.all_modules[stock_data.symbol]['balanceSheetHistory']
-                if 'balanceSheetHistoryQuarterly'      in symbol.all_modules[stock_data.symbol]: balanceSheetHistoryQuarterly      = symbol.all_modules[stock_data.symbol]['balanceSheetHistoryQuarterly']
-                if 'cashflowStatementHistory'          in symbol.all_modules[stock_data.symbol]: cashflowStatementHistoryYearly    = symbol.all_modules[stock_data.symbol]['cashflowStatementHistory']
-                if 'cashflowStatementHistoryQuarterly' in symbol.all_modules[stock_data.symbol]: cashflowStatementHistoryQuarterly = symbol.all_modules[stock_data.symbol]['cashflowStatementHistoryQuarterly']
-                if 'defaultKeyStatistics'              in symbol.all_modules[stock_data.symbol]: defaultKeyStatistics              = symbol.all_modules[stock_data.symbol]['defaultKeyStatistics']
-                if 'summaryDetail'                     in symbol.all_modules[stock_data.symbol]: summaryDetail                     = symbol.all_modules[stock_data.symbol]['summaryDetail']
-                if 'assetProfile'                      in symbol.all_modules[stock_data.symbol]: assetProfile                      = symbol.all_modules[stock_data.symbol]['assetProfile']
-                if 'incomeStatementHistory'            in symbol.all_modules[stock_data.symbol]: incomeStatementHistoryYearly      = symbol.all_modules[stock_data.symbol]['incomeStatementHistory']
-                if 'incomeStatementHistory'            in symbol.all_modules[stock_data.symbol]: incomeStatementHistoryQuarterly   = symbol.all_modules[stock_data.symbol]['incomeStatementHistoryQuarterly']
-                if 'quoteType'                         in symbol.all_modules[stock_data.symbol]: quoteType                         = symbol.all_modules[stock_data.symbol]['quoteType']
+                if 'balanceSheetHistory'               in symbol.all_modules[stock_data.symbol.replace('.','-')]: balanceSheetHistoryYearly         = symbol.all_modules[stock_data.symbol.replace('.','-')]['balanceSheetHistory']
+                if 'balanceSheetHistoryQuarterly'      in symbol.all_modules[stock_data.symbol.replace('.','-')]: balanceSheetHistoryQuarterly      = symbol.all_modules[stock_data.symbol.replace('.','-')]['balanceSheetHistoryQuarterly']
+                if 'cashflowStatementHistory'          in symbol.all_modules[stock_data.symbol.replace('.','-')]: cashflowStatementHistoryYearly    = symbol.all_modules[stock_data.symbol.replace('.','-')]['cashflowStatementHistory']
+                if 'cashflowStatementHistoryQuarterly' in symbol.all_modules[stock_data.symbol.replace('.','-')]: cashflowStatementHistoryQuarterly = symbol.all_modules[stock_data.symbol.replace('.','-')]['cashflowStatementHistoryQuarterly']
+                if 'defaultKeyStatistics'              in symbol.all_modules[stock_data.symbol.replace('.','-')]: defaultKeyStatistics              = symbol.all_modules[stock_data.symbol.replace('.','-')]['defaultKeyStatistics']
+                if 'summaryDetail'                     in symbol.all_modules[stock_data.symbol.replace('.','-')]: summaryDetail                     = symbol.all_modules[stock_data.symbol.replace('.','-')]['summaryDetail']
+                if 'assetProfile'                      in symbol.all_modules[stock_data.symbol.replace('.','-')]: assetProfile                      = symbol.all_modules[stock_data.symbol.replace('.','-')]['assetProfile']
+                if 'incomeStatementHistory'            in symbol.all_modules[stock_data.symbol.replace('.','-')]: incomeStatementHistoryYearly      = symbol.all_modules[stock_data.symbol.replace('.','-')]['incomeStatementHistory']
+                if 'incomeStatementHistory'            in symbol.all_modules[stock_data.symbol.replace('.','-')]: incomeStatementHistoryQuarterly   = symbol.all_modules[stock_data.symbol.replace('.','-')]['incomeStatementHistoryQuarterly']
+                if 'quoteType'                         in symbol.all_modules[stock_data.symbol.replace('.','-')]: quoteType                         = symbol.all_modules[stock_data.symbol.replace('.','-')]['quoteType']
 
                 earningsYearly    = None
                 earningsQuarterly = None
-                if 'earnings' in symbol.all_modules[stock_data.symbol]:
-                    earningsYearly    = symbol.all_modules[stock_data.symbol]['earnings']['financialsChart']['yearly']
-                    earningsQuarterly = symbol.all_modules[stock_data.symbol]['earnings']['financialsChart']['quarterly']
+                if 'earnings' in symbol.all_modules[stock_data.symbol.replace('.','-')]:
+                    earningsYearly    = symbol.all_modules[stock_data.symbol.replace('.','-')]['earnings']['financialsChart']['yearly']
+                    earningsQuarterly = symbol.all_modules[stock_data.symbol.replace('.','-')]['earnings']['financialsChart']['quarterly']
 
-                financialData     = symbol.financial_data[stock_data.symbol]
+                financialData     = symbol.financial_data[stock_data.symbol.replace('.','-')]
 
                 earnings_yearly_yq = {}
                 earnings_quarterly_yq = {}
