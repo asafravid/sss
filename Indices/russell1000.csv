@@ -6,7 +6,6 @@ AAP,Advance Auto Parts Inc
 AAPL,Apple Inc
 ABBV,Abbvie Inc
 ABC,Amerisourcebergen Corp
-ABMD,Abiomed Inc
 ABNB,Airbnb Inc Cl A
 ABT,Abbott Laboratories
 ACGL,Arch Capital Grp Ltd
@@ -49,7 +48,7 @@ ALSN,Allison Transmission Holdings
 AM,Antero Midstream Corp
 AMAT,Applied Materials
 AMBP,Ardagh Metal Packaging S.A.
-AMC,Amc Entertainment Holdings Inc
+AMC,AMC Entertainment Holdings
 AMCR,Amcor Plc
 AMD,Adv Micro Devices
 AME,Ametek Inc
@@ -116,13 +115,13 @@ BF.B,Brown Forman Inc Cl B
 BG,Bunge Ltd
 BHF,Brighthouse Financial Inc
 BIIB,Biogen Inc
-BILL,Bill.com Holdings Inc
+BILL,Bill Holdings Inc
 BIO,Bio-Rad Laboratories
 BJ,Bj's Wholesale Club Holdings Inc
 BK,Bank of New York Mellon Corp
 BKI,Black Knight Inc
 BKNG,Booking Holdings Inc
-BKR,Baker Hughes A Ge Co. Cl A
+BKR,Baker Hughes Company
 BLD,Topbuild Corp
 BLDR,Builders Firstsource
 BLK,Blackrock Inc
@@ -137,7 +136,7 @@ BRKR,Bruker Corp
 BRO,Brown & Brown
 BRX,Brixmor Property Group Inc
 BSX,Boston Scientific Corp
-BSY,Bentley Systems Incorporated Cl B
+BSY,Bentley Systems Inc Cl B
 BURL,Burlington Stores Inc
 BWA,Borgwarner Inc
 BWXT,Bwx Technologies Inc
@@ -182,8 +181,8 @@ CHH,Choice Hotels International
 CHK,Chesapeake Energy Corp
 CHPT,Chargepoint Hldgs Inc
 CHRW,C.H. Robinson Ww
-CHTR,Charter Communicatio
-CI,Cigna Corp
+CHTR,Charter Communications Inc
+CI,The Cigna Group
 CIEN,Ciena Corp
 CINF,Cincinnati Financial
 CL,Colgate-Palmolive Company
@@ -197,7 +196,7 @@ CME,CME Group Inc
 CMG,Chipotle Mexican Grill
 CMI,Cummins Inc
 CMS,Cms Energy Corp
-CNA,Cna Financial Corp
+CNA,CNA Financial Corp
 CNC,Centene Corp
 CNM,Core & Main Inc Cl A
 CNP,Centerpoint Energy Inc
@@ -205,19 +204,19 @@ CNXC,Concentrix Corp
 COF,Capital One Financial Corp
 COHR,Coherent Corp
 COIN,Coinbase Global Inc Cl A
+COLB,Columbia Banking Sys
 COLD,Americold Realty Trust
 COLM,Columbia Sprtswr
 COO,Cooper Companies
 COP,Conocophillips
 COST,Costco Wholesale
 COTY,Coty Inc
-COUP,Coupa Software Inc
 CPA,Copa Holdings S.A.
 CPB,Campbell Soup Company
 CPRI,Capri Holdings Ltd
 CPRT,Copart Inc
 CPT,Camden Property Trust
-CR,Crane Holdings CO
+CR,Crane Company
 CRI,Carter's Inc
 CRL,Charles River Laboratories Intl
 CRM,Salesforce Inc
@@ -234,7 +233,7 @@ CTSH,Cognizant Tech Sol
 CTVA,Corteva Inc
 CUBE,Cubesmart
 CUZ,Cousins Properties Inc
-CVNA,Carvana Co. Cl A
+CVNA,Carvana Company Cl A
 CVS,CVS Corp
 CVX,Chevron Corp
 CW,Curtiss-Wright Corp
@@ -335,7 +334,7 @@ F,Ford Motor Company
 FAF,First American Corp
 FANG,Diamondback Energy
 FAST,Fastenal Company
-FBHS,Fortune Brands Home & Security
+FBIN,Fortune Brands Innovations Inc
 FCN,Fti Consulting
 FCNCA,First Citizens Bancs
 FCX,Freeport-Mcmoran Inc
@@ -343,6 +342,7 @@ FDS,Factset Research Systems Inc
 FDX,Fedex Corp
 FE,Firstenergy Corp
 FFIV,F5 Inc
+FG,F&G Annuities & Life Inc
 FHB,First Hawaiian Inc
 FHN,First Horizon Corp
 FICO,Fair Isaac and Company
@@ -375,6 +375,7 @@ G,Genpact Ltd
 GD,General Dynamics Corp
 GDDY,Godaddy Inc
 GE,General Electric Company
+GEHC,Ge Healthcare Technologies Inc
 GEN,Gen Digital Inc
 GFS,Globalfoundries Inc
 GGG,Graco Inc
@@ -426,7 +427,7 @@ HON,Honeywell International Inc
 HOOD,Robinhood Markets Inc Cl A
 HPE,Hewlett Packard Enterprise Comp
 HPP,Hudson Pacific Properties
-HPQ,Hp Inc
+HPQ,HP Inc
 HR,Healthcare Realty Trust Inc.
 HRB,H&R Block
 HRL,Hormel Foods Corp
@@ -441,7 +442,6 @@ HUN,Huntsman Corp
 HWM,Howmet Aerospace Inc
 HXL,Hexcel Corp
 HZNP,Horizon Therapeutics
-IAA,Iaa Inc
 IAC,Iac Inc
 IART,Integra Lifesciences
 IBKR,Interactive Brokers
@@ -496,7 +496,7 @@ KEY,Keycorp
 KEYS,Keysight Technologies Inc
 KHC,Kraft Heinz Company
 KIM,Kimco Realty Corp
-KKR,KKR & Co. LP
+KKR,KKR & Company LP
 KLAC,K L A-Tencor Corp
 KMB,Kimberly-Clark Corp
 KMI,Kinder Morgan
@@ -560,6 +560,7 @@ MAR,Marriot Int Cl A
 MAS,Masco Corp
 MASI,Masimo Corp
 MAT,Mattel Inc
+MBC,Masterbrand Inc
 MCD,McDonald's Corp
 MCHP,Microchip Technology
 MCK,Mckesson Corp
@@ -648,8 +649,8 @@ NVR,NVR Inc
 NVST,Envista Holdings Corp
 NVT,Nvent Electric Plc
 NWL,Newell Rubbermaid Inc
-NWS,News Cp Cl B
-NWSA,News Cp Cl A
+NWS,News Corp Cl B
+NWSA,News Corp Cl A
 NXST,Nexstar Media Group Inc
 NYCB,New York Community Bancorp
 NYT,New York Times Company
@@ -657,7 +658,7 @@ O,Realty Income Corp
 OC,Owens Corning Inc
 ODFL,Old Dominion Freight Line Inc
 OGE,Oge Energy Corp
-OGN,Organon & CO
+OGN,Organon & Co.
 OHI,Omega Healthcare Investors
 OKE,Oneok Inc
 OKTA,Okta Inc Cl A
@@ -748,6 +749,7 @@ QRVO,Qorvo Inc
 QS,Quantumscape Corp
 R,Ryder System
 RARE,Ultragenyx Pharmaceu
+RBA,Ritchie Bros. Auctioneers Inc
 RBLX,Roblox Corp Cl A
 RCL,Royal Caribbean Cruises Ltd
 RE,Everest Re Group
@@ -788,7 +790,6 @@ S,Sentinelone Inc Cl A
 SAIC,Science Applications International
 SAM,Boston Beer Company
 SBAC,SBA Communications
-SBNY,Signature Bank
 SBUX,Starbucks Corp
 SCCO,Southern Copper Corp
 SCHW,The Charles Schwab Corp
@@ -798,12 +799,10 @@ SEE,Sealed Air Corp
 SEIC,Sei Investments Company
 SF,Stifel Financial Corp
 SGEN,Seagen Inc
-SGFY,Signify Health Inc Cl A
 SHC,Sotera Health Company
 SHW,Sherwin-Williams Company
 SIRI,Sirius XM Holdings
 SITE,Siteone Landscape Supply
-SIVB,Svb Financial Group
 SIX,Six Flags Entertainment Corp
 SJM,J.M. Smucker Company
 SKX,Skechers U.S.A.
@@ -838,12 +837,10 @@ SSRM,Ssr Mining Inc
 ST,Sensata Technologies Holding N.V.
 STE,Steris Corp
 STLD,Steel Dynamics Inc
-STOR,Store Capital Corp
 STT,State Street Corp
 STWD,Starwood Property Trust
 STZ,Constellation Brands Inc
 SUI,Sun Communities
-SWCH,Switch Inc
 SWK,Stanley Black & Decker Inc
 SWKS,Skyworks Solutions
 SWN,Southwestern Energy Company
@@ -908,11 +905,10 @@ UBER,Uber Technologies Inc
 UDR,United Dominion Realty Trust
 UGI,Ugi Corp
 UHAL,Amerco Inc
-UHALB,Amerco Series N Non-Voting
+UHA.B,U-Haul Holding Series N Non-Voting
 UHS,Universal Health Services
 UI,Ubiquiti Networks
 ULTA,Ulta Beauty Inc
-UMPQ,Umpqua Holdings Corp
 UNH,Unitedhealth Group Inc
 UNM,Unumprovident Corp
 UNP,Union Pacific Corp
@@ -942,10 +938,11 @@ VRSN,Verisign Inc
 VRT,Vertiv Holdings Llc.
 VRTX,Vertex Pharmaceutic
 VSAT,Viasat Inc
-VSCO,Victorias Secret & CO
+VSCO,Victorias Secret & Co.
 VST,Vistra Energy Corp
 VTR,Ventas Inc
 VTRS,Viatris Inc
+VTS,Vitesse Energy Inc
 VVV,Valvoline Inc
 VZ,Verizon Communications Inc
 W,Wayfair Inc
@@ -974,7 +971,7 @@ WMS,Advanced Drainage Systems Inc
 WMT,Walmart Inc
 WOLF,Wolfspeed Inc
 WOOF,Petco Health and Wellness Company Cl A
-WPC,W.P. Carey & Co. Llc
+WPC,W.P. Carey & Company Llc
 WRB,W.R. Berkley Corp
 WRK,Westrock Company
 WSC,Willscot Corp
@@ -984,7 +981,7 @@ WST,West Pharmaceutical Services
 WTFC,Wintrust Financial Corp
 WTM,White Mountains Insurance Group
 WTRG,Essential Utilities Inc
-WTW,Willis Towers Watson Public Ltd CO
+WTW,Willis Towers Watson Public Ltd
 WU,Western Union Company
 WWD,Woodward Inc
 WWE,World Wrestling Entertainment
@@ -993,9 +990,12 @@ WYNN,Wynn Resorts Ltd
 X,United States Steel Corp
 XEL,XCEL Energy Inc
 XOM,Exxon Mobil Corp
-XPO,Xpo Logistics Inc
+XPO,Xpo Inc
 XRAY,Dentsply Sirona Inc
 XYL,Xylem Inc
 YETI,Yeti Holdings Inc
 YUM,Yum! Brands
 Z,Zillow Group Cl C
+ZBH,Zimmer Biomet Holdings
+ZBRA,Zebra Technologies
+ZG,Zillow Grp Inc Cl A
