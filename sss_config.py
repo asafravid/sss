@@ -54,14 +54,14 @@ automatic_results_folder_selection = False
 # The research mode shall run on new_run as input (new_run >= reference_run) where > means newer
 reference_run_custom = 'Results/All/20220419-020633_A_nRes112_Custom_CustSssV'
 reference_run_tase   = None # 'Results/Tase/20221205-213437_Tase_Tchnlgy3.0_RlEstt1.0_nRes303'
-reference_run_nsr    = None # 'Results/Nsr/20221206-040620_Tchnlgy3.0_FnnclSrvcs1.0_nRes834'
-reference_run_all    = 'Results/All/20220827-133324_Tchnlgy3.0_FnnclSrvcs1.0_A_nRes2980'
+reference_run_nsr    = None # 'Results/Nsr/20230411-105538_Tchnlgy3.0_FnnclSrvcs1.0_nRes834' # 20221206-040620_Tchnlgy3.0_FnnclSrvcs1.0_nRes834'
+reference_run_all    = None #'Results/All/20220827-133324_Tchnlgy3.0_FnnclSrvcs1.0_A_nRes2980'
 reference_run_six    = 'Results/Six/20220111-002719_S_nRes196'                                        # '20211216-002301_S_nRes27_CustSssV'
 reference_run_st     = 'Results/St/20210915-023602_St_Bdb_nRes130'
 
 new_run_custom       = 'Results/Custom/20210917-201728_Bdb_nRes312_Custom'
 new_run_tase         = 'Results/Tase/20230410-234249_Tase_Tchnlgy3.0_RlEstt1.0_nRes253'
-new_run_nsr          = 'Results/Nsr/20230411-105538_Tchnlgy3.0_FnnclSrvcs1.0_nRes834'
+new_run_nsr          = 'Results/Nsr/20230412-155010_Tchnlgy3.0_FnnclSrvcs1.0_nRes837' # 20230411-105538_Tchnlgy3.0_FnnclSrvcs1.0_nRes834'
 new_run_all          = 'Results/All/20221208-004305_Tchnlgy3.0_FnnclSrvcs1.0_A_nRes2543'
 new_run_six          = 'Results/Six/20220111-002719_S_nRes196'                                        # '20211216-002301_S_nRes27_CustSssV'
 new_run_st           = 'Results/St/20210915-023602_St_Bdb_nRes130'

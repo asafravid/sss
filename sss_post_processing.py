@@ -38,6 +38,7 @@ SSS_VALUE_COLUMN_NAME            = "sss_value"
 def process_engine_csv(path) -> object:
     filename_path = path+"/"+sss_filenames.ENGINE_FILENAME
     data          = pd.read_csv(filename_path+".csv", skiprows=[0])  # 1st row is a description row, irrelevant for the data processing
+    print("[process_engine_csv] data = {}\n".format(data))
     max_values    = data.max()
     # max_2_nlargest = data.nlargest(2,numerator_parameters_list+denominator_parameters_list)
     [numerator_parameters_list,              denominator_parameters_list             ] = sss.get_used_parameters_names_in_core_equation(False)                                 # Take all values

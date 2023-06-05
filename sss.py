@@ -1489,6 +1489,7 @@ def stringify_keys(d, check_inner):
 
 def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, sectors_filter_out, countries_list, countries_filter_out, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, db_filename):
     return_value = True
+    quoteType = None
     if research_mode:
         if   stock_data.previous_close < 1.0:                                                                                                                         return_value = False  # Avoid Penny Stocks
         elif (not research_mode_max_ev and stock_data.enterprise_value < enterprise_value_millions_usd_limit * 1000000) or \
@@ -1519,6 +1520,18 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
         cash_flows_quarterly     = {}
         financials_yearly        = {}
         financials_quarterly     = {}
+        quoteType = None
+        balanceSheetHistoryYearly = None
+        balanceSheetHistoryQuarterly = None
+        cashflowStatementHistoryYearly = None
+        cashflowStatementHistoryQuarterly = None
+        defaultKeyStatistics = None
+        summaryDetail = None
+        assetProfile = None
+        incomeStatementHistoryYearly = None
+        incomeStatementHistoryQuarterly = None
+        quoteType = None
+
         # TODO: ASAFR: Here: id no previous_close, use market_high, low regular, or anything possible to avoid none!
         try:
             if isinstance(symbol, dict):
@@ -1581,7 +1594,7 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                     stock_data.financial_currency_conversion_rate_mult_to_usd = round(1.0/float(currency_conversion_tool[stock_data.financial_currency]), NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
                 else:
                     stock_data.financial_currency_conversion_rate_mult_to_usd = 1.0
-                stock_data.summary_currency_conversion_rate_mult_to_usd   = round(1.0/float(currency_conversion_tool[stock_data.summary_currency  ] if stock_data.summary_currency   else 1.0), NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
+                stock_data.summary_currency_conversion_rate_mult_to_usd   = round(1.0/float(currency_conversion_tool[stock_data.summary_currency  ] if (stock_data.summary_currency and stock_data.summary_currency != 'None') else 1.0), NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
             elif currency_conversion_tool_alternative:
                 try:
                     stock_data.financial_currency_conversion_rate_mult_to_usd = round(float(currency_conversion_tool_alternative.convert(1.0, stock_data.financial_currency, 'USD')), NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
@@ -1625,6 +1638,7 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
 
                 financialData     = symbol.financial_data[stock_data.symbol.replace('.','-')]
 
+
                 earnings_yearly_yq = {}
                 earnings_quarterly_yq = {}
 
@@ -1664,6 +1678,8 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
 
                 earnings_yearly_yq["Earnings"] = {}
                 earnings_yearly_yq["Revenue"] = {}
+
+
                 if earningsYearly:
                     for list_element_dict in earningsYearly:
                         earnings_yearly_yq["Earnings"][list_element_dict["date"]] = list_element_dict["earnings"]
@@ -1873,12 +1889,13 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
             pass
 
         if yq_mode:
-            if quoteType and 'shortName' in quoteType and quoteType['shortName'] and quoteType['shortName'] != 'None':
-                info['shortName'] = quoteType['shortName']
-            else:
-                info['shortName'] = quoteType['longName']
+            if quoteType:
+                if 'shortName' in quoteType and quoteType['shortName'] and quoteType['shortName'] != 'None':
+                    info['shortName'] = quoteType['shortName']
+                else:
+                    info['shortName'] = quoteType['longName']
 
-            info['quoteType'] = quoteType['quoteType']
+                info['quoteType'] = quoteType['quoteType']
             if assetProfile:
                 if 'country' in assetProfile: info['country'] = assetProfile['country']
 
@@ -2955,7 +2972,7 @@ def perform_scan_close_values_days(reference_raw_data, reference_download_data, 
                             symbol_data['Close'  ].iloc[-2] > symbol_data['MA21exp'].iloc[-2] and \
                             symbol_data['Close'  ].iloc[-3] > symbol_data['MA21exp'].iloc[-3] and \
                             date_and_time_crash_and_continue:
-                        print('[perform_scan_close_values_days] processing rising {:11} ({:40}). ({:4}/{:4} [{:2.2f%]) total_free_mem_mb={:5}'.format(symbol, symbol_name, len(rising_symbols)+1, len(symbols), 100*(len(rising_symbols)+1)/(len(symbols)), total_free_mem_mb))
+                        print('[perform_scan_close_values_days] processing rising {:11} ({:50}). ({:4}/{:4} [{:2.2f%]) total_free_mem_mb={:5}'.format(symbol, symbol_name, len(rising_symbols)+1, len(symbols), 100*(len(rising_symbols)+1)/(len(symbols)), total_free_mem_mb))
                         append_ma_data(date_and_time_crash_and_continue=date_and_time_crash_and_continue, group_type='rising', group_symbols=rising_symbols, group_type_rows=rising_rows, symbol=symbol, symbol_name=symbol_name, symbol_data=symbol_data, scan_close_values_interval=scan_close_values_interval)
                 else:
                     if      symbol_data['MA21exp'][-1] > symbol_data['MA21exp'][-2] > symbol_data['MA21exp'][-3] and \
@@ -2971,7 +2988,7 @@ def perform_scan_close_values_days(reference_raw_data, reference_download_data, 
                             symbol_data['Close'  ][-2] > symbol_data['MA21exp'][-2] and \
                             symbol_data['Close'  ][-3] > symbol_data['MA21exp'][-3] and \
                             date_and_time_crash_and_continue:
-                        print('[perform_scan_close_values_days] processing rising {:11} ({:40}). ({:4}/{:4} [{:2.2f}%]) total_free_mem_mb = {:5}'.format(symbol, symbol_name, len(rising_symbols) + 1, len(symbols),100 * (len(rising_symbols) + 1) / (len(symbols)), total_free_mem_mb))
+                        print('[perform_scan_close_values_days] processing rising {:11} ({:50}). ({:4}/{:4} [{:2.2f}%]) total_free_mem_mb = {:5}'.format(symbol, symbol_name, len(rising_symbols) + 1, len(symbols),100 * (len(rising_symbols) + 1) / (len(symbols)), total_free_mem_mb))
                         append_ma_data(date_and_time_crash_and_continue=date_and_time_crash_and_continue, group_type='rising', group_symbols=rising_symbols, group_type_rows=rising_rows, symbol=symbol, symbol_name=symbol_name, symbol_data=symbol_data, scan_close_values_interval=scan_close_values_interval)
                     # TODO: ASAFR: 1. Return the falling now with swap memory management working well!
                     #              2. Add Lower Level Rising not requiering 21exp to be rising!
