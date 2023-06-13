@@ -26,7 +26,7 @@ https://bit.ly/MultiDimensionalScan
 
 - Install `Python 3.6` or higher from https://www.python.org/downloads/
 - (Reccomended but Optional) Install `Pycharm Community Edition` from https://www.jetbrains.com/pycharm/download/
-- Download the `SSS` source code as a Zip file from this page (https://github.com/asafravid/sss/archive/master.zip) or clone/fork the repository directly
+- Download the source code as a Zip file from this page (https://github.com/asafravid/sss/archive/master.zip) or clone/fork the repository directly
 - Open Project from folder (to which you unzipped the `sss` source code)
 - No further steps required apart from `pip[3]` installing relevant libraries:
   - Mandatory
@@ -42,12 +42,11 @@ https://bit.ly/MultiDimensionalScan
     - `pip[3] install currency.converter`
   
 # Run Step-By-Step Instructions
-- 1: Set `multi_dim_scan_mode` to `False` and for 1st time run, you may set `reference_run_<mode>` to `None` (or latest directory in results)
+- 1: Set `multi_dim_scan_mode` to `False` and for 1st time run, you may set `reference_run_<mode>` to `None` (or to latest relevant directory in results)
 - 2: Set the required scanning mode(s) (`custom`/`tase`/`nsr`/`all`) in `sss_config.py` and run `sss_run.py`
-- 3: Run `sss_run.py`
-- 2: A Results directory shall be created under `Results/<mode>/` directory
-- 3: Feed the Results path into the `multi_dim_scan_mode = True` (Multi-Dimensional Scan). A `PDF` and `results_sss_*.csv` files shall be created in the same directory
-- 4: Crash and Continue from crash point - Supported for efficiency.
+- 3: A (New) `Results/<scan_mode>/<date_and_time>_..._<num_results>` directory shall be created under `Results/<mode>/` directory
+- 4: Feed the `Results` path into the `multi_dim_scan_mode = True` (Multi-Dimensional Scan). A `PDF` and `results_sss_*.csv` files shall be created in the same directory
+- 5: Crash and Continue from crash point - Supported for efficiency.
 
 # Indices Maintenance
 - Download `TASE` latest components via https://info.tase.co.il/eng/MarketData/Stocks/MarketData/Pages/MarketData.aspx into `Indices/Data_TASE.csv` -> This operation is done automatically upon each scan (with `research_mode = False`) via `sss_indices.py`
