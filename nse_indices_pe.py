@@ -1,6 +1,6 @@
 import datetime
 from constants import NSE_INDICES
-from nsepy import get_index_pe_history
+from nsepython import index_pe_pb_div
 import concurrent.futures
 
 #---------------------------------------------------------------------------
