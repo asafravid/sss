@@ -29,12 +29,12 @@ ALL_COUNTRY_SYMBOLS_ST  = 3  # Swedish (Stockholm) Stock Exchange
 
 run_custom_tase           = False  # Custom Portfolio
 run_custom                = False
-run_tase                  = False  # Tel Aviv Stock Exchange
+run_tase                  = True  # Tel Aviv Stock Exchange
 run_nsr                   = False  # NASDAQ100+S&P500+RUSSEL1000
-run_all                   = True   # All Nasdaq Stocks
+run_all                   = False   # All Nasdaq Stocks
 run_six                   = False  # All Swiss Stocks
 run_st                    = False  # All (Stockholm) Swedish Stocks
-multi_dim_scan_mode       = True   # Mult-dimentional scan Mode
+multi_dim_scan_mode       = False   # Mult-dimentional scan Mode
 aggregate_only            = False
 research_mode_max_ev      = False
 use_reference_as_raw_data = False
@@ -53,8 +53,8 @@ automatic_results_folder_selection = False
 # After 1st ever Run: Recommended to use reference (filter and damper)
 # The research mode shall run on new_run as input (new_run >= reference_run) where > means newer
 reference_run_custom = 'Results/All/20220419-020633_A_nRes112_Custom_CustSssV'
-reference_run_tase   = 'Results/Tase/20230410-234249_Tase_Tchnlgy3.0_RlEstt1.0_nRes253'
-reference_run_nsr    = 'Results/Nsr/20230411-105538_Tchnlgy3.0_FnnclSrvcs1.0_nRes834'
+reference_run_tase   = None # 'Results/Tase/20230410-234249_Tase_Tchnlgy3.0_RlEstt1.0_nRes253'
+reference_run_nsr    = None # 'Results/Nsr/20230411-105538_Tchnlgy3.0_FnnclSrvcs1.0_nRes834'
 reference_run_all    = 'Results/All/20221208-004305_Tchnlgy3.0_FnnclSrvcs1.0_A_nRes2543'
 reference_run_six    = 'Results/Six/20220111-002719_S_nRes196'                                        # '20211216-002301_S_nRes27_CustSssV'
 reference_run_st     = 'Results/St/20210915-023602_St_Bdb_nRes130'

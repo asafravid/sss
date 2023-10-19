@@ -1632,9 +1632,9 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
 
                 earningsYearly    = None
                 earningsQuarterly = None
-                if 'earnings' in symbol.all_modules[stock_data.symbol.replace('.','-') if not tase_mode else stock_data.symbol]:
-                    earningsYearly    = symbol.all_modules[stock_data.symbol.replace('.','-') if not tase_mode else stock_data.symbol]['earnings']['financialsChart']['yearly']
-                    earningsQuarterly = symbol.all_modules[stock_data.symbol.replace('.','-') if not tase_mode else stock_data.symbol]['earnings']['financialsChart']['quarterly']
+                if 'financialsChart' in symbol.earnings[stock_data.symbol.replace('.','-') if not tase_mode else stock_data.symbol]:
+                    earningsYearly    = symbol.earnings[stock_data.symbol.replace('.','-') if not tase_mode else stock_data.symbol]['financialsChart']['yearly']
+                    earningsQuarterly = symbol.earnings[stock_data.symbol.replace('.','-') if not tase_mode else stock_data.symbol]['financialsChart']['quarterly']
 
                 financialData     = symbol.financial_data[stock_data.symbol.replace('.','-') if not tase_mode else stock_data.symbol]
 
