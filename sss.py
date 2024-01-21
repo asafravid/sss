@@ -1486,6 +1486,10 @@ def stringify_keys(d, check_inner):
 
     return converted_dict
 
+def if_str_return_none(to_check):
+    if hasattr(to_check,'_validate_dtype'):
+        return to_check
+    return pd.DataFrame()
 
 def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, sectors_filter_out, countries_list, countries_filter_out, profit_margin_limit, ev_to_cfo_ratio_limit, debt_to_equity_limit, pb_limit, pi_limit, enterprise_value_millions_usd_limit, research_mode_max_ev, eqg_min, rqg_min, price_to_earnings_limit, enterprise_value_to_revenue_limit, favor_sectors, favor_sectors_by, research_mode, currency_conversion_tool, currency_conversion_tool_alternative, currency_conversion_tool_manual, reference_db, reference_db_title_row, db_filename):
     return_value = True
@@ -1608,26 +1612,20 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                 stock_data.summary_currency_conversion_rate_mult_to_usd   = round(1.0 / float(currency_conversion_tool_manual[stock_data.summary_currency  ]), NUM_ROUND_DECIMALS)  # conversion_rate is the value to multiply the foreign exchange (in which the stock's currency is) by to get the original value in USD. For instance if the currency is ILS, values should be divided by ~3.3
 
             if yq_mode:
-                balanceSheetHistoryYearly         = None
-                balanceSheetHistoryQuarterly      = None
-                cashflowStatementHistoryYearly    = None
-                cashflowStatementHistoryQuarterly = None
+                balanceSheetHistoryYearly         = if_str_return_none(symbol.balance_sheet(frequency='a'))
+                balanceSheetHistoryQuarterly      = if_str_return_none(symbol.balance_sheet(frequency='q'))
+                cashflowStatementHistoryYearly    = if_str_return_none(symbol.cash_flow(frequency='a'))
+                cashflowStatementHistoryQuarterly = if_str_return_none(symbol.cash_flow(frequency='q'))
                 defaultKeyStatistics              = None
                 summaryDetail                     = None
                 assetProfile                      = None
-                incomeStatementHistoryYearly      = None
-                incomeStatementHistoryQuarterly   = None
+                incomeStatementHistoryYearly      = if_str_return_none(symbol.income_statement(frequency='a'))
+                incomeStatementHistoryQuarterly   = if_str_return_none(symbol.income_statement(frequency='q'))
                 quoteType                         = None
 
-                if 'balanceSheetHistory'               in symbol.all_modules[stock_data.symbol.replace('.','-') if not tase_mode else stock_data.symbol]: balanceSheetHistoryYearly         = symbol.all_modules[stock_data.symbol.replace('.','-') if not tase_mode else stock_data.symbol]['balanceSheetHistory']
-                if 'balanceSheetHistoryQuarterly'      in symbol.all_modules[stock_data.symbol.replace('.','-') if not tase_mode else stock_data.symbol]: balanceSheetHistoryQuarterly      = symbol.all_modules[stock_data.symbol.replace('.','-') if not tase_mode else stock_data.symbol]['balanceSheetHistoryQuarterly']
-                if 'cashflowStatementHistory'          in symbol.all_modules[stock_data.symbol.replace('.','-') if not tase_mode else stock_data.symbol]: cashflowStatementHistoryYearly    = symbol.all_modules[stock_data.symbol.replace('.','-') if not tase_mode else stock_data.symbol]['cashflowStatementHistory']
-                if 'cashflowStatementHistoryQuarterly' in symbol.all_modules[stock_data.symbol.replace('.','-') if not tase_mode else stock_data.symbol]: cashflowStatementHistoryQuarterly = symbol.all_modules[stock_data.symbol.replace('.','-') if not tase_mode else stock_data.symbol]['cashflowStatementHistoryQuarterly']
                 if 'defaultKeyStatistics'              in symbol.all_modules[stock_data.symbol.replace('.','-') if not tase_mode else stock_data.symbol]: defaultKeyStatistics              = symbol.all_modules[stock_data.symbol.replace('.','-') if not tase_mode else stock_data.symbol]['defaultKeyStatistics']
                 if 'summaryDetail'                     in symbol.all_modules[stock_data.symbol.replace('.','-') if not tase_mode else stock_data.symbol]: summaryDetail                     = symbol.all_modules[stock_data.symbol.replace('.','-') if not tase_mode else stock_data.symbol]['summaryDetail']
                 if 'assetProfile'                      in symbol.all_modules[stock_data.symbol.replace('.','-') if not tase_mode else stock_data.symbol]: assetProfile                      = symbol.all_modules[stock_data.symbol.replace('.','-') if not tase_mode else stock_data.symbol]['assetProfile']
-                if 'incomeStatementHistory'            in symbol.all_modules[stock_data.symbol.replace('.','-') if not tase_mode else stock_data.symbol]: incomeStatementHistoryYearly      = symbol.all_modules[stock_data.symbol.replace('.','-') if not tase_mode else stock_data.symbol]['incomeStatementHistory']
-                if 'incomeStatementHistory'            in symbol.all_modules[stock_data.symbol.replace('.','-') if not tase_mode else stock_data.symbol]: incomeStatementHistoryQuarterly   = symbol.all_modules[stock_data.symbol.replace('.','-') if not tase_mode else stock_data.symbol]['incomeStatementHistoryQuarterly']
                 if 'quoteType'                         in symbol.all_modules[stock_data.symbol.replace('.','-') if not tase_mode else stock_data.symbol]: quoteType                         = symbol.all_modules[stock_data.symbol.replace('.','-') if not tase_mode else stock_data.symbol]['quoteType']
 
                 earningsYearly    = None
@@ -1693,139 +1691,138 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                         earnings_quarterly_yq["Revenue"][list_element_dict["date"]] = list_element_dict["revenue"]
 
 
-                if balanceSheetHistoryYearly:
-                    for list_element_dict in balanceSheetHistoryYearly['balanceSheetStatements']:
-                        balance_sheets_yearly_yq[list_element_dict['endDate']] = {}
-                        if 'retainedEarnings'        in list_element_dict:
-                            retained_earnings_yearly_yq.append(list_element_dict['retainedEarnings'])
-                            balance_sheets_yearly_yq[list_element_dict['endDate']]['Retained Earnings'] = list_element_dict['retainedEarnings']
-                        if 'totalStockholderEquity'        in list_element_dict:
-                            total_stockholder_equity_yearly_yq.append(list_element_dict['totalStockholderEquity'])
-                            balance_sheets_yearly_yq[list_element_dict['endDate']]['Total Stockholder Equity'] = list_element_dict['totalStockholderEquity']
-                        if 'totalCurrentAssets'      in list_element_dict:
-                            total_current_assets_yearly_yq.append(list_element_dict['totalCurrentAssets'])
-                            balance_sheets_yearly_yq[list_element_dict['endDate']]['Total Current Assets'] = list_element_dict['totalCurrentAssets']
-                        if 'totalAssets'             in list_element_dict:
-                            total_assets_yearly_yq.append(list_element_dict['totalAssets'])
-                            balance_sheets_yearly_yq[list_element_dict['endDate']]['Total Assets'] = list_element_dict['totalAssets']
-                        if 'totalCurrentLiabilities' in list_element_dict:
-                            total_current_liabilities_yearly_yq.append(list_element_dict['totalCurrentLiabilities'])
-                            balance_sheets_yearly_yq[list_element_dict['endDate']]['Total Current Liabilities'] = list_element_dict['totalCurrentLiabilities']
-                        if 'totalLiab'               in list_element_dict:
-                            total_liabilities_yearly_yq.append(list_element_dict['totalLiab'])
-                            balance_sheets_yearly_yq[list_element_dict['endDate']]['Total Liab'] = list_element_dict['totalLiab']
-                        if 'otherLiab'               in list_element_dict:
-                            other_liabilities_yearly_yq.append(list_element_dict['otherLiab'])
-                            balance_sheets_yearly_yq[list_element_dict['endDate']]['Other Liab'] = list_element_dict['otherLiab']
-                        if 'otherCurrentAssets'      in list_element_dict:
-                            other_current_assets_yearly_yq.append(list_element_dict['otherCurrentAssets'])
-                            balance_sheets_yearly_yq[list_element_dict['endDate']]['Other Current Assets'] = list_element_dict['otherCurrentAssets']
-                        if 'otherCurrentLiab'        in list_element_dict:
-                            other_current_liabilities_yearly_yq.append(list_element_dict['otherCurrentLiab'])
-                            balance_sheets_yearly_yq[list_element_dict['endDate']]['Other Current Liab'] = list_element_dict['otherCurrentLiab']
-                        if 'otherAssets'             in list_element_dict:
-                            other_assets_yearly_yq.append(list_element_dict['otherAssets'])
-                            balance_sheets_yearly_yq[list_element_dict['endDate']]['Other Assets'] = list_element_dict['otherAssets']
+                if not balanceSheetHistoryYearly.empty:
+                    for list_element_dict in balanceSheetHistoryYearly.to_dict('records'):
+                        balance_sheets_yearly_yq[list_element_dict['asOfDate']] = {}
+                        if 'RetainedEarnings'        in list_element_dict:
+                            retained_earnings_yearly_yq.append(list_element_dict['RetainedEarnings'])
+                            balance_sheets_yearly_yq[list_element_dict['asOfDate']]['Retained Earnings'] = list_element_dict['RetainedEarnings']
+                        if 'StockholdersEquity'        in list_element_dict:
+                            total_stockholder_equity_yearly_yq.append(list_element_dict['StockholdersEquity'])
+                            balance_sheets_yearly_yq[list_element_dict['asOfDate']]['Total Stockholder Equity'] = list_element_dict['StockholdersEquity']
+                        if 'CurrentAssets'      in list_element_dict:
+                            total_current_assets_yearly_yq.append(list_element_dict['CurrentAssets'])
+                            balance_sheets_yearly_yq[list_element_dict['asOfDate']]['Total Current Assets'] = list_element_dict['CurrentAssets']
+                        if 'TotalAssets'             in list_element_dict:
+                            total_assets_yearly_yq.append(list_element_dict['TotalAssets'])
+                            balance_sheets_yearly_yq[list_element_dict['asOfDate']]['Total Assets'] = list_element_dict['TotalAssets']
+                        if 'CurrentLiabilities' in list_element_dict:
+                            total_current_liabilities_yearly_yq.append(list_element_dict['CurrentLiabilities'])
+                            balance_sheets_yearly_yq[list_element_dict['asOfDate']]['Total Current Liabilities'] = list_element_dict['CurrentLiabilities']
+                        if 'TotalLiabilitiesNetMinorityInterest'               in list_element_dict:
+                            total_liabilities_yearly_yq.append(list_element_dict['TotalLiabilitiesNetMinorityInterest'])
+                            balance_sheets_yearly_yq[list_element_dict['asOfDate']]['Total Liab'] = list_element_dict['TotalLiabilitiesNetMinorityInterest']
+                        if 'TotalNonCurrentLiabilitiesNetMinorityInterest'               in list_element_dict:
+                            other_liabilities_yearly_yq.append(list_element_dict['TotalNonCurrentLiabilitiesNetMinorityInterest'])
+                            balance_sheets_yearly_yq[list_element_dict['asOfDate']]['Other Liab'] = list_element_dict['TotalNonCurrentLiabilitiesNetMinorityInterest']
+                        if 'PrepaidAssets'      in list_element_dict:
+                            other_current_assets_yearly_yq.append(list_element_dict['PrepaidAssets'])
+                            balance_sheets_yearly_yq[list_element_dict['asOfDate']]['Other Current Assets'] = list_element_dict['PrepaidAssets']
+                        if 'OtherCurrentLiabilities'        in list_element_dict:
+                            other_current_liabilities_yearly_yq.append(list_element_dict['OtherCurrentLiabilities'])
+                            balance_sheets_yearly_yq[list_element_dict['asOfDate']]['Other Current Liab'] = list_element_dict['OtherCurrentLiabilities']
+                        if 'TotalNonCurrentAssets'             in list_element_dict:
+                            other_assets_yearly_yq.append(list_element_dict['TotalNonCurrentAssets'])
+                            balance_sheets_yearly_yq[list_element_dict['asOfDate']]['Other Assets'] = list_element_dict['TotalNonCurrentAssets']
 
-                if balanceSheetHistoryQuarterly:
-                    for list_element_dict in balanceSheetHistoryQuarterly['balanceSheetStatements']:
-                        balance_sheets_quarterly_yq[list_element_dict['endDate']] = {}
-                        if 'retainedEarnings'        in list_element_dict:
-                            retained_earnings_quarterly_yq.append(list_element_dict['retainedEarnings'])
-                            balance_sheets_quarterly_yq[list_element_dict['endDate']]['Retained Earnings'] = list_element_dict['retainedEarnings']
-                        if 'totalStockholderEquity'        in list_element_dict:
-                            total_stockholder_equity_quarterly_yq.append(list_element_dict['totalStockholderEquity'])
-                            balance_sheets_quarterly_yq[list_element_dict['endDate']]['Total Stockholder Equity'] = list_element_dict['totalStockholderEquity']
-                        if 'totalCurrentAssets'      in list_element_dict:
-                            total_current_assets_quarterly_yq.append(list_element_dict['totalCurrentAssets'])
-                            balance_sheets_quarterly_yq[list_element_dict['endDate']]['Total Current Assets'] = list_element_dict['totalCurrentAssets']
-                        if 'totalAssets'             in list_element_dict:
-                            total_assets_quarterly_yq.append(list_element_dict['totalAssets'])
-                            balance_sheets_quarterly_yq[list_element_dict['endDate']]['Total Assets'] = list_element_dict['totalAssets']
-                        if 'totalCurrentLiabilities' in list_element_dict:
-                            total_current_liabilities_quarterly_yq.append(list_element_dict['totalCurrentLiabilities'])
-                            balance_sheets_quarterly_yq[list_element_dict['endDate']]['Total Current Liabilities'] = list_element_dict['totalCurrentLiabilities']
-                        if 'totalLiab'               in list_element_dict:
-                            total_liabilities_quarterly_yq.append(list_element_dict['totalLiab'])
-                            balance_sheets_quarterly_yq[list_element_dict['endDate']]['Total Liab'] = list_element_dict['totalLiab']
-                        if 'otherLiab'               in list_element_dict:
-                            other_liabilities_quarterly_yq.append(list_element_dict['otherLiab'])
-                            balance_sheets_quarterly_yq[list_element_dict['endDate']]['Other Liab'] = list_element_dict['otherLiab']
-                        if 'otherCurrentAssets'      in list_element_dict:
-                            other_current_assets_quarterly_yq.append(list_element_dict['otherCurrentAssets'])
-                            balance_sheets_quarterly_yq[list_element_dict['endDate']]['Other Current Assets'] = list_element_dict['otherCurrentAssets']
-                        if 'otherCurrentLiab'        in list_element_dict:
-                            other_current_liabilities_quarterly_yq.append(list_element_dict['otherCurrentLiab'])
-                            balance_sheets_quarterly_yq[list_element_dict['endDate']]['Other Current Liab'] = list_element_dict['otherCurrentLiab']
-                        if 'otherAssets'             in list_element_dict:
-                            other_assets_quarterly_yq.append(list_element_dict['otherAssets'])
-                            balance_sheets_quarterly_yq[list_element_dict['endDate']]['Other Assets'] = list_element_dict['otherAssets']
+                if not balanceSheetHistoryQuarterly.empty:
+                    for list_element_dict in balanceSheetHistoryQuarterly.to_dict('records'):
+                        balance_sheets_quarterly_yq[list_element_dict['asOfDate']] = {}
+                        if 'RetainedEarnings'        in list_element_dict:
+                            retained_earnings_quarterly_yq.append(list_element_dict['RetainedEarnings'])
+                            balance_sheets_quarterly_yq[list_element_dict['asOfDate']]['Retained Earnings'] = list_element_dict['RetainedEarnings']
+                        if 'StockholdersEquity'        in list_element_dict:
+                            total_stockholder_equity_quarterly_yq.append(list_element_dict['StockholdersEquity'])
+                            balance_sheets_quarterly_yq[list_element_dict['asOfDate']]['Total Stockholder Equity'] = list_element_dict['StockholdersEquity']
+                        if 'CurrentAssets'      in list_element_dict:
+                            total_current_assets_quarterly_yq.append(list_element_dict['CurrentAssets'])
+                            balance_sheets_quarterly_yq[list_element_dict['asOfDate']]['Total Current Assets'] = list_element_dict['CurrentAssets']
+                        if 'TotalAssets'             in list_element_dict:
+                            total_assets_quarterly_yq.append(list_element_dict['TotalAssets'])
+                            balance_sheets_quarterly_yq[list_element_dict['asOfDate']]['Total Assets'] = list_element_dict['TotalAssets']
+                        if 'CurrentLiabilities' in list_element_dict:
+                            total_current_liabilities_quarterly_yq.append(list_element_dict['CurrentLiabilities'])
+                            balance_sheets_quarterly_yq[list_element_dict['asOfDate']]['Total Current Liabilities'] = list_element_dict['CurrentLiabilities']
+                        if 'TotalLiabilitiesNetMinorityInterest'               in list_element_dict:
+                            total_liabilities_quarterly_yq.append(list_element_dict['TotalLiabilitiesNetMinorityInterest'])
+                            balance_sheets_quarterly_yq[list_element_dict['asOfDate']]['Total Liab'] = list_element_dict['TotalLiabilitiesNetMinorityInterest']
+                        if 'TotalNonCurrentLiabilitiesNetMinorityInterest'               in list_element_dict:
+                            other_liabilities_quarterly_yq.append(list_element_dict['TotalNonCurrentLiabilitiesNetMinorityInterest'])
+                            balance_sheets_quarterly_yq[list_element_dict['asOfDate']]['Other Liab'] = list_element_dict['TotalNonCurrentLiabilitiesNetMinorityInterest']
+                        if 'PrepaidAssets'      in list_element_dict:
+                            other_current_assets_quarterly_yq.append(list_element_dict['PrepaidAssets'])
+                            balance_sheets_quarterly_yq[list_element_dict['asOfDate']]['Other Current Assets'] = list_element_dict['PrepaidAssets']
+                        if 'OtherCurrentLiabilities'        in list_element_dict:
+                            other_current_liabilities_quarterly_yq.append(list_element_dict['OtherCurrentLiabilities'])
+                            balance_sheets_quarterly_yq[list_element_dict['asOfDate']]['Other Current Liab'] = list_element_dict['OtherCurrentLiabilities']
+                        if 'TotalNonCurrentAssets'             in list_element_dict:
+                            other_assets_quarterly_yq.append(list_element_dict['TotalNonCurrentAssets'])
+                            balance_sheets_quarterly_yq[list_element_dict['asOfDate']]['Other Assets'] = list_element_dict['TotalNonCurrentAssets']
 
-                if cashflowStatementHistoryYearly:
-                    for list_element_dict in cashflowStatementHistoryYearly['cashflowStatements']:
-                        cash_flows_yearly_yq[list_element_dict['endDate']] = {}
+                if not cashflowStatementHistoryYearly.empty:
+                    for list_element_dict in cashflowStatementHistoryYearly.to_dict('records'):
+                        cash_flows_yearly_yq[list_element_dict['asOfDate']] = {}
 
-                        if 'totalCashFromOperatingActivities' in list_element_dict:
-                            total_cash_from_operating_activities_yearly_yq.append(list_element_dict['totalCashFromOperatingActivities'])
-                            cash_flows_yearly_yq[list_element_dict['endDate']]['Total Cash From Operating Activities'] = list_element_dict['totalCashFromOperatingActivities']
-                        if 'depreciation' in list_element_dict:
-                            depreciation_yearly_yq.append(list_element_dict['depreciation'])
-                            cash_flows_yearly_yq[list_element_dict['endDate']]['Depreciation'] = list_element_dict['depreciation']
+                        if 'OperatingCashFlow' in list_element_dict:
+                            total_cash_from_operating_activities_yearly_yq.append(list_element_dict['OperatingCashFlow'])
+                            cash_flows_yearly_yq[list_element_dict['asOfDate']]['Total Cash From Operating Activities'] = list_element_dict['OperatingCashFlow']
+                        if 'Depreciation' in list_element_dict:
+                            depreciation_yearly_yq.append(list_element_dict['Depreciation'])
+                            cash_flows_yearly_yq[list_element_dict['asOfDate']]['Depreciation'] = list_element_dict['Depreciation']
 
-                if cashflowStatementHistoryQuarterly:
-                    for list_element_dict in cashflowStatementHistoryQuarterly['cashflowStatements']:
-                        cash_flows_quarterly_yq[list_element_dict['endDate']] = {}
+                if not cashflowStatementHistoryQuarterly.empty:
+                    for list_element_dict in cashflowStatementHistoryQuarterly.to_dict('records'):
+                        cash_flows_quarterly_yq[list_element_dict['asOfDate']] = {}
 
-                        if 'totalCashFromOperatingActivities' in list_element_dict:
-                            total_cash_from_operating_activities_quarterly_yq.append(list_element_dict['totalCashFromOperatingActivities'])
-                            cash_flows_quarterly_yq[list_element_dict['endDate']]['Total Cash From Operating Activities'] = list_element_dict['totalCashFromOperatingActivities']
-                        if 'depreciation' in list_element_dict:
-                            depreciation_quarterly_yq.append(list_element_dict['depreciation'])
-                            cash_flows_quarterly_yq[list_element_dict['endDate']]['Depreciation'] = list_element_dict['depreciation']
+                        if 'OperatingCashFlow' in list_element_dict:
+                            total_cash_from_operating_activities_quarterly_yq.append(list_element_dict['OperatingCashFlow'])
+                            cash_flows_quarterly_yq[list_element_dict['asOfDate']]['Total Cash From Operating Activities'] = list_element_dict['OperatingCashFlow']
+                        if 'Depreciation' in list_element_dict:
+                            depreciation_quarterly_yq.append(list_element_dict['Depreciation'])
+                            cash_flows_quarterly_yq[list_element_dict['asOfDate']]['Depreciation'] = list_element_dict['Depreciation']
 
                 financials_yearly_yq = {}
                 financials_quarterly_yq = {}
 
                 total_revenue_yearly_yq = []
                 total_revenue_quarterly_yq = []
-                if incomeStatementHistoryYearly:
-                    for list_element_dict in incomeStatementHistoryYearly['incomeStatementHistory']:
-                        total_revenue_yearly_yq.append(list_element_dict['totalRevenue'])
-                        financials_yearly_yq[list_element_dict["endDate"]] = {}
-                        financials_yearly_yq[list_element_dict["endDate"]]['Income Before Tax']                      = list_element_dict["incomeBeforeTax"]
-                        financials_yearly_yq[list_element_dict["endDate"]]['Net Income']                             = list_element_dict["netIncome"]
-                        financials_yearly_yq[list_element_dict["endDate"]]['Total Revenue']                          = list_element_dict["totalRevenue"]
-                        financials_yearly_yq[list_element_dict["endDate"]]['Cost Of Revenue']                        = list_element_dict["costOfRevenue"]
-                        financials_yearly_yq[list_element_dict["endDate"]]['Gross Profit']                           = list_element_dict["grossProfit"]
-                        financials_yearly_yq[list_element_dict["endDate"]]['Total Operating Expenses']               = list_element_dict["totalOperatingExpenses"]
-                        financials_yearly_yq[list_element_dict["endDate"]]['Operating Income']                       = list_element_dict["operatingIncome"]
-                        financials_yearly_yq[list_element_dict["endDate"]]['Total Other Income Expense Net']         = list_element_dict["totalOtherIncomeExpenseNet"]
-                        financials_yearly_yq[list_element_dict["endDate"]]['Ebit']                                   = list_element_dict["ebit"]
-                        financials_yearly_yq[list_element_dict["endDate"]]['Interest Expense']                       = list_element_dict["interestExpense"]
-                        financials_yearly_yq[list_element_dict["endDate"]]['Income Before Tax']                      = list_element_dict["incomeBeforeTax"]
-                        financials_yearly_yq[list_element_dict["endDate"]]['Income Tax Expense']                     = list_element_dict["incomeTaxExpense"]
-                        financials_yearly_yq[list_element_dict["endDate"]]['Net Income From Continuing Ops']         = list_element_dict["netIncomeFromContinuingOps"]
-                        financials_yearly_yq[list_element_dict["endDate"]]['Net Income Applicable To Common Shares'] = list_element_dict["netIncomeApplicableToCommonShares"]
+                
+                if not incomeStatementHistoryYearly.empty:
+                    for list_element_dict in incomeStatementHistoryYearly.to_dict('records'):
+                        total_revenue_yearly_yq.append(list_element_dict['TotalRevenue'])
+                        financials_yearly_yq[list_element_dict["asOfDate"]] = {}
+                        financials_yearly_yq[list_element_dict["asOfDate"]]['Income Before Tax']                      = list_element_dict["PretaxIncome"]
+                        financials_yearly_yq[list_element_dict["asOfDate"]]['Net Income']                             = list_element_dict["NetIncome"]
+                        financials_yearly_yq[list_element_dict["asOfDate"]]['Total Revenue']                          = list_element_dict["TotalRevenue"]
+                        financials_yearly_yq[list_element_dict["asOfDate"]]['Cost Of Revenue']                        = list_element_dict["CostOfRevenue"]
+                        financials_yearly_yq[list_element_dict["asOfDate"]]['Gross Profit']                           = list_element_dict["GrossProfit"]
+                        financials_yearly_yq[list_element_dict["asOfDate"]]['Total Operating Expenses']               = list_element_dict["OperatingExpense"]
+                        financials_yearly_yq[list_element_dict["asOfDate"]]['Operating Income']                       = list_element_dict["OperatingIncome"]
+                        financials_yearly_yq[list_element_dict["asOfDate"]]['Total Other Income Expense Net']         = list_element_dict["NetNonOperatingInterestIncomeExpense"]
+                        financials_yearly_yq[list_element_dict["asOfDate"]]['Ebit']                                   = list_element_dict["EBIT"]
+                        financials_yearly_yq[list_element_dict["asOfDate"]]['Interest Expense']                       = list_element_dict["InterestExpense"]
+                        financials_yearly_yq[list_element_dict["asOfDate"]]['Income Tax Expense']                     = list_element_dict["TaxProvision"]
+                        financials_yearly_yq[list_element_dict["asOfDate"]]['Net Income From Continuing Ops']         = list_element_dict["NetIncomeContinuousOperations"]
+                        financials_yearly_yq[list_element_dict["asOfDate"]]['Net Income Applicable To Common Shares'] = list_element_dict["NetIncomeCommonStockholders"]
 
 
-                if incomeStatementHistoryQuarterly:
-                    for list_element_dict in incomeStatementHistoryQuarterly['incomeStatementHistory']:
-                        total_revenue_quarterly_yq.append(list_element_dict['totalRevenue'])
-                        financials_quarterly_yq[list_element_dict["endDate"]] = {}
-                        financials_quarterly_yq[list_element_dict["endDate"]]['Income Before Tax']                      = list_element_dict["incomeBeforeTax"]
-                        financials_quarterly_yq[list_element_dict["endDate"]]['Net Income']                             = list_element_dict["netIncome"]
-                        financials_quarterly_yq[list_element_dict["endDate"]]['Total Revenue']                          = list_element_dict["totalRevenue"]
-                        financials_quarterly_yq[list_element_dict["endDate"]]['Cost Of Revenue']                        = list_element_dict["costOfRevenue"]
-                        financials_quarterly_yq[list_element_dict["endDate"]]['Gross Profit']                           = list_element_dict["grossProfit"]
-                        financials_quarterly_yq[list_element_dict["endDate"]]['Total Operating Expenses']               = list_element_dict["totalOperatingExpenses"]
-                        financials_quarterly_yq[list_element_dict["endDate"]]['Operating Income']                       = list_element_dict["operatingIncome"]
-                        financials_quarterly_yq[list_element_dict["endDate"]]['Total Other Income Expense Net']         = list_element_dict["totalOtherIncomeExpenseNet"]
-                        financials_quarterly_yq[list_element_dict["endDate"]]['Ebit']                                   = list_element_dict["ebit"]
-                        financials_quarterly_yq[list_element_dict["endDate"]]['Interest Expense']                       = list_element_dict["interestExpense"]
-                        financials_quarterly_yq[list_element_dict["endDate"]]['Income Before Tax']                      = list_element_dict["incomeBeforeTax"]
-                        financials_quarterly_yq[list_element_dict["endDate"]]['Income Tax Expense']                     = list_element_dict["incomeTaxExpense"]
-                        financials_quarterly_yq[list_element_dict["endDate"]]['Net Income From Continuing Ops']         = list_element_dict["netIncomeFromContinuingOps"]
-                        financials_quarterly_yq[list_element_dict["endDate"]]['Net Income Applicable To Common Shares'] = list_element_dict["netIncomeApplicableToCommonShares"]
+                if not incomeStatementHistoryQuarterly.empty:
+                    for list_element_dict in incomeStatementHistoryQuarterly.to_dict('records'):
+                        total_revenue_quarterly_yq.append(list_element_dict['TotalRevenue'])
+                        financials_quarterly_yq[list_element_dict["asOfDate"]] = {}
+                        financials_quarterly_yq[list_element_dict["asOfDate"]]['Income Before Tax']                      = list_element_dict["PretaxIncome"]
+                        financials_quarterly_yq[list_element_dict["asOfDate"]]['Net Income']                             = list_element_dict["NetIncome"]
+                        financials_quarterly_yq[list_element_dict["asOfDate"]]['Total Revenue']                          = list_element_dict["TotalRevenue"]
+                        financials_quarterly_yq[list_element_dict["asOfDate"]]['Cost Of Revenue']                        = list_element_dict["CostOfRevenue"]
+                        financials_quarterly_yq[list_element_dict["asOfDate"]]['Gross Profit']                           = list_element_dict["GrossProfit"]
+                        financials_quarterly_yq[list_element_dict["asOfDate"]]['Total Operating Expenses']               = list_element_dict["OperatingExpense"]
+                        financials_quarterly_yq[list_element_dict["asOfDate"]]['Operating Income']                       = list_element_dict["OperatingIncome"]
+                        financials_quarterly_yq[list_element_dict["asOfDate"]]['Total Other Income Expense Net']         = list_element_dict["NetNonOperatingInterestIncomeExpense"]
+                        financials_quarterly_yq[list_element_dict["asOfDate"]]['Ebit']                                   = list_element_dict["EBIT"]
+                        financials_quarterly_yq[list_element_dict["asOfDate"]]['Interest Expense']                       = list_element_dict["InterestExpense"]
+                        financials_quarterly_yq[list_element_dict["asOfDate"]]['Income Tax Expense']                     = list_element_dict["TaxProvision"]
+                        financials_quarterly_yq[list_element_dict["asOfDate"]]['Net Income From Continuing Ops']         = list_element_dict["NetIncomeContinuousOperations"]
+                        financials_quarterly_yq[list_element_dict["asOfDate"]]['Net Income Applicable To Common Shares'] = list_element_dict["NetIncomeCommonStockholders"]
 
                 if assetProfile:
                     stock_data.sector = assetProfile['sector']
