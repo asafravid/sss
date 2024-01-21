@@ -1791,38 +1791,65 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                     for list_element_dict in incomeStatementHistoryYearly.to_dict('records'):
                         total_revenue_yearly_yq.append(list_element_dict['TotalRevenue'])
                         financials_yearly_yq[list_element_dict["asOfDate"]] = {}
-                        financials_yearly_yq[list_element_dict["asOfDate"]]['Income Before Tax']                      = list_element_dict["PretaxIncome"]
-                        financials_yearly_yq[list_element_dict["asOfDate"]]['Net Income']                             = list_element_dict["NetIncome"]
-                        financials_yearly_yq[list_element_dict["asOfDate"]]['Total Revenue']                          = list_element_dict["TotalRevenue"]
-                        financials_yearly_yq[list_element_dict["asOfDate"]]['Cost Of Revenue']                        = list_element_dict["CostOfRevenue"]
-                        financials_yearly_yq[list_element_dict["asOfDate"]]['Gross Profit']                           = list_element_dict["GrossProfit"]
-                        financials_yearly_yq[list_element_dict["asOfDate"]]['Total Operating Expenses']               = list_element_dict["OperatingExpense"]
-                        financials_yearly_yq[list_element_dict["asOfDate"]]['Operating Income']                       = list_element_dict["OperatingIncome"]
-                        financials_yearly_yq[list_element_dict["asOfDate"]]['Total Other Income Expense Net']         = list_element_dict["NetNonOperatingInterestIncomeExpense"]
-                        financials_yearly_yq[list_element_dict["asOfDate"]]['Ebit']                                   = list_element_dict["EBIT"]
-                        financials_yearly_yq[list_element_dict["asOfDate"]]['Interest Expense']                       = list_element_dict["InterestExpense"]
-                        financials_yearly_yq[list_element_dict["asOfDate"]]['Income Tax Expense']                     = list_element_dict["TaxProvision"]
-                        financials_yearly_yq[list_element_dict["asOfDate"]]['Net Income From Continuing Ops']         = list_element_dict["NetIncomeContinuousOperations"]
-                        financials_yearly_yq[list_element_dict["asOfDate"]]['Net Income Applicable To Common Shares'] = list_element_dict["NetIncomeCommonStockholders"]
+                        if "PretaxIncome" in list_element_dict:
+                            financials_yearly_yq[list_element_dict["asOfDate"]]['Income Before Tax']                      = list_element_dict["PretaxIncome"]
+                        if "NetIncome" in list_element_dict:
+                            financials_yearly_yq[list_element_dict["asOfDate"]]['Net Income']                             = list_element_dict["NetIncome"]
+                        if "TotalRevenue" in list_element_dict:
+                            financials_yearly_yq[list_element_dict["asOfDate"]]['Total Revenue']                          = list_element_dict["TotalRevenue"]
+                        if "CostOfRevenue" in list_element_dict:
+                            financials_yearly_yq[list_element_dict["asOfDate"]]['Cost Of Revenue']                        = list_element_dict["CostOfRevenue"]
+                        if "GrossProfit" in list_element_dict:
+                            financials_yearly_yq[list_element_dict["asOfDate"]]['Gross Profit']                           = list_element_dict["GrossProfit"]
+                        if "OperatingExpense" in list_element_dict:
+                            financials_yearly_yq[list_element_dict["asOfDate"]]['Total Operating Expenses']               = list_element_dict["OperatingExpense"]
+                        if "OperatingIncome" in list_element_dict:
+                            financials_yearly_yq[list_element_dict["asOfDate"]]['Operating Income']                       = list_element_dict["OperatingIncome"]
+                        if "NetNonOperatingInterestIncomeExpense" in list_element_dict:
+                            financials_yearly_yq[list_element_dict["asOfDate"]]['Total Other Income Expense Net']         = list_element_dict["NetNonOperatingInterestIncomeExpense"]
+                        if "EBIT" in list_element_dict:
+                            financials_yearly_yq[list_element_dict["asOfDate"]]['Ebit']                                   = list_element_dict["EBIT"]
+                        if "InterestExpense" in list_element_dict:
+                            financials_yearly_yq[list_element_dict["asOfDate"]]['Interest Expense']                       = list_element_dict["InterestExpense"]
+                        if "TaxProvision" in list_element_dict:
+                            financials_yearly_yq[list_element_dict["asOfDate"]]['Income Tax Expense']                     = list_element_dict["TaxProvision"]
+                        if "NetIncomeContinuousOperations" in list_element_dict:
+                            financials_yearly_yq[list_element_dict["asOfDate"]]['Net Income From Continuing Ops']         = list_element_dict["NetIncomeContinuousOperations"]
+                        if "NetIncomeCommonStockholders" in list_element_dict:
+                            financials_yearly_yq[list_element_dict["asOfDate"]]['Net Income Applicable To Common Shares'] = list_element_dict["NetIncomeCommonStockholders"]
 
 
                 if not incomeStatementHistoryQuarterly.empty:
                     for list_element_dict in incomeStatementHistoryQuarterly.to_dict('records'):
                         total_revenue_quarterly_yq.append(list_element_dict['TotalRevenue'])
-                        financials_quarterly_yq[list_element_dict["asOfDate"]] = {}
-                        financials_quarterly_yq[list_element_dict["asOfDate"]]['Income Before Tax']                      = list_element_dict["PretaxIncome"]
-                        financials_quarterly_yq[list_element_dict["asOfDate"]]['Net Income']                             = list_element_dict["NetIncome"]
-                        financials_quarterly_yq[list_element_dict["asOfDate"]]['Total Revenue']                          = list_element_dict["TotalRevenue"]
-                        financials_quarterly_yq[list_element_dict["asOfDate"]]['Cost Of Revenue']                        = list_element_dict["CostOfRevenue"]
-                        financials_quarterly_yq[list_element_dict["asOfDate"]]['Gross Profit']                           = list_element_dict["GrossProfit"]
-                        financials_quarterly_yq[list_element_dict["asOfDate"]]['Total Operating Expenses']               = list_element_dict["OperatingExpense"]
-                        financials_quarterly_yq[list_element_dict["asOfDate"]]['Operating Income']                       = list_element_dict["OperatingIncome"]
-                        financials_quarterly_yq[list_element_dict["asOfDate"]]['Total Other Income Expense Net']         = list_element_dict["NetNonOperatingInterestIncomeExpense"]
-                        financials_quarterly_yq[list_element_dict["asOfDate"]]['Ebit']                                   = list_element_dict["EBIT"]
-                        financials_quarterly_yq[list_element_dict["asOfDate"]]['Interest Expense']                       = list_element_dict["InterestExpense"]
-                        financials_quarterly_yq[list_element_dict["asOfDate"]]['Income Tax Expense']                     = list_element_dict["TaxProvision"]
-                        financials_quarterly_yq[list_element_dict["asOfDate"]]['Net Income From Continuing Ops']         = list_element_dict["NetIncomeContinuousOperations"]
-                        financials_quarterly_yq[list_element_dict["asOfDate"]]['Net Income Applicable To Common Shares'] = list_element_dict["NetIncomeCommonStockholders"]
+                        if "PretaxIncome" in list_element_dict:
+                            financials_quarterly_yq[list_element_dict["asOfDate"]] = {}
+                        if "NetIncome" in list_element_dict:
+                            financials_quarterly_yq[list_element_dict["asOfDate"]]['Income Before Tax']                      = list_element_dict["PretaxIncome"]
+                        if "TotalRevenue" in list_element_dict:
+                            financials_quarterly_yq[list_element_dict["asOfDate"]]['Net Income']                             = list_element_dict["NetIncome"]
+                        if "CostOfRevenue" in list_element_dict:
+                            financials_quarterly_yq[list_element_dict["asOfDate"]]['Total Revenue']                          = list_element_dict["TotalRevenue"]
+                        if "CostOfRevenue" in list_element_dict:
+                            financials_quarterly_yq[list_element_dict["asOfDate"]]['Cost Of Revenue']                        = list_element_dict["CostOfRevenue"]
+                        if "GrossProfit" in list_element_dict:
+                            financials_quarterly_yq[list_element_dict["asOfDate"]]['Gross Profit']                           = list_element_dict["GrossProfit"]
+                        if "OperatingExpense" in list_element_dict:
+                            financials_quarterly_yq[list_element_dict["asOfDate"]]['Total Operating Expenses']               = list_element_dict["OperatingExpense"]
+                        if "OperatingIncome" in list_element_dict:
+                            financials_quarterly_yq[list_element_dict["asOfDate"]]['Operating Income']                       = list_element_dict["OperatingIncome"]
+                        if "NetNonOperatingInterestIncomeExpense" in list_element_dict:
+                            financials_quarterly_yq[list_element_dict["asOfDate"]]['Total Other Income Expense Net']         = list_element_dict["NetNonOperatingInterestIncomeExpense"]
+                        if "EBIT" in list_element_dict:
+                            financials_quarterly_yq[list_element_dict["asOfDate"]]['Ebit']                                   = list_element_dict["EBIT"]
+                        if "InterestExpense" in list_element_dict:
+                            financials_quarterly_yq[list_element_dict["asOfDate"]]['Interest Expense']                       = list_element_dict["InterestExpense"]
+                        if "TaxProvision" in list_element_dict:
+                            financials_quarterly_yq[list_element_dict["asOfDate"]]['Income Tax Expense']                     = list_element_dict["TaxProvision"]
+                        if "NetIncomeContinuousOperations" in list_element_dict:
+                            financials_quarterly_yq[list_element_dict["asOfDate"]]['Net Income From Continuing Ops']         = list_element_dict["NetIncomeContinuousOperations"]
+                        if "NetIncomeCommonStockholders" in list_element_dict:
+                            financials_quarterly_yq[list_element_dict["asOfDate"]]['Net Income Applicable To Common Shares'] = list_element_dict["NetIncomeCommonStockholders"]
 
                 if assetProfile:
                     stock_data.sector = assetProfile['sector']
