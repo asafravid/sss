@@ -177,6 +177,6 @@ def csv_to_pdf(csv_filename, output_path, data_time_str, title, limit_num_rows, 
     output_filename = output_path+'/'+data_time_str+title.replace('detagergga','aggregated')+("_n" if "normalized" in db_filename else "")+'.pdf'
     os.remove(csv_filename+"_fig.png")
 
-    if output: pdf.output(output_filename, 'F')
+    if output: pdf.output(output_filename)  # fpdf2 >=2.x dropped the positional dest arg ('F')
     return pdf
 
