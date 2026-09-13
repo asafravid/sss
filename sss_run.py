@@ -441,7 +441,16 @@ def research_db(sectors_list, sectors_filter_out, countries_list, countries_filt
     result_sorted_appearance_counter_dict_sss   = {k: v for k, v in sorted_appearance_counter_dict_sss.items()    if v > 0.0}
 
     result_list_filename_sss              = csv_db_path+'/results_{}'.format(    db_filename.replace('_engine',''))
-    result_list_filename_sss_ref_to_read  = older_path +'/results_{}'.format(    db_filename.replace('_engine',''))
+    # older_path is None when no reference run is configured. Lines further down
+    # already guard on `if older_path is not None`, so None was always meant to be
+    # supported here -- these three dereferences simply missed the guard, and they
+    # made the scan crash with
+    #     TypeError: unsupported operand type(s) for +: 'NoneType' and 'str'
+    # AFTER the whole grid had already been computed. That matters because the
+    # engine wants reference_run=None (a stale reference triggers the 90/10
+    # compensation blend in sss.py) while the scan wanted a path -- so the two
+    # phases could not use the same config.
+    result_list_filename_sss_ref_to_read  = (older_path +'/results_{}'.format(    db_filename.replace('_engine',''))) if older_path is not None else None
     result_list_filename_sss_ref_to_write = csv_db_path+'/results_ref_{}'.format(db_filename.replace('_engine',''))
 
     # Read the MA rising lists:
@@ -449,7 +458,7 @@ def research_db(sectors_list, sectors_filter_out, countries_list, countries_filt
     ref_rising_list_symbols = []
 
     new_rising_list_filename = csv_db_path + '/rising/rising_list.csv'
-    ref_rising_list_filename = older_path  + '/rising/rising_list.csv'
+    ref_rising_list_filename = (older_path + '/rising/rising_list.csv') if older_path is not None else None
 
     # rising/rising_list.csv is an optional artifact -- only 45 of the 144 committed
     # snapshots have one, and it is used solely to tag a row with 'r+' in the output.
@@ -466,7 +475,7 @@ def research_db(sectors_list, sectors_filter_out, countries_list, countries_filt
     else:
         print('[rising] no {} -- continuing without rising-list tags'.format(new_rising_list_filename))
 
-    if os.path.exists(ref_rising_list_filename):
+    if ref_rising_list_filename is not None and os.path.exists(ref_rising_list_filename):
         with open(ref_rising_list_filename, mode='r', newline='') as engine:
             reader = csv.reader(engine, delimiter=',')
             row_index = 0
@@ -486,13 +495,16 @@ def research_db(sectors_list, sectors_filter_out, countries_list, countries_filt
 
     # Read the reference results file without the Diff column
     ref_rows_no_diff = []
-    with open(result_list_filename_sss_ref_to_read, mode='r', newline='') as engine:
-        reader = csv.reader(engine, delimiter=',')
-        row_index = 0
-        for row in reader:
-            ref_rows_no_diff.append(row)
-            if row_index >= res_length: break
-            row_index += 1
+    if result_list_filename_sss_ref_to_read is not None and os.path.exists(result_list_filename_sss_ref_to_read):
+        with open(result_list_filename_sss_ref_to_read, mode='r', newline='') as engine:
+            reader = csv.reader(engine, delimiter=',')
+            row_index = 0
+            for row in reader:
+                ref_rows_no_diff.append(row)
+                if row_index >= res_length: break
+                row_index += 1
+    else:
+        print('[ref] no reference results to compare against -- writing an empty results_ref file')
 
     # Create the removed results file without yet adding the Diff column
     with open(result_list_filename_sss_ref_to_write, 'w') as f:
@@ -546,15 +558,18 @@ def aggregate_results(newer_path, older_path, res_length, scan_mode):
             f.write("{},{},{},{},{},{},{}\n".format(row[0], row[1], row[2], row[3], row[4], row[5], round(row[6],4)))
 
     # Read reference aggregated_results less the diff column:
-    result_list_filename_sss_ref = older_path + '/results_sss_aggregated.csv'
+    result_list_filename_sss_ref = (older_path + '/results_sss_aggregated.csv') if older_path is not None else None
     ref_rows_no_diff = []
-    with open(result_list_filename_sss_ref, mode='r', newline='') as engine:
-        reader = csv.reader(engine, delimiter=',')
-        row_index = 0
-        for row in reader:
-            ref_rows_no_diff.append(row)
-            if row_index >= res_length: break
-            row_index += 1
+    if result_list_filename_sss_ref is not None and os.path.exists(result_list_filename_sss_ref):
+        with open(result_list_filename_sss_ref, mode='r', newline='') as engine:
+            reader = csv.reader(engine, delimiter=',')
+            row_index = 0
+            for row in reader:
+                ref_rows_no_diff.append(row)
+                if row_index >= res_length: break
+                row_index += 1
+    else:
+        print('[ref] no reference aggregated results -- writing an empty results_ref_sss_aggregated file')
 
     # Create the removed results file without yet adding the Diff column
     result_list_filename_sss_ref_to_write = newer_path + '/results_ref_sss_aggregated.csv'

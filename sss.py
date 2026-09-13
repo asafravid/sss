@@ -988,6 +988,14 @@ def sss_core_equation_value_set(stock_data):
 
 
 _TASE_RATIO_CORRECTED = str(getattr(sss_config, 'tase_ratio_scaling', 'upstream')).lower() == 'corrected'
+# Minimum revenue a reporting period must show to take part in the profit-margin
+# average. 0 reproduces upstream (zero-revenue periods are kept and divided by the
+# 0.001 guard, yielding ratios of ~1e12). See sss_config.profit_margin_skip_zero_revenue.
+_PM_MIN_REVENUE = MIN_REVENUE_FOR_0_REVENUE_DIV_BY_0_AVOIDANCE \
+    if getattr(sss_config, 'profit_margin_skip_zero_revenue', True) else 0
+# True -> the research screen tests debt_to_equity_effective_used (what the core
+# equation actually consumes) instead of the raw, possibly-negative column.
+_DE_SCREEN_USES_USED = str(getattr(sss_config, 'debt_to_equity_screen_column', 'used')).lower() == 'used'
 _SUBRANK_SQRT = str(getattr(sss_config, 'subrank_formula', 'linear')).lower() == 'sqrt'
 
 
@@ -1707,7 +1715,11 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
         elif stock_data.pe_effective                     <= 0                     or stock_data.pe_effective              >  price_to_earnings_limit:                 return_value = False
         elif stock_data.effective_profit_margin          <  profit_margin_limit:                                                                                      return_value = False
         elif stock_data.ev_to_cfo_ratio_effective        >  ev_to_cfo_ratio_limit or stock_data.ev_to_cfo_ratio_effective <= 0:                                       return_value = False
-        elif stock_data.debt_to_equity_effective         >  debt_to_equity_limit  or stock_data.debt_to_equity_effective  <= 0:                                       return_value = False
+        # see sss_config.debt_to_equity_screen_column: the raw column is negative for
+        # companies with negative book equity, and screening it rejected 32 of 481 NS
+        # names that the core equation scores perfectly well via `_used`.
+        elif (stock_data.debt_to_equity_effective_used if _DE_SCREEN_USES_USED else stock_data.debt_to_equity_effective) >  debt_to_equity_limit  or \
+             (stock_data.debt_to_equity_effective_used if _DE_SCREEN_USES_USED else stock_data.debt_to_equity_effective) <= 0:                                       return_value = False
         elif stock_data.eqg_factor_effective             <  eqg_min:                                                                                                  return_value = False
         elif stock_data.rqg_factor_effective             <  rqg_min:                                                                                                  return_value = False
 
@@ -2057,6 +2069,22 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
 
                 if assetProfile:
                     stock_data.sector = assetProfile['sector']
+                    # CACHE-LOSS BUG (fixed 2026-09-13): sector was written only to
+                    # stock_data, never into `info` -- and `info` is what gets serialised
+                    # into db.json (json_db[sym]["info"] = info). On replay from a cached
+                    # db.json, process_info reads info['sector'] (see the non-yq branch
+                    # below), finds nothing, and every symbol comes back with sector=None.
+                    #
+                    # Measured: 0 of 518 cached NS records carried a sector. Because the
+                    # NS run uses favor_sectors=['Technology','Financial Services'] with
+                    # favor_sectors_by=[3.5, 1.0], a replayed run silently loses the 3.5x
+                    # Technology weighting -- CRM and ORCL dropped out of the top 20 and
+                    # insurers moved up, for reasons that had nothing to do with the data.
+                    #
+                    # Storing it in `info` makes db.json round-trip, which is what makes a
+                    # re-process a genuine substitute for a ~5,200-request refetch.
+                    if isinstance(info, dict):
+                        info['sector'] = stock_data.sector
 
                 if defaultKeyStatistics:
                     if 'enterpriseValue'         in defaultKeyStatistics: info['enterpriseValue']         = defaultKeyStatistics['enterpriseValue']
@@ -2305,7 +2333,7 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                 boost_neg_earnings        = False
                 try:
                     for key in earnings_yearly['Revenue']:
-                        if float(earnings_yearly['Revenue'][key]) >= 0:
+                        if float(earnings_yearly['Revenue'][key]) >= _PM_MIN_REVENUE:
                             earnings = float(          earnings_yearly['Earnings'][key])
                             revenue  = float(max(MIN_REVENUE_FOR_0_REVENUE_DIV_BY_0_AVOIDANCE,earnings_yearly['Revenue' ][key]))
                             earnings_to_revenues_list.append((earnings/revenue)*wsel(PROFIT_MARGIN_YEARLY_WEIGHTS, weight_index))
@@ -2376,7 +2404,7 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                 boost_neg_earnings        = False
                 try:
                     for key in earnings_quarterly['Revenue']:
-                        if float(earnings_quarterly['Revenue'][key]) >= 0:
+                        if float(earnings_quarterly['Revenue'][key]) >= _PM_MIN_REVENUE:
                             earnings = float(          earnings_quarterly['Earnings'][key])
                             revenue  = float(max(MIN_REVENUE_FOR_0_REVENUE_DIV_BY_0_AVOIDANCE,earnings_quarterly['Revenue' ][key]))
 
@@ -2716,8 +2744,23 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
                 if not _TASE_RATIO_CORRECTED:
                     stock_data.trailing_price_to_earnings /= 100.0  # In TLV stocks, yfinance multiplies trailingPE by a factor of 100, so compensate
                     # sss_config.tase_ratio_scaling='corrected' skips this: measured Sept 2026, Yahoo's trailingPE for TASE is already correct in ILS.
-                if stock_data.symbol in g_symbols_tase_duals:  # TODO: ASAFR: Do research and add this condition to all relevant cases in other fundamental parameters
-                    stock_data.trailing_price_to_earnings *= stock_data.summary_currency_conversion_rate_mult_to_usd # Additionally, in TLV DUAL stocks this ratio is mistakenly calculated using PriceInNis/EarningsInUSD -> so Compensate
+                    # STALE COMPENSATION (2026-09-13): the dual-listing multiplication below is
+                    # the FIFTH of the 2021 TASE compensations, and like three of the other four
+                    # it has rotted. Measured on the 2026-09-13 refetch, NICE (a listed dual):
+                    #     previous_close 30060.0 agorot = 300.60 ILS,  trailing_eps 20.74 ILS
+                    #     300.60 / 20.74            = 14.49   <- the true P/E
+                    #     stored trailingPE          =  4.7594
+                    #     4.7594 / 0.328376 (ILS->USD) = 14.49  <- exactly the true value
+                    # i.e. Yahoo's trailingPE for TASE duals is ALREADY correct, and multiplying
+                    # by the USD rate makes it ~3x too cheap. Across the snapshot the 29 duals
+                    # showed a median P/E of 6.74 against 12.44 for the 271 non-duals (ratio
+                    # 0.542); dividing the compensation out gives 20.52, which is plausible for
+                    # TLV-listed tech. It put NICE at #18 in the TASE top 20 on a P/E of 1.59.
+                    # Now gated with the other corrections. price_to_book is deliberately NOT
+                    # changed: its /100 is still genuinely required, so its dual term may still
+                    # be required too, and there is no measurement either way yet.
+                    if stock_data.symbol in g_symbols_tase_duals:  # TODO: ASAFR: Do research and add this condition to all relevant cases in other fundamental parameters
+                        stock_data.trailing_price_to_earnings *= stock_data.summary_currency_conversion_rate_mult_to_usd # Additionally, in TLV DUAL stocks this ratio is mistakenly calculated using PriceInNis/EarningsInUSD -> so Compensate
         elif stock_data.effective_earnings != None and stock_data.effective_earnings != 0 and stock_data.market_cap != None:
             stock_data.trailing_price_to_earnings = float(stock_data.market_cap)       / float(stock_data.effective_earnings) # Calculate manually.
         elif stock_data.effective_net_income != None and stock_data.effective_net_income != 0 and stock_data.enterprise_value != None:
@@ -2730,8 +2773,10 @@ def process_info(yq_mode, json_db, symbol, stock_data, tase_mode, sectors_list, 
             if tase_mode and stock_data.forward_price_to_earnings != None:
                 if not _TASE_RATIO_CORRECTED:
                     stock_data.forward_price_to_earnings /= 100.0 # In TLV stocks, yfinance multiplies forwardPE by a factor of 100, so compensate
-                if stock_data.symbol in g_symbols_tase_duals:  # TODO: ASAFR: Do research and add this condition to all relevant cases in other fundamental parameters
-                    stock_data.forward_price_to_earnings *= stock_data.summary_currency_conversion_rate_mult_to_usd # Additionally, in DUAL TLV stocks this ratio is mistakenly calculated using PriceInNis/EarningsInUSD -> so Compensate
+                    # same stale dual-listing compensation as trailingPE above -- same field
+                    # family, same units, so gated together.
+                    if stock_data.symbol in g_symbols_tase_duals:  # TODO: ASAFR: Do research and add this condition to all relevant cases in other fundamental parameters
+                        stock_data.forward_price_to_earnings *= stock_data.summary_currency_conversion_rate_mult_to_usd # Additionally, in DUAL TLV stocks this ratio is mistakenly calculated using PriceInNis/EarningsInUSD -> so Compensate
         else:  stock_data.forward_price_to_earnings  = None # Mark as None, so as to try and calculate manually. TODO: ASAFR: Calcualte using the forward_eps?
 
         if   stock_data.trailing_price_to_earnings is None and stock_data.forward_price_to_earnings  is None: stock_data.effective_price_to_earnings = None

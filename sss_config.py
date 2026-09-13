@@ -29,9 +29,9 @@ ALL_COUNTRY_SYMBOLS_ST  = 3  # Swedish (Stockholm) Stock Exchange
 
 run_custom_tase           = False  # Custom Portfolio
 run_custom                = False
-run_tase                  = False  # Tel Aviv Stock Exchange
-run_nsr                   = True   # NASDAQ100+S&P500+RUSSEL1000
-run_all                   = False   # All Nasdaq Stocks
+run_tase             = True
+run_nsr              = False
+run_all              = False
 run_six                   = False  # All Swiss Stocks
 run_st                    = False  # All (Stockholm) Swedish Stocks
 multi_dim_scan_mode       = True   # research mode
@@ -53,15 +53,15 @@ automatic_results_folder_selection = False
 # After 1st ever Run: Recommended to use reference (filter and damper)
 # The research mode shall run on new_run as input (new_run >= reference_run) where > means newer
 reference_run_custom = 'Results/All/20220419-020633_A_nRes112_Custom_CustSssV'
-reference_run_tase   = 'Results/Tase/20230607-221131_Tase_Tchnlgy3.0_RlEstt1.0_nRes298'
-reference_run_nsr    = 'Results/Nsr/20230606-224929_Tchnlgy3.0_FnnclSrvcs1.0_nRes826'
+reference_run_tase   = 'Results/Tase/20260913-150325_Tase_Tchnlgy3.0_RlEstt1.0_nRes300'
+reference_run_nsr    = 'Results/Nsr/20260913-123506_Tchnlgy3.0_FnnclSrvcs1.0_nRes476'
 reference_run_all    = 'Results/All/20221208-004305_Tchnlgy3.0_FnnclSrvcs1.0_A_nRes2543'
 reference_run_six    = 'Results/Six/20220111-002719_S_nRes196'                                        # '20211216-002301_S_nRes27_CustSssV'
 reference_run_st     = 'Results/St/20210915-023602_St_Bdb_nRes130'
 
 new_run_custom       = 'Results/Custom/20210917-201728_Bdb_nRes312_Custom'
-new_run_tase         = 'Results/Tase/20260913-100629_Tase_Tchnlgy3.0_RlEstt1.0_nRes302'
-new_run_nsr          = 'Results/Nsr/20260913-123506_Tchnlgy3.0_FnnclSrvcs1.0_nRes476'
+new_run_tase         = 'Results/Tase/20260913-150938_Tase_Tchnlgy3.0_RlEstt1.0_nRes300'
+new_run_nsr          = 'Results/Nsr/20260913-131610_Tchnlgy3.0_FnnclSrvcs1.0_nRes481'
 new_run_all          = 'Results/All/20230620-045317_Tchnlgy3.0_FnnclSrvcs1.0_A_nRes2786' #
 new_run_six          = 'Results/Six/20220111-002719_S_nRes196'                                        # '20211216-002301_S_nRes27_CustSssV'
 new_run_st           = 'Results/St/20210915-023602_St_Bdb_nRes130'
@@ -189,14 +189,93 @@ nsr_include_russell1000 = False
 # --- multi-dim scan breadth (added 2026-09-13) --------------------------------
 # get_range() builds each axis range from percentiles, then pops the loosest rung
 # ("the 1st percentile and the 1st element usually give the same result").
-# For the NSR/All markets several axes are called with num_sections=2, so the
-# range is [min, p50] and popping leaves ONE value -- the median. Every screen
-# then demands top-half enterprise_value AND top-half held_percent_insiders
-# simultaneously, which is why the loosest screen on the 2026-09-13 NS run
-# returned 39 of 476 and the scan graded exactly those 39. That is the intended
-# shortlist behaviour, not a bug -- but it is unfalsifiable as a ranking, because
-# 92% of the universe never receives a Grade at all.
-#   None -> upstream per-market values (0/1/2 depending on market). DEFAULT.
+# Upstream pops a different number of rungs per market, and they disagree:
+#
+#     TASE : pop=0   -> graded 302/302 (100%) on the 2026-09-13 run
+#     NS   : pop=1   -> graded  39/476 (8.2%)
+#     ALL  : pop=2   -> (untested, would be worse still)
+#
+# For NS, held_percent_insiders and enterprise_value are both built with
+# num_sections=2, so the range is [min, p50] and popping the loosest rung leaves
+# ONE value -- the median. Every screen then demands top-half enterprise_value AND
+# top-half held_percent_insiders simultaneously. Measured on the 2026-09-13 NS
+# snapshot the loosest screen returned 39 of 476, and since screens are nested
+# that is the ceiling: the scan graded exactly those 39.
+#
+# That is defensible as a shortlist, but it makes Grade unfalsifiable as a ranking
+# -- 92% of the universe never receives one, so there is nothing to score rank
+# quality against. It is also inconsistent with TASE, which already behaves as if
+# this knob were 0.
+#
 #   0    -> keep the loosest rung on every axis, so the first screen admits the
-#           whole universe and every symbol accumulates a Grade.
-scan_pop_1st_percentiles = None
+#           whole universe and every symbol accumulates a Grade. DEFAULT as of
+#           2026-09-13. No-op for TASE (already 0). NS: 39 -> 444 of 476.
+#   None -> upstream per-market values (TASE 0 / NS 1 / ALL 2). Set this to
+#           reproduce pre-2026-09-13 output exactly, or to A/B the change.
+#
+# Costs and caveats of the 0 default:
+#   * Grade is a SUM of sub-ranks over surviving screens, so admitting more
+#     screens rescales it. NS PDD went 18.13 -> 196.14. Grades are therefore only
+#     comparable across runs that used the SAME value of this knob -- record it
+#     alongside any stored run.
+#   * Screens executed grow: NS 189 -> 5,137 (10s -> ~2min). The ALL grid goes
+#     18,375 -> 138,915 combinations over 8,264 rows instead of 476. This is pure
+#     local CSV work -- no Yahoo requests, so no rate-limit exposure -- but budget
+#     hours, not minutes, for the ALL scan.
+#   * It does NOT fix the other coverage gap: 32 of 476 NS symbols are still
+#     ungraded because process_info() rejects debt_to_equity_effective <= 0, i.e.
+#     every company with negative book equity from buybacks (MCD, MO, PM, ABBV,
+#     BKNG, LOW, SBUX, HPQ, DELL, AZO, ORLY, YUM, HCA, TDG, ...). That is a
+#     separate, unresolved modelling decision -- see STATUS.md 12.4.
+scan_pop_1st_percentiles = 0
+
+# --- zero-revenue years in the profit-margin average (added 2026-09-13) --------
+# sss.py computes the weighted profit margin as earnings/revenue per reporting
+# period, guarding division by zero with
+#     revenue = max(MIN_REVENUE_FOR_0_REVENUE_DIV_BY_0_AVOIDANCE, revenue)   # 0.001
+# Yahoo returns revenue == 0.00 with non-zero earnings for some periods, e.g. on
+# the 2026-09-13 NS snapshot:
+#     VMRK 2025  revenue 0.00  earnings 1,051,301,000  -> ratio 1.051e+12
+#     SOLV 2023  revenue 0.00  earnings 1,346,000,000  -> ratio 1.346e+12
+#     TPL  2024  revenue 0.00  earnings   453,960,000  -> ratio 4.540e+11
+# The guard therefore converts "revenue unknown" into "infinite margin" -- the
+# most attractive possible value on a higher-is-better axis. 13 of 476 NS rows
+# carried effective_profit_margin > 100 (i.e. >10,000%) because of this, and
+# effective_profit_margin is both a core-equation factor and one of the six scan
+# axes.
+#
+#   True  -> skip any period whose revenue is not above the guard, so the margin
+#            is averaged over the periods where revenue is actually known.
+#            DEFAULT as of 2026-09-13.
+#   False -> upstream behaviour (substitute 0.001 and keep the period).
+#
+# The skip is implemented by raising the loop's entry condition, NOT by
+# `continue` -- `weight_index += 1` lives outside the `if`, so a `continue` would
+# desynchronise the recency weights.
+profit_margin_skip_zero_revenue = True
+
+# --- which debt/equity column the research screen tests (added 2026-09-13) -----
+# sss.py computes TWO debt/equity values:
+#   debt_to_equity_effective        raw; NEGATIVE when book equity is negative
+#   debt_to_equity_effective_used   the modelled value, always positive:
+#       raw <  0 -> 1.0 - raw*NEGATIVE_DEBT_TO_EQUITY_FACTOR   (negative equity is
+#                                                               re-expressed as very
+#                                                               high leverage)
+#       raw >= 0 -> DEBT_TO_EQUITY_MIN_BASE + sqrt(raw)
+# The core equation consumes `_used` (it is in the core-equation index list, and
+# sss_value requires `_used > 0`). The skip_reason logic also tests `_used`.
+#
+# But process_info()'s research-mode screen tested the RAW column and rejected
+# `raw <= 0`, which threw out every company with negative book equity from
+# buybacks -- 32 of 481 on the 2026-09-13 NS snapshot: ABBV, AZO, BKNG, CLX, DELL,
+# DPZ, HCA, HLT, HPQ, LOW, MAR, MCD, MCK, MO, MSCI, MTD, ORLY, OTIS, PM, SBAC,
+# SBUX, STX, TDG, WYNN, YUM and others. Their `_used` values are 43.1 .. 4.08e4,
+# i.e. perfectly usable, and the equation was happy to score them -- only the
+# screen refused to let them in. That is an internal inconsistency, not a
+# modelling decision: the decision about negative equity was already taken at
+# sss.py:2263 with an investopedia citation, and the screen contradicted it.
+#
+#   'used'     -> screen on debt_to_equity_effective_used, consistent with the
+#                 core equation. DEFAULT as of 2026-09-13.
+#   'upstream' -> screen on the raw column (rejects negative book equity).
+debt_to_equity_screen_column = 'used'
