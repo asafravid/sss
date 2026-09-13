@@ -139,6 +139,10 @@ def retrieve_path_settings(automatic_results_folder_selection_flag, research_mod
 #
 # In order to give a chance to all stocks fairly, always take the 1st element in the sorted list
 def get_range(csv_db_path, db_filename, column_name, num_sections, reverse, pop_1st_percentiles_range=1):
+    # sss_config.scan_pop_1st_percentiles overrides the per-market popping so the
+    # scan's breadth is A/B-testable. None keeps upstream behaviour exactly.
+    if getattr(sss_config, 'scan_pop_1st_percentiles', None) is not None:
+        pop_1st_percentiles_range = sss_config.scan_pop_1st_percentiles
     csv_db_filename = csv_db_path+'/'+db_filename
     num_title_rows = 1 if "normalized" in db_filename else 2
     with open(csv_db_filename, mode='r', newline='') as engine:
