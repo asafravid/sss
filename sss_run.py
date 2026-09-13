@@ -32,7 +32,18 @@ import sss_config # This is the configuration file for the run modes
 import sss_diff
 import cProfile
 
-DB_FILENAMES = ['sss_engine.csv', 'sss_engine_normalized.csv']  # 'db.csv' -> but faster with 9so hence use) sss_engine.csv
+# Which score(s) the multi-dimensional scan ranks on. Upstream ran the entire grid
+# twice, once per entry, producing two result sets that are never reconciled -- on the
+# Jan-2024 TASE run they correlate at Spearman 0.516. Selecting one via
+# sss_config.ranking_score also halves scan time ('All' is 42875 screens per entry).
+_RANKING_SCORE_TO_DB_FILENAME = {'sss_value': 'sss_engine.csv', 'sss_value_normalized': 'sss_engine_normalized.csv'}
+_ranking_score = getattr(sss_config, 'ranking_score', None)
+if _ranking_score in (None, 'both'):
+    DB_FILENAMES = ['sss_engine.csv', 'sss_engine_normalized.csv']  # upstream behaviour
+elif _ranking_score in _RANKING_SCORE_TO_DB_FILENAME:
+    DB_FILENAMES = [_RANKING_SCORE_TO_DB_FILENAME[_ranking_score]]
+else:
+    raise ValueError("sss_config.ranking_score must be 'sss_value', 'sss_value_normalized' or 'both', got {!r}".format(_ranking_score))
 
 # TODO: ASAFR: 1. read_csv in pandas, and then .describe() and .quantiles() will provide mean, std and percentiles for all the columns (sss_engine.csv and/or db.csv)
 #              2. Calculate the angle (dericative) of the Profit margin change over years and quarters and apply a bonus relative to the slope
@@ -436,21 +447,31 @@ def research_db(sectors_list, sectors_filter_out, countries_list, countries_filt
     new_rising_list_filename = csv_db_path + '/rising/rising_list.csv'
     ref_rising_list_filename = older_path  + '/rising/rising_list.csv'
 
-    with open(new_rising_list_filename, mode='r', newline='') as engine:
-        reader = csv.reader(engine, delimiter=',')
-        row_index = 0
-        for row in reader:
-            row_index += 1
-            if row_index <= 1: continue
-            new_rising_list_symbols.append(row[0])
+    # rising/rising_list.csv is an optional artifact -- only 45 of the 144 committed
+    # snapshots have one, and it is used solely to tag a row with 'r+' in the output.
+    # Opening it unconditionally made every older snapshot unscannable with a bare
+    # FileNotFoundError, so it is now skipped when absent.
+    if os.path.exists(new_rising_list_filename):
+        with open(new_rising_list_filename, mode='r', newline='') as engine:
+            reader = csv.reader(engine, delimiter=',')
+            row_index = 0
+            for row in reader:
+                row_index += 1
+                if row_index <= 1: continue
+                new_rising_list_symbols.append(row[0])
+    else:
+        print('[rising] no {} -- continuing without rising-list tags'.format(new_rising_list_filename))
 
-    with open(ref_rising_list_filename, mode='r', newline='') as engine:
-        reader = csv.reader(engine, delimiter=',')
-        row_index = 0
-        for row in reader:
-            row_index += 1
-            if row_index <= 1: continue
-            ref_rising_list_symbols.append(row[0])
+    if os.path.exists(ref_rising_list_filename):
+        with open(ref_rising_list_filename, mode='r', newline='') as engine:
+            reader = csv.reader(engine, delimiter=',')
+            row_index = 0
+            for row in reader:
+                row_index += 1
+                if row_index <= 1: continue
+                ref_rising_list_symbols.append(row[0])
+    else:
+        print('[rising] no {} -- continuing without reference rising-list tags'.format(ref_rising_list_filename))
 
     # Create the new results file without yet adding the Diff column
     with open(result_list_filename_sss, 'w') as f:
