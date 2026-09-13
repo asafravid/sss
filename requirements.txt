@@ -1,0 +1,32 @@
+# sss — verified working set (resolved and import-tested 2026-09-12)
+#
+# IMPORTANT: the repo README tells you to `pip install fpdf` and `pip install pyPdf`.
+# Do NOT do that. Both are dead packages:
+#   - `fpdf` (pyfpdf) unmaintained since 2017; `fpdf2` is the maintained fork and is
+#     API-compatible with the `from fpdf import FPDF, HTMLMixin` import sss uses.
+#     Installing both puts two different packages in the same `fpdf` namespace.
+#   - `pyPdf` is Python-2 only and is not imported anywhere in the codebase.
+# The README list is otherwise fine.
+
+yfinance==1.7.0
+yahooquery==2.4.1
+fpdf2==2.8.8
+pandas==3.0.2
+numpy==2.4.4
+matplotlib==3.10.8
+requests==2.33.1
+beautifulsoup4==4.14.3
+psutil==7.2.2
+python-dateutil
+certifi
+urllib3
+CurrencyConverter==0.18.21
+
+# Optional forex fallbacks. sss.py imports forex_python at module scope, so it must
+# be installed even though its upstream rate API has been unreliable for years.
+# sss has internal fallback tables; CurrencyConverter above is the primary path.
+forex-python
+
+# pandas implements .corr(method="spearman") by importing scipy.stats.spearmanr,
+# so sss_backtest.py fails with ModuleNotFoundError without this.
+scipy
