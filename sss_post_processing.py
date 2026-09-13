@@ -44,23 +44,30 @@ def process_engine_csv(path) -> object:
     # max_denominator_values_to_calculate = data[denominator_parameters_list_to_calculate].max()
 
 
+    # FIX (was a bug): the normalized score used to be *seeded* by the first entry of
+    # numerator_parameters_list via the `else` branch below, with no membership check
+    # against ..._to_calculate. With custom_sss_value_equation = True the custom model is
+    # evr * pe * p_to_s / profit_margin, yet the score was still seeded with
+    # eff_dist_from_low_factor, which is not part of that model at all. Seeding the column
+    # explicitly at 0.0 removes the special case and makes both loops symmetric.
+    new_column_index = data.columns.get_loc(SSS_VALUE_COLUMN_NAME)
+    data.insert(new_column_index + 1, SSS_VALUE_NORMALIZED_COLUMN_NAME, 0.0)
+
+    normalized_columns = {}
     for parameter in numerator_parameters_list:
-        new_column       = data[parameter] / max_numerator_values[parameter]
-        new_column_index = data.columns.get_loc(parameter)
-        data.insert(new_column_index+1, parameter+"_normalized",new_column)
-        if SSS_VALUE_NORMALIZED_COLUMN_NAME in data:
-            if parameter in numerator_parameters_list_to_calculate:  # and parameter != "effective_peg_ratio":
-                data[SSS_VALUE_NORMALIZED_COLUMN_NAME] = data[SSS_VALUE_NORMALIZED_COLUMN_NAME] + data[parameter+"_normalized"]
-        else:
-            new_column_index = data.columns.get_loc(SSS_VALUE_COLUMN_NAME)
-            data.insert(new_column_index + 1, SSS_VALUE_NORMALIZED_COLUMN_NAME, new_column)
+        normalized_columns[parameter] = data[parameter] / max_numerator_values[parameter]
+        if parameter in numerator_parameters_list_to_calculate:
+            data[SSS_VALUE_NORMALIZED_COLUMN_NAME] = data[SSS_VALUE_NORMALIZED_COLUMN_NAME] + normalized_columns[parameter]
 
     for parameter in denominator_parameters_list:
-        new_column       = data[parameter] / max_denominator_values[parameter]
-        new_column_index = data.columns.get_loc(parameter)
-        data.insert(new_column_index+1, parameter+"_normalized",new_column)
+        normalized_columns[parameter] = data[parameter] / max_denominator_values[parameter]
         if parameter in denominator_parameters_list_to_calculate:
-            data[SSS_VALUE_NORMALIZED_COLUMN_NAME]     = data[SSS_VALUE_NORMALIZED_COLUMN_NAME] - data[parameter+"_normalized"]
+            data[SSS_VALUE_NORMALIZED_COLUMN_NAME] = data[SSS_VALUE_NORMALIZED_COLUMN_NAME] - normalized_columns[parameter]
+
+    # Insert all the *_normalized columns in one pass. Inserting them one at a time
+    # triggered pandas' "DataFrame is highly fragmented" PerformanceWarning 17 times per run.
+    for parameter in numerator_parameters_list + denominator_parameters_list:
+        data.insert(data.columns.get_loc(parameter) + 1, parameter + "_normalized", normalized_columns[parameter])
 
     sorted_Data = data.sort_values(by=[SSS_VALUE_NORMALIZED_COLUMN_NAME])
     sorted_Data.to_csv(filename_path+"_normalized.csv", index = False)
