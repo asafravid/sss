@@ -1,102 +1,103 @@
 Symbol,Name
-AAPL,Apple Inc
-ABNB,Airbnb Inc Cl A
-ADBE,Adobe Systems Inc
-ADI,Analog Devices
-ADP,Automatic Data Procs
-ADSK,Autodesk Inc
-AEP,American Electric Power Company
-ALGN,Align Technology
-AMAT,Applied Materials
-AMD,Adv Micro Devices
-AMGN,Amgen Inc
-AMZN,Amazon.com Inc
-ANSS,Ansys Inc
-ASML,Asml Holdings NY Reg ADR
-ATVI,Activision Blizzard
-AVGO,Broadcom Ltd
-AZN,Astrazeneca Plc ADR
-BIIB,Biogen Inc
-BKNG,Booking Holdings Inc
-BKR,Baker Hughes Company
-CDNS,Cadence Design Sys
-CEG,Constellation Energy Corp
-CHTR,Charter Communications Inc
-CMCSA,Comcast Corp A
-COST,Costco Wholesale
-CPRT,Copart Inc
-CRWD,Crowdstrike Holdings Inc
-CSCO,Cisco Systems Inc
-CSGP,Costar Group Inc
-CSX,CSX Corp
-CTAS,Cintas Corp
-CTSH,Cognizant Tech Sol
-DDOG,Datadog Inc Cl A
-DLTR,Dollar Tree Inc
-DXCM,Dexcom Inc
-EA,Electronic Arts Inc
-EBAY,Ebay Inc
-ENPH,Enphase Energy Inc
-EXC,Exelon Corp
-FANG,Diamondback Energy
-FAST,Fastenal Company
-FISV,Fiserv Inc
-FTNT,Fortinet Inc
-GFS,Globalfoundries Inc
-GILD,Gilead Sciences Inc
-GOOG,Alphabet Cl C
-GOOGL,Alphabet Cl A
-HON,Honeywell International Inc
-IDXX,Idexx Laboratories
-ILMN,Illumina Inc
-INTC,Intel Corp
-INTU,Intuit Inc
-ISRG,Intuitive Surg Inc
-JD,Jd.com Inc ADR
-KDP,Keurig Dr Pepper Inc
-KHC,Kraft Heinz Company
-KLAC,K L A-Tencor Corp
-LCID,Lucid Group Inc
-LRCX,Lam Research Corp
-LULU,Lululemon Athletica
-MAR,Marriot Int Cl A
-MCHP,Microchip Technology
-MDLZ,Mondelez Intl Inc
-MELI,Mercadolibre Inc
-META,Meta Platforms Inc
-MNST,Monster Beverage Cp
-MRNA,Moderna Inc
-MRVL,Marvell Technology Inc
-MSFT,Microsoft Corp
-MU,Micron Technology
-NFLX,Netflix Inc
 NVDA,Nvidia Corp
-NXPI,Nxp Semiconductors
-ODFL,Old Dominion Freight Line Inc
-ORLY,O'Reilly Automotive
-PANW,Palo Alto Networks Inc
-PAYX,Paychex Inc
-PCAR,Paccar Inc
-PDD,Pdd Holdings Inc
-PEP,Pepsico Inc
-PYPL,Paypal Holdings
+AAPL,Apple Inc.
+MSFT,Microsoft Corp
+AMZN,Amazon.Com Inc
+GOOGL,Alphabet Inc. Class A Common Stock
+SPCX,Space Exploration Technologies Corp. Class A Common Stock
+GOOG,Alphabet Inc. Class C Capital Stock
+AVGO,Broadcom Inc. Common Stock
+META,Meta Platforms  Inc. Class A Common Stock
+TSLA,Tesla  Inc. Common Stock
+MU,Micron Technology  Inc.
+WMT,Walmart Inc. Common Stock
+AMD,Advanced Micro Devices
+ASML,ASML Holding NV
+INTC,Intel Corp
+CSCO,Cisco Systems  Inc. Common Stock (DE)
+PLTR,Palantir Technologies Inc. Class A Common Stock
+COST,Costco Wholesale Corp
+LRCX,Lam Research Corp
+AMAT,Applied Materials Inc
+NFLX,NetFlix Inc
+ARM,Arm Holdings plc American Depositary Shares
+PANW,Palo Alto Networks  Inc. Common Stock
+TXN,Texas Instruments Incorporated
+SNDK,Sandisk Corporation Common Stock
+KLAC,KLA Corporation Common Stock
+LIN,Linde plc Ordinary Share
+MRVL,Marvell Technology  Inc. Common Stock
+CRWD,CrowdStrike Holdings  Inc. Class A Common Stock
+AMGN,Amgen Inc
+TMUS,T-Mobile US  Inc.
 QCOM,Qualcomm Inc
-REGN,Regeneron Pharmaceuticals
-RIVN,Rivian Automotive Inc Cl A
-ROST,Ross Stores Inc
+STX,Seagate Technology Holdings PLC Ordinary Shares (Ireland)
+PEP,PepsiCo  Inc.
+ADI,Analog Devices  Inc.
+GILD,Gilead Sciences Inc
+SHOP,Shopify Inc. Class A subordinate voting shares
+WDC,Western Digital Corp.
+BKNG,Booking Holdings Inc. Common Stock
+VRTX,Vertex Pharmaceuticals Inc
+ISRG,Intuitive Surgical Inc.
+FTNT,Fortinet  Inc.
 SBUX,Starbucks Corp
-SGEN,Seagen Inc
-SIRI,Sirius XM Holdings
+PDD,PDD Holdings Inc. American Depositary Shares
+APP,Applovin Corporation Class A Common Stock
+ADP,Automatic Data Processing
+CEG,Constellation Energy Corporation Common Stock
+ABNB,Airbnb  Inc. Class A Common Stock
+ADBE,Adobe Inc.
+MELI,Mercado Libre  Inc
+CSX,CSX Corporation
+CMCSA,Comcast Corp
+DASH,DoorDash  Inc. Class A Common Stock
+MAR,Marriott International Class A Common Stock
+INTU,Intuit Inc
+MNST,Monster Beverage Corporation
+LITE,Lumentum Holdings Inc. Common Stock
+CTAS,Cintas Corp
+REGN,Regeneron Pharmaceuticals Inc
+MDLZ,Mondelez International  Inc. Class A
+CDNS,Cadence Design Systems
+DDOG,Datadog  Inc. Class A Common Stock
 SNPS,Synopsys Inc
-TEAM,Atlassian Corp
-TMUS,T-Mobile US
-TSLA,Tesla Inc
-TXN,Texas Instruments
-VRSK,Verisk Analytics Inc
-VRTX,Vertex Pharmaceutic
-WBA,Walgreens Boots Alliance
-WBD,Discovery Inc Series A
-WDAY,Workday Inc
-XEL,XCEL Energy Inc
-ZM,Zoom Video Communications Cl A
-ZS,Zscaler Inc
+ROST,Ross Stores Inc
+WBD,Warner Bros. Discovery  Inc. Series A Common Stock
+ORLY,O'Reilly Automotive  Inc.
+AEP,American Electric Power Company  Inc.
+PCAR,Paccar Inc
+HON,Honeywell International  Inc.
+NBIS,Nebius Group N.V. Class A Ordinary Shares
+MPWR,Monolithic Power Systems  Inc.
+NXPI,NXP Semiconductors N.V.
+TER,Teradyne  Inc. Common Stock
+BKR,Baker Hughes Company
+FANG,Diamondback Energy  Inc.
+FAST,Fastenal Co
+MSTR,Strategy Inc Common Stock Class A
+ALAB,Astera Labs  Inc. Common Stock
+HONA,Honeywell Aerospace Inc. Common Stock
+CRWV,CoreWeave  Inc. Class A Common Stock
+XEL,Xcel Energy  Inc.
+PYPL,PayPal Holdings  Inc. Common Stock
+CCEP,Coca-Cola Europacific Partners plc Ordinary Shares
+WDAY,Workday  Inc. Class A Common Stock
+EXC,Exelon Corporation
+ADSK,Autodesk Inc
+KDP,Keurig Dr Pepper Inc.
+TRI,Thomson Reuters Corporation Common Shares
+PAYX,Paychex Inc
+FER,Ferrovial N.V. Ordinary Shares
+MCHP,Microchip Technology Inc
+TTWO,Take-Two Interactive Software Inc
+RKLB,Rocket Lab Corporation Common Stock
+IDXX,Idexx Laboratories Inc
+AXON,Axon Enterprise  Inc. Common Stock
+ROP,Roper Technologies  Inc. Common Stock
+ODFL,Old Dominion Freight Line
+ALNY,Alnylam Pharmaceuticals  Inc.
+DXCM,DexCom  Inc.
+KHC,The Kraft Heinz Company Common Stock
+GEHC,GE HealthCare Technologies Inc. Common Stock
+CPRT,Copart Inc
