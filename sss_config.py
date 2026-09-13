@@ -34,7 +34,7 @@ run_nsr                   = True   # NASDAQ100+S&P500+RUSSEL1000
 run_all                   = False   # All Nasdaq Stocks
 run_six                   = False  # All Swiss Stocks
 run_st                    = False  # All (Stockholm) Swedish Stocks
-multi_dim_scan_mode       = False  # engine run
+multi_dim_scan_mode       = True   # research mode
 aggregate_only            = False
 research_mode_max_ev      = False
 use_reference_as_raw_data = False
@@ -61,7 +61,7 @@ reference_run_st     = 'Results/St/20210915-023602_St_Bdb_nRes130'
 
 new_run_custom       = 'Results/Custom/20210917-201728_Bdb_nRes312_Custom'
 new_run_tase         = 'Results/Tase/20260913-100629_Tase_Tchnlgy3.0_RlEstt1.0_nRes302'
-new_run_nsr          = 'Results/Nsr/20260913-112338_Tchnlgy3.0_FnnclSrvcs1.0_nRes476'
+new_run_nsr          = 'Results/Nsr/20260913-123506_Tchnlgy3.0_FnnclSrvcs1.0_nRes476'
 new_run_all          = 'Results/All/20230620-045317_Tchnlgy3.0_FnnclSrvcs1.0_A_nRes2786' #
 new_run_six          = 'Results/Six/20220111-002719_S_nRes196'                                        # '20211216-002301_S_nRes27_CustSssV'
 new_run_st           = 'Results/St/20210915-023602_St_Bdb_nRes130'
@@ -185,3 +185,18 @@ tase_ratio_scaling = 'corrected'
 # loses mid-cap coverage. Snapshots taken with this False are NOT comparable with
 # the committed Nsr history, which all included Russell 1000.
 nsr_include_russell1000 = False
+
+# --- multi-dim scan breadth (added 2026-09-13) --------------------------------
+# get_range() builds each axis range from percentiles, then pops the loosest rung
+# ("the 1st percentile and the 1st element usually give the same result").
+# For the NSR/All markets several axes are called with num_sections=2, so the
+# range is [min, p50] and popping leaves ONE value -- the median. Every screen
+# then demands top-half enterprise_value AND top-half held_percent_insiders
+# simultaneously, which is why the loosest screen on the 2026-09-13 NS run
+# returned 39 of 476 and the scan graded exactly those 39. That is the intended
+# shortlist behaviour, not a bug -- but it is unfalsifiable as a ranking, because
+# 92% of the universe never receives a Grade at all.
+#   None -> upstream per-market values (0/1/2 depending on market). DEFAULT.
+#   0    -> keep the loosest rung on every axis, so the first screen admits the
+#           whole universe and every symbol accumulates a Grade.
+scan_pop_1st_percentiles = None
